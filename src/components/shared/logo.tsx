@@ -19,7 +19,7 @@ export function Logo({
         sizes[size],
         className,
       )}
-      aria-label="Amora — home"
+      aria-label="Virelsy — home"
     >
       <svg
         viewBox="0 0 24 24"
@@ -29,7 +29,7 @@ export function Logo({
       >
         <path d="M12 21.35c-.32 0-.64-.1-.9-.3C6.6 17.7 2 13.9 2 9.3 2 6.4 4.3 4 7.2 4c1.9 0 3.6 1 4.8 2.6C13.2 5 14.9 4 16.8 4 19.7 4 22 6.4 22 9.3c0 4.6-4.6 8.4-9.1 11.75-.26.2-.58.3-.9.3Z" />
       </svg>
-      <span>Amora</span>
+      <span>Virelsy</span>
     </Link>
   );
 }

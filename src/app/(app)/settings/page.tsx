@@ -94,7 +94,7 @@ export default async function SettingsPage() {
         <SignOutButton />
 
         <p className="pb-4 text-center text-xs text-muted-foreground">
-          Amora v1.0 · <Link href="/legal/terms" className="underline underline-offset-2">Terms</Link> ·{" "}
+          Virelsy v1.0 · <Link href="/legal/terms" className="underline underline-offset-2">Terms</Link> ·{" "}
           <Link href="/legal/privacy" className="underline underline-offset-2">Privacy</Link>
         </p>
       </div>

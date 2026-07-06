@@ -39,7 +39,7 @@ export function DeleteAccountButton() {
     const res = await fetch("/api/account/delete", { method: "POST" });
     setBusy(false);
     if (!res.ok) {
-      toast.error("Couldn't process the deletion. Contact privacy@amora.app.");
+      toast.error("Couldn't process the deletion. Contact privacy@virelsy.app.");
       return;
     }
     toast.success("Account scheduled for deletion.");

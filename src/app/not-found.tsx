@@ -17,7 +17,7 @@ export default function NotFound() {
         </p>
       </div>
       <Button size="lg" className="rounded-full px-8" asChild>
-        <Link href="/">Back to Amora</Link>
+        <Link href="/">Back to Virelsy</Link>
       </Button>
     </div>
   );

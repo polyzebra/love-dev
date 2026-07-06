@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Safety Centre",
-  description: "How Amora keeps dating safe: verification, moderation, privacy controls and GDPR rights.",
+  description: "How Virelsy keeps dating safe: verification, moderation, privacy controls and GDPR rights.",
 };
 
 const PILLARS = [
@@ -44,7 +44,7 @@ const PILLARS = [
 const TIPS = [
   "Meet in public for the first few dates.",
   "Tell a friend where you're going and who you're meeting.",
-  "Keep conversations on Amora until you trust the person.",
+  "Keep conversations on Virelsy until you trust the person.",
   "Never send money or share financial details — ever.",
   "Video chat before meeting if it helps you feel safe.",
   "Trust your instincts. If something feels off, it probably is.",
@@ -62,7 +62,7 @@ export default function SafetyPage() {
             Safety Centre
           </h1>
           <p className="text-lg text-muted-foreground">
-            Feeling safe is the baseline, not a feature. Here is how Amora protects you
+            Feeling safe is the baseline, not a feature. Here is how Virelsy protects you
             before, during and after every match.
           </p>
         </div>
@@ -97,9 +97,9 @@ export default function SafetyPage() {
           <div className="mt-10 rounded-3xl bg-accent p-6">
             <h3 className="font-semibold text-accent-foreground">In immediate danger?</h3>
             <p className="mt-1 text-sm text-accent-foreground/80">
-              Call 999 (UK) or 112 (Ireland). For non-urgent support, our safety team is at{" "}
-              <a href="mailto:safety@amora.app" className="font-medium underline underline-offset-2">
-                safety@amora.app
+              Call 112 or your local emergency number. For non-urgent support, our safety team is at{" "}
+              <a href="mailto:safety@virelsy.app" className="font-medium underline underline-offset-2">
+                safety@virelsy.app
               </a>
               .
             </p>

@@ -23,6 +23,7 @@ export type PeekProfile = {
   isVerified: boolean;
   isOnline: boolean;
   photoUrl?: string | null;
+  sameCity?: string | null;
 };
 
 /**
@@ -72,21 +73,37 @@ export function ProfilePeek({
             </p>
           )}
 
-          {profile.sharedInterests.length > 0 && (
-            <div className="glass rounded-3xl p-4 text-center">
-              <p className="mb-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-                <Sparkles className="size-3.5" aria-hidden="true" /> You both love
+          {/* About you two — only real, shared ground */}
+          {(profile.sharedInterests.length > 0 || profile.sameCity || profile.isVerified) && (
+            <div className="glass rounded-3xl p-5 text-center">
+              <p className="mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+                <Sparkles className="size-3.5" aria-hidden="true" /> About you two
               </p>
-              <div className="flex flex-wrap justify-center gap-1.5">
-                {profile.sharedInterests.map((interest) => (
-                  <span
-                    key={interest}
-                    className="rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary-soft"
-                  >
-                    {interest}
-                  </span>
-                ))}
-              </div>
+              <ul className="space-y-2 text-sm text-foreground/90">
+                {profile.sameCity && (
+                  <li>
+                    You&apos;re both in <span className="font-medium">{profile.sameCity}</span>
+                  </li>
+                )}
+                {profile.sharedInterests.length > 0 && (
+                  <li className="flex flex-wrap items-center justify-center gap-1.5">
+                    <span>You both love</span>
+                    {profile.sharedInterests.map((interest) => (
+                      <span
+                        key={interest}
+                        className="rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary-soft"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </li>
+                )}
+                {profile.isVerified && (
+                  <li className="text-muted-foreground">
+                    {profile.displayName} passed photo verification
+                  </li>
+                )}
+              </ul>
             </div>
           )}
 

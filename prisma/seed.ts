@@ -46,12 +46,12 @@ async function main() {
   console.log("✓ interest catalogue");
 
   // Admin
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "admin-amora-2026";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "admin-virelsy-2026";
   await db.user.upsert({
-    where: { email: "admin@amora.app" },
+    where: { email: "admin@virelsy.app" },
     create: {
-      email: "admin@amora.app",
-      name: "Amora Admin",
+      email: "admin@virelsy.app",
+      name: "Virelsy Admin",
       role: "ADMIN",
       emailVerified: new Date(),
       onboardingDone: true,
@@ -60,12 +60,12 @@ async function main() {
     },
     update: { role: "ADMIN" },
   });
-  console.log(`✓ admin@amora.app (password: ${adminPassword})`);
+  console.log(`✓ admin@virelsy.app (password: ${adminPassword})`);
 
   // Demo members
-  const demoPassword = await bcrypt.hash("demo-amora-2026", 12);
+  const demoPassword = await bcrypt.hash("demo-virelsy-2026", 12);
   for (const demo of DEMO_PROFILES) {
-    const email = `${demo.name.toLowerCase()}@demo.amora.app`;
+    const email = `${demo.name.toLowerCase()}@demo.virelsy.app`;
     const birthDate = new Date(1994 + (demo.name.length % 6), (demo.name.length * 3) % 12, 12);
 
     const user = await db.user.upsert({
@@ -114,7 +114,7 @@ async function main() {
       update: {},
     });
   }
-  console.log(`✓ ${DEMO_PROFILES.length} demo profiles (password: demo-amora-2026)`);
+  console.log(`✓ ${DEMO_PROFILES.length} demo profiles (password: demo-virelsy-2026)`);
 }
 
 main()

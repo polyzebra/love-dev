@@ -47,7 +47,7 @@ export default function LandingPage() {
           {/* CSS-only entrances above the fold — LCP paints before hydration */}
           <div className="space-y-8 text-center md:text-left">
             <p className="animate-rise text-xs font-semibold uppercase tracking-[0.35em] text-gold">
-              Ireland &amp; the UK
+              Meet someone real
             </p>
             <h1 className="animate-rise font-display text-[clamp(2.9rem,8vw,6.5rem)] font-medium leading-[0.98] tracking-tight text-balance [--rise-delay:80ms]">
               Love, with
@@ -95,7 +95,7 @@ export default function LandingPage() {
             <p className="font-display text-[clamp(1.8rem,4.5vw,3.4rem)] font-medium leading-[1.25] tracking-tight text-balance">
               Swiping was built to be <span className="italic text-muted-foreground">endless</span>.
               <br />
-              We built Amora to be <span className="text-luxe italic">the last app you download</span>.
+              We built Virelsy to be <span className="text-luxe italic">the last app you download</span>.
             </p>
           </Reveal>
         </div>
@@ -286,7 +286,7 @@ export default function LandingPage() {
           <Reveal delay={0.28}>
             <Magnetic className="mt-10 inline-block">
               <Button size="lg" className="h-16 rounded-full px-14 text-lg" asChild>
-                <Link href="/register">Join Amora — free</Link>
+                <Link href="/register">Join Virelsy — free</Link>
               </Button>
             </Magnetic>
           </Reveal>

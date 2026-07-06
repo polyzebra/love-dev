@@ -58,7 +58,10 @@ export default async function ConversationPage({
     }),
     db.profile.findUnique({
       where: { userId },
-      select: { interests: { select: { interest: { select: { slug: true } } } } },
+      select: {
+        city: true,
+        interests: { select: { interest: { select: { slug: true } } } },
+      },
     }),
     db.message.findMany({
       where: { conversationId, deletedAt: null },
@@ -87,6 +90,8 @@ export default async function ConversationPage({
     isVerified: (other?.user.verifications.length ?? 0) > 0,
     isOnline: online,
     photoUrl: other?.user.photos[0]?.url ?? null,
+    sameCity:
+      myProfile?.city && other?.user.profile?.city === myProfile.city ? myProfile.city : null,
   };
 
   return (
@@ -152,6 +157,7 @@ export default async function ConversationPage({
         conversationId={conversationId}
         currentUserId={userId}
         otherName={otherName}
+        sharedInterests={peek.sharedInterests}
         initialMessages={messages as ThreadMessage[]}
       />
     </>

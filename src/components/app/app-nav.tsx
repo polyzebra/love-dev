@@ -94,7 +94,7 @@ export function AppNav() {
             })}
           </ul>
         </nav>
-        <p className="px-6 py-6 text-xs text-muted-foreground">Made with care in Dublin &amp; London</p>
+        <p className="px-6 py-6 text-xs text-muted-foreground">Made with care</p>
       </aside>
     </>
   );

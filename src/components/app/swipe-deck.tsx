@@ -11,7 +11,7 @@ import {
   useTransform,
 } from "motion/react";
 import { toast } from "sonner";
-import { BadgeCheck, Heart, MapPin, RotateCcw, SearchX, Star, X } from "lucide-react";
+import { BadgeCheck, Heart, MapPin, RotateCcw, SearchX, Sparkles, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,10 +23,35 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { MatchRing } from "@/components/shared/match-ring";
 import { HeartBurst } from "@/components/fx/heart-burst";
+import { emitInteraction } from "@/lib/interaction-events";
+import { useDominantColor, type RGB } from "@/hooks/use-dominant-color";
 import type { DiscoverProfile } from "@/lib/services/discovery";
-import { formatDistance } from "@/lib/utils";
+import { cn, formatDistance } from "@/lib/utils";
 
 type SwipeAction = "LIKE" | "PASS" | "SUPER_LIKE";
+
+export type ViewerContext = {
+  city: string | null;
+  interests: string[];
+};
+
+/** Honest, data-backed reasons this profile appears — never invented. */
+function compatibilityReasons(
+  profile: DiscoverProfile,
+  viewer: ViewerContext | null,
+  shared: string[],
+): string[] {
+  const reasons: string[] = [];
+  if (shared.length === 1) reasons.push(`You both love ${shared[0].toLowerCase()}`);
+  if (shared.length > 1) reasons.push(`${shared.length} shared interests`);
+  if (viewer?.city && profile.city && viewer.city === profile.city)
+    reasons.push(`Both in ${profile.city}`);
+  else if (profile.distanceKm != null && profile.distanceKm <= 15)
+    reasons.push("Practically neighbours");
+  if (profile.isVerified) reasons.push("Photo verified");
+  if (profile.isOnline) reasons.push("Online right now");
+  return reasons.slice(0, 3);
+}
 
 const EXIT_VELOCITY = 600;
 const EXIT_OFFSET = 110;
@@ -45,10 +70,14 @@ function photoGradient(seed: string): string {
  */
 function TopCard({
   profile,
+  reasons,
+  sharedSet,
   onDecide,
   registerDecider,
 }: {
   profile: DiscoverProfile;
+  reasons: string[];
+  sharedSet: Set<string>;
   onDecide: (action: SwipeAction) => void;
   registerDecider: (fn: (action: SwipeAction) => void) => void;
 }) {
@@ -164,9 +193,31 @@ function TopCard({
           Pass
         </motion.span>
 
-        {/* Floating badges */}
+        {/* Floating badges + the WHY behind the number */}
         <div className="absolute inset-x-4 top-4 flex items-start justify-between">
-          <MatchRing value={profile.compatibility} />
+          <div className="flex flex-col items-start gap-1.5">
+            <MatchRing value={profile.compatibility} />
+            <motion.ul
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.35, delayChildren: 0.7 } } }}
+              className="space-y-1"
+              aria-label="Why you match"
+            >
+              {reasons.map((reason) => (
+                <motion.li
+                  key={reason}
+                  variants={{
+                    hidden: { opacity: 0, x: -12 },
+                    show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 26 } },
+                  }}
+                  className="glass-chip w-fit rounded-full px-2.5 py-0.5 text-[10px] font-medium text-white/90"
+                >
+                  {reason}
+                </motion.li>
+              ))}
+            </motion.ul>
+          </div>
           {profile.isOnline && (
             <span className="glass-chip flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white">
               <span className="relative flex size-2" aria-hidden="true">
@@ -185,7 +236,7 @@ function TopCard({
               {profile.displayName}, {profile.age}
             </h2>
             {profile.isVerified && (
-              <span className="relative flex items-center justify-center" aria-label="Photo verified">
+              <span role="img" className="relative flex items-center justify-center" aria-label="Photo verified">
                 <span className="absolute size-6 animate-ping-soft rounded-full bg-sky-400/30" />
                 <BadgeCheck className="relative size-6 fill-sky-400 text-white" />
               </span>
@@ -210,18 +261,30 @@ function TopCard({
               animate="show"
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.35 } } }}
             >
-              {profile.interests.slice(0, 4).map((interest) => (
-                <motion.span
-                  key={interest}
-                  variants={{
-                    hidden: { opacity: 0, y: 10, scale: 0.9 },
-                    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 380, damping: 24 } },
-                  }}
-                  className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-white"
-                >
-                  {interest}
-                </motion.span>
-              ))}
+              {[...profile.interests]
+                .sort((a, b) => Number(sharedSet.has(b)) - Number(sharedSet.has(a)))
+                .slice(0, 4)
+                .map((interest) => {
+                  const shared = sharedSet.has(interest);
+                  return (
+                    <motion.span
+                      key={interest}
+                      variants={{
+                        hidden: { opacity: 0, y: 10, scale: 0.9 },
+                        show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 380, damping: 24 } },
+                      }}
+                      className={cn(
+                        "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium",
+                        shared
+                          ? "border border-rose-300/40 bg-rose-500/30 text-white shadow-[0_0_14px_rgba(225,29,72,0.35)] backdrop-blur-md"
+                          : "glass-chip text-white",
+                      )}
+                    >
+                      {shared && <Sparkles className="size-3 text-rose-200" aria-hidden="true" />}
+                      {interest}
+                    </motion.span>
+                  );
+                })}
             </motion.div>
           )}
         </div>
@@ -230,7 +293,13 @@ function TopCard({
   );
 }
 
-export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfile[] }) {
+export function SwipeDeck({
+  initialProfiles,
+  viewer,
+}: {
+  initialProfiles: DiscoverProfile[];
+  viewer: ViewerContext | null;
+}) {
   const [deck, setDeck] = useState(initialProfiles);
   const [matchedWith, setMatchedWith] = useState<DiscoverProfile | null>(null);
   const busy = useRef(false);
@@ -238,6 +307,16 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
 
   const top = deck[0];
   const next = deck[1];
+
+  // Shared ground with the person on top — drives reasons & highlights
+  const viewerSet = new Set(viewer?.interests ?? []);
+  const shared = top ? top.interests.filter((i) => viewerSet.has(i)) : [];
+  const sharedSet = new Set(shared);
+  const reasons = top ? compatibilityReasons(top, viewer, shared) : [];
+
+  // Ambient light sampled from the top card's photo; falls back to brand rose
+  const dominant = useDominantColor(top?.photos[0]?.url);
+  const ambient: RGB = dominant ?? [225, 29, 72];
 
   const commit = useCallback(
     async (action: SwipeAction) => {
@@ -266,7 +345,13 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
           return;
         }
         const { data } = (await res.json()) as { data: { matched: boolean } };
-        if (data.matched) setMatchedWith(current);
+        emitInteraction(
+          action === "LIKE" ? "like" : action === "PASS" ? "pass" : "superlike",
+        );
+        if (data.matched) {
+          emitInteraction("match");
+          setMatchedWith(current);
+        }
       } catch {
         setDeck((d) => [current, ...d]);
         toast.error("You appear to be offline.");
@@ -290,8 +375,10 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
       });
       return;
     }
-    if (res.ok) toast.success("Last swipe undone. Refresh to see them again.");
-    else toast("Nothing to undo yet.");
+    if (res.ok) {
+      emitInteraction("undo");
+      toast.success("Last swipe undone. Refresh to see them again.");
+    } else toast("Nothing to undo yet.");
   }, []);
 
   if (deck.length === 0) {
@@ -312,10 +399,13 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
   return (
     <div className="mx-auto w-full max-w-sm">
       <div className="relative aspect-3/4 w-full" role="group" aria-label="Profile cards">
-        {/* Ambient stage light */}
+        {/* Ambient stage light — tinted by the person's photo */}
         <div
           aria-hidden="true"
-          className="absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.2),transparent_70%)] blur-2xl"
+          className="absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-[background] duration-[1400ms] ease-out"
+          style={{
+            background: `radial-gradient(closest-side, rgba(${ambient[0]},${ambient[1]},${ambient[2]},0.22), transparent 70%)`,
+          }}
         />
 
         {/* Next card preview — real content, waiting underneath */}
@@ -343,6 +433,8 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
             <TopCard
               key={top.userId}
               profile={top}
+              reasons={reasons}
+              sharedSet={sharedSet}
               onDecide={commit}
               registerDecider={(fn) => (deciderRef.current = fn)}
             />

@@ -129,7 +129,7 @@ export default async function ProfilePage() {
               <h1 className="flex flex-wrap items-center gap-3 font-display text-[clamp(2.2rem,6vw,4rem)] font-medium leading-none tracking-tight text-white">
                 {profile.displayName}, {age}
                 {verifiedTypes.has("PHOTO") && (
-                  <span className="relative flex items-center justify-center" aria-label="Photo verified">
+                  <span role="img" className="relative flex items-center justify-center" aria-label="Photo verified">
                     <span className="absolute size-8 animate-ping-soft rounded-full bg-sky-400/25" />
                     <BadgeCheck className="relative size-8 fill-sky-400 text-white" />
                   </span>

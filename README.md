@@ -1,6 +1,6 @@
-# Amora — Dating, designed with intention
+# Virelsy — Dating, designed with intention
 
-A production-grade dating SaaS platform for **Ireland & the UK**. Verified profiles, honest
+A production-grade premium dating SaaS platform. Verified profiles, honest
 intentions, premium experience. Built mobile-first with a custom design system.
 
 ## Stack
@@ -39,8 +39,8 @@ npm run dev              # http://localhost:3000
 
 **Seeded accounts** (dev only — change immediately in any shared environment):
 
-- Admin: `admin@amora.app` / `admin-amora-2026` → `/admin`
-- Demo members: `saoirse@demo.amora.app` (and 5 more) / `demo-amora-2026`
+- Admin: `admin@virelsy.app` / `admin-virelsy-2026` → `/admin`
+- Demo members: `saoirse@demo.virelsy.app` (and 5 more) / `demo-virelsy-2026`
 
 ## Scripts
 

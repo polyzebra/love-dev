@@ -14,7 +14,7 @@ const EASE_LUXE = [0.16, 1, 0.3, 1] as const;
 const DESCRIPTIONS: Record<string, string> = {
   FREE: "Everything you need to meet someone real. No card, no catch.",
   PLUS: "For daters with momentum — unlimited likes and the power to undo.",
-  PREMIUM: "The full Amora experience. Priority, boosts and every advantage.",
+  PREMIUM: "The full Virelsy experience. Priority, boosts and every advantage.",
 };
 
 function price(cents: number) {

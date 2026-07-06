@@ -18,24 +18,23 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "Amora — Dating, designed with intention",
-    template: "%s · Amora",
+    default: "Virelsy — Dating, designed with intention",
+    template: "%s · Virelsy",
   },
   description:
-    "Amora is a premium dating platform for Ireland & the UK. Verified profiles, thoughtful matching and conversations that go somewhere.",
-  keywords: ["dating", "Ireland", "UK", "relationships", "verified dating"],
+    "Virelsy is a premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
+  keywords: ["dating", "relationships", "verified dating", "premium dating"],
   openGraph: {
-    title: "Amora — Dating, designed with intention",
+    title: "Virelsy — Dating, designed with intention",
     description:
-      "A premium dating platform for Ireland & the UK. Verified profiles, thoughtful matching and conversations that go somewhere.",
+      "A premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
     type: "website",
-    locale: "en_IE",
-    siteName: "Amora",
+    siteName: "Virelsy",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Amora — Dating, designed with intention",
-    description: "A premium dating platform for Ireland & the UK.",
+    title: "Virelsy — Dating, designed with intention",
+    description: "A premium dating platform. Verified profiles, real intentions.",
   },
 };
 

@@ -1,4 +1,4 @@
-// Amora — Prisma schema
+// Virelsy — Prisma schema
 // PostgreSQL (Supabase-compatible). Normalized, indexed for the hot paths:
 // discovery feeds, match lookups, conversation timelines and admin queues.
 

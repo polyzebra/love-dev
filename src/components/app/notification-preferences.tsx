@@ -11,7 +11,7 @@ const PREFS = [
   { key: "messages", label: "Messages", hint: "New messages from your matches" },
   { key: "likes", label: "Likes", hint: "When someone likes your profile" },
   { key: "superlikes", label: "Super Likes", hint: "When someone really likes your profile" },
-  { key: "digest", label: "Weekly digest", hint: "Your week on Amora, summarised" },
+  { key: "digest", label: "Weekly digest", hint: "Your week on Virelsy, summarised" },
   { key: "product", label: "Product updates", hint: "New features and improvements" },
 ] as const;
 
@@ -23,7 +23,7 @@ export function NotificationPreferences() {
   const [state, setState] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
     try {
-      return JSON.parse(window.localStorage.getItem("amora:notifications") ?? "{}");
+      return JSON.parse(window.localStorage.getItem("virelsy:notifications") ?? "{}");
     } catch {
       return {};
     }
@@ -32,7 +32,7 @@ export function NotificationPreferences() {
   function toggle(key: string, value: boolean) {
     const next = { ...state, [key]: value };
     setState(next);
-    window.localStorage.setItem("amora:notifications", JSON.stringify(next));
+    window.localStorage.setItem("virelsy:notifications", JSON.stringify(next));
     toast.success("Preference saved.");
   }
 

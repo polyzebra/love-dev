@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { emitInteraction } from "@/lib/interaction-events";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
@@ -66,6 +67,22 @@ const CITIES: Record<"IE" | "GB", string[]> = {
 
 const STEPS = ["Basics", "Intentions", "Location", "About you", "Lifestyle", "Interests"] as const;
 
+/** Honest value, shown after each completed step — explanation, not pressure. */
+const STEP_VALUE: Record<number, string> = {
+  0: "Nice to meet you. Real names and real ages build real trust.",
+  1: "Clear intentions get more replies — people know where they stand with you.",
+  2: "You'll only be shown to people within reach. Your exact location stays private.",
+  3: "Profiles with a bio start far more conversations.",
+  4: "Lifestyle details quietly improve who we introduce you to.",
+};
+
+/** Milestones worth pausing for. */
+const MILESTONES: { at: number; message: string }[] = [
+  { at: 25, message: "Your profile is taking shape." },
+  { at: 50, message: "Halfway — your profile is now visible to more people." },
+  { at: 75, message: "Looking great. Complete profiles get noticeably more matches." },
+];
+
 function ChipToggle({
   selected,
   onToggle,
@@ -110,6 +127,8 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
+  const [valueNote, setValueNote] = useState<string | null>(null);
+  const milestonesShown = useRef(new Set<number>());
   const [data, setData] = useState<WizardData>({
     displayName: initialName,
     birthDate: "",
@@ -166,6 +185,19 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     return Math.min(100, score);
   }, [data, age]);
 
+  // Celebrate genuine milestones once each — explanation, not manipulation
+  useEffect(() => {
+    for (const { at, message } of MILESTONES) {
+      if (profileScore >= at && !milestonesShown.current.has(at)) {
+        milestonesShown.current.add(at);
+        if (profileScore < 100) {
+          toast.success(message, { duration: 2600 });
+          emitInteraction("milestone");
+        }
+      }
+    }
+  }, [profileScore]);
+
   const stepValid = useMemo(() => {
     switch (step) {
       case 0:
@@ -218,6 +250,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
       return;
     }
     // A breath of celebration before the product opens
+    emitInteraction("celebration");
     setCelebrating(true);
     window.setTimeout(() => {
       router.push("/discover");
@@ -290,6 +323,21 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           </span>
         </div>
         <Progress value={progress} aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`} />
+        <AnimatePresence>
+          {valueNote && (
+            <motion.p
+              key={valueNote}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="text-xs text-gold"
+              aria-live="polite"
+            >
+              {valueNote}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence mode="wait">
@@ -307,7 +355,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                   Let&apos;s start with the basics
                 </h1>
-                <p className="text-muted-foreground">This is how you&apos;ll appear on Amora.</p>
+                <p className="text-muted-foreground">This is how you&apos;ll appear on Virelsy.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="displayName">First name</Label>
@@ -332,7 +380,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 />
                 <p id="age-hint" className="text-xs text-muted-foreground">
                   {age !== null && age < 18
-                    ? "You must be 18 or older to use Amora."
+                    ? "You must be 18 or older to use Virelsy."
                     : "Your age is shown on your profile — never your birthday."}
                 </p>
               </div>
@@ -684,7 +732,11 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
             <Button
               size="lg"
               className="rounded-full px-8"
-              onClick={() => setStep((s) => s + 1)}
+              onClick={() => {
+                setValueNote(STEP_VALUE[step] ?? null);
+                emitInteraction("step-complete");
+                setStep((s) => s + 1);
+              }}
               disabled={!stepValid}
             >
               Continue <ArrowRight className="size-4" aria-hidden="true" />

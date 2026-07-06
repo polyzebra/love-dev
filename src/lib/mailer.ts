@@ -41,15 +41,15 @@ export async function sendMail(mail: Mail): Promise<void> {
 export function verificationEmail(to: string, url: string): Mail {
   return {
     to,
-    subject: "Confirm your email — Amora",
-    text: `Welcome to Amora!\n\nConfirm your email address to get started:\n${url}\n\nThis link expires in 24 hours. If you didn't create an account, you can ignore this email.`,
+    subject: "Confirm your email — Virelsy",
+    text: `Welcome to Virelsy!\n\nConfirm your email address to get started:\n${url}\n\nThis link expires in 24 hours. If you didn't create an account, you can ignore this email.`,
   };
 }
 
 export function passwordResetEmail(to: string, url: string): Mail {
   return {
     to,
-    subject: "Reset your password — Amora",
-    text: `We received a request to reset your Amora password.\n\nReset it here (link expires in 30 minutes):\n${url}\n\nIf you didn't request this, your account is safe and you can ignore this email.`,
+    subject: "Reset your password — Virelsy",
+    text: `We received a request to reset your Virelsy password.\n\nReset it here (link expires in 30 minutes):\n${url}\n\nIf you didn't request this, your account is safe and you can ignore this email.`,
   };
 }

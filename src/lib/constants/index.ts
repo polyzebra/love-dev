@@ -1,4 +1,4 @@
-export const APP_NAME = "Amora";
+export const APP_NAME = "Virelsy";
 export const APP_TAGLINE = "Dating, designed with intention.";
 export const SUPPORTED_COUNTRIES = [
   { code: "IE", label: "Ireland" },
