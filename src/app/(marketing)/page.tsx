@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ArrowDown,
   ArrowRight,
   BadgeCheck,
   HeartHandshake,
@@ -93,18 +92,10 @@ export default function LandingPage() {
             <HeroScene />
           </div>
         </div>
-
-        <a
-          href="#story"
-          aria-label="Scroll to learn more"
-          className="relative mx-auto mb-6 flex size-11 items-center justify-center rounded-full border border-white/12 text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowDown className="size-4 animate-bounce" aria-hidden="true" />
-        </a>
       </section>
 
       {/* ====================== MANIFESTO INTERLUDE ====================== */}
-      <section id="story" className="relative overflow-hidden py-32 md:py-44">
+      <section className="relative overflow-hidden py-32 md:py-44">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <Reveal>
             <p className="font-display text-[clamp(1.8rem,4.5vw,3.4rem)] font-medium leading-[1.25] tracking-tight text-balance">
