@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -19,6 +19,23 @@ function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Clean messages for Auth.js redirect errors (?error=...) - no stack
+  // traces, no raw codes on screen.
+  const authError = searchParams.get("error");
+  useEffect(() => {
+    if (!authError) return;
+    const messages: Record<string, string> = {
+      Configuration: "Sign-in isn't fully configured on this server. Please try again later.",
+      AccessDenied: "Access was denied. Your account may not be permitted to sign in.",
+      OAuthCallbackError: "The sign-in with your provider didn't complete. Please try again.",
+      OAuthAccountNotLinked:
+        "That email is already registered with a different sign-in method. Use your original method.",
+      Verification: "That sign-in link is invalid or has expired.",
+      SessionRequired: "Please sign in to continue.",
+    };
+    toast.error(messages[authError] ?? "Sign-in failed. Please try again.");
+  }, [authError]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

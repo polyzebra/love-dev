@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+
+type ConfigStatus = {
+  google: boolean;
+  apple: boolean;
+  missingGoogleVars: string[];
+};
 
 function GoogleIcon() {
   return (
@@ -36,13 +43,45 @@ function AppleIcon() {
   );
 }
 
+/**
+ * OAuth entry points, configuration-aware:
+ * - Apple renders only when its credentials exist (never a broken button)
+ * - Google always renders; if unconfigured it explains exactly which
+ *   variables are missing instead of redirecting into a Google error
+ */
 export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: string }) {
   const [pending, setPending] = useState<"google" | "apple" | null>(null);
+  const [config, setConfig] = useState<ConfigStatus | null>(null);
 
-  const start = (provider: "google" | "apple") => {
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/config-status")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setConfig(data);
+      })
+      .catch(() => {
+        /* endpoint unreachable - leave buttons functional; Auth.js will guard */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function start(provider: "google" | "apple") {
+    if (provider === "google" && config && !config.google) {
+      toast.error(
+        `Google sign-in isn't configured. Set ${config.missingGoogleVars.join(
+          " and ",
+        )} in your .env (see .env.example), then restart the server.`,
+      );
+      return;
+    }
     setPending(provider);
     void signIn(provider, { callbackUrl });
-  };
+  }
+
+  const showApple = config === null ? false : config.apple;
 
   return (
     <div className="grid gap-3">
@@ -52,28 +91,31 @@ export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: stri
         size="lg"
         className="h-12 rounded-full"
         disabled={pending !== null}
+        aria-disabled={config ? !config.google : undefined}
         onClick={() => start("google")}
       >
         {pending === "google" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
         Continue with Google
       </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="lg"
-        className="h-12 rounded-full"
-        disabled={pending !== null}
-        onClick={() => start("apple")}
-      >
-        {pending === "apple" ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
-        Continue with Apple
-      </Button>
+      {showApple && (
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="h-12 rounded-full"
+          disabled={pending !== null}
+          onClick={() => start("apple")}
+        >
+          {pending === "apple" ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
+          Continue with Apple
+        </Button>
+      )}
       <div className="relative py-2" role="separator" aria-label="or">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center">
-          <span className="glass-chip rounded-full px-3.5 py-1 text-xs uppercase tracking-wider text-muted-foreground">
+          <span className="rounded-full bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">
             or
           </span>
         </div>

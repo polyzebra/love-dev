@@ -2,6 +2,51 @@ import type { NextAuthConfig } from "next-auth";
 import type { Role } from "@/generated/prisma/enums";
 import Google from "next-auth/providers/google";
 import Apple from "next-auth/providers/apple";
+import { SignJWT, importPKCS8 } from "jose";
+import { appleConfig, googleConfig } from "@/lib/oauth";
+
+/**
+ * Providers are registered only when fully configured - an empty
+ * GOOGLE_CLIENT_ID can never reach Google's consent screen and fail
+ * with "Missing required parameter: client_id".
+ */
+const oauthProviders: NextAuthConfig["providers"] = [];
+
+if (googleConfig) {
+  oauthProviders.push(
+    Google({
+      clientId: googleConfig.clientId,
+      clientSecret: googleConfig.clientSecret,
+      allowDangerousEmailAccountLinking: false,
+    }),
+  );
+}
+
+if (appleConfig) {
+  oauthProviders.push(
+    Apple({
+      clientId: appleConfig.clientId,
+      clientSecret:
+        appleConfig.clientSecret ??
+        // Mint Apple's client-secret JWT from the signing inputs (ES256,
+        // max 6 months). Runs once at boot; edge-safe via jose.
+        (await (async () => {
+          const key = await importPKCS8(
+            appleConfig.privateKey!.replace(/\\n/g, "\n"),
+            "ES256",
+          );
+          return new SignJWT({})
+            .setProtectedHeader({ alg: "ES256", kid: appleConfig.keyId! })
+            .setIssuer(appleConfig.teamId!)
+            .setIssuedAt()
+            .setExpirationTime("180days")
+            .setAudience("https://appleid.apple.com")
+            .setSubject(appleConfig.clientId)
+            .sign(key);
+        })()),
+    }),
+  );
+}
 
 /**
  * Edge-safe Auth.js configuration - no database imports.
@@ -14,28 +59,28 @@ export const authConfig = {
   trustHost: true,
   pages: {
     signIn: "/login",
+    error: "/login", // Auth.js errors surface as clean toasts on our login page
     newUser: "/onboarding",
   },
   session: { strategy: "jwt", maxAge: 30 * 24 * 3600 },
-  providers: [
-    Google({
-      allowDangerousEmailAccountLinking: false,
-    }),
-    Apple,
-  ],
+  providers: oauthProviders,
   callbacks: {
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
       const loggedIn = !!auth?.user;
 
-      const isProtected =
-        pathname.startsWith("/discover") ||
-        pathname.startsWith("/matches") ||
-        pathname.startsWith("/chat") ||
-        pathname.startsWith("/profile") ||
-        pathname.startsWith("/settings") ||
-        pathname.startsWith("/onboarding") ||
-        pathname.startsWith("/admin");
+      const isProtected = [
+        "/discover",
+        "/matches",
+        "/chat",
+        "/messages",
+        "/likes",
+        "/dashboard",
+        "/profile",
+        "/settings",
+        "/onboarding",
+        "/admin",
+      ].some((p) => pathname.startsWith(p));
 
       if (isProtected && !loggedIn) return false; // redirects to signIn page
 
