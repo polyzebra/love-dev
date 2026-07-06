@@ -32,7 +32,9 @@ function LoginForm() {
     setSubmitting(false);
 
     if (result?.error) {
-      toast.error("That email and password combination didn't work.");
+      toast.error(
+        "Sign-in failed. Check your details — and make sure you've confirmed your email.",
+      );
       return;
     }
     router.push(callbackUrl);

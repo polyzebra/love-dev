@@ -9,6 +9,9 @@ import Apple from "next-auth/providers/apple";
  * config in `auth.ts` layers the Prisma adapter and credentials on top.
  */
 export const authConfig = {
+  // Required for self-hosted deployments (Auth.js v5). The reverse proxy /
+  // platform in front of the app must set the Host header correctly.
+  trustHost: true,
   pages: {
     signIn: "/login",
     newUser: "/onboarding",
@@ -38,7 +41,9 @@ export const authConfig = {
 
       if (pathname.startsWith("/admin")) {
         const role = auth?.user?.role;
-        return role === "ADMIN" || role === "MODERATOR";
+        if (role === "ADMIN" || role === "MODERATOR") return true;
+        // Signed-in but not staff: send home rather than to the login page
+        return Response.redirect(new URL("/discover", request.nextUrl));
       }
 
       return true;
