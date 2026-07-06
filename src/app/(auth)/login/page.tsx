@@ -69,7 +69,7 @@ function LoginForm() {
             <Label htmlFor="password">Password</Label>
             <Link
               href="/forgot-password"
-              className="text-sm text-primary underline-offset-2 hover:underline"
+              className="text-sm text-primary-soft underline-offset-2 hover:underline"
             >
               Forgot password?
             </Link>
@@ -108,7 +108,7 @@ function LoginForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         New to Amora?{" "}
-        <Link href="/register" className="font-medium text-primary underline-offset-2 hover:underline">
+        <Link href="/register" className="font-medium text-primary-soft underline-offset-2 hover:underline">
           Create an account
         </Link>
       </p>

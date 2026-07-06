@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "motion/react";
 import { Flame, Heart, MessageCircle, Settings, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
@@ -15,20 +16,20 @@ const NAV_ITEMS = [
 ] as const;
 
 /**
- * Adaptive navigation: bottom tab bar on mobile (≤5 items, safe-area
- * aware), sidebar from lg upward.
+ * Floating glass navigation. Mobile: a levitating capsule tab bar with
+ * a spring-animated active halo. Desktop (lg+): a frosted side rail.
  */
 export function AppNav() {
   const pathname = usePathname();
 
   return (
     <>
-      {/* Mobile bottom tab bar */}
+      {/* Mobile floating capsule */}
       <nav
         aria-label="Primary"
-        className="glass safe-bottom fixed inset-x-0 bottom-0 z-40 border-t lg:hidden"
+        className="fixed inset-x-4 bottom-[max(1rem,var(--safe-bottom))] z-40 mx-auto max-w-md lg:hidden"
       >
-        <ul className="mx-auto flex max-w-md items-stretch justify-around">
+        <ul className="glass flex items-stretch justify-around rounded-full px-2 py-1.5 shadow-float">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
@@ -37,12 +38,19 @@ export function AppNav() {
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "tap-target flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium transition-colors",
-                    active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+                    "tap-target relative flex flex-col items-center justify-center gap-0.5 rounded-full py-1.5 text-[10px] font-medium transition-colors",
+                    active ? "text-white" : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Icon className={cn("size-6", active && "fill-primary/15")} aria-hidden="true" />
-                  {label}
+                  {active && (
+                    <motion.span
+                      layoutId="app-nav-halo"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      className="absolute inset-x-1 inset-y-0 rounded-full bg-primary/25 shadow-[0_0_18px_rgba(225,29,72,0.35)]"
+                    />
+                  )}
+                  <Icon className={cn("relative size-5", active && "fill-primary/30")} aria-hidden="true" />
+                  <span className="relative">{label}</span>
                 </Link>
               </li>
             );
@@ -50,9 +58,9 @@ export function AppNav() {
         </ul>
       </nav>
 
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r bg-card lg:flex">
-        <div className="px-6 py-6">
+      {/* Desktop frosted rail */}
+      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-[28px] border border-white/8 bg-card/50 backdrop-blur-2xl lg:flex">
+        <div className="px-6 py-7">
           <Logo href="/discover" />
         </div>
         <nav aria-label="Primary" className="flex-1 px-3">
@@ -65,23 +73,28 @@ export function AppNav() {
                     href={href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
+                      "relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
                       active
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        ? "text-white"
+                        : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
                     )}
                   >
-                    <Icon className="size-5" aria-hidden="true" />
-                    {label}
+                    {active && (
+                      <motion.span
+                        layoutId="app-rail-halo"
+                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                        className="absolute inset-0 rounded-2xl bg-primary/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_20px_rgba(225,29,72,0.25)]"
+                      />
+                    )}
+                    <Icon className="relative size-5" aria-hidden="true" />
+                    <span className="relative">{label}</span>
                   </Link>
                 </li>
               );
             })}
           </ul>
         </nav>
-        <p className="px-6 py-6 text-xs text-muted-foreground">
-          Made with care in Dublin & London
-        </p>
+        <p className="px-6 py-6 text-xs text-muted-foreground">Made with care in Dublin &amp; London</p>
       </aside>
     </>
   );

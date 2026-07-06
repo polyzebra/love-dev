@@ -73,7 +73,7 @@ export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: stri
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-background px-3 text-xs uppercase tracking-wider text-muted-foreground">
+          <span className="glass-chip rounded-full px-3.5 py-1 text-xs uppercase tracking-wider text-muted-foreground">
             or
           </span>
         </div>

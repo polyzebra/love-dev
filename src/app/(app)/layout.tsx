@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { AppNav } from "@/components/app/app-nav";
+import { Aurora } from "@/components/fx/aurora";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -15,9 +16,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user.onboardingDone) redirect("/onboarding");
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="noise relative min-h-dvh bg-background">
+      <Aurora fixed intensity="faint" />
       <AppNav />
-      <main className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:px-6 lg:ml-64 lg:max-w-4xl lg:pb-10 lg:pt-8">
+      <main className="relative mx-auto max-w-2xl px-4 pb-32 pt-6 md:px-6 lg:ml-72 lg:max-w-4xl lg:pb-12 lg:pt-10">
         {children}
       </main>
     </div>

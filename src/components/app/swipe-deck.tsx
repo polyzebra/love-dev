@@ -64,7 +64,7 @@ function TopCard({
       exit={{ opacity: 0, transition: { duration: 0.18 } }}
       transition={{ type: "spring", stiffness: 350, damping: 30 }}
     >
-      <div className="relative flex h-full w-full flex-col justify-end overflow-hidden rounded-3xl shadow-float">
+      <div className="relative flex h-full w-full flex-col justify-end overflow-hidden rounded-[28px] border border-white/12 shadow-float [box-shadow:inset_0_1px_0_rgba(255,255,255,0.14),0_12px_40px_rgba(0,0,0,0.5),0_32px_80px_rgba(0,0,0,0.35)]">
         {/* Photo layer */}
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -105,8 +105,11 @@ function TopCard({
               <BadgeCheck className="size-6 fill-sky-400 text-white" aria-label="Photo verified" />
             )}
             {profile.isOnline && (
-              <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
-                <span className="size-1.5 rounded-full bg-green-400" aria-hidden="true" />
+              <span className="glass-chip flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
+                <span className="relative flex size-1.5" aria-hidden="true">
+                  <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
+                </span>
                 Online
               </span>
             )}
@@ -130,7 +133,7 @@ function TopCard({
               {profile.interests.slice(0, 4).map((interest) => (
                 <span
                   key={interest}
-                  className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm"
+                  className="glass-chip rounded-full px-3 py-1 text-xs font-medium"
                 >
                   {interest}
                 </span>
@@ -222,9 +225,17 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
   return (
     <div className="mx-auto w-full max-w-sm">
       <div className="relative aspect-3/4 w-full" role="group" aria-label="Profile cards">
+        {/* Ambient glow beneath the deck */}
+        <div
+          aria-hidden="true"
+          className="absolute left-1/2 top-1/2 size-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.2),transparent_70%)] blur-2xl"
+        />
         {/* Next card peeking behind */}
         {next && (
-          <div className="absolute inset-0 scale-[0.96] rounded-3xl bg-muted shadow-card" aria-hidden="true" />
+          <div
+            className="absolute inset-0 scale-[0.94] translate-y-3 rounded-[28px] border border-white/8 bg-card shadow-card"
+            aria-hidden="true"
+          />
         )}
         <AnimatePresence>
           {top && <TopCard key={top.userId} profile={top} onSwipe={swipe} />}
@@ -255,7 +266,7 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
         <Button
           size="icon"
           aria-label="Like"
-          className="size-16 rounded-full shadow-float"
+          className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_rgba(225,29,72,0.45),0_12px_32px_rgba(225,29,72,0.3)]"
           disabled={busy}
           onClick={() => swipe("LIKE")}
         >

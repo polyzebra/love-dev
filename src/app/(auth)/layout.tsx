@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
+import { Aurora } from "@/components/fx/aurora";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
-      <header className="safe-top mx-auto w-full max-w-6xl px-5 py-5 md:px-8">
+    <div className="noise relative flex min-h-dvh flex-col overflow-hidden bg-background">
+      <Aurora fixed />
+      <header className="safe-top relative mx-auto w-full max-w-6xl px-6 py-6 md:px-10">
         <Logo />
       </header>
-      <main className="flex flex-1 items-center justify-center px-5 pb-16">
-        <div className="w-full max-w-md">{children}</div>
+      <main className="relative flex flex-1 items-center justify-center px-4 pb-16">
+        <div className="glass w-full max-w-md rounded-[32px] p-7 sm:p-10">{children}</div>
       </main>
-      <footer className="safe-bottom pb-6 text-center text-xs text-muted-foreground">
+      <footer className="safe-bottom relative pb-6 text-center text-xs text-muted-foreground">
         By continuing you agree to our{" "}
         <Link href="/legal/terms" className="underline underline-offset-2 hover:text-foreground">
           Terms

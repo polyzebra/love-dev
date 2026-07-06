@@ -53,7 +53,7 @@ const TIPS = [
 export default function SafetyPage() {
   return (
     <>
-      <section className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
+      <section className="mx-auto max-w-6xl px-5 pb-16 pt-36 md:px-8 md:pb-24 md:pt-44">
         <div className="mx-auto mb-14 max-w-2xl space-y-4 text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-3xl bg-accent">
             <ShieldCheck className="size-7 text-accent-foreground" aria-hidden="true" />
@@ -70,7 +70,7 @@ export default function SafetyPage() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {PILLARS.map(({ icon: Icon, title, body }) => (
             <article key={title} className="rounded-3xl border bg-card p-7 shadow-card">
-              <Icon className="mb-4 size-6 text-primary" aria-hidden="true" />
+              <Icon className="mb-4 size-6 text-primary-soft" aria-hidden="true" />
               <h2 className="mb-2 text-lg font-semibold">{title}</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
             </article>

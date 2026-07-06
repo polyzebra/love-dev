@@ -3,117 +3,85 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ---------------------------------- */
-/* Amora design tokens                 */
-/* Brand: warm rose on calm neutrals   */
-/* ---------------------------------- */
+/* ------------------------------------------------------------------ */
+/*  AMORA v2 — cinematic dark luxury                                   */
+/*  Near-black warm base · ambient aurora light · frosted glass ·      */
+/*  rose signal with glow · editorial serif over Inter                 */
+/* ------------------------------------------------------------------ */
 
 :root {
-  /* Core surfaces */
-  --background: #fafafa;
-  --foreground: #111111;
-  --card: #ffffff;
-  --card-foreground: #111111;
-  --popover: #ffffff;
-  --popover-foreground: #111111;
+  /* Base surfaces — warm near-black, never pure #000 (OLED smear) */
+  --background: #0b0709;
+  --foreground: #f6f1f1;
+  --card: #171114;
+  --card-foreground: #f6f1f1;
+  --popover: #1c1518;
+  --popover-foreground: #f6f1f1;
 
-  /* Brand */
+  /* Brand — rose signal on darkness */
   --primary: #e11d48;
+  --primary-soft: #fb7185;
   --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #111111;
-  --muted: #f4f4f5;
-  --muted-foreground: #6b7280;
-  --accent: #fff1f2;
-  --accent-foreground: #be123c;
-
-  /* Feedback */
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --success: #16a34a;
-  --success-foreground: #ffffff;
-  --warning: #f59e0b;
-  --warning-foreground: #451a03;
-
-  /* Lines & focus */
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --ring: #e11d48;
-
-  /* Charts */
-  --chart-1: #e11d48;
-  --chart-2: #6366f1;
-  --chart-3: #16a34a;
-  --chart-4: #f59e0b;
-  --chart-5: #06b6d4;
-
-  /* Sidebar (admin) */
-  --sidebar: #ffffff;
-  --sidebar-foreground: #111111;
-  --sidebar-primary: #e11d48;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f4f4f5;
-  --sidebar-accent-foreground: #111111;
-  --sidebar-border: #e5e7eb;
-  --sidebar-ring: #e11d48;
-
-  /* Geometry — premium rounded-XL language */
-  --radius: 1.25rem;
-
-  /* Elevation — minimal, soft */
-  --shadow-card: 0 1px 2px rgb(17 17 17 / 0.04), 0 4px 16px rgb(17 17 17 / 0.04);
-  --shadow-float: 0 2px 8px rgb(17 17 17 / 0.06), 0 12px 32px rgb(17 17 17 / 0.1);
-
-  /* Safe areas */
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-.dark {
-  --background: #0c0a0b;
-  --foreground: #f5f5f4;
-  --card: #171415;
-  --card-foreground: #f5f5f4;
-  --popover: #171415;
-  --popover-foreground: #f5f5f4;
-
-  --primary: #fb7185;
-  --primary-foreground: #300513;
-  --secondary: #241f21;
-  --secondary-foreground: #f5f5f4;
-  --muted: #241f21;
-  --muted-foreground: #a1a1aa;
-  --accent: #2c1218;
+  --secondary: #241c20;
+  --secondary-foreground: #f6f1f1;
+  --muted: #221a1e;
+  --muted-foreground: #b3a8ad;
+  --accent: #2c151d;
   --accent-foreground: #fda4af;
 
-  --destructive: #f87171;
-  --destructive-foreground: #300513;
-  --success: #4ade80;
-  --success-foreground: #052e16;
-  --warning: #fbbf24;
-  --warning-foreground: #451a03;
+  /* Champagne — small luxury moments only */
+  --gold: #e7c9a1;
 
-  --border: #2b2628;
-  --input: #2b2628;
+  /* Feedback */
+  --destructive: #f87171;
+  --destructive-foreground: #2b0707;
+  --success: #4ade80;
+  --success-foreground: #04220f;
+  --warning: #fbbf24;
+  --warning-foreground: #2e1e02;
+
+  /* Lines & focus */
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.12);
   --ring: #fb7185;
 
+  /* Charts */
   --chart-1: #fb7185;
-  --chart-2: #818cf8;
+  --chart-2: #a78bfa;
   --chart-3: #4ade80;
   --chart-4: #fbbf24;
   --chart-5: #22d3ee;
 
-  --sidebar: #171415;
-  --sidebar-foreground: #f5f5f4;
+  /* Admin sidebar */
+  --sidebar: #120d10;
+  --sidebar-foreground: #f6f1f1;
   --sidebar-primary: #fb7185;
-  --sidebar-primary-foreground: #300513;
-  --sidebar-accent: #241f21;
-  --sidebar-accent-foreground: #f5f5f4;
-  --sidebar-border: #2b2628;
+  --sidebar-primary-foreground: #2b0711;
+  --sidebar-accent: #241c20;
+  --sidebar-accent-foreground: #f6f1f1;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #fb7185;
 
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.3);
-  --shadow-float: 0 2px 8px rgb(0 0 0 / 0.5), 0 12px 32px rgb(0 0 0 / 0.45);
+  /* Geometry */
+  --radius: 1.5rem;
+
+  /* Depth — layered, soft, real */
+  --shadow-card:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-float:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 32px 80px rgba(0, 0, 0, 0.35);
+  --glow-rose: 0 0 24px rgba(225, 29, 72, 0.35), 0 8px 32px rgba(225, 29, 72, 0.25);
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Single cinematic theme — .dark kept as alias so existing markup holds */
+.dark {
+  --background: #0b0709;
 }
 
 @theme inline {
@@ -124,6 +92,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -131,6 +100,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
@@ -157,60 +127,91 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-playfair), ui-serif, Georgia, serif;
 
-  --radius-sm: calc(var(--radius) - 8px);
-  --radius-md: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 10px);
+  --radius-md: calc(var(--radius) - 6px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-3xl: calc(var(--radius) + 14px);
 
   --shadow-card: var(--shadow-card);
   --shadow-float: var(--shadow-float);
+  --shadow-glow: var(--glow-rose);
 
-  --animate-shimmer: shimmer 1.8s ease-in-out infinite;
-  --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
-  --animate-heart-pop: heart-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Motion vocabulary */
+  --ease-luxe: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-shimmer: shimmer 2s var(--ease-luxe) infinite;
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+  --animate-heart-pop: heart-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-aurora-a: aurora-a 26s ease-in-out infinite alternate;
+  --animate-aurora-b: aurora-b 32s ease-in-out infinite alternate;
+  --animate-aurora-c: aurora-c 38s ease-in-out infinite alternate;
+  --animate-float-slow: float-slow 7s ease-in-out infinite;
+  --animate-float-slower: float-slow 11s ease-in-out infinite reverse;
+  --animate-ping-soft: ping-soft 2.2s var(--ease-luxe) infinite;
+  --animate-sheen: sheen 3.5s var(--ease-luxe) infinite;
 
   @keyframes shimmer {
-    0% {
-      background-position: -400px 0;
-    }
-    100% {
-      background-position: 400px 0;
-    }
+    0% { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
   }
   @keyframes pulse-dot {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.5;
-      transform: scale(0.85);
-    }
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.82); }
   }
   @keyframes heart-pop {
-    0% {
-      transform: scale(0);
-    }
-    60% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1);
-    }
+    0% { transform: scale(0); }
+    60% { transform: scale(1.25); }
+    100% { transform: scale(1); }
   }
+  /* Ambient light blobs — transform/opacity only, GPU friendly */
+  @keyframes aurora-a {
+    0% { transform: translate3d(-8%, -4%, 0) scale(1) rotate(0deg); }
+    100% { transform: translate3d(10%, 8%, 0) scale(1.25) rotate(12deg); }
+  }
+  @keyframes aurora-b {
+    0% { transform: translate3d(6%, 10%, 0) scale(1.1) rotate(0deg); }
+    100% { transform: translate3d(-10%, -6%, 0) scale(0.9) rotate(-10deg); }
+  }
+  @keyframes aurora-c {
+    0% { transform: translate3d(0%, 6%, 0) scale(0.95); opacity: 0.7; }
+    100% { transform: translate3d(-6%, -10%, 0) scale(1.2); opacity: 1; }
+  }
+  @keyframes float-slow {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--float-rotate, 0deg)); }
+    50% { transform: translate3d(0, -14px, 0) rotate(var(--float-rotate, 0deg)); }
+  }
+  @keyframes ping-soft {
+    0% { transform: scale(1); opacity: 0.7; }
+    80%, 100% { transform: scale(2.1); opacity: 0; }
+  }
+  @keyframes sheen {
+    0% { transform: translateX(-150%) skewX(-18deg); }
+    60%, 100% { transform: translateX(220%) skewX(-18deg); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translate3d(0, 28px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+}
+
+/* CSS-only entrance for above-the-fold content: no hydration wait, so
+   the hero paints (and LCP fires) immediately. Delay via --rise-delay. */
+@utility animate-rise {
+  animation: rise 0.9s var(--ease-luxe) both;
+  animation-delay: var(--rise-delay, 0s);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/60;
   }
 
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
@@ -220,16 +221,12 @@
   }
 
   ::selection {
-    @apply bg-primary/15 text-foreground;
+    @apply bg-primary/30 text-foreground;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-    *,
-    *::before,
-    *::after {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -237,25 +234,78 @@
   }
 }
 
+/* ---------------------------------------------------------------- */
+/*  Surface & light utilities                                        */
+/* ---------------------------------------------------------------- */
+
+/* Frosted glass — the house material */
 @utility glass {
-  background-color: color-mix(in oklab, var(--card) 72%, transparent);
-  backdrop-filter: blur(20px) saturate(1.6);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  background: color-mix(in oklab, var(--card) 62%, transparent);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
-@utility safe-top {
-  padding-top: var(--safe-top);
+/* Lighter glass for chips & badges */
+@utility glass-chip {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-@utility safe-bottom {
-  padding-bottom: var(--safe-bottom);
+/* Fine film-grain over gradients (SVG turbulence, tiles at 160px) */
+@utility noise {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 }
+
+/* Conic gradient border for spotlight panels */
+@utility border-glow {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      140deg,
+      rgba(251, 113, 133, 0.55),
+      rgba(255, 255, 255, 0.1) 30%,
+      rgba(255, 255, 255, 0.04) 60%,
+      rgba(231, 201, 161, 0.35)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Editorial gradient headline text */
+@utility text-luxe {
+  background: linear-gradient(180deg, #ffffff 0%, #f4dfe2 55%, #d9a5ad 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility safe-top { padding-top: var(--safe-top); }
+@utility safe-bottom { padding-bottom: var(--safe-bottom); }
 
 @utility scrollbar-none {
   scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 }
 
 @utility tap-target {
@@ -263,6 +313,8 @@
   min-height: 44px;
 }
 
-@utility text-balance {
-  text-wrap: balance;
-}
+@utility text-balance { text-wrap: balance; }
+
+/* Perspective stage for 3D card tilt */
+@utility perspective-stage { perspective: 1200px; }
+@utility preserve-3d { transform-style: preserve-3d; }
