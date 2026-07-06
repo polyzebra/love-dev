@@ -8,11 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/fx/magnetic";
 import { cn } from "@/lib/utils";
 
-const LINKS = [
-  { href: "/pricing", label: "Pricing" },
-  { href: "/safety", label: "Safety" },
-] as const;
-
 /**
  * Floating glass capsule. Starts wide and airy over the hero; on scroll
  * it condenses — tighter padding, deeper blur, a visible edge.
@@ -34,17 +29,6 @@ export function MarketingNavbar() {
         )}
       >
         <Logo size={condensed ? "sm" : "md"} className="transition-all duration-300" />
-        <div className="hidden items-center gap-1 md:flex">
-          {LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/6 hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
         <div className="flex items-center gap-1.5">
           <Button variant="ghost" className="rounded-full max-sm:hidden" asChild>
             <Link href="/login">Sign in</Link>
