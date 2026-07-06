@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, Ban, Eye, FileDown, Flag, Lock, ShieldCheck, UserCheck } from "lucide-react";
+import { AlertTriangle, Ban, Eye, FileDown, Flag, Lock, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MarketingHero } from "@/components/marketing/hero";
 
 export const metadata: Metadata = {
   title: "Safety Centre",
@@ -53,20 +54,19 @@ const TIPS = [
 export default function SafetyPage() {
   return (
     <>
-      <section className="mx-auto max-w-6xl px-5 pb-16 pt-36 md:px-8 md:pb-24 md:pt-44">
-        <div className="mx-auto mb-14 max-w-2xl space-y-4 text-center">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-3xl bg-accent">
-            <ShieldCheck className="size-7 text-accent-foreground" aria-hidden="true" />
-          </div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">
-            Safety Centre
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Feeling safe is the baseline, not a feature. Here is how Virelsy protects you
-            before, during and after every match.
-          </p>
-        </div>
+      <MarketingHero
+        eyebrow="Trust & safety"
+        title={
+          <>
+            Safe is the baseline,
+            <br />
+            <span className="text-luxe italic">not a feature.</span>
+          </>
+        }
+        subtitle="How Virelsy protects you before, during and after every match."
+      />
 
+      <section className="mx-auto max-w-6xl px-5 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {PILLARS.map(({ icon: Icon, title, body }) => (
             <article key={title} className="rounded-3xl border bg-card p-7 shadow-card">
