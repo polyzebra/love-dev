@@ -13,7 +13,7 @@ import { Aurora } from "@/components/fx/aurora";
 import { Magnetic } from "@/components/fx/magnetic";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 import { TiltCard } from "@/components/fx/tilt-card";
-import { HeroCards } from "@/components/marketing/hero-cards";
+import { HeroScene } from "@/components/marketing/hero-scene";
 
 const PRINCIPLES = [
   {
@@ -39,24 +39,24 @@ const PRINCIPLES = [
 export default function LandingPage() {
   return (
     <>
-      {/* ============================== HERO ============================== */}
-      <section className="noise relative flex min-h-dvh flex-col overflow-hidden">
+      {/* ============== HERO — the product, already happening ============== */}
+      <section className="noise relative flex min-h-dvh flex-col overflow-x-clip">
         <Aurora intensity="hero" />
 
-        <div className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-16 px-6 pb-16 pt-32 md:grid-cols-[1.1fr_0.9fr] md:px-10 lg:gap-8">
+        <div className="relative mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-6 pb-10 pt-28 md:grid-cols-[0.95fr_1.05fr] md:gap-0 md:px-10">
           {/* CSS-only entrances above the fold — LCP paints before hydration */}
-          <div className="space-y-8 text-center md:text-left">
+          <div className="relative z-10 space-y-7 text-center md:text-left">
             <p className="animate-rise text-xs font-semibold uppercase tracking-[0.35em] text-gold">
               Meet someone real
             </p>
-            <h1 className="animate-rise font-display text-[clamp(2.9rem,8vw,6.5rem)] font-medium leading-[0.98] tracking-tight text-balance [--rise-delay:80ms]">
+            <h1 className="animate-rise font-display text-[clamp(2.9rem,8vw,6.8rem)] font-medium leading-[0.96] tracking-tight text-balance [--rise-delay:80ms]">
               Love, with
               <br />
               <span className="text-luxe italic">intention.</span>
             </h1>
             <p className="animate-rise mx-auto max-w-md text-lg leading-relaxed text-muted-foreground [--rise-delay:160ms] md:mx-0">
-              A dating experience that treats meeting someone like it matters. Every profile
-              verified. Every intention stated. Every conversation given room to breathe.
+              Every profile verified. Every intention stated. Every conversation given room to
+              breathe.
             </p>
             <div className="animate-rise flex flex-col items-center gap-4 [--rise-delay:240ms] sm:flex-row md:items-start">
               <Magnetic>
@@ -71,18 +71,33 @@ export default function LandingPage() {
                 <Link href="/safety">How we keep you safe</Link>
               </Button>
             </div>
-            <p className="animate-rise text-sm text-muted-foreground [--rise-delay:320ms]">
-              Free to join · No ads · Cancel anytime
-            </p>
+            {/* Proof, not promises — the product's own signals */}
+            <div className="animate-rise flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground [--rise-delay:320ms] md:justify-start">
+              <span className="flex items-center gap-1.5">
+                <BadgeCheck className="size-4 fill-sky-400/90 text-background" aria-hidden="true" />
+                Photo-verified members
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="relative flex size-2" aria-hidden="true">
+                  <span className="absolute h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
+                  <span className="relative size-2 rounded-full bg-emerald-400" />
+                </span>
+                Conversations happening now
+              </span>
+              <span>Free to join · No ads</span>
+            </div>
           </div>
 
-          <HeroCards />
+          {/* The scene deliberately overlaps the copy column on desktop */}
+          <div className="md:-ml-10 lg:-ml-16">
+            <HeroScene />
+          </div>
         </div>
 
         <a
           href="#story"
           aria-label="Scroll to learn more"
-          className="mx-auto mb-8 flex size-11 items-center justify-center rounded-full border border-white/12 text-muted-foreground transition-colors hover:text-foreground"
+          className="relative mx-auto mb-6 flex size-11 items-center justify-center rounded-full border border-white/12 text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowDown className="size-4 animate-bounce" aria-hidden="true" />
         </a>
