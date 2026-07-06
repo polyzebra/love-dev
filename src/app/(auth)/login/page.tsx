@@ -100,7 +100,7 @@ function LoginForm() {
             Keep me signed in
           </Label>
         </div>
-        <Button type="submit" size="lg" className="h-12 w-full rounded-2xl" disabled={submitting}>
+        <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
           Sign in
         </Button>

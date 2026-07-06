@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
         <p className="mx-auto max-w-sm leading-relaxed text-muted-foreground">
           If that email is registered, a reset link is on its way. It expires in 30 minutes.
         </p>
-        <Button variant="outline" className="rounded-2xl" asChild>
+        <Button variant="outline" className="rounded-full" asChild>
           <Link href="/login">Back to sign in</Link>
         </Button>
       </div>
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
             className="h-12 rounded-2xl"
           />
         </div>
-        <Button type="submit" size="lg" className="h-12 w-full rounded-2xl" disabled={submitting}>
+        <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
           Send reset link
         </Button>

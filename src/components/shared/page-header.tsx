@@ -14,7 +14,7 @@ export function PageHeader({
   return (
     <header className={cn("flex items-start justify-between gap-4 pb-6", className)}>
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
+        <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">{title}</h1>
         {description ? (
           <p className="text-sm text-muted-foreground md:text-base">{description}</p>
         ) : null}

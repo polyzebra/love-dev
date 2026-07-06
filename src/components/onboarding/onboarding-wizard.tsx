@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { emitInteraction } from "@/lib/interaction-events";
+import { EASE_LUXE } from "@/lib/motion";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
@@ -275,7 +276,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.25, duration: 0.7, ease: EASE_LUXE }}
           className="font-display text-4xl font-medium tracking-tight"
         >
           You&apos;re in, {data.displayName.split(" ")[0]}.
@@ -330,7 +331,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.5, ease: EASE_LUXE }}
               className="text-xs text-gold"
               aria-live="polite"
             >
@@ -346,7 +347,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           initial={{ opacity: 0, x: 36, scale: 0.985, filter: "blur(6px)" }}
           animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
           exit={{ opacity: 0, x: -36, scale: 0.985, filter: "blur(6px)" }}
-          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.38, ease: EASE_LUXE }}
           className="min-h-[50dvh]"
         >
           {step === 0 && (

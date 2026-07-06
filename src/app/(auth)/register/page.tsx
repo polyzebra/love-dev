@@ -55,7 +55,7 @@ export default function RegisterPage() {
         <p className="mx-auto max-w-sm leading-relaxed text-muted-foreground">
           We sent a confirmation link to your email. Click it, then sign in to build your profile.
         </p>
-        <Button size="lg" className="rounded-2xl" asChild>
+        <Button size="lg" className="rounded-full" asChild>
           <Link href="/login">Go to sign in</Link>
         </Button>
       </div>
@@ -142,7 +142,7 @@ export default function RegisterPage() {
             Send me dating tips and product updates (optional)
           </Label>
         </div>
-        <Button type="submit" size="lg" className="h-12 w-full rounded-2xl" disabled={submitting}>
+        <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
           Create account
         </Button>

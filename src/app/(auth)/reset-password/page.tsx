@@ -48,7 +48,7 @@ function ResetPasswordForm() {
       <div className="space-y-4 text-center">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Link expired</h1>
         <p className="text-muted-foreground">This reset link is invalid or incomplete.</p>
-        <Button className="rounded-2xl" asChild>
+        <Button className="rounded-full" asChild>
           <Link href="/forgot-password">Request a new link</Link>
         </Button>
       </div>
@@ -88,7 +88,7 @@ function ResetPasswordForm() {
             className="h-12 rounded-2xl"
           />
         </div>
-        <Button type="submit" size="lg" className="h-12 w-full rounded-2xl" disabled={submitting}>
+        <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
           Update password
         </Button>

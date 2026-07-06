@@ -1,9 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { EASE_LUXE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-
-const EASE_LUXE = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Scroll-into-view reveal. Children rise and settle with an expo-out

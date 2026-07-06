@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-
-const EASE_LUXE = [0.16, 1, 0.3, 1] as const;
+import { EASE_LUXE } from "@/lib/motion";
 
 /** Animated compatibility ring — fills to `value`% on mount. */
 export function MatchRing({

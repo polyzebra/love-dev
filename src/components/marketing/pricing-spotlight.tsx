@@ -3,13 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
+import { EASE_LUXE } from "@/lib/motion";
 import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/fx/magnetic";
 import { PLANS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-
-const EASE_LUXE = [0.16, 1, 0.3, 1] as const;
 
 const DESCRIPTIONS: Record<string, string> = {
   FREE: "Everything you need to meet someone real. No card, no catch.",

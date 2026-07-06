@@ -94,6 +94,7 @@ function TopCard({
   const light = useMotionTemplate`radial-gradient(26rem 26rem at ${lx}% ${ly}%, rgba(255,255,255,0.09), transparent 60%)`;
 
   const [grabbed, setGrabbed] = useState(false);
+  const [photoLoaded, setPhotoLoaded] = useState(false);
   const leaving = useRef(false);
   const photo = profile.photos[0];
 
@@ -165,7 +166,11 @@ function TopCard({
           <img
             src={photo.url}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            onLoad={() => setPhotoLoaded(true)}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-[opacity,filter] duration-700 ease-out",
+              photoLoaded ? "opacity-100 blur-0" : "opacity-0 blur-md",
+            )}
             draggable={false}
           />
         ) : (

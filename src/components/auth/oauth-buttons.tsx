@@ -50,7 +50,7 @@ export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: stri
         type="button"
         variant="outline"
         size="lg"
-        className="h-12 rounded-2xl"
+        className="h-12 rounded-full"
         disabled={pending !== null}
         onClick={() => start("google")}
       >
@@ -61,7 +61,7 @@ export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: stri
         type="button"
         variant="outline"
         size="lg"
-        className="h-12 rounded-2xl"
+        className="h-12 rounded-full"
         disabled={pending !== null}
         onClick={() => start("apple")}
       >

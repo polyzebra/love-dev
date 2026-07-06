@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import { EASE_LUXE } from "@/lib/motion";
 import { BadgeCheck, Check, Coffee, Heart, MapPin, Sparkles } from "lucide-react";
-
-const EASE_LUXE = [0.16, 1, 0.3, 1] as const;
 
 const PHOTO_SAOIRSE =
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=480&q=75&auto=format&fit=crop";

@@ -50,7 +50,7 @@ function VerifyEmail() {
         <CheckCircle2 className="mx-auto size-12 text-success" aria-hidden="true" />
         <h1 className="font-display text-3xl font-semibold tracking-tight">Email confirmed</h1>
         <p className="text-muted-foreground">You&apos;re all set. Sign in to build your profile.</p>
-        <Button size="lg" className="rounded-2xl" asChild>
+        <Button size="lg" className="rounded-full" asChild>
           <Link href="/login">Sign in</Link>
         </Button>
       </div>
@@ -64,7 +64,7 @@ function VerifyEmail() {
       <p className="text-muted-foreground">
         This confirmation link is invalid or has expired. Sign in to request a new one.
       </p>
-      <Button variant="outline" className="rounded-2xl" asChild>
+      <Button variant="outline" className="rounded-full" asChild>
         <Link href="/login">Back to sign in</Link>
       </Button>
     </div>
