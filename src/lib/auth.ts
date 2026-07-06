@@ -56,12 +56,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   events: {
-    async signIn({ user }) {
+    async signIn({ user, account, isNewUser }) {
+      // Identity audit line - answers "which provider account resolved
+      // to which app user" for every sign-in. No secrets logged.
+      console.info(
+        `[auth:signIn] provider=${account?.provider ?? "credentials"}` +
+          ` providerAccountId=${account?.providerAccountId ?? "-"}` +
+          ` user.id=${user.id} email=${user.email} newUser=${isNewUser ?? false}`,
+      );
       if (user.id) {
         await db.user
           .update({ where: { id: user.id }, data: { lastActiveAt: new Date() } })
           .catch(() => {});
       }
+    },
+    async signOut(message) {
+      const token = "token" in message ? message.token : null;
+      console.info(`[auth:signOut] user.id=${token?.id ?? "-"} email=${token?.email ?? "-"}`);
     },
   },
 });

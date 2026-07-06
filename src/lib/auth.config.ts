@@ -18,6 +18,11 @@ if (googleConfig) {
       clientId: googleConfig.clientId,
       clientSecret: googleConfig.clientSecret,
       allowDangerousEmailAccountLinking: false,
+      // Always show Google's account chooser. Without this, Google
+      // silently re-authenticates the previously used Google account
+      // after an app sign-out - which reads as "signed in with B but
+      // got A's session". Selection must be explicit, every time.
+      authorization: { params: { prompt: "select_account" } },
     }),
   );
 }
