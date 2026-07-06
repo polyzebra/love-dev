@@ -26,7 +26,7 @@ export default function PricingPage() {
           </Reveal>
           <Reveal delay={0.16}>
             <p className="text-lg text-muted-foreground">
-              Start free. Upgrade when you want more. Cancel in two taps — no dark patterns,
+              Start free. Upgrade when you want more. Cancel in two taps - no dark patterns,
               no win-back mazes.
             </p>
           </Reveal>

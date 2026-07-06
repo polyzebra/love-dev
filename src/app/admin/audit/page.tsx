@@ -47,7 +47,7 @@ export default async function AdminAuditPage() {
                   <code className="rounded-md bg-muted px-2 py-0.5 text-xs">{entry.action}</code>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {entry.targetType ? `${entry.targetType}:${entry.targetId ?? "—"}` : "—"}
+                  {entry.targetType ? `${entry.targetType}:${entry.targetId ?? "-"}` : "-"}
                 </TableCell>
               </TableRow>
             ))}

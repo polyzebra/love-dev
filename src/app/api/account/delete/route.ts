@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 
 /**
- * GDPR account deletion (Art. 17 — right to erasure).
+ * GDPR account deletion (Art. 17 - right to erasure).
  * Marks the account for deletion with a 30-day grace window, hides the
  * profile immediately and revokes all sessions. A scheduled job performs
  * the hard delete after the window (cascades cover related rows).

@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 const DESCRIPTIONS: Record<string, string> = {
   FREE: "Everything you need to meet someone real. No card, no catch.",
-  PLUS: "For daters with momentum — unlimited likes and the power to undo.",
+  PLUS: "For daters with momentum - unlimited likes and the power to undo.",
   PREMIUM: "The full Virelsy experience. Priority, boosts and every advantage.",
 };
 

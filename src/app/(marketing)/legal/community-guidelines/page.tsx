@@ -8,14 +8,14 @@ export default function CommunityGuidelinesPage() {
       <h1>Community Guidelines</h1>
       <p>
         Virelsy works because people feel safe being themselves. These guidelines apply to profiles,
-        photos, messages and behaviour — on and off the platform.
+        photos, messages and behaviour - on and off the platform.
       </p>
 
       <h2>Be yourself, genuinely</h2>
       <ul>
         <li>Use recent photos that clearly show you.</li>
         <li>No impersonation, no fake ages, no misleading profiles.</li>
-        <li>Accounts are for individuals — no couples accounts, businesses or promotion.</li>
+        <li>Accounts are for individuals - no couples accounts, businesses or promotion.</li>
       </ul>
 
       <h2>Respect is non-negotiable</h2>
@@ -35,7 +35,7 @@ export default function CommunityGuidelinesPage() {
       <h2>Enforcement</h2>
       <p>
         Violations lead to warnings, feature limits, or permanent bans depending on severity.
-        Serious harms — threats, exploitation, fraud — result in immediate removal and, where
+        Serious harms - threats, exploitation, fraud - result in immediate removal and, where
         appropriate, referral to law enforcement.
       </p>
 

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Ambient light field — three slow-drifting blurred orbs plus a radial
+ * Ambient light field - three slow-drifting blurred orbs plus a radial
  * key light and film grain. Pure CSS transforms (GPU only), fixed or
  * absolute, always behind content and inert to pointers.
  */

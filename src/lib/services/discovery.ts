@@ -4,7 +4,7 @@ import { calculateAge } from "@/lib/utils";
 /**
  * Discovery feed. Excludes: self, already-swiped, blocked (either way),
  * hidden/suspended/shadow-banned accounts. Prefers boosted and recently
- * active profiles. Distance uses a bounding-box approximation — replace
+ * active profiles. Distance uses a bounding-box approximation - replace
  * with PostGIS earth_distance for production-scale precision.
  */
 

@@ -25,25 +25,25 @@ const PRINCIPLES = [
     number: "02",
     icon: HeartHandshake,
     title: "Intentions, up front",
-    body: "Long-term, short-term, figuring it out — every profile says so before the first hello. No guessing games.",
+    body: "Long-term, short-term, figuring it out - every profile says so before the first hello. No guessing games.",
   },
   {
     number: "03",
     icon: MessageCircleHeart,
     title: "Conversations with a pulse",
-    body: "A curated daily feed instead of an infinite slot machine. Fewer, better matches — and openers worth answering.",
+    body: "A curated daily feed instead of an infinite slot machine. Fewer, better matches - and openers worth answering.",
   },
 ] as const;
 
 export default function LandingPage() {
   return (
     <>
-      {/* ============== HERO — the product, already happening ============== */}
+      {/* ============== HERO - the product, already happening ============== */}
       <section className="noise relative flex min-h-dvh flex-col overflow-x-clip">
         <Aurora intensity="hero" />
 
         <div className="relative mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-6 pb-10 pt-28 md:grid-cols-[0.95fr_1.05fr] md:gap-0 md:px-10">
-          {/* CSS-only entrances above the fold — LCP paints before hydration */}
+          {/* CSS-only entrances above the fold - LCP paints before hydration */}
           <div className="relative z-10 space-y-7 text-center md:text-left">
             <p className="animate-rise text-xs font-semibold uppercase tracking-[0.35em] text-gold">
               Meet someone real
@@ -70,7 +70,7 @@ export default function LandingPage() {
                 <Link href="/safety">How we keep you safe</Link>
               </Button>
             </div>
-            {/* Proof, not promises — the product's own signals */}
+            {/* Proof, not promises - the product's own signals */}
             <div className="animate-rise flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground [--rise-delay:320ms] md:justify-start">
               <span className="flex items-center gap-1.5">
                 <BadgeCheck className="size-4 fill-sky-400/90 text-background" aria-hidden="true" />
@@ -145,7 +145,7 @@ export default function LandingPage() {
             <Reveal delay={0.16}>
               <p className="max-w-md text-lg leading-relaxed text-muted-foreground">
                 Because it is. Profiles read like people, not inventory. Distance, intentions and
-                shared interests sit exactly where your eyes expect them — and nothing screams for
+                shared interests sit exactly where your eyes expect them - and nothing screams for
                 your attention.
               </p>
             </Reveal>
@@ -248,7 +248,7 @@ export default function LandingPage() {
             <RevealGroup className="space-y-2" stagger={0.12}>
               {[
                 ["Five honest minutes", "Photos that look like you, intentions you actually hold, and the small details that make someone stop scrolling."],
-                ["One quick selfie", "Our verification check earns your blue tick — and filters out everyone who wouldn't take it."],
+                ["One quick selfie", "Our verification check earns your blue tick - and filters out everyone who wouldn't take it."],
                 ["A feed worth opening", "A short, curated set of profiles each day. When it's mutual, the conversation starts warm."],
               ].map(([title, body], i) => (
                 <RevealItem key={title}>
@@ -292,7 +292,7 @@ export default function LandingPage() {
           <Reveal delay={0.28}>
             <Magnetic className="mt-10 inline-block">
               <Button size="lg" className="h-16 rounded-full px-14 text-lg" asChild>
-                <Link href="/register">Join Virelsy — free</Link>
+                <Link href="/register">Join Virelsy - free</Link>
               </Button>
             </Magnetic>
           </Reveal>

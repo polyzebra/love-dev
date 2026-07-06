@@ -20,6 +20,6 @@ export async function POST(req: Request) {
     await sendMail(passwordResetEmail(user.email, url));
   }
 
-  // Constant response — never reveal whether the account exists
+  // Constant response - never reveal whether the account exists
   return ok({ message: "If that email is registered, a reset link is on its way." });
 }

@@ -43,7 +43,7 @@ export function useDominantColor(url: string | null | undefined): RGB | null {
           b = 0,
           n = 0;
         for (let i = 0; i < data.length; i += 4) {
-          // skip near-black/near-white pixels — they wash the tone out
+          // skip near-black/near-white pixels - they wash the tone out
           const lum = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
           if (lum < 24 || lum > 235) continue;
           r += data[i];
@@ -57,7 +57,7 @@ export function useDominantColor(url: string | null | undefined): RGB | null {
         cache.set(url, lifted);
         if (!cancelled) setColor(lifted);
       } catch {
-        cache.set(url, null); // tainted canvas (CORS) — fall back silently
+        cache.set(url, null); // tainted canvas (CORS) - fall back silently
         if (!cancelled) setColor(null);
       }
     };

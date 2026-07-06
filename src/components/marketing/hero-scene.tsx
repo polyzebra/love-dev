@@ -47,7 +47,7 @@ function Ring({ value, delay }: { value: number; delay: number }) {
 }
 
 /**
- * The living hero — one cinematic composition of the actual product.
+ * The living hero - one cinematic composition of the actual product.
  * Three parallax depth layers (back card · main card · floating UI),
  * everything breathing, nothing static, nothing empty.
  */
@@ -56,7 +56,7 @@ export function HeroScene() {
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
   const spring = { stiffness: 55, damping: 18 };
-  // Depth layers move at different rates — closer moves more
+  // Depth layers move at different rates - closer moves more
   const backX = useSpring(useTransform(mx, [0, 1], [10, -10]), spring);
   const backY = useSpring(useTransform(my, [0, 1], [8, -8]), spring);
   const midX = useSpring(useTransform(mx, [0, 1], [-16, 16]), spring);
@@ -204,7 +204,7 @@ export function HeroScene() {
             <span className="ml-auto text-[9px] uppercase tracking-widest text-white/40">now</span>
           </div>
           <p className="rounded-2xl rounded-bl-md bg-white/8 px-3 py-2 text-xs leading-snug text-white/85">
-            The Forty Foot at 7am — you in?
+            The Forty Foot at 7am - you in?
           </p>
           <p className="ml-auto mt-1.5 w-fit rounded-2xl rounded-br-md bg-linear-160 from-[#f43f5e] to-[#be123c] px-3 py-2 text-xs leading-snug text-white shadow-[0_4px_14px_rgba(225,29,72,0.3)]">
             Only if breakfast follows ☕

@@ -30,7 +30,7 @@ export default async function AccountSettingsPage() {
   const rows = [
     {
       label: "Email",
-      value: user?.email ?? "—",
+      value: user?.email ?? "-",
       verified: !!user?.emailVerified,
       action: user?.emailVerified ? null : "Resend link",
     },
@@ -99,7 +99,7 @@ export default async function AccountSettingsPage() {
           <CardDescription>
             {user?.passwordHash
               ? "Change your password via a secure email link."
-              : "You signed up with Google or Apple — set a password to also sign in with email."}
+              : "You signed up with Google or Apple - set a password to also sign in with email."}
           </CardDescription>
         </CardHeader>
         <CardContent>

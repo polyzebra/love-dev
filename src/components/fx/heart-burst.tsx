@@ -8,7 +8,7 @@ import { Heart } from "lucide-react";
  * decorative, transform/opacity only, plays once per mount.
  */
 export function HeartBurst({ count = 14 }: { count?: number }) {
-  // Deterministic pseudo-random spread — stable across renders
+  // Deterministic pseudo-random spread - stable across renders
   const hearts = Array.from({ length: count }, (_, i) => {
     const t = (i * 137.508) % 360; // golden angle
     return {

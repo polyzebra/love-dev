@@ -1,4 +1,4 @@
-// Virelsy — Prisma schema
+// Virelsy - Prisma schema
 // PostgreSQL (Supabase-compatible). Normalized, indexed for the hot paths:
 // discovery feeds, match lookups, conversation timelines and admin queues.
 
@@ -332,7 +332,7 @@ model Profile {
 
   relationshipGoal RelationshipGoal @default(FIGURING_OUT)
 
-  // Location (coarse — city-level; exact coords never exposed to clients)
+  // Location (coarse - city-level; exact coords never exposed to clients)
   city      String?
   region    String?
   country   String  @default("IE") // IE | GB
@@ -416,7 +416,7 @@ model ProfileInterest {
 }
 
 // Verification records reference external providers (Veriff / Stripe Identity).
-// Identity documents are NEVER stored — only provider references and status.
+// Identity documents are NEVER stored - only provider references and status.
 model Verification {
   id                String             @id @default(cuid())
   userId            String

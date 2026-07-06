@@ -21,7 +21,7 @@ export function UserRowActions({ userId, status }: { userId: string; status: str
         await setUserStatus(userId, next);
         toast.success(`User ${next === "ACTIVE" ? "reinstated" : next.toLowerCase().replace("_", " ")}.`);
       } catch {
-        toast.error("Action failed — you may not have permission.");
+        toast.error("Action failed - you may not have permission.");
       }
     });
   }

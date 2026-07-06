@@ -57,7 +57,7 @@ export async function POST(req: Request) {
   const raw = await req.text();
 
   if (!env.STRIPE_WEBHOOK_SECRET || !signature) {
-    // Not configured — acknowledge so Stripe CLI testing doesn't retry-spam
+    // Not configured - acknowledge so Stripe CLI testing doesn't retry-spam
     return Response.json({ received: true, configured: false });
   }
 

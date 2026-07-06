@@ -21,7 +21,7 @@ export function ReportActions({
         await fn();
         toast.success(message);
       } catch {
-        toast.error("Action failed — you may not have permission.");
+        toast.error("Action failed - you may not have permission.");
       }
     });
   }

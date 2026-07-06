@@ -18,14 +18,14 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "Virelsy — Dating, designed with intention",
+    default: "Virelsy - Dating, designed with intention",
     template: "%s · Virelsy",
   },
   description:
     "Virelsy is a premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
   keywords: ["dating", "relationships", "verified dating", "premium dating"],
   openGraph: {
-    title: "Virelsy — Dating, designed with intention",
+    title: "Virelsy - Dating, designed with intention",
     description:
       "A premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
     type: "website",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Virelsy — Dating, designed with intention",
+    title: "Virelsy - Dating, designed with intention",
     description: "A premium dating platform. Verified profiles, real intentions.",
   },
 };

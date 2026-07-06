@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /**
  * Environment contract. Server-only values must never be imported into
- * client components — this module is the single source of truth.
+ * client components - this module is the single source of truth.
  */
 /** Treat empty strings from .env templates as "not set". */
 const optionalStr = z.preprocess(

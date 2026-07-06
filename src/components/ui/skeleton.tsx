@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-/** Loading placeholder — a glass surface with a slow light sweep. */
+/** Loading placeholder - a glass surface with a slow light sweep. */
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

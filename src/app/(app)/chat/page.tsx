@@ -73,7 +73,7 @@ export default async function ChatListPage() {
                       c.unread > 0 ? "font-medium text-foreground" : "text-muted-foreground",
                     )}
                   >
-                    {c.lastMessage?.body ?? "You matched — say hello!"}
+                    {c.lastMessage?.body ?? "You matched - say hello!"}
                   </p>
                   {c.unread > 0 && (
                     <Badge className="ml-auto size-5 shrink-0 justify-center rounded-full p-0 text-[11px]">

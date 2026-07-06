@@ -3,7 +3,7 @@
  *
  * Default store is in-memory (fine for a single instance / dev). In
  * production behind multiple instances, swap the store for Redis
- * (e.g. Upstash) — the interface is deliberately tiny.
+ * (e.g. Upstash) - the interface is deliberately tiny.
  */
 
 type WindowRecord = { count: number; resetAt: number };

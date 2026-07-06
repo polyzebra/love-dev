@@ -1,4 +1,4 @@
-# Virelsy — Production Checklist
+# Virelsy - Production Checklist
 
 ## Security
 
@@ -38,7 +38,7 @@
 
 - [ ] Photo upload storage (Supabase Storage / S3) with WebP/AVIF conversion + blur placeholders
 - [ ] Image moderation provider connected (photo `moderation` field is ready)
-- [ ] Photo/ID verification provider (Veriff / Stripe Identity) connected — status-only storage
+- [ ] Photo/ID verification provider (Veriff / Stripe Identity) connected - status-only storage
 
 ## Realtime
 
@@ -62,7 +62,7 @@
 
 - [ ] Privacy policy & terms reviewed by counsel (IE + UK)
 - [ ] Cookie/consent banner if analytics/marketing cookies are added
-- [ ] Age gate verified (18+) — enforced in validation, verify at ID check too
+- [ ] Age gate verified (18+) - enforced in validation, verify at ID check too
 - [ ] Data Protection Impact Assessment (DPIA) completed
 - [ ] Safety team escalation runbook (24h SLA on severe reports)
 

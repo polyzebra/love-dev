@@ -41,20 +41,20 @@ const POLL_INTERVAL_MS = 5000;
 const GROUP_WINDOW_MS = 3 * 60_000;
 
 /**
- * Conversation intelligence — everything below derives from REAL shared
+ * Conversation intelligence - everything below derives from REAL shared
  * interests between the two people; nothing is invented.
  */
 const STARTER_TEMPLATES: [RegExp, (name: string) => string][] = [
-  [/hik/i, (n) => `You both love hiking — ask ${n} about a favourite trail`],
-  [/coffee/i, (n) => `You both rate coffee — ask ${n} for their go-to café`],
-  [/travel/i, (n) => `You both love travelling — ask ${n} their dream destination`],
-  [/dog/i, (n) => `You're both dog people — ask about ${n}'s dog`],
-  [/run/i, (n) => `You both run — ask ${n} about their route`],
-  [/swim/i, (n) => `You both swim — ask ${n} where they brave the water`],
-  [/read/i, (n) => `You both read — ask ${n} what they'd recommend`],
-  [/music/i, (n) => `You both love live music — ask ${n} about the best gig they've seen`],
-  [/cook|bak/i, (n) => `You both cook — ask ${n} their signature dish`],
-  [/film/i, (n) => `You both love films — ask ${n} for a favourite`],
+  [/hik/i, (n) => `You both love hiking - ask ${n} about a favourite trail`],
+  [/coffee/i, (n) => `You both rate coffee - ask ${n} for their go-to café`],
+  [/travel/i, (n) => `You both love travelling - ask ${n} their dream destination`],
+  [/dog/i, (n) => `You're both dog people - ask about ${n}'s dog`],
+  [/run/i, (n) => `You both run - ask ${n} about their route`],
+  [/swim/i, (n) => `You both swim - ask ${n} where they brave the water`],
+  [/read/i, (n) => `You both read - ask ${n} what they'd recommend`],
+  [/music/i, (n) => `You both love live music - ask ${n} about the best gig they've seen`],
+  [/cook|bak/i, (n) => `You both cook - ask ${n} their signature dish`],
+  [/film/i, (n) => `You both love films - ask ${n} for a favourite`],
 ];
 
 function startersFor(shared: string[], name: string): string[] {
@@ -62,7 +62,7 @@ function startersFor(shared: string[], name: string): string[] {
   for (const interest of shared) {
     const hit = STARTER_TEMPLATES.find(([re]) => re.test(interest));
     out.push(
-      hit ? hit[1](name) : `You both love ${interest.toLowerCase()} — ask ${name} about it`,
+      hit ? hit[1](name) : `You both love ${interest.toLowerCase()} - ask ${name} about it`,
     );
   }
   return out;
@@ -125,7 +125,7 @@ export function ChatThread({
   const [nudgeDismissed, setNudgeDismissed] = useState(true);
 
   useEffect(() => {
-    // A gentle, once-per-session suggestion — never on first paint
+    // A gentle, once-per-session suggestion - never on first paint
     setNudgeDismissed(
       window.sessionStorage.getItem(`virelsy:nudge:${conversationId}`) === "1",
     );
@@ -156,7 +156,7 @@ export function ChatThread({
     scrollToBottom(false);
   }, [scrollToBottom]);
 
-  // Poll for new messages — swap for WebSocket/SSE transport in production
+  // Poll for new messages - swap for WebSocket/SSE transport in production
   useEffect(() => {
     const timer = setInterval(async () => {
       try {
@@ -175,7 +175,7 @@ export function ChatThread({
           return merged;
         });
       } catch {
-        // offline — polling will recover
+        // offline - polling will recover
       }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
@@ -228,7 +228,7 @@ export function ChatThread({
         role="log"
         aria-label={`Conversation with ${otherName}`}
       >
-        {/* Quiet safety line — present, not shouting */}
+        {/* Quiet safety line - present, not shouting */}
         <p className="flex items-center justify-center gap-1.5 pb-6 pt-2 text-center text-[11px] text-muted-foreground">
           <ShieldCheck className="size-3" aria-hidden="true" />
           Keep chats here and never send money ·{" "}
@@ -319,7 +319,7 @@ export function ChatThread({
         <div ref={bottomRef} />
       </div>
 
-      {/* Guided moment — the right suggestion for where you are */}
+      {/* Guided moment - the right suggestion for where you are */}
       {showNudge ? (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -361,7 +361,7 @@ export function ChatThread({
             <button
               key={starter}
               type="button"
-              onClick={() => setDraft(starter.split(" — ")[1] ?? starter)}
+              onClick={() => setDraft(starter.split(" - ")[1] ?? starter)}
               className="glass-chip tap-target flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-foreground/90 transition-transform active:scale-95"
             >
               <Sparkles className="size-3.5 text-gold" aria-hidden="true" />

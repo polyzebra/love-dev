@@ -31,7 +31,7 @@ export default function PrivacyPage() {
       <h2>4. Identity verification</h2>
       <p>
         Optional ID checks are performed by specialist providers. We receive only the verification
-        outcome and a provider reference — never your documents.
+        outcome and a provider reference - never your documents.
       </p>
 
       <h2>5. Retention</h2>
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
       <h2>6. Your rights</h2>
       <ul>
         <li>Access & portability: export your data from Settings at any time.</li>
-        <li>Erasure: delete your account from Settings — no emails, no phone calls required.</li>
+        <li>Erasure: delete your account from Settings - no emails, no phone calls required.</li>
         <li>Rectification, restriction and objection: contact privacy@virelsy.app.</li>
         <li>You may lodge a complaint with the Irish Data Protection Commission or the UK ICO.</li>
       </ul>

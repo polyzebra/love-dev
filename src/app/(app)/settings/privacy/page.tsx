@@ -21,7 +21,7 @@ export default async function PrivacySettingsPage() {
     <>
       <PageHeader
         title="Privacy Centre"
-        description="Your data, your rules — as GDPR intended."
+        description="Your data, your rules - as GDPR intended."
       />
 
       <div className="space-y-6">
@@ -56,8 +56,8 @@ export default async function PrivacySettingsPage() {
           <CardHeader>
             <CardTitle className="text-base">Export your data</CardTitle>
             <CardDescription>
-              Download a copy of everything Virelsy holds about you — profile, activity, messages and
-              payments — as JSON. (GDPR Art. 20)
+              Download a copy of everything Virelsy holds about you - profile, activity, messages and
+              payments - as JSON. (GDPR Art. 20)
             </CardDescription>
           </CardHeader>
           <CardContent>

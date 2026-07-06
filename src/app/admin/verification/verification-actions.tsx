@@ -15,7 +15,7 @@ export function VerificationActions({ verificationId }: { verificationId: string
         await reviewVerification(verificationId, approve);
         toast.success(approve ? "Verification approved." : "Verification rejected.");
       } catch {
-        toast.error("Action failed — you may not have permission.");
+        toast.error("Action failed - you may not have permission.");
       }
     });
   }

@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 
 /**
- * Magnetic hover — the child is gently pulled toward the cursor and
+ * Magnetic hover - the child is gently pulled toward the cursor and
  * snaps back on leave with spring physics. Mouse only; a plain wrapper
  * on touch. Wrap buttons and key CTAs, never body text.
  */

@@ -1,4 +1,4 @@
-# Virelsy — Dating, designed with intention
+# Virelsy - Dating, designed with intention
 
 A production-grade premium dating SaaS platform. Verified profiles, honest
 intentions, premium experience. Built mobile-first with a custom design system.
@@ -11,9 +11,9 @@ intentions, premium experience. Built mobile-first with a custom design system.
 | Language   | TypeScript (strict)                                           |
 | Styling    | Tailwind CSS v4 + custom design tokens                        |
 | Components | shadcn/ui (30+ primitives) + bespoke app components           |
-| Motion     | Motion (Framer Motion successor) — springs, 60fps transforms  |
+| Motion     | Motion (Framer Motion successor) - springs, 60fps transforms  |
 | Database   | PostgreSQL (Supabase-compatible) via Prisma 7                 |
-| Auth       | Auth.js v5 — email/password, Google, Apple, JWT sessions      |
+| Auth       | Auth.js v5 - email/password, Google, Apple, JWT sessions      |
 | Validation | Zod on every API boundary                                     |
 | Payments   | Stripe-first webhook architecture (Revolut-ready)             |
 | Email      | Provider-agnostic mailer (Resend-ready, console in dev)       |
@@ -37,7 +37,7 @@ npx prisma db seed       # interests + admin + demo profiles
 npm run dev              # http://localhost:3000
 ```
 
-**Seeded accounts** (dev only — change immediately in any shared environment):
+**Seeded accounts** (dev only - change immediately in any shared environment):
 
 - Admin: `admin@virelsy.app` / `admin-virelsy-2026` → `/admin`
 - Demo members: `saoirse@demo.virelsy.app` (and 5 more) / `demo-virelsy-2026`
@@ -59,12 +59,12 @@ npm run dev              # http://localhost:3000
 ```
 src/
 ├── app/
-│   ├── (marketing)/         # Landing, pricing, safety, legal — static, SEO-first
+│   ├── (marketing)/         # Landing, pricing, safety, legal - static, SEO-first
 │   ├── (auth)/              # Login, register, forgot/reset password, verify email
 │   ├── (app)/               # Authenticated app: discover, matches, chat, profile, settings
 │   ├── onboarding/          # 6-step profile wizard (own shell, pre-app)
 │   ├── admin/               # RBAC-gated admin panel (dashboard, users, reports, …)
-│   └── api/                 # Route handlers — thin controllers over services
+│   └── api/                 # Route handlers - thin controllers over services
 ├── components/
 │   ├── ui/                  # shadcn/ui design-system primitives
 │   ├── shared/              # Logo, badges, empty states, page headers
@@ -78,7 +78,7 @@ src/
 │   ├── rate-limit.ts        # Sliding window (memory now, Redis-swappable)
 │   ├── tokens.ts            # Hashed one-time tokens (email, reset, OTP)
 │   ├── audit.ts             # Append-only audit trail
-│   ├── validators/          # Zod schemas — single source of validation truth
+│   ├── validators/          # Zod schemas - single source of validation truth
 │   └── services/            # Domain logic: discovery, matching, chat, profile
 ├── middleware.ts            # Session gating for app/admin routes
 └── generated/prisma/        # Generated Prisma client (do not edit)
@@ -90,7 +90,7 @@ src/
 - Services own domain logic; route handlers stay thin.
 - All user input crosses a Zod schema before touching the database.
 - Privileged actions write to the audit log.
-- Colors/typography/radius come from tokens in `globals.css` — no raw hex in components.
+- Colors/typography/radius come from tokens in `globals.css` - no raw hex in components.
 
 ## Design system
 
@@ -103,7 +103,7 @@ Built with guidance from the bundled **UI/UX Pro Max** skill (`.claude/skills/ui
 - Report & block flows wired end-to-end (user → admin queue → resolution + audit).
 - Shadow banning, suspension, verification review in the admin panel.
 - GDPR: self-service data export (Art. 20) and account deletion with 30-day grace (Art. 17).
-- Identity documents are never stored — verification providers return status only.
+- Identity documents are never stored - verification providers return status only.
 - Rate limiting on auth, swipes, messages and reports; brute-force lockout on login.
 
 ## Production

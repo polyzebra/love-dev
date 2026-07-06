@@ -3,7 +3,7 @@ import type { Prisma } from "@/generated/prisma/client";
 
 /**
  * Append-only audit trail for privileged and safety-relevant actions.
- * Never throws — an audit failure must not break the primary operation,
+ * Never throws - an audit failure must not break the primary operation,
  * but it is always logged.
  */
 export async function audit(entry: {

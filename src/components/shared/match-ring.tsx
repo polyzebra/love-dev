@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
 
-/** Animated compatibility ring — fills to `value`% on mount. */
+/** Animated compatibility ring - fills to `value`% on mount. */
 export function MatchRing({
   value,
   size = "sm",

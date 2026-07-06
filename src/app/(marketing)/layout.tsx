@@ -7,7 +7,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-dvh flex-col bg-background">
       <ScrollProgress />
       <MarketingNavbar />
-      {/* Navbar floats — heroes own their top spacing */}
+      {/* Navbar floats - heroes own their top spacing */}
       <main className="flex-1">{children}</main>
       <MarketingFooter />
     </div>

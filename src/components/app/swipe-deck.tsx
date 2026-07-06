@@ -35,7 +35,7 @@ export type ViewerContext = {
   interests: string[];
 };
 
-/** Honest, data-backed reasons this profile appears — never invented. */
+/** Honest, data-backed reasons this profile appears - never invented. */
 function compatibilityReasons(
   profile: DiscoverProfile,
   viewer: ViewerContext | null,
@@ -313,7 +313,7 @@ export function SwipeDeck({
   const top = deck[0];
   const next = deck[1];
 
-  // Shared ground with the person on top — drives reasons & highlights
+  // Shared ground with the person on top - drives reasons & highlights
   const viewerSet = new Set(viewer?.interests ?? []);
   const shared = top ? top.interests.filter((i) => viewerSet.has(i)) : [];
   const sharedSet = new Set(shared);
@@ -391,7 +391,7 @@ export function SwipeDeck({
       <EmptyState
         icon={SearchX}
         title="You're all caught up"
-        description="No more profiles match your filters right now. Widen your distance or age range, or check back later — new members join every day."
+        description="No more profiles match your filters right now. Widen your distance or age range, or check back later - new members join every day."
         action={
           <Button className="rounded-full" asChild>
             <Link href="/settings/discovery">Adjust filters</Link>
@@ -404,7 +404,7 @@ export function SwipeDeck({
   return (
     <div className="mx-auto w-full max-w-sm">
       <div className="relative aspect-3/4 w-full" role="group" aria-label="Profile cards">
-        {/* Ambient stage light — tinted by the person's photo */}
+        {/* Ambient stage light - tinted by the person's photo */}
         <div
           aria-hidden="true"
           className="absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-[background] duration-[1400ms] ease-out"
@@ -413,7 +413,7 @@ export function SwipeDeck({
           }}
         />
 
-        {/* Next card preview — real content, waiting underneath */}
+        {/* Next card preview - real content, waiting underneath */}
         {next && (
           <motion.div
             key={`peek-${next.userId}`}

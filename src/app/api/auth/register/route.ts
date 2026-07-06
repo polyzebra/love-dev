@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   const existing = await db.user.findUnique({ where: { email: data.email } });
   if (existing) {
-    // Same response shape as success — do not leak which emails exist
+    // Same response shape as success - do not leak which emails exist
     return created({ message: "Check your inbox to confirm your email." });
   }
 

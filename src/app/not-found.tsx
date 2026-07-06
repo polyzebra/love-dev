@@ -13,7 +13,7 @@ export default function NotFound() {
       <div className="space-y-2">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Page not found</h1>
         <p className="max-w-sm text-muted-foreground">
-          This page has moved on. Unlike your next match — they&apos;re still out there.
+          This page has moved on. Unlike your next match - they&apos;re still out there.
         </p>
       </div>
       <Button size="lg" className="rounded-full px-8" asChild>

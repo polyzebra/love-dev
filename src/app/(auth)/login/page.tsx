@@ -33,7 +33,7 @@ function LoginForm() {
 
     if (result?.error) {
       toast.error(
-        "Sign-in failed. Check your details — and make sure you've confirmed your email.",
+        "Sign-in failed. Check your details - and make sure you've confirmed your email.",
       );
       return;
     }

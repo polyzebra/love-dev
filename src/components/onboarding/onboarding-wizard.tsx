@@ -68,10 +68,10 @@ const CITIES: Record<"IE" | "GB", string[]> = {
 
 const STEPS = ["Basics", "Intentions", "Location", "About you", "Lifestyle", "Interests"] as const;
 
-/** Honest value, shown after each completed step — explanation, not pressure. */
+/** Honest value, shown after each completed step - explanation, not pressure. */
 const STEP_VALUE: Record<number, string> = {
   0: "Nice to meet you. Real names and real ages build real trust.",
-  1: "Clear intentions get more replies — people know where they stand with you.",
+  1: "Clear intentions get more replies - people know where they stand with you.",
   2: "You'll only be shown to people within reach. Your exact location stays private.",
   3: "Profiles with a bio start far more conversations.",
   4: "Lifestyle details quietly improve who we introduce you to.",
@@ -80,7 +80,7 @@ const STEP_VALUE: Record<number, string> = {
 /** Milestones worth pausing for. */
 const MILESTONES: { at: number; message: string }[] = [
   { at: 25, message: "Your profile is taking shape." },
-  { at: 50, message: "Halfway — your profile is now visible to more people." },
+  { at: 50, message: "Halfway - your profile is now visible to more people." },
   { at: 75, message: "Looking great. Complete profiles get noticeably more matches." },
 ];
 
@@ -167,7 +167,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     [data.birthDate],
   );
 
-  /** Live profile glow — grows as the profile gets richer. */
+  /** Live profile glow - grows as the profile gets richer. */
   const profileScore = useMemo(() => {
     let score = 0;
     if (data.displayName.trim().length >= 2) score += 10;
@@ -186,7 +186,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     return Math.min(100, score);
   }, [data, age]);
 
-  // Celebrate genuine milestones once each — explanation, not manipulation
+  // Celebrate genuine milestones once each - explanation, not manipulation
   useEffect(() => {
     for (const { at, message } of MILESTONES) {
       if (profileScore >= at && !milestonesShown.current.has(at)) {
@@ -382,7 +382,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 <p id="age-hint" className="text-xs text-muted-foreground">
                   {age !== null && age < 18
                     ? "You must be 18 or older to use Virelsy."
-                    : "Your age is shown on your profile — never your birthday."}
+                    : "Your age is shown on your profile - never your birthday."}
                 </p>
               </div>
               <fieldset className="space-y-2">
@@ -469,7 +469,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   Where are you based?
                 </h1>
                 <p className="text-muted-foreground">
-                  We only ever show your city — never your exact location.
+                  We only ever show your city - never your exact location.
                 </p>
               </div>
               <fieldset className="space-y-2">
@@ -515,7 +515,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   Tell your story
                 </h1>
                 <p className="text-muted-foreground">
-                  All optional — but profiles with a bio get far more matches.
+                  All optional - but profiles with a bio get far more matches.
                 </p>
               </div>
               <div className="space-y-2">
@@ -693,7 +693,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   What are you into?
                 </h1>
                 <p className="text-muted-foreground" aria-live="polite">
-                  Pick at least 3 — you&apos;ve chosen {data.interests.length} of 12.
+                  Pick at least 3 - you&apos;ve chosen {data.interests.length} of 12.
                 </p>
               </div>
               {INTEREST_CATALOGUE.map((group) => (

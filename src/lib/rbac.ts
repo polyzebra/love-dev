@@ -1,7 +1,7 @@
 import type { Role } from "@/generated/prisma/enums";
 
 /**
- * Role-based access control. Permissions are explicit — least privilege —
+ * Role-based access control. Permissions are explicit - least privilege -
  * so a new capability must be added here before any route can use it.
  */
 export const PERMISSIONS = {

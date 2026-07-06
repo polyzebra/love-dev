@@ -82,7 +82,7 @@ export default async function AdminUsersPage({
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <p className="font-medium">{user.profile?.displayName ?? user.name ?? "—"}</p>
+                  <p className="font-medium">{user.profile?.displayName ?? user.name ?? "-"}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </TableCell>
                 <TableCell>

@@ -67,7 +67,7 @@ function defaultHapticSink(event: InteractionEvent): void {
     try {
       navigator.vibrate(pattern);
     } catch {
-      /* unsupported — fine */
+      /* unsupported - fine */
     }
   }
 }

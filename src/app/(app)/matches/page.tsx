@@ -49,7 +49,7 @@ export default async function MatchesPage() {
         <EmptyState
           icon={HeartOff}
           title="No matches yet"
-          description="Your future match is probably in Discover right now. Keep an open mind — and a complete profile gets up to 3× more likes."
+          description="Your future match is probably in Discover right now. Keep an open mind - and a complete profile gets up to 3× more likes."
           action={
             <Button className="rounded-full" asChild>
               <Link href="/discover">Go to Discover</Link>

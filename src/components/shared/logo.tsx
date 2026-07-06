@@ -19,7 +19,7 @@ export function Logo({
         sizes[size],
         className,
       )}
-      aria-label="Virelsy — home"
+      aria-label="Virelsy - home"
     >
       <svg
         viewBox="0 0 24 24"

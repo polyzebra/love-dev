@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Floating glass capsule. Starts wide and airy over the hero; on scroll
- * it condenses — tighter padding, deeper blur, a visible edge.
+ * it condenses - tighter padding, deeper blur, a visible edge.
  */
 export function MarketingNavbar() {
   const { scrollY } = useScroll();

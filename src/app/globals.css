@@ -4,13 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ------------------------------------------------------------------ */
-/*  AMORA v2 — cinematic dark luxury                                   */
+/*  AMORA v2 - cinematic dark luxury                                   */
 /*  Near-black warm base · ambient aurora light · frosted glass ·      */
 /*  rose signal with glow · editorial serif over Inter                 */
 /* ------------------------------------------------------------------ */
 
 :root {
-  /* Base surfaces — warm near-black, never pure #000 (OLED smear) */
+  /* Base surfaces - warm near-black, never pure #000 (OLED smear) */
   --background: #0b0709;
   --foreground: #f6f1f1;
   --card: #171114;
@@ -18,7 +18,7 @@
   --popover: #1c1518;
   --popover-foreground: #f6f1f1;
 
-  /* Brand — rose signal on darkness */
+  /* Brand - rose signal on darkness */
   --primary: #e11d48;
   --primary-soft: #fb7185;
   --primary-foreground: #ffffff;
@@ -29,7 +29,7 @@
   --accent: #2c151d;
   --accent-foreground: #fda4af;
 
-  /* Champagne — small luxury moments only */
+  /* Champagne - small luxury moments only */
   --gold: #e7c9a1;
 
   /* Feedback */
@@ -65,7 +65,7 @@
   /* Geometry */
   --radius: 1.5rem;
 
-  /* Depth — layered, soft, real */
+  /* Depth - layered, soft, real */
   --shadow-card:
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 8px 24px rgba(0, 0, 0, 0.35);
@@ -79,7 +79,7 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Single cinematic theme — .dark kept as alias so existing markup holds */
+/* Single cinematic theme - .dark kept as alias so existing markup holds */
 .dark {
   --background: #0b0709;
 }
@@ -165,7 +165,7 @@
     60% { transform: scale(1.25); }
     100% { transform: scale(1); }
   }
-  /* Ambient light blobs — transform/opacity only, GPU friendly */
+  /* Ambient light blobs - transform/opacity only, GPU friendly */
   @keyframes aurora-a {
     0% { transform: translate3d(-8%, -4%, 0) scale(1) rotate(0deg); }
     100% { transform: translate3d(10%, 8%, 0) scale(1.25) rotate(12deg); }
@@ -238,7 +238,7 @@
 /*  Surface & light utilities                                        */
 /* ---------------------------------------------------------------- */
 
-/* Frosted glass — the house material */
+/* Frosted glass - the house material */
 @utility glass {
   background: color-mix(in oklab, var(--card) 62%, transparent);
   backdrop-filter: blur(24px) saturate(1.5);

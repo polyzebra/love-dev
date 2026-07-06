@@ -101,7 +101,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      {/* ================= COVER — magazine opener ================= */}
+      {/* ================= COVER - magazine opener ================= */}
       <Reveal y={16}>
         <section className="relative overflow-hidden rounded-[36px] border border-white/12 shadow-float">
           <div className="relative aspect-4/5 sm:aspect-square md:aspect-4/3">
@@ -124,7 +124,7 @@ export default async function ProfilePage() {
               </Button>
             </div>
 
-            {/* Identity — editorial lockup */}
+            {/* Identity - editorial lockup */}
             <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 md:p-9">
               <h1 className="flex flex-wrap items-center gap-3 font-display text-[clamp(2.2rem,6vw,4rem)] font-medium leading-none tracking-tight text-white">
                 {profile.displayName}, {age}
@@ -163,7 +163,7 @@ export default async function ProfilePage() {
         <Reveal>
           <section className="glass rounded-[28px] p-6 text-center">
             <p className="text-sm text-muted-foreground">
-              No bio yet — profiles with a story get far more matches.{" "}
+              No bio yet - profiles with a story get far more matches.{" "}
               <Link href="/settings" className="font-medium text-primary-soft underline-offset-2 hover:underline">
                 Write yours
               </Link>

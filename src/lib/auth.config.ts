@@ -4,7 +4,7 @@ import Google from "next-auth/providers/google";
 import Apple from "next-auth/providers/apple";
 
 /**
- * Edge-safe Auth.js configuration — no database imports.
+ * Edge-safe Auth.js configuration - no database imports.
  * The middleware (proxy) uses this to gate routes; the full server
  * config in `auth.ts` layers the Prisma adapter and credentials on top.
  */

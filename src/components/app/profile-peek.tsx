@@ -27,7 +27,7 @@ export type PeekProfile = {
 };
 
 /**
- * Bottom-sheet profile preview inside a conversation — tap the header
+ * Bottom-sheet profile preview inside a conversation - tap the header
  * to remember who you're talking to without leaving the thread.
  */
 export function ProfilePeek({
@@ -73,7 +73,7 @@ export function ProfilePeek({
             </p>
           )}
 
-          {/* About you two — only real, shared ground */}
+          {/* About you two - only real, shared ground */}
           {(profile.sharedInterests.length > 0 || profile.sameCity || profile.isVerified) && (
             <div className="glass rounded-3xl p-5 text-center">
               <p className="mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-gold">

@@ -56,7 +56,7 @@ export default async function AdminVerificationPage() {
                 </span>
               </div>
               <p className="text-sm">
-                <span className="font-medium">{item.user.profile?.displayName ?? "—"}</span>{" "}
+                <span className="font-medium">{item.user.profile?.displayName ?? "-"}</span>{" "}
                 <span className="text-muted-foreground">
                   · {item.user.email}
                   {item.user.profile?.city ? ` · ${item.user.profile.city}` : ""}
@@ -64,7 +64,7 @@ export default async function AdminVerificationPage() {
               </p>
               {item.provider && (
                 <p className="text-xs text-muted-foreground">
-                  Provider: {item.provider} · Session {item.providerSessionId ?? "—"}
+                  Provider: {item.provider} · Session {item.providerSessionId ?? "-"}
                 </p>
               )}
               {item.user.photos.length > 0 && (

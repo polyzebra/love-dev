@@ -12,7 +12,7 @@ const PILLARS = [
   {
     icon: UserCheck,
     title: "Verification first",
-    body: "Photo verification is part of onboarding. Optional ID verification adds an extra layer for those who want it. We never store identity documents — only the outcome.",
+    body: "Photo verification is part of onboarding. Optional ID verification adds an extra layer for those who want it. We never store identity documents - only the outcome.",
   },
   {
     icon: Flag,
@@ -22,7 +22,7 @@ const PILLARS = [
   {
     icon: Ban,
     title: "Blocking that actually blocks",
-    body: "Blocking removes you both from each other's world instantly — feed, matches and message history.",
+    body: "Blocking removes you both from each other's world instantly - feed, matches and message history.",
   },
   {
     icon: Eye,
@@ -37,7 +37,7 @@ const PILLARS = [
   {
     icon: FileDown,
     title: "Your data, your rights",
-    body: "Export everything we hold about you or delete your account permanently — both are self-service in Settings.",
+    body: "Export everything we hold about you or delete your account permanently - both are self-service in Settings.",
   },
 ] as const;
 
@@ -45,7 +45,7 @@ const TIPS = [
   "Meet in public for the first few dates.",
   "Tell a friend where you're going and who you're meeting.",
   "Keep conversations on Virelsy until you trust the person.",
-  "Never send money or share financial details — ever.",
+  "Never send money or share financial details - ever.",
   "Video chat before meeting if it helps you feel safe.",
   "Trust your instincts. If something feels off, it probably is.",
 ] as const;

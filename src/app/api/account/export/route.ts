@@ -2,7 +2,7 @@ import { requireSession, unauthorized } from "@/lib/api";
 import { db } from "@/lib/db";
 
 /**
- * GDPR data export (Art. 20 — data portability).
+ * GDPR data export (Art. 20 - data portability).
  * Returns the user's personal data as a downloadable JSON document.
  */
 export async function GET() {

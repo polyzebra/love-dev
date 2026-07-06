@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import type { OnboardingInput } from "@/lib/validators/profile";
 
-/** Weighted profile completion — drives the progress ring in the UI. */
+/** Weighted profile completion - drives the progress ring in the UI. */
 export function computeCompletion(profile: {
   bio?: string | null;
   heightCm?: number | null;

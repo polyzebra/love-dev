@@ -94,7 +94,7 @@ export default async function AdminPaymentsPage() {
             {payments.map((p) => (
               <TableRow key={p.id}>
                 <TableCell>
-                  <p className="font-medium">{p.user.profile?.displayName ?? "—"}</p>
+                  <p className="font-medium">{p.user.profile?.displayName ?? "-"}</p>
                   <p className="text-xs text-muted-foreground">{p.user.email}</p>
                 </TableCell>
                 <TableCell className="text-sm">{p.description ?? "Subscription"}</TableCell>
