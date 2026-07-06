@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useMotionValue, useTransform } from "motion/react";
-import { toast } from "sonner";
 import {
-  BadgeCheck,
-  Heart,
-  MapPin,
-  RotateCcw,
-  SearchX,
-  Sparkles,
-  Star,
-  X,
-} from "lucide-react";
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useTransform,
+} from "motion/react";
+import { toast } from "sonner";
+import { BadgeCheck, Heart, MapPin, RotateCcw, SearchX, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,10 +21,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { MatchRing } from "@/components/shared/match-ring";
+import { HeartBurst } from "@/components/fx/heart-burst";
 import type { DiscoverProfile } from "@/lib/services/discovery";
-import { cn, formatDistance } from "@/lib/utils";
+import { formatDistance } from "@/lib/utils";
 
 type SwipeAction = "LIKE" | "PASS" | "SUPER_LIKE";
+
+const EXIT_VELOCITY = 600;
+const EXIT_OFFSET = 110;
 
 function photoGradient(seed: string): string {
   const hues = [346, 12, 262, 200, 160];
@@ -34,38 +37,100 @@ function photoGradient(seed: string): string {
   return `linear-gradient(160deg, hsl(${h} 80% 72%) 0%, hsl(${h} 72% 48%) 55%, hsl(${h} 70% 26%) 100%)`;
 }
 
+/**
+ * The card is a physical object: it lifts as you grab it, bends into
+ * the direction of travel (rotateY), banks with drag (rotateZ), and a
+ * light source follows your pointer across the surface. Releases fly
+ * out on the gesture's own velocity.
+ */
 function TopCard({
   profile,
-  onSwipe,
+  onDecide,
+  registerDecider,
 }: {
   profile: DiscoverProfile;
-  onSwipe: (action: SwipeAction) => void;
+  onDecide: (action: SwipeAction) => void;
+  registerDecider: (fn: (action: SwipeAction) => void) => void;
 }) {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-250, 250], [-14, 14]);
-  const likeOpacity = useTransform(x, [40, 140], [0, 1]);
-  const passOpacity = useTransform(x, [-140, -40], [1, 0]);
+  const y = useMotionValue(0);
+  const rotate = useTransform(x, [-260, 260], [-13, 13]);
+  const bend = useTransform(x, [-260, 260], [7, -7]); // subtle 3D fold
+  const likeOpacity = useTransform(x, [40, 130], [0, 1]);
+  const passOpacity = useTransform(x, [-130, -40], [1, 0]);
+
+  // Pointer-tracked lighting
+  const lx = useMotionValue(50);
+  const ly = useMotionValue(35);
+  const light = useMotionTemplate`radial-gradient(26rem 26rem at ${lx}% ${ly}%, rgba(255,255,255,0.09), transparent 60%)`;
+
+  const [grabbed, setGrabbed] = useState(false);
+  const leaving = useRef(false);
   const photo = profile.photos[0];
+
+  const flyOut = useCallback(
+    (action: SwipeAction, velocity = 0) => {
+      if (leaving.current) return;
+      leaving.current = true;
+      const dir = action === "PASS" ? -1 : 1;
+      const targetX = dir * (typeof window !== "undefined" ? window.innerWidth : 600) * 1.1;
+      const speed = Math.max(Math.abs(velocity), 900);
+      animate(x, targetX, {
+        type: "spring",
+        stiffness: 90,
+        damping: 16,
+        velocity: dir * speed,
+      });
+      animate(y, action === "SUPER_LIKE" ? -80 : 40, { duration: 0.4 });
+      // Hand off to the deck slightly before the spring settles
+      window.setTimeout(() => onDecide(action), 240);
+    },
+    [onDecide, x, y],
+  );
+
+  // Let the action bar drive the same physics as a gesture
+  useEffect(() => {
+    registerDecider(flyOut);
+  }, [registerDecider, flyOut]);
 
   return (
     <motion.article
       aria-label={`${profile.displayName}, ${profile.age}`}
-      className="absolute inset-0 cursor-grab touch-none select-none active:cursor-grabbing"
-      style={{ x, rotate }}
-      drag="x"
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.9}
+      className="absolute inset-0 cursor-grab touch-none select-none [perspective:1000px] active:cursor-grabbing"
+      style={{ x, y, rotate }}
+      drag
+      dragElastic={0.85}
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+      onDragStart={() => setGrabbed(true)}
       onDragEnd={(_, info) => {
-        if (info.offset.x > 110 || info.velocity.x > 600) onSwipe("LIKE");
-        else if (info.offset.x < -110 || info.velocity.x < -600) onSwipe("PASS");
+        setGrabbed(false);
+        const { offset, velocity } = info;
+        if (offset.x > EXIT_OFFSET || velocity.x > EXIT_VELOCITY) flyOut("LIKE", velocity.x);
+        else if (offset.x < -EXIT_OFFSET || velocity.x < -EXIT_VELOCITY) flyOut("PASS", velocity.x);
       }}
-      initial={{ scale: 0.97, opacity: 0.8 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.18 } }}
-      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse") return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        lx.set(((e.clientX - rect.left) / rect.width) * 100);
+        ly.set(((e.clientY - rect.top) / rect.height) * 100);
+      }}
+      initial={{ scale: 0.94, y: 14, opacity: 0.7 }}
+      animate={{
+        scale: grabbed ? 1.035 : 1,
+        y: 0,
+        opacity: 1,
+        boxShadow: grabbed
+          ? "0 40px 90px rgba(0,0,0,0.65), 0 0 40px rgba(225,29,72,0.18)"
+          : "0 24px 60px rgba(0,0,0,0.5)",
+      }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      transition={{ type: "spring", stiffness: 320, damping: 26 }}
     >
-      <div className="relative flex h-full w-full flex-col justify-end overflow-hidden rounded-[28px] border border-white/12 shadow-float [box-shadow:inset_0_1px_0_rgba(255,255,255,0.14),0_12px_40px_rgba(0,0,0,0.5),0_32px_80px_rgba(0,0,0,0.35)]">
-        {/* Photo layer */}
+      <motion.div
+        style={{ rotateY: bend }}
+        className="relative flex h-full w-full flex-col justify-end overflow-hidden rounded-[30px] border border-white/12"
+      >
+        {/* Photo */}
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -77,44 +142,56 @@ function TopCard({
         ) : (
           <div className="absolute inset-0" style={{ background: photoGradient(profile.userId) }} />
         )}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+        {/* Cinematic grade + inner edge light */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+        <div className="absolute inset-0 rounded-[30px] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
+        {/* Pointer lighting */}
+        <motion.div aria-hidden="true" className="absolute inset-0" style={{ background: light }} />
 
-        {/* Swipe verdict stamps */}
+        {/* Verdict stamps */}
         <motion.span
           style={{ opacity: likeOpacity }}
-          className="absolute left-6 top-8 -rotate-12 rounded-xl border-4 border-success px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-success"
+          className="absolute left-6 top-9 -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-emerald-400"
           aria-hidden="true"
         >
           Like
         </motion.span>
         <motion.span
           style={{ opacity: passOpacity }}
-          className="absolute right-6 top-8 rotate-12 rounded-xl border-4 border-white/90 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-white/90"
+          className="absolute right-6 top-9 rotate-12 rounded-2xl border-4 border-white/85 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-white/85"
           aria-hidden="true"
         >
           Pass
         </motion.span>
 
-        {/* Profile info */}
-        <div className="relative space-y-2.5 p-6 text-white">
+        {/* Floating badges */}
+        <div className="absolute inset-x-4 top-4 flex items-start justify-between">
+          <MatchRing value={profile.compatibility} />
+          {profile.isOnline && (
+            <span className="glass-chip flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white">
+              <span className="relative flex size-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
+                <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
+              </span>
+              Online
+            </span>
+          )}
+        </div>
+
+        {/* Identity */}
+        <div className="relative space-y-2.5 p-6">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-3xl font-semibold tracking-tight">
+            <h2 className="text-3xl font-semibold tracking-tight text-white">
               {profile.displayName}, {profile.age}
             </h2>
             {profile.isVerified && (
-              <BadgeCheck className="size-6 fill-sky-400 text-white" aria-label="Photo verified" />
-            )}
-            {profile.isOnline && (
-              <span className="glass-chip flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium">
-                <span className="relative flex size-1.5" aria-hidden="true">
-                  <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
-                </span>
-                Online
+              <span className="relative flex items-center justify-center" aria-label="Photo verified">
+                <span className="absolute size-6 animate-ping-soft rounded-full bg-sky-400/30" />
+                <BadgeCheck className="relative size-6 fill-sky-400 text-white" />
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-sm text-white/85">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/85">
             {profile.city && (
               <span className="flex items-center gap-1">
                 <MapPin className="size-3.5" aria-hidden="true" />
@@ -122,26 +199,33 @@ function TopCard({
               </span>
             )}
             {profile.distanceKm != null && <span>{formatDistance(profile.distanceKm)}</span>}
-            <span className="flex items-center gap-1">
-              <Sparkles className="size-3.5" aria-hidden="true" />
-              {profile.compatibility}% match
-            </span>
           </div>
-          {profile.bio && <p className="line-clamp-2 text-sm/relaxed text-white/90">{profile.bio}</p>}
+          {profile.bio && (
+            <p className="line-clamp-2 text-sm/relaxed text-white/90">{profile.bio}</p>
+          )}
           {profile.interests.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
+            <motion.div
+              className="flex flex-wrap gap-1.5 pt-1"
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.35 } } }}
+            >
               {profile.interests.slice(0, 4).map((interest) => (
-                <span
+                <motion.span
                   key={interest}
-                  className="glass-chip rounded-full px-3 py-1 text-xs font-medium"
+                  variants={{
+                    hidden: { opacity: 0, y: 10, scale: 0.9 },
+                    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 380, damping: 24 } },
+                  }}
+                  className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-white"
                 >
                   {interest}
-                </span>
+                </motion.span>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
-      </div>
+      </motion.div>
     </motion.article>
   );
 }
@@ -149,16 +233,17 @@ function TopCard({
 export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfile[] }) {
   const [deck, setDeck] = useState(initialProfiles);
   const [matchedWith, setMatchedWith] = useState<DiscoverProfile | null>(null);
-  const [busy, setBusy] = useState(false);
+  const busy = useRef(false);
+  const deciderRef = useRef<((action: SwipeAction) => void) | null>(null);
 
   const top = deck[0];
   const next = deck[1];
 
-  const swipe = useCallback(
+  const commit = useCallback(
     async (action: SwipeAction) => {
-      if (!top || busy) return;
-      setBusy(true);
-      const current = top;
+      const current = deck[0];
+      if (!current || busy.current) return;
+      busy.current = true;
       setDeck((d) => d.slice(1));
 
       try {
@@ -186,11 +271,16 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
         setDeck((d) => [current, ...d]);
         toast.error("You appear to be offline.");
       } finally {
-        setBusy(false);
+        busy.current = false;
       }
     },
-    [top, busy],
+    [deck],
   );
+
+  const act = useCallback((action: SwipeAction) => {
+    // Route through the top card so buttons get the same exit physics
+    if (deciderRef.current) deciderRef.current(action);
+  }, []);
 
   const undo = useCallback(async () => {
     const res = await fetch("/api/swipes", { method: "DELETE" });
@@ -200,11 +290,8 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
       });
       return;
     }
-    if (res.ok) {
-      toast.success("Last swipe undone. Refresh to see them again.");
-    } else {
-      toast("Nothing to undo yet.");
-    }
+    if (res.ok) toast.success("Last swipe undone. Refresh to see them again.");
+    else toast("Nothing to undo yet.");
   }, []);
 
   if (deck.length === 0) {
@@ -225,87 +312,114 @@ export function SwipeDeck({ initialProfiles }: { initialProfiles: DiscoverProfil
   return (
     <div className="mx-auto w-full max-w-sm">
       <div className="relative aspect-3/4 w-full" role="group" aria-label="Profile cards">
-        {/* Ambient glow beneath the deck */}
+        {/* Ambient stage light */}
         <div
           aria-hidden="true"
-          className="absolute left-1/2 top-1/2 size-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.2),transparent_70%)] blur-2xl"
+          className="absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.2),transparent_70%)] blur-2xl"
         />
-        {/* Next card peeking behind */}
+
+        {/* Next card preview — real content, waiting underneath */}
         {next && (
-          <div
-            className="absolute inset-0 scale-[0.94] translate-y-3 rounded-[28px] border border-white/8 bg-card shadow-card"
+          <motion.div
+            key={`peek-${next.userId}`}
             aria-hidden="true"
-          />
+            initial={{ scale: 0.9, y: 24, opacity: 0.4 }}
+            animate={{ scale: 0.94, y: 14, opacity: 0.75 }}
+            transition={{ type: "spring", stiffness: 260, damping: 26 }}
+            className="absolute inset-0 overflow-hidden rounded-[30px] border border-white/8 bg-card shadow-card"
+          >
+            {next.photos[0] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={next.photos[0].url} alt="" className="h-full w-full object-cover opacity-70" />
+            ) : (
+              <div className="h-full w-full" style={{ background: photoGradient(next.userId) }} />
+            )}
+            <div className="absolute inset-0 bg-black/35" />
+          </motion.div>
         )}
+
         <AnimatePresence>
-          {top && <TopCard key={top.userId} profile={top} onSwipe={swipe} />}
+          {top && (
+            <TopCard
+              key={top.userId}
+              profile={top}
+              onDecide={commit}
+              registerDecider={(fn) => (deciderRef.current = fn)}
+            />
+          )}
         </AnimatePresence>
       </div>
 
       {/* Action bar */}
-      <div className="mt-6 flex items-center justify-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Undo last swipe"
-          className="size-12 rounded-full"
-          onClick={undo}
-        >
-          <RotateCcw className="size-5 text-warning" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Pass"
-          className="size-16 rounded-full border-2"
-          disabled={busy}
-          onClick={() => swipe("PASS")}
-        >
-          <X className="size-7 text-muted-foreground" />
-        </Button>
-        <Button
-          size="icon"
-          aria-label="Like"
-          className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_rgba(225,29,72,0.45),0_12px_32px_rgba(225,29,72,0.3)]"
-          disabled={busy}
-          onClick={() => swipe("LIKE")}
-        >
-          <Heart className="size-7 fill-current" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Super Like"
-          className="size-12 rounded-full"
-          disabled={busy}
-          onClick={() => swipe("SUPER_LIKE")}
-        >
-          <Star className="size-5 fill-sky-400 text-sky-400" />
-        </Button>
+      <div className="mt-7 flex items-center justify-center gap-4">
+        <motion.div whileTap={{ scale: 0.85 }}>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Undo last swipe"
+            className="size-12 rounded-full"
+            onClick={undo}
+          >
+            <RotateCcw className="size-5 text-warning" />
+          </Button>
+        </motion.div>
+        <motion.div whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.06 }}>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Pass"
+            className="size-16 rounded-full border-white/16"
+            onClick={() => act("PASS")}
+          >
+            <X className="size-7 text-muted-foreground" />
+          </Button>
+        </motion.div>
+        <motion.div whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.08 }}>
+          <Button
+            size="icon"
+            aria-label="Like"
+            className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_rgba(225,29,72,0.45),0_12px_32px_rgba(225,29,72,0.3)]"
+            onClick={() => act("LIKE")}
+          >
+            <Heart className="size-7 fill-current" />
+          </Button>
+        </motion.div>
+        <motion.div whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.06 }}>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Super Like"
+            className="size-12 rounded-full"
+            onClick={() => act("SUPER_LIKE")}
+          >
+            <Star className="size-5 fill-sky-400 text-sky-400" />
+          </Button>
+        </motion.div>
       </div>
 
       {/* Match celebration */}
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>
-        <DialogContent className="rounded-3xl text-center sm:max-w-sm">
-          <DialogHeader className="items-center space-y-3">
-            <span
-              className={cn(
-                "flex size-16 animate-heart-pop items-center justify-center rounded-full bg-accent",
-              )}
+        <DialogContent className="overflow-hidden rounded-[32px] border-white/10 text-center sm:max-w-sm">
+          {matchedWith && <HeartBurst />}
+          <DialogHeader className="relative items-center space-y-3">
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 320, damping: 14, delay: 0.1 }}
+              className="flex size-16 items-center justify-center rounded-full bg-accent shadow-[0_0_40px_rgba(225,29,72,0.35)]"
             >
               <Heart className="size-8 fill-primary text-primary" aria-hidden="true" />
-            </span>
-            <DialogTitle className="font-display text-2xl">It&apos;s a match!</DialogTitle>
+            </motion.span>
+            <DialogTitle className="font-display text-3xl font-medium">It&apos;s a match</DialogTitle>
             <DialogDescription>
-              You and {matchedWith?.displayName} liked each other. Break the ice while it&apos;s
-              warm.
+              You and {matchedWith?.displayName} liked each other. Break the ice while it&apos;s warm.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-2">
-            <Button className="h-12 rounded-2xl" asChild>
+          <div className="relative grid gap-2">
+            <Button className="h-12 rounded-full" asChild>
               <Link href="/chat">Say hello</Link>
             </Button>
-            <Button variant="ghost" className="rounded-2xl" onClick={() => setMatchedWith(null)}>
+            <Button variant="ghost" className="rounded-full" onClick={() => setMatchedWith(null)}>
               Keep swiping
             </Button>
           </div>

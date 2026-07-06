@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Loader2, PartyPopper } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Heart, Loader2, PartyPopper } from "lucide-react";
+import { HeartBurst } from "@/components/fx/heart-burst";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,19 +76,32 @@ function ChipToggle({
   children: React.ReactNode;
 }) {
   return (
-    <button
+    <motion.button
       type="button"
       aria-pressed={selected}
       onClick={onToggle}
+      whileTap={{ scale: 0.92 }}
+      animate={selected ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       className={cn(
-        "tap-target rounded-full border px-4 py-2 text-sm font-medium transition-all",
+        "tap-target inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
         selected
-          ? "border-primary bg-primary text-primary-foreground shadow-card"
-          : "bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+          ? "border-transparent bg-linear-160 from-[#fb4a6e] to-[#be123c] text-white shadow-[0_4px_18px_rgba(225,29,72,0.35)]"
+          : "glass-chip text-muted-foreground hover:text-foreground",
       )}
     >
+      {selected && (
+        <motion.span
+          initial={{ scale: 0, rotate: -60 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 20 }}
+          aria-hidden="true"
+        >
+          <Check className="size-3.5" />
+        </motion.span>
+      )}
       {children}
-    </button>
+    </motion.button>
   );
 }
 
@@ -95,6 +109,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const [data, setData] = useState<WizardData>({
     displayName: initialName,
     birthDate: "",
@@ -131,6 +146,25 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     () => (data.birthDate ? calculateAge(data.birthDate) : null),
     [data.birthDate],
   );
+
+  /** Live profile glow — grows as the profile gets richer. */
+  const profileScore = useMemo(() => {
+    let score = 0;
+    if (data.displayName.trim().length >= 2) score += 10;
+    if (age !== null && age >= 18) score += 10;
+    if (data.gender) score += 8;
+    if (data.interestedIn.length) score += 8;
+    if (data.relationshipGoal) score += 10;
+    if (data.city) score += 10;
+    if (data.bio.trim().length >= 40) score += 14;
+    else if (data.bio.trim().length > 0) score += 7;
+    if (data.heightCm) score += 4;
+    if (data.occupation.trim()) score += 5;
+    if (data.education) score += 4;
+    if (data.exercise || data.children || data.pets) score += 5;
+    score += Math.min(12, data.interests.length * 2);
+    return Math.min(100, score);
+  }, [data, age]);
 
   const stepValid = useMemo(() => {
     switch (step) {
@@ -183,22 +217,77 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
       toast.error(payload?.error?.message ?? "Couldn't save your profile. Please try again.");
       return;
     }
-    toast.success("Profile created — welcome to Amora!");
-    router.push("/discover");
-    router.refresh();
+    // A breath of celebration before the product opens
+    setCelebrating(true);
+    window.setTimeout(() => {
+      router.push("/discover");
+      router.refresh();
+    }, 1900);
   }
 
   const progress = ((step + 1) / STEPS.length) * 100;
 
+  if (celebrating) {
+    return (
+      <div className="relative flex min-h-[70dvh] flex-col items-center justify-center gap-5 text-center">
+        <HeartBurst count={18} />
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 14 }}
+          className="flex size-20 items-center justify-center rounded-full bg-accent shadow-[0_0_60px_rgba(225,29,72,0.4)]"
+        >
+          <Heart className="size-9 fill-primary text-primary" aria-hidden="true" />
+        </motion.span>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="font-display text-4xl font-medium tracking-tight"
+        >
+          You&apos;re in, {data.displayName.split(" ")[0]}.
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="max-w-xs text-muted-foreground"
+        >
+          Your profile is live. Let&apos;s find someone worth your evening.
+        </motion.p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 pt-4">
-      {/* Progress */}
-      <div className="space-y-2">
+      {/* Progress + live profile glow */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
-          <p className="font-medium">{STEPS[step]}</p>
-          <p className="text-muted-foreground">
-            Step {step + 1} of {STEPS.length}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={STEPS[step]}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="font-medium"
+            >
+              {STEPS[step]}
+            </motion.p>
+          </AnimatePresence>
+          <span
+            className="glass-chip flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+            aria-label={`Profile score ${profileScore} percent`}
+          >
+            <Heart
+              className={cn(
+                "size-3.5 transition-colors",
+                profileScore >= 70 ? "fill-rose-500 text-rose-500" : "text-muted-foreground",
+              )}
+              aria-hidden="true"
+            />
+            <span className="tabular-nums">{profileScore}%</span>
+          </span>
         </div>
         <Progress value={progress} aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`} />
       </div>
@@ -206,10 +295,10 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -24 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
+          initial={{ opacity: 0, x: 36, scale: 0.985, filter: "blur(6px)" }}
+          animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, x: -36, scale: 0.985, filter: "blur(6px)" }}
+          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
           className="min-h-[50dvh]"
         >
           {step === 0 && (

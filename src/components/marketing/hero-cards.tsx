@@ -190,6 +190,23 @@ export function HeroCards() {
         </div>
       </motion.div>
 
+      {/* Drifting light particles */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        {[
+          ["left-[-8%]", "top-[18%]", "size-1.5", "7s", "0s"],
+          ["right-[-6%]", "top-[38%]", "size-1", "9s", "1.2s"],
+          ["left-[6%]", "bottom-[8%]", "size-1", "8s", "0.6s"],
+          ["right-[10%]", "bottom-[-4%]", "size-1.5", "10s", "2s"],
+          ["left-[45%]", "top-[-6%]", "size-1", "11s", "1.6s"],
+        ].map(([x, y, s, dur, delay], i) => (
+          <span
+            key={i}
+            className={`absolute ${x} ${y} ${s} animate-float-slow rounded-full bg-rose-200/40 blur-[1px]`}
+            style={{ animationDuration: dur as string, animationDelay: delay as string }}
+          />
+        ))}
+      </div>
+
       {/* Floating like bubble */}
       <motion.div
         initial={reduced ? false : { opacity: 0, scale: 0 }}
@@ -199,6 +216,31 @@ export function HeroCards() {
         aria-hidden="true"
       >
         <Heart className="size-5 fill-rose-500 text-rose-500" />
+      </motion.div>
+
+      {/* Live conversation preview */}
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 24, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 220, damping: 18, delay: 1.9 }}
+        className="glass absolute -bottom-7 -right-2 w-52 rounded-2xl rounded-br-md p-3 text-left shadow-float sm:-right-12"
+        aria-hidden="true"
+      >
+        <p className="text-[11px] font-semibold text-white/90">Saoirse</p>
+        <p className="mt-0.5 text-xs leading-snug text-white/75">
+          The Forty Foot at 7am — you in?
+        </p>
+        <span className="mt-2 flex items-center gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="size-1.5 rounded-full bg-rose-300/80"
+              animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
+              transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18 }}
+            />
+          ))}
+          <span className="ml-1.5 text-[10px] text-white/50">you&apos;re typing…</span>
+        </span>
       </motion.div>
       <motion.div
         initial={reduced ? false : { opacity: 0, scale: 0 }}

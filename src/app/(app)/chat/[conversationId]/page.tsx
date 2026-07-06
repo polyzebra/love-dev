@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { assertParticipant, markRead } from "@/lib/services/chat";
 import { ChatThread, type ThreadMessage } from "@/components/app/chat-thread";
 import { ChatActions } from "@/components/app/chat-actions";
+import { ProfilePeek } from "@/components/app/profile-peek";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { initialsOf } from "@/lib/utils";
+import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline as presenceOnline } from "@/lib/presence";
 
 export const metadata: Metadata = { title: "Conversation" };
@@ -28,7 +29,7 @@ export default async function ConversationPage({
   const participant = await assertParticipant(conversationId, userId);
   if (!participant) notFound();
 
-  const [other, messages] = await Promise.all([
+  const [other, myProfile, messages] = await Promise.all([
     db.participant.findFirst({
       where: { conversationId, userId: { not: userId } },
       include: {
@@ -36,7 +37,16 @@ export default async function ConversationPage({
           select: {
             id: true,
             lastActiveAt: true,
-            profile: { select: { displayName: true } },
+            profile: {
+              select: {
+                displayName: true,
+                bio: true,
+                birthDate: true,
+                city: true,
+                interests: { select: { interest: { select: { label: true, slug: true } } } },
+              },
+            },
+            verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
             photos: {
               orderBy: [{ isCover: "desc" }, { position: "asc" }],
               take: 1,
@@ -45,6 +55,10 @@ export default async function ConversationPage({
           },
         },
       },
+    }),
+    db.profile.findUnique({
+      where: { userId },
+      select: { interests: { select: { interest: { select: { slug: true } } } } },
     }),
     db.message.findMany({
       where: { conversationId, deletedAt: null },
@@ -57,28 +71,81 @@ export default async function ConversationPage({
   await markRead(conversationId, userId);
 
   const otherName = other?.user.profile?.displayName ?? "Member";
-  const isOnline = other ? presenceOnline(other.user.lastActiveAt) : false;
+  const online = other ? presenceOnline(other.user.lastActiveAt) : false;
+  const mySlugs = new Set(myProfile?.interests.map((i) => i.interest.slug) ?? []);
+  const otherInterests = other?.user.profile?.interests ?? [];
+
+  const peek = {
+    displayName: otherName,
+    age: other?.user.profile ? calculateAge(other.user.profile.birthDate) : null,
+    city: other?.user.profile?.city ?? null,
+    bio: other?.user.profile?.bio ?? null,
+    interests: otherInterests.map((i) => i.interest.label),
+    sharedInterests: otherInterests
+      .filter((i) => mySlugs.has(i.interest.slug))
+      .map((i) => i.interest.label),
+    isVerified: (other?.user.verifications.length ?? 0) > 0,
+    isOnline: online,
+    photoUrl: other?.user.photos[0]?.url ?? null,
+  };
 
   return (
     <>
-      <header className="mb-2 flex items-center gap-3">
-        <Button variant="ghost" size="icon" aria-label="Back to chats" className="rounded-full" asChild>
+      {/* Gradient conversation header */}
+      <header className="glass relative mb-3 flex items-center gap-3 overflow-hidden rounded-[24px] p-2.5 pr-3">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(24rem_10rem_at_20%_0%,rgba(225,29,72,0.14),transparent_70%)]"
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Back to chats"
+          className="relative rounded-full"
+          asChild
+        >
           <Link href="/chat">
             <ArrowLeft className="size-5" />
           </Link>
         </Button>
-        <div className="relative">
-          <Avatar className="size-10">
-            <AvatarImage src={other?.user.photos[0]?.url} alt="" />
-            <AvatarFallback>{initialsOf(otherName)}</AvatarFallback>
-          </Avatar>
-          <OnlineDot online={isOnline} className="absolute -bottom-0.5 -right-0.5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate font-semibold">{otherName}</h1>
-          <p className="text-xs text-muted-foreground">{isOnline ? "Online now" : "Recently active"}</p>
-        </div>
-        {other && <ChatActions otherUserId={other.user.id} otherName={otherName} />}
+
+        <ProfilePeek profile={peek}>
+          <button
+            type="button"
+            className="relative flex min-w-0 flex-1 items-center gap-3 rounded-2xl text-left"
+            aria-label={`View ${otherName}'s profile`}
+          >
+            <div className="relative shrink-0">
+              <Avatar className="size-11 border border-white/15">
+                <AvatarImage src={peek.photoUrl ?? undefined} alt="" />
+                <AvatarFallback>{initialsOf(otherName)}</AvatarFallback>
+              </Avatar>
+              <OnlineDot online={online} className="absolute -bottom-0.5 -right-0.5" />
+            </div>
+            <div className="min-w-0">
+              <p className="flex items-center gap-1.5 truncate font-semibold">
+                {otherName}
+                {peek.isVerified && (
+                  <BadgeCheck className="size-4 shrink-0 fill-sky-400 text-card" aria-hidden="true" />
+                )}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {online ? (
+                  <span className="text-success">Online now</span>
+                ) : (
+                  "Recently active"
+                )}
+                {peek.sharedInterests[0] ? ` · you both love ${peek.sharedInterests[0].toLowerCase()}` : ""}
+              </p>
+            </div>
+          </button>
+        </ProfilePeek>
+
+        {other && (
+          <div className="relative">
+            <ChatActions otherUserId={other.user.id} otherName={otherName} />
+          </div>
+        )}
       </header>
 
       <ChatThread

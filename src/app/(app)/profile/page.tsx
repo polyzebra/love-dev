@@ -5,7 +5,9 @@ import {
   BadgeCheck,
   Briefcase,
   Camera,
+  CircleDashed,
   GraduationCap,
+  Heart,
   Languages,
   MapPin,
   PencilLine,
@@ -13,24 +15,58 @@ import {
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { calculateAge } from "@/lib/utils";
-import { PageHeader } from "@/components/shared/page-header";
-import { VerifiedBadge } from "@/components/shared/verified-badge";
+import { calculateAge, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
 export const dynamic = "force-dynamic";
 
 const GOAL_LABELS: Record<string, string> = {
-  LONG_TERM: "Long-term relationship",
-  SHORT_TERM: "Something casual",
+  LONG_TERM: "Looking for something long-term",
+  SHORT_TERM: "Here for something casual",
   OPEN_TO_EITHER: "Open to either",
-  FRIENDSHIP: "Friendship",
+  FRIENDSHIP: "Here for friendship",
   FIGURING_OUT: "Still figuring it out",
 };
+
+function coverGradient(seed: string): string {
+  const hues = [346, 12, 262, 200];
+  const h = hues[seed.charCodeAt(0) % hues.length];
+  return `linear-gradient(165deg, hsl(${h} 70% 60%) 0%, hsl(${h} 75% 38%) 50%, hsl(${h} 70% 18%) 100%)`;
+}
+
+/** SVG completion ring with the score in the centre. */
+function CompletionRing({ value }: { value: number }) {
+  const r = 26;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative flex size-16 items-center justify-center" aria-label={`Profile ${value}% complete`}>
+      <svg viewBox="0 0 64 64" className="absolute inset-0 -rotate-90">
+        <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="4" />
+        <circle
+          cx="32"
+          cy="32"
+          r={r}
+          fill="none"
+          stroke="url(#ring-grad)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - value / 100)}
+        />
+        <defs>
+          <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#fb7185" />
+            <stop offset="100%" stopColor="#e7c9a1" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <span className="text-sm font-semibold tabular-nums">{value}%</span>
+    </div>
+  );
+}
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -50,155 +86,166 @@ export default async function ProfilePage() {
 
   const verifiedTypes = new Set(profile.user.verifications.map((v) => v.type));
   const photos = profile.user.photos;
+  const cover = photos[0];
+  const age = calculateAge(profile.birthDate);
+
+  const essentials = [
+    profile.heightCm && { icon: Ruler, label: `${profile.heightCm} cm` },
+    profile.occupation && { icon: Briefcase, label: profile.occupation },
+    profile.education && {
+      icon: GraduationCap,
+      label: profile.education.toLowerCase().replace(/_/g, " "),
+    },
+    profile.languages.length > 0 && { icon: Languages, label: profile.languages.join(", ") },
+  ].filter(Boolean) as { icon: typeof Ruler; label: string }[];
 
   return (
-    <>
-      <PageHeader
-        title="Profile"
-        description="This is what potential matches see."
-        actions={
-          <Button className="rounded-full" asChild>
-            <Link href="/settings">
-              <PencilLine className="size-4" /> Edit
-            </Link>
-          </Button>
-        }
-      />
+    <div className="space-y-6">
+      {/* ================= COVER — magazine opener ================= */}
+      <Reveal y={16}>
+        <section className="relative overflow-hidden rounded-[36px] border border-white/12 shadow-float">
+          <div className="relative aspect-4/5 sm:aspect-square md:aspect-4/3">
+            {cover ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={cover.url} alt="Your cover photo" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0" style={{ background: coverGradient(profile.userId) }} />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
+            <div className="absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]" />
 
-      {/* Completion nudge */}
-      {profile.completionPct < 100 && (
-        <Card className="mb-6 rounded-3xl border-primary/20 bg-accent/60">
-          <CardContent className="space-y-3 py-5">
-            <div className="flex items-center justify-between text-sm">
-              <p className="font-medium text-accent-foreground">
-                Profile {profile.completionPct}% complete
-              </p>
-              <p className="text-muted-foreground">Complete profiles get up to 3× more likes</p>
+            {/* Top rail: completion + edit */}
+            <div className="absolute inset-x-5 top-5 flex items-start justify-between">
+              <CompletionRing value={profile.completionPct} />
+              <Button className="rounded-full" asChild>
+                <Link href="/settings">
+                  <PencilLine className="size-4" aria-hidden="true" /> Edit
+                </Link>
+              </Button>
             </div>
-            <Progress value={profile.completionPct} aria-label={`Profile ${profile.completionPct}% complete`} />
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Photos */}
-      <section aria-labelledby="photos-heading" className="mb-8">
-        <h2 id="photos-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Photos ({photos.length}/9)
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          {photos.map((photo, i) => (
-            <div key={photo.id} className="relative aspect-3/4 overflow-hidden rounded-2xl bg-muted">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photo.url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
-              {photo.isCover && (
-                <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
-                  Cover
-                </span>
-              )}
-            </div>
-          ))}
-          {photos.length < 9 && (
-            <button
-              type="button"
-              className="flex aspect-3/4 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-              aria-label="Add photo"
-            >
-              <Camera className="size-6" aria-hidden="true" />
-              <span className="text-xs font-medium">Add photo</span>
-            </button>
-          )}
-        </div>
-        {photos.length < 2 && (
-          <p className="mt-2 text-xs text-warning-foreground">
-            Add at least 2 photos to appear in Discover.
-          </p>
-        )}
-      </section>
-
-      {/* About */}
-      <Card className="mb-6 rounded-3xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            {profile.displayName}, {calculateAge(profile.birthDate)}
-            {verifiedTypes.has("PHOTO") && <VerifiedBadge />}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {profile.bio ? (
-            <p className="leading-relaxed">{profile.bio}</p>
-          ) : (
-            <p className="text-sm italic text-muted-foreground">
-              No bio yet — profiles with a bio get far more matches.
-            </p>
-          )}
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div className="flex items-center gap-2">
-              <MapPin className="size-4 text-muted-foreground" aria-hidden="true" />
-              <dt className="sr-only">Location</dt>
-              <dd>
+            {/* Identity — editorial lockup */}
+            <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 md:p-9">
+              <h1 className="flex flex-wrap items-center gap-3 font-display text-[clamp(2.2rem,6vw,4rem)] font-medium leading-none tracking-tight text-white">
+                {profile.displayName}, {age}
+                {verifiedTypes.has("PHOTO") && (
+                  <span className="relative flex items-center justify-center" aria-label="Photo verified">
+                    <span className="absolute size-8 animate-ping-soft rounded-full bg-sky-400/25" />
+                    <BadgeCheck className="relative size-8 fill-sky-400 text-white" />
+                  </span>
+                )}
+              </h1>
+              <p className="flex items-center gap-1.5 text-sm text-white/80">
+                <MapPin className="size-4" aria-hidden="true" />
                 {profile.city}
                 {profile.country === "IE" ? ", Ireland" : ", UK"}
-              </dd>
+              </p>
+              <Badge className="rounded-full border-0 bg-white/15 px-4 py-1.5 text-white backdrop-blur-md">
+                <Heart className="size-3.5 fill-current" aria-hidden="true" />
+                {GOAL_LABELS[profile.relationshipGoal]}
+              </Badge>
             </div>
-            {profile.heightCm && (
-              <div className="flex items-center gap-2">
-                <Ruler className="size-4 text-muted-foreground" aria-hidden="true" />
-                <dt className="sr-only">Height</dt>
-                <dd>{profile.heightCm} cm</dd>
-              </div>
-            )}
-            {profile.occupation && (
-              <div className="flex items-center gap-2">
-                <Briefcase className="size-4 text-muted-foreground" aria-hidden="true" />
-                <dt className="sr-only">Occupation</dt>
-                <dd>{profile.occupation}</dd>
-              </div>
-            )}
-            {profile.education && (
-              <div className="flex items-center gap-2">
-                <GraduationCap className="size-4 text-muted-foreground" aria-hidden="true" />
-                <dt className="sr-only">Education</dt>
-                <dd className="capitalize">{profile.education.toLowerCase().replace(/_/g, " ")}</dd>
-              </div>
-            )}
-            {profile.languages.length > 0 && (
-              <div className="flex items-center gap-2">
-                <Languages className="size-4 text-muted-foreground" aria-hidden="true" />
-                <dt className="sr-only">Languages</dt>
-                <dd>{profile.languages.join(", ")}</dd>
-              </div>
-            )}
-          </dl>
-        </CardContent>
-      </Card>
+          </div>
+        </section>
+      </Reveal>
 
-      {/* Looking for + interests */}
-      <Card className="mb-6 rounded-3xl">
-        <CardHeader>
-          <CardTitle className="text-base">Looking for</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Badge variant="secondary" className="rounded-full px-4 py-1.5">
-            {GOAL_LABELS[profile.relationshipGoal]}
-          </Badge>
-        </CardContent>
-      </Card>
+      {/* ================= IN THEIR WORDS ================= */}
+      {profile.bio ? (
+        <Reveal>
+          <section className="px-2 py-4 md:px-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">In my words</p>
+            <blockquote className="mt-3 font-display text-2xl italic leading-snug text-foreground/95 md:text-3xl">
+              &ldquo;{profile.bio}&rdquo;
+            </blockquote>
+          </section>
+        </Reveal>
+      ) : (
+        <Reveal>
+          <section className="glass rounded-[28px] p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              No bio yet — profiles with a story get far more matches.{" "}
+              <Link href="/settings" className="font-medium text-primary-soft underline-offset-2 hover:underline">
+                Write yours
+              </Link>
+            </p>
+          </section>
+        </Reveal>
+      )}
 
-      <Card className="rounded-3xl">
-        <CardHeader>
-          <CardTitle className="text-base">Interests</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          {profile.interests.map(({ interest }) => (
-            <Badge key={interest.id} variant="outline" className="rounded-full px-3.5 py-1">
-              {interest.label}
-            </Badge>
+      {/* ================= ESSENTIALS ================= */}
+      {essentials.length > 0 && (
+        <RevealGroup className="grid grid-cols-2 gap-3">
+          {essentials.map(({ icon: Icon, label }) => (
+            <RevealItem key={label}>
+              <div className="glass flex items-center gap-3 rounded-3xl px-5 py-4">
+                <Icon className="size-4.5 shrink-0 text-primary-soft" aria-hidden="true" />
+                <span className="truncate text-sm font-medium capitalize">{label}</span>
+              </div>
+            </RevealItem>
           ))}
-        </CardContent>
-      </Card>
+        </RevealGroup>
+      )}
 
-      {/* Verification statuses */}
-      <section className="mt-6 grid gap-3 sm:grid-cols-3">
+      {/* ================= INTEREST CLOUD ================= */}
+      {profile.interests.length > 0 && (
+        <Reveal>
+          <section className="glass rounded-[28px] p-6">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
+              Into
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {profile.interests.map(({ interest }, i) => (
+                <span
+                  key={interest.id}
+                  className={cn(
+                    "rounded-full border border-white/10 bg-white/5 font-medium",
+                    i % 3 === 0 ? "px-4 py-2 text-sm" : "px-3 py-1.5 text-xs",
+                    i % 4 === 0 && "bg-primary/12 text-primary-soft",
+                  )}
+                >
+                  {interest.label}
+                </span>
+              ))}
+            </div>
+          </section>
+        </Reveal>
+      )}
+
+      {/* ================= GALLERY ================= */}
+      <Reveal>
+        <section>
+          <div className="mb-3 flex items-baseline justify-between px-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Gallery</p>
+            <p className="text-xs text-muted-foreground">{photos.length}/9 photos</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2.5">
+            {photos.slice(1).map((photo, i) => (
+              <div key={photo.id} className="relative aspect-3/4 overflow-hidden rounded-2xl border border-white/8">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo.url} alt={`Photo ${i + 2}`} className="h-full w-full object-cover" />
+              </div>
+            ))}
+            {photos.length < 9 && (
+              <button
+                type="button"
+                className="flex aspect-3/4 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft"
+                aria-label="Add photo"
+              >
+                <Camera className="size-5" aria-hidden="true" />
+                <span className="text-[11px] font-medium">Add photo</span>
+              </button>
+            )}
+          </div>
+          {photos.length < 2 && (
+            <p className="mt-2 px-1 text-xs text-warning">
+              Add at least 2 photos to appear in Discover.
+            </p>
+          )}
+        </section>
+      </Reveal>
+
+      {/* ================= TRUST ================= */}
+      <RevealGroup className="grid gap-2.5 sm:grid-cols-3">
         {(
           [
             ["EMAIL", "Email verified"],
@@ -208,24 +255,24 @@ export default async function ProfilePage() {
         ).map(([type, label]) => {
           const done = verifiedTypes.has(type);
           return (
-            <div
-              key={type}
-              className="flex items-center gap-2 rounded-2xl border bg-card px-4 py-3 text-sm"
-            >
-              <BadgeCheck
-                className={done ? "size-5 text-success" : "size-5 text-muted-foreground/40"}
-                aria-hidden="true"
-              />
-              <span className={done ? "" : "text-muted-foreground"}>{label}</span>
-              {!done && (
-                <Button variant="link" size="sm" className="ml-auto h-auto p-0 text-primary" asChild>
-                  <Link href="/settings/account">Verify</Link>
-                </Button>
-              )}
-            </div>
+            <RevealItem key={type}>
+              <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
+                {done ? (
+                  <BadgeCheck className="size-5 shrink-0 text-success" aria-hidden="true" />
+                ) : (
+                  <CircleDashed className="size-5 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+                )}
+                <span className={done ? "" : "text-muted-foreground"}>{label}</span>
+                {!done && (
+                  <Button variant="link" size="sm" className="ml-auto h-auto p-0" asChild>
+                    <Link href="/settings/account">Verify</Link>
+                  </Button>
+                )}
+              </div>
+            </RevealItem>
           );
         })}
-      </section>
-    </>
+      </RevealGroup>
+    </div>
   );
 }
