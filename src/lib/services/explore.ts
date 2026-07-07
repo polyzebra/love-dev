@@ -238,3 +238,49 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
     })),
   };
 }
+
+/** Full profile for the immersive viewer - same safety rules as the grid. */
+export async function getExploreProfile(viewerId: string, targetId: string) {
+  if (targetId === viewerId) return null;
+  const blockedIds = await blockedIdsFor(viewerId);
+  if (blockedIds.includes(targetId)) return null;
+
+  const [target, me] = await Promise.all([
+    db.user.findFirst({
+      where: { id: targetId, ...visibleWhere(viewerId, blockedIds) },
+      include: {
+        profile: { include: { interests: { select: { interest: { select: { slug: true, label: true } } } } } },
+        photos: {
+          where: { moderation: { not: "REJECTED" } },
+          orderBy: [{ isCover: "desc" }, { position: "asc" }],
+          select: { url: true, blurDataUrl: true },
+        },
+        verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
+      },
+    }),
+    db.profile.findUnique({
+      where: { userId: viewerId },
+      select: { interests: { select: { interest: { select: { slug: true } } } } },
+    }),
+  ]);
+  if (!target?.profile) return null;
+
+  const mySlugs = new Set(me?.interests.map((i) => i.interest.slug) ?? []);
+  const p = target.profile;
+  return {
+    userId: target.id,
+    displayName: p.displayName,
+    age: calculateAge(p.birthDate),
+    bio: p.bio,
+    city: p.city,
+    country: p.country,
+    relationshipGoal: p.relationshipGoal,
+    isVerified: target.verifications.length > 0,
+    isOnline: Date.now() - target.lastActiveAt.getTime() < 5 * 60_000,
+    photos: target.photos,
+    interests: p.interests.map((i) => ({
+      label: i.interest.label,
+      shared: mySlugs.has(i.interest.slug),
+    })),
+  };
+}

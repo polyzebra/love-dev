@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, BadgeCheck, Sparkles, UserSearch } from "lucide-react";
+import { ArrowLeft, UserSearch } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { exploreFiltersSchema } from "@/lib/validators/explore";
-import { getExploreMatches, track } from "@/lib/services/explore";
+import { getExploreMatches, getExploreProfile, track } from "@/lib/services/explore";
+import { ExplorePersonCard } from "@/components/explore/person-card";
+import { ExploreProfileViewer } from "@/components/explore/profile-viewer";
 import { ExploreCard3DVisual } from "@/components/explore/explore-card";
 import { ExploreFilterSheet } from "@/components/explore/filter-sheet";
 import { ExplorePreferenceToggle } from "@/components/explore/preference-toggle";
 import { EmptyState } from "@/components/shared/empty-state";
-import { OnlineDot } from "@/components/shared/online-dot";
 import { Button } from "@/components/ui/button";
-import { initialsOf } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Explore" };
 export const dynamic = "force-dynamic";
@@ -25,7 +25,9 @@ export default async function ExploreCategoryPage({
 }) {
   const [{ slug }, rawFilters, session] = await Promise.all([params, searchParams, auth()]);
   const userId = session!.user.id;
-  const filters = exploreFiltersSchema.safeParse(rawFilters);
+  const { profile: profileParam, ...filterParams } = rawFilters;
+  const filters = exploreFiltersSchema.safeParse(filterParams);
+  const viewerProfile = profileParam ? await getExploreProfile(userId, profileParam) : null;
   const result = await getExploreMatches(userId, slug, filters.success ? filters.data : {});
   if (!result) notFound();
   const { category, users, total, page, pageSize } = result;
@@ -35,7 +37,7 @@ export default async function ExploreCategoryPage({
   }));
   track("explore_category_viewed", userId, { slug });
 
-  const hasFilters = Object.keys(rawFilters).length > 0;
+  const hasFilters = Object.keys(filterParams).length > 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
@@ -86,31 +88,7 @@ export default async function ExploreCategoryPage({
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {users.map((u) => (
               <li key={u.userId}>
-                <div className="group relative overflow-hidden rounded-3xl border border-white/8 bg-card/80 shadow-card">
-                  <div className="relative aspect-3/4 bg-muted">
-                    {u.photo ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={u.photo.url} alt={`${u.displayName}'s photo`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-white/10 to-transparent font-display text-3xl text-white/60">
-                        {initialsOf(u.displayName)}
-                      </div>
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
-                      <p className="flex items-center gap-1.5 text-sm font-semibold text-white">
-                        {u.displayName}, {u.age}
-                        {u.isVerified && <BadgeCheck className="size-4 shrink-0 fill-sky-400 text-black/40" aria-label="Photo verified" />}
-                        <OnlineDot online={u.isOnline} className="ml-auto" />
-                      </p>
-                      {u.sharedInterests > 0 && (
-                        <p className="mt-0.5 flex items-center gap-1 text-[11px] text-white/80">
-                          <Sparkles className="size-3 text-gold" aria-hidden="true" />
-                          {u.sharedInterests} shared interest{u.sharedInterests > 1 ? "s" : ""}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <ExplorePersonCard person={u} />
               </li>
             ))}
           </ul>
@@ -118,18 +96,31 @@ export default async function ExploreCategoryPage({
             <div className="mt-6 flex items-center justify-center gap-3 text-sm">
               {page > 1 && (
                 <Button variant="outline" className="rounded-full" asChild>
-                  <Link href={`/explore/${slug}?${new URLSearchParams({ ...rawFilters, page: String(page - 1) })}`}>Previous</Link>
+                  <Link href={`/explore/${slug}?${new URLSearchParams({ ...filterParams, page: String(page - 1) })}`}>Previous</Link>
                 </Button>
               )}
               <span className="tabular-nums text-muted-foreground">{page} / {totalPages}</span>
               {page < totalPages && (
                 <Button variant="outline" className="rounded-full" asChild>
-                  <Link href={`/explore/${slug}?${new URLSearchParams({ ...rawFilters, page: String(page + 1) })}`}>Next</Link>
+                  <Link href={`/explore/${slug}?${new URLSearchParams({ ...filterParams, page: String(page + 1) })}`}>Next</Link>
                 </Button>
               )}
             </div>
           )}
         </>
+      )}
+
+      {profileParam && viewerProfile && <ExploreProfileViewer profile={viewerProfile} />}
+      {profileParam && !viewerProfile && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/95 p-6 backdrop-blur-xl" role="alertdialog" aria-label="Profile unavailable">
+          <div className="glass max-w-xs space-y-4 rounded-[28px] p-6 text-center">
+            <p className="font-display text-xl">This profile isn&apos;t available</p>
+            <p className="text-sm text-muted-foreground">It may have been hidden or is no longer on Virelsy.</p>
+            <Button className="rounded-full" asChild>
+              <Link href={`/explore/${slug}`}>Back to Explore</Link>
+            </Button>
+          </div>
+        </div>
       )}
     </>
   );
