@@ -32,9 +32,14 @@ export default async function ExploreCategoryPage({
   if (!result) notFound();
   const { category, users, total, page, pageSize } = result;
 
-  const saved = !!(await db.userExplorePreference.findUnique({
-    where: { userId_categoryId: { userId, categoryId: category.id } },
-  }));
+  const [savedPref, myProfile] = await Promise.all([
+    db.userExplorePreference.findUnique({
+      where: { userId_categoryId: { userId, categoryId: category.id } },
+    }),
+    db.profile.findUnique({ where: { userId }, select: { city: true } }),
+  ]);
+  const saved = !!savedPref;
+  const myCity = myProfile?.city ?? null;
   track("explore_category_viewed", userId, { slug });
 
   const hasFilters = Object.keys(filterParams).length > 0;
@@ -63,9 +68,32 @@ export default async function ExploreCategoryPage({
         </div>
       </section>
 
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">People</h2>
-        <ExploreFilterSheet />
+      <div className="mb-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+            {category.title}
+            {myCity ? ` near ${myCity}` : ""}
+          </h2>
+          <ExploreFilterSheet />
+        </div>
+        {/* Active context chips - never a dead end */}
+        <div className="scrollbar-none flex gap-1.5 overflow-x-auto" aria-label="Active filters">
+          <span className="glass-chip shrink-0 rounded-full px-3 py-1 text-[11px] font-medium">{category.title}</span>
+          {myCity && <span className="glass-chip shrink-0 rounded-full px-3 py-1 text-[11px] font-medium">{myCity}</span>}
+          {filters.success && filters.data.verifiedOnly && (
+            <span className="glass-chip shrink-0 rounded-full px-3 py-1 text-[11px] font-medium text-sky-300">Verified only</span>
+          )}
+          {filters.success && (filters.data.ageMin || filters.data.ageMax) && (
+            <span className="glass-chip shrink-0 rounded-full px-3 py-1 text-[11px] font-medium">
+              {filters.data.ageMin ?? 18}-{filters.data.ageMax ?? 99}
+            </span>
+          )}
+          {filters.success && filters.data.country && (
+            <span className="glass-chip shrink-0 rounded-full px-3 py-1 text-[11px] font-medium">
+              {filters.data.country === "IE" ? "Ireland" : "United Kingdom"}
+            </span>
+          )}
+        </div>
       </div>
 
       {users.length === 0 ? (

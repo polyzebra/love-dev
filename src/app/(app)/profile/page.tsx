@@ -10,6 +10,7 @@ import {
   Heart,
   Languages,
   MapPin,
+  PencilLine,
   Settings,
   Ruler,
 } from "lucide-react";
@@ -148,6 +149,61 @@ export default async function ProfilePage() {
           </div>
         </section>
       </Reveal>
+
+      {/* ============ Actionable completion checklist ============ */}
+      {(() => {
+        const items = [
+          photos.length < 4 && {
+            label: `Add ${4 - photos.length} more photo${4 - photos.length > 1 ? "s" : ""}`,
+            why: "Profiles with 4+ photos get more replies.",
+            href: "/settings",
+          },
+          (profile.bio?.length ?? 0) < 40 && {
+            label: "Write a short bio",
+            why: "A story in your own words starts more conversations.",
+            href: "/settings",
+          },
+          profile.interests.length < 3 && {
+            label: `Choose ${3 - profile.interests.length} more interest${3 - profile.interests.length > 1 ? "s" : ""}`,
+            why: "Interests power your matches and Explore circles.",
+            href: "/settings",
+          },
+          !verifiedTypes.has("PHONE") && {
+            label: "Verify your phone",
+            why: "Phone-verified profiles are trusted more.",
+            href: "/settings/account",
+          },
+          !verifiedTypes.has("PHOTO") && {
+            label: "Verify your photos",
+            why: "The blue tick gets noticeably more likes.",
+            href: "/settings/account",
+          },
+        ].filter(Boolean) as { label: string; why: string; href: string }[];
+        if (items.length === 0) return null;
+        return (
+          <Reveal>
+            <section className="glass rounded-[28px] p-5" aria-label="Complete your profile">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
+                Get more matches
+              </p>
+              <ul className="space-y-2.5">
+                {items.slice(0, 3).map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className="group flex items-center gap-3 rounded-2xl border border-white/8 bg-white/4 px-4 py-3 transition-colors hover:border-primary/40">
+                      <CircleDashed className="size-4.5 shrink-0 text-primary-soft" aria-hidden="true" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium">{item.label}</span>
+                        <span className="block text-xs text-muted-foreground">{item.why}</span>
+                      </span>
+                      <PencilLine className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary-soft" aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </Reveal>
+        );
+      })()}
 
       {/* ================= IN THEIR WORDS ================= */}
       {profile.bio ? (
