@@ -7,6 +7,23 @@ import { db } from "@/lib/db";
  * password reset + email verification, which Supabase owns).
  */
 
+/**
+ * Does this uid still exist in Supabase Auth? Queried straight from
+ * auth.users (same database) - never trust the app User row's email
+ * alone. Fails SAFE: if auth.users is unreadable we report "alive" so
+ * a live account is never torn down by mistake.
+ */
+export async function isAuthUserAlive(userId: string): Promise<boolean> {
+  try {
+    const rows = await db.$queryRaw<{ id: string }[]>`
+      SELECT id::text FROM auth.users WHERE id::text = ${userId} LIMIT 1`;
+    return rows.length > 0;
+  } catch (error) {
+    console.warn(`[identity] auth.users lookup failed - assuming alive: ${String(error).slice(0, 80)}`);
+    return true;
+  }
+}
+
 /** Is this email banned from authenticating (any provider unless scoped)? */
 export async function isIdentityBlocked(email: string, provider?: string): Promise<boolean> {
   const row = await db.blockedIdentity.findUnique({ where: { email: email.toLowerCase() } });

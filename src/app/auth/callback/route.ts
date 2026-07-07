@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { db } from "@/lib/db";
-import { isIdentityBlocked, recycleDeletedRow, teardownAccount } from "@/lib/auth/identity";
+import { isAuthUserAlive, isIdentityBlocked, recycleDeletedRow, teardownAccount } from "@/lib/auth/identity";
 
 /**
  * OAuth / magic-link callback - the ONLY place an app User row is
@@ -91,8 +91,13 @@ export async function GET(request: NextRequest) {
   if (emailHolder) {
     if (emailHolder.status === "DELETED") {
       await teardownAccount(emailHolder.id, "email freed for new identity");
+    } else if (!(await isAuthUserAlive(emailHolder.id))) {
+      // The holder's auth user is gone (dashboard deletion without the
+      // webhook) - it's an orphan, not a conflict. Tear it down, free
+      // the email, and let the new identity start from zero.
+      await teardownAccount(emailHolder.id, "orphaned by auth-user deletion");
     } else {
-      console.error(`[identity] conflict: email held by active ${emailHolder.id}, new auth uid ${u.id}`);
+      console.error(`[identity] conflict: email held by LIVE account ${emailHolder.id}, new auth uid ${u.id}`);
       await supabase.auth.signOut().catch(() => {});
       return fail("AccountConflict");
     }
