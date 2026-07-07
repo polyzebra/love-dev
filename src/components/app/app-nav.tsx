@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Compass, Flame, Heart, MessageCircle, PanelLeftClose, PanelLeftOpen, UserRound } from "lucide-react";
+import { Compass, Flame, Heart, MessageCircle, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
 
@@ -22,23 +21,6 @@ const NAV_ITEMS = [
  */
 export function AppNav() {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
-
-  // Restore preference and expose rail width to the layout as a CSS var
-  useEffect(() => {
-    const saved = window.localStorage.getItem("virelsy:rail") === "collapsed";
-    const id = window.setTimeout(() => setCollapsed(saved), 0);
-    return () => window.clearTimeout(id);
-  }, []);
-  useEffect(() => {
-    document.documentElement.style.setProperty("--rail-w", collapsed ? "7rem" : "17rem");
-  }, [collapsed]);
-  function toggle() {
-    setCollapsed((c) => {
-      window.localStorage.setItem("virelsy:rail", c ? "expanded" : "collapsed");
-      return !c;
-    });
-  }
 
   return (
     <>
@@ -77,17 +59,9 @@ export function AppNav() {
       </nav>
 
       {/* Desktop frosted rail */}
-      <aside className={cn("group/rail fixed bottom-4 left-4 top-4 z-40 hidden flex-col overflow-hidden rounded-[28px] border border-white/8 bg-card/50 backdrop-blur-2xl transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:flex", collapsed ? "w-[88px]" : "w-60")}>
-        <div className={cn("flex items-center py-7", collapsed ? "justify-center px-0" : "justify-between px-6")}>
-          {!collapsed && <Logo href="/discover" />}
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="tap-target flex items-center justify-center rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/6 hover:text-foreground"
-          >
-            {collapsed ? <PanelLeftOpen className="size-5" /> : <PanelLeftClose className="size-5" />}
-          </button>
+      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-[28px] border border-white/8 bg-card/50 backdrop-blur-2xl lg:flex">
+        <div className="px-6 py-7">
+          <Logo href="/discover" />
         </div>
         <nav aria-label="Primary" className="flex-1 px-3">
           <ul className="space-y-1">
@@ -98,10 +72,8 @@ export function AppNav() {
                   <Link
                     href={href}
                     aria-current={active ? "page" : undefined}
-                    title={collapsed ? label : undefined}
                     className={cn(
-                      "relative flex items-center gap-3 rounded-2xl py-3 text-sm font-medium transition-colors",
-                      collapsed ? "justify-center px-0" : "px-4",
+                      "relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
                       active
                         ? "text-white"
                         : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
@@ -114,15 +86,15 @@ export function AppNav() {
                         className="absolute inset-0 rounded-2xl bg-primary/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_20px_rgba(225,29,72,0.25)]"
                       />
                     )}
-                    <Icon className="relative size-5 shrink-0" aria-hidden="true" />
-                    <span className={cn("relative whitespace-nowrap transition-[opacity] duration-200", collapsed && "sr-only")}>{label}</span>
+                    <Icon className="relative size-5" aria-hidden="true" />
+                    <span className="relative">{label}</span>
                   </Link>
                 </li>
               );
             })}
           </ul>
         </nav>
-        <p className={cn("px-6 py-6 text-xs text-muted-foreground", collapsed && "sr-only")}>Made with care</p>
+        <p className="px-6 py-6 text-xs text-muted-foreground">Made with care</p>
       </aside>
     </>
   );

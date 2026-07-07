@@ -113,7 +113,7 @@ export default async function ExploreCategoryPage({
         />
       ) : (
         <>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(210px,1fr))]">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {users.map((u) => (
               <li key={u.userId}>
                 <ExplorePersonCard person={u} />
