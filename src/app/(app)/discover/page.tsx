@@ -6,7 +6,7 @@ import { getDiscoverFeed } from "@/lib/services/discovery";
 import { SwipeDeck, type ViewerContext } from "@/components/app/swipe-deck";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { ArrowLeft, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Bell, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Discover" };
@@ -74,9 +74,14 @@ export default async function DiscoverPage({
             <p className="text-sm text-muted-foreground md:text-base">Profiles picked for you, refreshed daily.</p>
           </div>
         </div>
-        <Button variant="outline" size="icon" className="size-11 rounded-full" aria-label="Discovery preferences" asChild>
-          <Link href="/settings/discovery"><SlidersHorizontal className="size-5" /></Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" className="size-11 rounded-full" aria-label="Notifications" asChild>
+            <Link href="/notifications"><Bell className="size-5" /></Link>
+          </Button>
+          <Button variant="outline" size="icon" className="size-11 rounded-full" aria-label="Discovery preferences" asChild>
+            <Link href="/settings/discovery"><SlidersHorizontal className="size-5" /></Link>
+          </Button>
+        </div>
       </header>
       <Suspense fallback={<DeckSkeleton />}>
         <Deck />

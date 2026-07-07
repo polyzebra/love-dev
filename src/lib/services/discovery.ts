@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { calculateAge } from "@/lib/utils";
+import { computeCompatibility, type ScoringProfile } from "@/lib/services/scoring";
 
 /**
  * Discovery feed. Excludes: self, already-swiped, blocked (either way),
@@ -22,6 +23,7 @@ export type DiscoverProfile = {
   interests: string[];
   photos: { url: string; blurDataUrl: string | null }[];
   compatibility: number;
+  reasons: string[];
 };
 
 const ONLINE_WINDOW_MS = 5 * 60_000;
@@ -36,15 +38,32 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/**
- * Compatibility placeholder: shared-interest Jaccard similarity scaled
- * to 55-98. Swap for a learned model without touching the UI contract.
- */
-function compatibilityScore(mine: Set<string>, theirs: string[]): number {
-  if (mine.size === 0 || theirs.length === 0) return 60;
-  const shared = theirs.filter((i) => mine.has(i)).length;
-  const union = new Set([...mine, ...theirs]).size;
-  return Math.round(55 + (shared / union) * 43);
+/** Map a Prisma profile row (with interests) onto the scoring engine's shape. */
+function toScoringProfile(p: {
+  relationshipGoal: ScoringProfile["relationshipGoal"];
+  gender: ScoringProfile["gender"];
+  city: string | null; country: string;
+  latitude: number | null; longitude: number | null;
+  languages: string[];
+  smoking: ScoringProfile["smoking"]; drinking: ScoringProfile["drinking"];
+  exercise: string | null;
+  personalityTags: string[]; communityTags: string[];
+  birthDate: Date; minAge: number; maxAge: number;
+  interests: { interest: { slug: string; label: string } }[];
+}): ScoringProfile {
+  return {
+    relationshipGoal: p.relationshipGoal,
+    gender: p.gender,
+    city: p.city, country: p.country,
+    latitude: p.latitude, longitude: p.longitude,
+    languages: p.languages,
+    interestSlugs: p.interests.map((i) => i.interest.slug),
+    interestLabels: p.interests.map((i) => i.interest.label),
+    smoking: p.smoking, drinking: p.drinking,
+    exercise: p.exercise,
+    personalityTags: p.personalityTags, communityTags: p.communityTags,
+    birthDate: p.birthDate, minAge: p.minAge, maxAge: p.maxAge,
+  };
 }
 
 export async function getDiscoverFeed(userId: string, take = 20): Promise<DiscoverProfile[]> {
@@ -88,6 +107,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       user: {
         select: {
           lastActiveAt: true,
+          createdAt: true,
           photos: {
             where: { moderation: { not: "REJECTED" } },
             orderBy: [{ isCover: "desc" }, { position: "asc" }],
@@ -104,7 +124,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
     take: take * 3, // over-fetch, then filter by distance
   });
 
-  const myInterests = new Set(me.interests.map((i) => i.interest.slug));
+  const viewerScoring = toScoringProfile(me);
 
   const results: DiscoverProfile[] = [];
   for (const c of candidates) {
@@ -132,13 +152,23 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       isBoosted: c.isBoosted,
       interests: c.interests.map((i) => i.interest.label),
       photos: c.user.photos,
-      compatibility: compatibilityScore(
-        myInterests,
-        c.interests.map((i) => i.interest.slug),
-      ),
+      ...(() => {
+        const { score, reasons } = computeCompatibility(
+          viewerScoring,
+          toScoringProfile(c),
+          {
+            isVerified: c.user.verifications.length > 0,
+            lastActiveAt: c.user.lastActiveAt,
+            createdAt: c.user.createdAt,
+            isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,
+          },
+        );
+        return { compatibility: score, reasons };
+      })(),
     });
-    if (results.length >= take) break;
   }
 
-  return results;
+  // Deterministic ranking: best compatibility first - never random order
+  results.sort((a, b) => b.compatibility - a.compatibility);
+  return results.slice(0, take);
 }

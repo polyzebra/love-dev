@@ -317,7 +317,7 @@ export function SwipeDeck({
   const viewerSet = new Set(viewer?.interests ?? []);
   const shared = top ? top.interests.filter((i) => viewerSet.has(i)) : [];
   const sharedSet = new Set(shared);
-  const reasons = top ? compatibilityReasons(top, viewer, shared) : [];
+  const reasons = top ? (top.reasons?.length ? top.reasons : compatibilityReasons(top, viewer, shared)) : [];
 
   // Ambient light sampled from the top card's photo; falls back to brand rose
   const dominant = useDominantColor(top?.photos[0]?.url);

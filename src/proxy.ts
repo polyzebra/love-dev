@@ -5,6 +5,7 @@ const PROTECTED = [
   "/discover",
   "/explore",
   "/matches",
+  "/notifications",
   "/chat",
   "/messages",
   "/likes",
