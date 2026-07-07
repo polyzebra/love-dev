@@ -10,7 +10,7 @@ import {
   SlidersHorizontal,
   UserRound,
 } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -45,9 +45,9 @@ const GROUPS = [
 ] as const;
 
 export default async function SettingsPage() {
-  const session = await auth();
+  const user = await requireUser();
   const subscription = await db.subscription.findUnique({
-    where: { userId: session!.user.id },
+    where: { userId: user.id },
     select: { tier: true },
   });
   const tier = subscription?.tier ?? "FREE";
@@ -56,7 +56,7 @@ export default async function SettingsPage() {
     <>
       <PageHeader
         title="Settings"
-        description={session?.user?.email ?? undefined}
+        description={user.email}
         actions={
           <Badge variant={tier === "FREE" ? "secondary" : "default"} className="rounded-full px-3">
             {tier === "FREE" ? "Free plan" : tier === "PLUS" ? "Plus" : "Premium"}

@@ -43,10 +43,21 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
   const { pathname } = request.nextUrl;
-  if (!user && PROTECTED.some((p) => pathname.startsWith(p))) {
-    const login = new URL("/login", request.url);
-    login.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(login);
+  if (!user) {
+    // A session cookie that no longer maps to a live Supabase user is
+    // dead weight (e.g. the user was deleted in the dashboard). Purge
+    // it here - middleware is the one place cookie writes always apply.
+    const staleAuthCookies = request.cookies
+      .getAll()
+      .filter((c) => c.name.startsWith("sb-") && c.name.includes("-auth-token"));
+    if (PROTECTED.some((p) => pathname.startsWith(p))) {
+      const login = new URL("/login", request.url);
+      login.searchParams.set("callbackUrl", pathname);
+      const redirect = NextResponse.redirect(login);
+      for (const c of staleAuthCookies) redirect.cookies.delete(c.name);
+      return redirect;
+    }
+    for (const c of staleAuthCookies) response.cookies.delete(c.name);
   }
 
   return response;

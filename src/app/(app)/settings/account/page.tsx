@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeCheck, CircleDashed } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,9 @@ export const metadata: Metadata = { title: "Account & verification" };
 export const dynamic = "force-dynamic";
 
 export default async function AccountSettingsPage() {
-  const session = await auth();
+  const viewer = await requireUser();
   const user = await db.user.findUnique({
-    where: { id: session!.user.id },
+    where: { id: viewer.id },
     select: {
       email: true,
       emailVerified: true,

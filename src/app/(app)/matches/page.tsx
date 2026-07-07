@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HeartOff } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline } from "@/lib/presence";
@@ -15,8 +15,8 @@ export const metadata: Metadata = { title: "Matches" };
 export const dynamic = "force-dynamic";
 
 export default async function MatchesPage() {
-  const session = await auth();
-  const userId = session!.user.id;
+  const user = await requireUser();
+  const userId = user.id;
 
   const matches = await db.match.findMany({
     where: { status: "ACTIVE", OR: [{ userAId: userId }, { userBId: userId }] },

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Receipt } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PLANS } from "@/lib/constants";
 import { PageHeader } from "@/components/shared/page-header";
@@ -13,11 +13,11 @@ export const metadata: Metadata = { title: "Subscription & billing" };
 export const dynamic = "force-dynamic";
 
 export default async function SubscriptionSettingsPage() {
-  const session = await auth();
+  const user = await requireUser();
   const [subscription, payments] = await Promise.all([
-    db.subscription.findUnique({ where: { userId: session!.user.id } }),
+    db.subscription.findUnique({ where: { userId: user.id } }),
     db.payment.findMany({
-      where: { userId: session!.user.id },
+      where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       take: 12,
     }),

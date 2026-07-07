@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MessageSquareDashed, Pin } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { listConversations } from "@/lib/services/chat";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -15,8 +15,8 @@ export const metadata: Metadata = { title: "Chat" };
 export const dynamic = "force-dynamic";
 
 export default async function ChatListPage() {
-  const session = await auth();
-  const conversations = await listConversations(session!.user.id);
+  const user = await requireUser();
+  const conversations = await listConversations(user.id);
 
   if (conversations.length === 0) {
     return (

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MonitorSmartphone, ShieldCheck } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +11,9 @@ export const metadata: Metadata = { title: "Devices & sessions" };
 export const dynamic = "force-dynamic";
 
 export default async function DevicesSettingsPage() {
-  const session = await auth();
+  const user = await requireUser();
   const devices = await db.device.findMany({
-    where: { userId: session!.user.id },
+    where: { userId: user.id },
     orderBy: { lastSeenAt: "desc" },
   });
 

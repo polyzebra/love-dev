@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { assertParticipant, markRead } from "@/lib/services/chat";
 import { ChatThread, type ThreadMessage } from "@/components/app/chat-thread";
@@ -23,8 +23,8 @@ export default async function ConversationPage({
   params: Promise<{ conversationId: string }>;
 }) {
   const { conversationId } = await params;
-  const session = await auth();
-  const userId = session!.user.id;
+  const user = await requireUser();
+  const userId = user.id;
 
   const participant = await assertParticipant(conversationId, userId);
   if (!participant) notFound();

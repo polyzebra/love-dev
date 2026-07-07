@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +10,9 @@ export const metadata: Metadata = { title: "Privacy Centre" };
 export const dynamic = "force-dynamic";
 
 export default async function PrivacySettingsPage() {
-  const session = await auth();
+  const user = await requireUser();
   const blocks = await db.block.findMany({
-    where: { blockerId: session!.user.id },
+    where: { blockerId: user.id },
     include: { blocked: { select: { profile: { select: { displayName: true } } } } },
     orderBy: { createdAt: "desc" },
   });

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { getDiscoverFeed } from "@/lib/services/discovery";
 import { SwipeDeck, type ViewerContext } from "@/components/app/swipe-deck";
@@ -27,13 +27,13 @@ function DeckSkeleton() {
 }
 
 async function Deck() {
-  const session = await auth();
-  if (!session?.user?.id) return <SwipeDeck initialProfiles={[]} viewer={null} />;
+  const user = await requireUser();
+  if (!user.id) return <SwipeDeck initialProfiles={[]} viewer={null} />;
 
   const [feed, me] = await Promise.all([
-    getDiscoverFeed(session.user.id),
+    getDiscoverFeed(user.id),
     db.profile.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: {
         city: true,
         relationshipGoal: true,

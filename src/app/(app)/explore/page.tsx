@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { getExploreCategories, track } from "@/lib/services/explore";
 import { PageHeader } from "@/components/shared/page-header";
 import { ExploreCard } from "@/components/explore/explore-card";
@@ -20,9 +20,9 @@ const GROUP_LABELS: Record<string, string> = {
 const GROUP_ORDER = ["TODAY", "GOALS", "LIFESTYLE", "INTERESTS", "PERSONALITY", "COMMUNITIES"];
 
 export default async function ExplorePage() {
-  const session = await auth();
-  const categories = await getExploreCategories(session!.user.id);
-  track("explore_opened", session!.user.id);
+  const user = await requireUser();
+  const categories = await getExploreCategories(user.id);
+  track("explore_opened", user.id);
 
   if (categories.length === 0) {
     return (
