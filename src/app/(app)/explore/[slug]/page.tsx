@@ -110,7 +110,13 @@ export default async function ExploreCategoryPage({
         </>
       )}
 
-      {profileParam && viewerProfile && <ExploreProfileViewer profile={viewerProfile} />}
+      {profileParam && viewerProfile && (
+        <ExploreProfileViewer
+          profile={viewerProfile}
+          slug={slug}
+          queue={users.map((u) => ({ userId: u.userId, photoUrl: u.photo?.url ?? null }))}
+        />
+      )}
       {profileParam && !viewerProfile && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/95 p-6 backdrop-blur-xl" role="alertdialog" aria-label="Profile unavailable">
           <div className="glass max-w-xs space-y-4 rounded-[28px] p-6 text-center">

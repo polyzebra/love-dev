@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, useMotionValue, useTransform } from "motion/react";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { toast } from "sonner";
 import { BadgeCheck, Heart, MapPin, RotateCcw, Sparkles, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,12 +52,57 @@ function fallbackGradient(seed: string): string {
  * Covers the app chrome entirely; browser back closes it and Explore
  * keeps its scroll position (all navigation is scroll: false).
  */
-export function ExploreProfileViewer({ profile }: { profile: ViewerProfile }) {
+export type QueueEntry = { userId: string; photoUrl: string | null };
+
+export function ExploreProfileViewer({
+  profile: initialProfile,
+  queue,
+  slug,
+}: {
+  profile: ViewerProfile;
+  queue: QueueEntry[];
+  slug: string;
+}) {
   const router = useRouter();
+  const [profile, setProfile] = useState<ViewerProfile>(initialProfile);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [exhausted, setExhausted] = useState(false);
+  const [acted, setActed] = useState<Set<string>>(new Set());
   const photos = profile.photos;
   const hasPhotos = photos.length > 0;
+
+  // Preload the next queue profile's first photo for a seamless advance
+  useEffect(() => {
+    const next = queue.find((q) => q.userId !== profile.userId && !acted.has(q.userId));
+    if (next?.photoUrl) {
+      const img = new Image();
+      img.src = next.photoUrl;
+    }
+  }, [profile.userId, acted, queue]);
+
+  const advance = useCallback(
+    async (from: string) => {
+      const remaining = queue.filter((q) => q.userId !== from && !acted.has(q.userId));
+      for (const entry of remaining) {
+        const res = await fetch(`/api/explore/profile/${entry.userId}`);
+        if (res.ok) {
+          const { data } = (await res.json()) as { data: ViewerProfile };
+          setProfile(data);
+          setPhotoIndex(0);
+          x.set(0);
+          // keep the modal route alive; replace so Back still exits to grid
+          router.replace(`/explore/${slug}?profile=${entry.userId}`, { scroll: false });
+          return;
+        }
+        // profile became unavailable (blocked/hidden) - skip it
+        setActed((prev) => new Set(prev).add(entry.userId));
+      }
+      setExhausted(true);
+      router.replace(`/explore/${slug}`, { scroll: false });
+    },
+    [queue, acted, router, slug],
+  );
 
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-8, 8]);
@@ -121,7 +166,12 @@ export function ExploreProfileViewer({ profile }: { profile: ViewerProfile }) {
           action: { label: "Say hello", onClick: () => router.push("/chat") },
         });
       }
-      close();
+      // Animate the card away, then advance IN PLACE - never back to grid
+      const dir = action === "PASS" ? -1 : 1;
+      animate(x, dir * window.innerWidth * 1.1, { type: "spring", stiffness: 110, damping: 18 });
+      const departed = profile.userId;
+      setActed((prev) => new Set(prev).add(departed));
+      window.setTimeout(() => void advance(departed), 220);
     } finally {
       setBusy(false);
     }
@@ -132,6 +182,23 @@ export function ExploreProfileViewer({ profile }: { profile: ViewerProfile }) {
     if (res.status === 402) toast("Undo is a Plus feature.");
     else if (res.ok) toast.success("Last swipe undone.");
     else toast("Nothing to undo yet.");
+  }
+
+  if (exhausted) {
+    return (
+      <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-5 bg-background p-8 text-center" role="dialog" aria-modal="true" aria-label="All caught up">
+        <span className="glass-chip flex size-16 items-center justify-center rounded-full">
+          <Sparkles className="size-7 text-gold" aria-hidden="true" />
+        </span>
+        <h2 className="font-display text-3xl font-medium tracking-tight">You&apos;re all caught up</h2>
+        <p className="max-w-xs text-sm text-muted-foreground">
+          You&apos;ve seen everyone here for now. New people join every day.
+        </p>
+        <Button className="h-12 rounded-full px-8" onClick={() => router.push(`/explore/${slug}`, { scroll: false })}>
+          Back to Explore
+        </Button>
+      </div>
+    );
   }
 
   return (

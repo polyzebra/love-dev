@@ -135,13 +135,16 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
   const category = await db.exploreCategory.findUnique({ where: { slug } });
   if (!category || !category.isActive) return null;
 
-  const [me, blockedIds] = await Promise.all([
+  const [me, blockedIds, swiped] = await Promise.all([
     db.profile.findUnique({
       where: { userId: viewerId },
       include: { interests: { select: { interest: { select: { slug: true } } } } },
     }),
     blockedIdsFor(viewerId),
+    db.like.findMany({ where: { fromId: viewerId }, select: { toId: true } }),
   ]);
+  // Already acted (liked/passed) profiles never re-enter the queue
+  const actedIds = swiped.map((l) => l.toId);
 
   const now = Date.now();
   const ageWhere: Prisma.ProfileWhereInput = {};
@@ -159,7 +162,7 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
 
   const where: Prisma.UserWhereInput = {
     AND: [
-      visibleWhere(viewerId, blockedIds),
+      visibleWhere(viewerId, [...blockedIds, ...actedIds]),
       membershipWhere(category.id, category.matcher as Matcher | null),
       {
         profile: {
@@ -253,6 +256,7 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
         photos: {
           where: { moderation: { not: "REJECTED" } },
           orderBy: [{ isCover: "desc" }, { position: "asc" }],
+          take: 10,
           select: { url: true, blurDataUrl: true },
         },
         verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
