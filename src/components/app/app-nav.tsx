@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { Flame, Heart, MessageCircle, Settings, UserRound } from "lucide-react";
+import { Compass, Flame, Heart, MessageCircle, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
 
 const NAV_ITEMS = [
-  { href: "/discover", label: "Discover", icon: Flame },
-  { href: "/matches", label: "Matches", icon: Heart },
+  { href: "/discover", label: "Swipe", icon: Flame },
+  { href: "/explore", label: "Explore", icon: Compass },
+  { href: "/matches", label: "Likes", icon: Heart },
   { href: "/chat", label: "Chat", icon: MessageCircle },
   { href: "/profile", label: "Profile", icon: UserRound },
-  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 /**

@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 
 const PROTECTED = [
   "/discover",
+  "/explore",
   "/matches",
   "/chat",
   "/messages",

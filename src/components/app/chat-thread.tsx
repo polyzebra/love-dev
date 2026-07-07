@@ -126,9 +126,9 @@ export function ChatThread({
 
   useEffect(() => {
     // A gentle, once-per-session suggestion - never on first paint
-    setNudgeDismissed(
-      window.sessionStorage.getItem(`virelsy:nudge:${conversationId}`) === "1",
-    );
+    const dismissed = window.sessionStorage.getItem(`virelsy:nudge:${conversationId}`) === "1";
+    const id = window.setTimeout(() => setNudgeDismissed(dismissed), 0);
+    return () => window.clearTimeout(id);
   }, [conversationId]);
 
   const firstName = otherName.split(" ")[0];

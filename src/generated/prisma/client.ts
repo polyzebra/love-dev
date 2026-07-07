@@ -141,3 +141,18 @@ export type AdminLog = Prisma.AdminLogModel
  * 
  */
 export type FeatureFlag = Prisma.FeatureFlagModel
+/**
+ * Model ExploreCategory
+ * 
+ */
+export type ExploreCategory = Prisma.ExploreCategoryModel
+/**
+ * Model UserExplorePreference
+ * 
+ */
+export type UserExplorePreference = Prisma.UserExplorePreferenceModel
+/**
+ * Model AnalyticsEvent
+ * 
+ */
+export type AnalyticsEvent = Prisma.AnalyticsEventModel

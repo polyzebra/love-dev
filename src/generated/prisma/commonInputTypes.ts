@@ -705,6 +705,23 @@ export type EnumNotificationTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumNotificationTypeFilter<$PrismaModel>
 }
 
+export type EnumExploreGroupFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExploreGroup | Prisma.EnumExploreGroupFieldRefInput<$PrismaModel>
+  in?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel> | $Enums.ExploreGroup
+}
+
+export type EnumExploreGroupWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExploreGroup | Prisma.EnumExploreGroupFieldRefInput<$PrismaModel>
+  in?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExploreGroupWithAggregatesFilter<$PrismaModel> | $Enums.ExploreGroup
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1369,6 +1386,23 @@ export type NestedEnumNotificationTypeWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumExploreGroupFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExploreGroup | Prisma.EnumExploreGroupFieldRefInput<$PrismaModel>
+  in?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel> | $Enums.ExploreGroup
+}
+
+export type NestedEnumExploreGroupWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExploreGroup | Prisma.EnumExploreGroupFieldRefInput<$PrismaModel>
+  in?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExploreGroup[] | Prisma.ListEnumExploreGroupFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExploreGroupWithAggregatesFilter<$PrismaModel> | $Enums.ExploreGroup
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
 }
 
 

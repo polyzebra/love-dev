@@ -70,7 +70,10 @@ export const ModelName = {
   Payment: 'Payment',
   Notification: 'Notification',
   AdminLog: 'AdminLog',
-  FeatureFlag: 'FeatureFlag'
+  FeatureFlag: 'FeatureFlag',
+  ExploreCategory: 'ExploreCategory',
+  UserExplorePreference: 'UserExplorePreference',
+  AnalyticsEvent: 'AnalyticsEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,6 +404,48 @@ export const FeatureFlagScalarFieldEnum = {
 } as const
 
 export type FeatureFlagScalarFieldEnum = (typeof FeatureFlagScalarFieldEnum)[keyof typeof FeatureFlagScalarFieldEnum]
+
+
+export const ExploreCategoryScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  description: 'description',
+  group: 'group',
+  iconKey: 'iconKey',
+  imageUrl: 'imageUrl',
+  gradientFrom: 'gradientFrom',
+  gradientTo: 'gradientTo',
+  matcher: 'matcher',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExploreCategoryScalarFieldEnum = (typeof ExploreCategoryScalarFieldEnum)[keyof typeof ExploreCategoryScalarFieldEnum]
+
+
+export const UserExplorePreferenceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  categoryId: 'categoryId',
+  weight: 'weight',
+  createdAt: 'createdAt'
+} as const
+
+export type UserExplorePreferenceScalarFieldEnum = (typeof UserExplorePreferenceScalarFieldEnum)[keyof typeof UserExplorePreferenceScalarFieldEnum]
+
+
+export const AnalyticsEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  data: 'data',
+  createdAt: 'createdAt'
+} as const
+
+export type AnalyticsEventScalarFieldEnum = (typeof AnalyticsEventScalarFieldEnum)[keyof typeof AnalyticsEventScalarFieldEnum]
 
 
 export const SortOrder = {

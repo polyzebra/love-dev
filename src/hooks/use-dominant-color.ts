@@ -20,8 +20,8 @@ export function useDominantColor(url: string | null | undefined): RGB | null {
       return;
     }
     if (cache.has(url)) {
-      setColor(cache.get(url)!);
-      return;
+      const id = window.setTimeout(() => setColor(cache.get(url)!), 0);
+      return () => window.clearTimeout(id);
     }
     let cancelled = false;
     const img = new Image();

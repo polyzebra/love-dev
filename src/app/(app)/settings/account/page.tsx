@@ -96,7 +96,7 @@ export default async function AccountSettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Password</CardTitle>
           <CardDescription>
-            "Change or set your password via a secure email link."
+            Change or set your password via a secure email link.
           </CardDescription>
         </CardHeader>
         <CardContent>

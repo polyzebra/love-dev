@@ -241,10 +241,11 @@ model User {
   blocksMade      Block[]  @relation("BlocksMade")
   blocksReceived  Block[]  @relation("BlocksReceived")
 
-  subscription  Subscription?
-  payments      Payment[]
-  notifications Notification[]
-  adminLogs     AdminLog[]     @relation("AdminActor")
+  subscription       Subscription?
+  payments           Payment[]
+  notifications      Notification[]
+  explorePreferences UserExplorePreference[]
+  adminLogs          AdminLog[]              @relation("AdminActor")
 
   @@index([status, lastActiveAt])
   @@index([role])
@@ -625,4 +626,65 @@ model FeatureFlag {
   rules       Json?
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Explore - data-driven discovery categories
+// ---------------------------------------------------------------------------
+
+enum ExploreGroup {
+  LIFESTYLE
+  INTERESTS
+  GOALS
+  TODAY
+  PERSONALITY
+  COMMUNITIES
+}
+
+model ExploreCategory {
+  id           String       @id @default(cuid())
+  slug         String       @unique
+  title        String
+  description  String?
+  group        ExploreGroup
+  iconKey      String // maps to a 3D visual; real assets swap in via imageUrl
+  imageUrl     String?
+  gradientFrom String       @default("#fb7185")
+  gradientTo   String       @default("#be123c")
+  // Predicate for matching profiles, e.g.
+  // {"kind":"interests","values":["coffee-dates"]} | {"kind":"goal","values":["LONG_TERM"]}
+  // {"kind":"country","values":["IE"]} | {"kind":"recentlyActive"} | {"kind":"preference"}
+  matcher      Json?
+  sortOrder    Int          @default(0)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  preferences UserExplorePreference[]
+
+  @@index([isActive, group, sortOrder])
+}
+
+model UserExplorePreference {
+  id         String   @id @default(cuid())
+  userId     String
+  categoryId String
+  weight     Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category ExploreCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId])
+  @@index([categoryId])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  name      String
+  data      Json?
+  createdAt DateTime @default(now())
+
+  @@index([name, createdAt])
 }

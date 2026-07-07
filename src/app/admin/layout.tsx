@@ -9,6 +9,7 @@ import {
   ScrollText,
   ToggleRight,
   Users,
+  Compass
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { isStaff } from "@/lib/rbac";
@@ -23,6 +24,7 @@ const NAV = [
   { href: "/admin/reports", icon: Flag, label: "Reports" },
   { href: "/admin/verification", icon: BadgeCheck, label: "Verification" },
   { href: "/admin/payments", icon: CreditCard, label: "Payments" },
+  { href: "/admin/explore", icon: Compass, label: "Explore" },
   { href: "/admin/flags", icon: ToggleRight, label: "Feature flags" },
   { href: "/admin/audit", icon: ScrollText, label: "Audit log" },
 ] as const;

@@ -265,3 +265,15 @@ export const ModerationStatus = {
 } as const
 
 export type ModerationStatus = (typeof ModerationStatus)[keyof typeof ModerationStatus]
+
+
+export const ExploreGroup = {
+  LIFESTYLE: 'LIFESTYLE',
+  INTERESTS: 'INTERESTS',
+  GOALS: 'GOALS',
+  TODAY: 'TODAY',
+  PERSONALITY: 'PERSONALITY',
+  COMMUNITIES: 'COMMUNITIES'
+} as const
+
+export type ExploreGroup = (typeof ExploreGroup)[keyof typeof ExploreGroup]
