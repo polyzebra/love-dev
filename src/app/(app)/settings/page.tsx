@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  LifeBuoy,
   Bell,
   ChevronRight,
   CreditCard,
@@ -38,6 +39,7 @@ const GROUPS = [
     items: [
       { href: "/settings/privacy", icon: ShieldCheck, label: "Privacy Centre", hint: "Data export, blocked users, deletion" },
       { href: "/settings/devices", icon: MonitorSmartphone, label: "Devices & sessions", hint: "Where you're signed in" },
+      { href: "/safety", icon: LifeBuoy, label: "Safety Centre", hint: "Guidelines, reporting, emergency help" },
     ],
   },
 ] as const;

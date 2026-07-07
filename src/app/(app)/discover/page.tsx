@@ -5,7 +5,9 @@ import { db } from "@/lib/db";
 import { getDiscoverFeed } from "@/lib/services/discovery";
 import { SwipeDeck, type ViewerContext } from "@/components/app/swipe-deck";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PageHeader } from "@/components/shared/page-header";
+import Link from "next/link";
+import { ArrowLeft, SlidersHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Discover" };
 export const dynamic = "force-dynamic";
@@ -50,13 +52,32 @@ async function Deck() {
   return <SwipeDeck initialProfiles={feed} viewer={viewer} />;
 }
 
-export default function DiscoverPage() {
+export default async function DiscoverPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const { from } = await searchParams;
+  const backHref = from?.startsWith("/explore") ? from : null;
   return (
     <>
-      <PageHeader
-        title="Discover"
-        description="Profiles picked for you, refreshed daily."
-      />
+      {/* Swipe header: contextual back (from Explore) left, filters right */}
+      <header className="flex items-start justify-between gap-4 pb-6">
+        <div className="flex items-center gap-2">
+          {backHref && (
+            <Button variant="ghost" size="icon" className="rounded-full" aria-label="Back to Explore" asChild>
+              <Link href={backHref}><ArrowLeft className="size-5" /></Link>
+            </Button>
+          )}
+          <div>
+            <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">Swipe</h1>
+            <p className="text-sm text-muted-foreground md:text-base">Profiles picked for you, refreshed daily.</p>
+          </div>
+        </div>
+        <Button variant="outline" size="icon" className="size-11 rounded-full" aria-label="Discovery preferences" asChild>
+          <Link href="/settings/discovery"><SlidersHorizontal className="size-5" /></Link>
+        </Button>
+      </header>
       <Suspense fallback={<DeckSkeleton />}>
         <Deck />
       </Suspense>

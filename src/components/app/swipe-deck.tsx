@@ -418,18 +418,18 @@ export function SwipeDeck({
           <motion.div
             key={`peek-${next.userId}`}
             aria-hidden="true"
-            initial={{ scale: 0.9, y: 24, opacity: 0.4 }}
-            animate={{ scale: 0.94, y: 14, opacity: 0.75 }}
+            initial={{ scale: 0.9, y: 26, opacity: 0.3 }}
+            animate={{ scale: 0.93, y: 16, opacity: 0.55 }}
             transition={{ type: "spring", stiffness: 260, damping: 26 }}
             className="absolute inset-0 overflow-hidden rounded-[30px] border border-white/8 bg-card shadow-card"
           >
             {next.photos[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={next.photos[0].url} alt="" className="h-full w-full object-cover opacity-70" />
+              <img src={next.photos[0].url} alt="" className="h-full w-full object-cover opacity-60" />
             ) : (
               <div className="h-full w-full" style={{ background: photoGradient(next.userId) }} />
             )}
-            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 bg-black/55" />
           </motion.div>
         )}
 
