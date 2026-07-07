@@ -406,7 +406,8 @@ export const ModelName = {
   FeatureFlag: 'FeatureFlag',
   ExploreCategory: 'ExploreCategory',
   UserExplorePreference: 'UserExplorePreference',
-  AnalyticsEvent: 'AnalyticsEvent'
+  AnalyticsEvent: 'AnalyticsEvent',
+  BlockedIdentity: 'BlockedIdentity'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent"
+    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2128,6 +2129,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BlockedIdentity: {
+      payload: Prisma.$BlockedIdentityPayload<ExtArgs>
+      fields: Prisma.BlockedIdentityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BlockedIdentityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BlockedIdentityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>
+        }
+        findFirst: {
+          args: Prisma.BlockedIdentityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BlockedIdentityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>
+        }
+        findMany: {
+          args: Prisma.BlockedIdentityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>[]
+        }
+        create: {
+          args: Prisma.BlockedIdentityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>
+        }
+        createMany: {
+          args: Prisma.BlockedIdentityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BlockedIdentityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>[]
+        }
+        delete: {
+          args: Prisma.BlockedIdentityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>
+        }
+        update: {
+          args: Prisma.BlockedIdentityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>
+        }
+        deleteMany: {
+          args: Prisma.BlockedIdentityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BlockedIdentityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BlockedIdentityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>[]
+        }
+        upsert: {
+          args: Prisma.BlockedIdentityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockedIdentityPayload>
+        }
+        aggregate: {
+          args: Prisma.BlockedIdentityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBlockedIdentity>
+        }
+        groupBy: {
+          args: Prisma.BlockedIdentityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BlockedIdentityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BlockedIdentityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BlockedIdentityCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2524,6 +2599,19 @@ export const AnalyticsEventScalarFieldEnum = {
 } as const
 
 export type AnalyticsEventScalarFieldEnum = (typeof AnalyticsEventScalarFieldEnum)[keyof typeof AnalyticsEventScalarFieldEnum]
+
+
+export const BlockedIdentityScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  provider: 'provider',
+  reason: 'reason',
+  blockedAt: 'blockedAt',
+  expiresAt: 'expiresAt',
+  createdBy: 'createdBy'
+} as const
+
+export type BlockedIdentityScalarFieldEnum = (typeof BlockedIdentityScalarFieldEnum)[keyof typeof BlockedIdentityScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3146,6 +3234,7 @@ export type GlobalOmitConfig = {
   exploreCategory?: Prisma.ExploreCategoryOmit
   userExplorePreference?: Prisma.UserExplorePreferenceOmit
   analyticsEvent?: Prisma.AnalyticsEventOmit
+  blockedIdentity?: Prisma.BlockedIdentityOmit
 }
 
 /* Types for Logging */

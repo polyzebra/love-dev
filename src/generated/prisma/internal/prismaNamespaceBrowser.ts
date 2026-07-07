@@ -73,7 +73,8 @@ export const ModelName = {
   FeatureFlag: 'FeatureFlag',
   ExploreCategory: 'ExploreCategory',
   UserExplorePreference: 'UserExplorePreference',
-  AnalyticsEvent: 'AnalyticsEvent'
+  AnalyticsEvent: 'AnalyticsEvent',
+  BlockedIdentity: 'BlockedIdentity'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -449,6 +450,19 @@ export const AnalyticsEventScalarFieldEnum = {
 } as const
 
 export type AnalyticsEventScalarFieldEnum = (typeof AnalyticsEventScalarFieldEnum)[keyof typeof AnalyticsEventScalarFieldEnum]
+
+
+export const BlockedIdentityScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  provider: 'provider',
+  reason: 'reason',
+  blockedAt: 'blockedAt',
+  expiresAt: 'expiresAt',
+  createdBy: 'createdBy'
+} as const
+
+export type BlockedIdentityScalarFieldEnum = (typeof BlockedIdentityScalarFieldEnum)[keyof typeof BlockedIdentityScalarFieldEnum]
 
 
 export const SortOrder = {

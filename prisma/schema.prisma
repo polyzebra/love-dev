@@ -693,3 +693,16 @@ model AnalyticsEvent {
 
   @@index([name, createdAt])
 }
+
+// Identity blocklist - emails/providers that may never authenticate again.
+model BlockedIdentity {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  provider  String? // google | apple | email | null = all
+  reason    String?
+  blockedAt DateTime  @default(now())
+  expiresAt DateTime?
+  createdBy String?
+
+  @@index([email])
+}

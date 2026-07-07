@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { supabaseServer } from "@/lib/supabase/server";
+import { isIdentityBlocked } from "@/lib/auth/identity";
 import type { Role } from "@/generated/prisma/enums";
 
 /**
@@ -39,7 +40,8 @@ export const auth = cache(async (): Promise<AppSession | null> => {
   // A session whose app user vanished (deleted account, revoked access)
   // is terminated on the spot: sign out, clear cookies, return null.
   const appUser = await db.user.findUnique({ where: { id: user.id } });
-  if (!appUser || appUser.status === "SUSPENDED" || appUser.status === "DELETED") {
+  const blocked = appUser ? false : await isIdentityBlocked(user.email);
+  if (!appUser || blocked || appUser.status === "SUSPENDED" || appUser.status === "DELETED") {
     console.warn(`[auth:guard] invalid app user for auth.uid=${user.id} - signing out`);
     await supabase.auth.signOut().catch(() => {});
     return null;

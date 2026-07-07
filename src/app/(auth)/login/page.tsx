@@ -33,6 +33,10 @@ function LoginForm() {
         "That email is already registered with a different sign-in method. Use your original method.",
       Verification: "That sign-in link is invalid or has expired.",
       SessionRequired: "Please sign in to continue.",
+      AccountBlocked:
+        "This account can no longer be used. Contact support if you believe this is a mistake.",
+      AccountConflict:
+        "This email is attached to another account. Contact support to resolve it.",
     };
     toast.error(messages[authError] ?? "Sign-in failed. Please try again.");
   }, [authError]);

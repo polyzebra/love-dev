@@ -156,3 +156,8 @@ export type UserExplorePreference = Prisma.UserExplorePreferenceModel
  * 
  */
 export type AnalyticsEvent = Prisma.AnalyticsEventModel
+/**
+ * Model BlockedIdentity
+ * 
+ */
+export type BlockedIdentity = Prisma.BlockedIdentityModel
