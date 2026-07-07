@@ -37,14 +37,14 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
       type="button"
       onClick={open}
       aria-label={`View ${person.displayName}'s profile`}
-      className="group relative block w-full overflow-hidden rounded-3xl border border-white/8 bg-card/80 text-left shadow-card transition-shadow hover:shadow-float"
+      className="group relative block w-full overflow-hidden rounded-3xl border border-border bg-card/80 text-left shadow-card transition-shadow hover:shadow-float"
     >
       <div className="relative aspect-3/4 bg-muted">
         {person.photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={person.photo.url} alt={`${person.displayName}'s photo`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
         ) : (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-white/10 to-transparent font-display text-3xl text-white/60">
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-foreground/10 to-transparent font-display text-3xl text-foreground/60">
             {initialsOf(person.displayName)}
           </div>
         )}

@@ -15,15 +15,15 @@ export function MatchRing({
   const c = 2 * Math.PI * r;
   const dims = size === "md" ? "size-8" : "size-6";
   return (
-    <span className="glass-chip flex items-center gap-2 rounded-full py-1 pl-1.5 pr-3 text-xs font-semibold text-white">
+    <span className="glass-chip flex items-center gap-2 rounded-full py-1 pl-1.5 pr-3 text-xs font-semibold text-foreground">
       <svg viewBox="0 0 36 36" className={`${dims} -rotate-90`} aria-hidden="true">
-        <circle cx="18" cy="18" r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
+        <circle cx="18" cy="18" r={r} fill="none" stroke="color-mix(in oklab, var(--foreground) 20%, transparent)" strokeWidth="3" />
         <motion.circle
           cx="18"
           cy="18"
           r={r}
           fill="none"
-          stroke="#fb7185"
+          stroke="var(--primary-soft)"
           strokeWidth="3"
           strokeLinecap="round"
           strokeDasharray={c}

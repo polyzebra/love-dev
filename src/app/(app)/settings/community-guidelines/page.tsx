@@ -55,7 +55,7 @@ export default function CommunityGuidelinesPage() {
         {GUIDELINES.map(({ icon: Icon, title, body }) => (
           <section
             key={title}
-            className="rounded-3xl border border-white/8 bg-card/80 p-6 shadow-card"
+            className="rounded-3xl border border-border bg-card/80 p-6 shadow-card"
           >
             <div className="flex items-start gap-4">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">

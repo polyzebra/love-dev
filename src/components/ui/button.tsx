@@ -16,11 +16,11 @@ const buttonVariants = cva(
           "bg-destructive/15 border border-destructive/40 text-destructive shadow-xs hover:bg-destructive/25 focus-visible:ring-destructive/30 active:scale-[0.97]",
         // Frosted glass secondary
         outline:
-          "glass-chip text-foreground transition-[transform,background-color] duration-300 hover:bg-white/12 active:scale-[0.97]",
+          "glass-chip text-foreground transition-[transform,background-color] duration-300 hover:bg-foreground/10 active:scale-[0.97]",
         secondary:
-          "bg-secondary text-secondary-foreground border border-white/8 hover:bg-secondary/70 active:scale-[0.97]",
+          "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/70 active:scale-[0.97]",
         ghost:
-          "hover:bg-white/6 hover:text-foreground active:scale-[0.97]",
+          "hover:bg-foreground/5 hover:text-foreground active:scale-[0.97]",
         link: "text-primary-soft underline-offset-4 hover:underline",
       },
       size: {

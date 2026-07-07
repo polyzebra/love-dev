@@ -44,7 +44,7 @@ export default async function ExploreCategoryPage({
     <>
       {/* Category hero */}
       <section
-        className="relative mb-6 overflow-hidden rounded-[32px] border border-white/10 p-6 shadow-card"
+        className="relative mb-6 overflow-hidden rounded-[32px] border border-border p-6 shadow-card"
         style={{ background: `radial-gradient(130% 120% at 20% 0%, ${category.gradientFrom}40, transparent 60%), radial-gradient(120% 130% at 90% 100%, ${category.gradientTo}30, transparent 55%)` }}
       >
         <div className="flex items-start justify-between">

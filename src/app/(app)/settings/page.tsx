@@ -81,7 +81,7 @@ export default async function SettingsPage() {
             <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               {group.title}
             </h2>
-            <div className="overflow-hidden rounded-3xl border border-white/8 bg-card/80 shadow-card">
+            <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
               {group.items.map(({ href, icon: Icon, label, hint }, i) => (
                 <Link
                   key={href}
@@ -108,7 +108,7 @@ export default async function SettingsPage() {
           <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Account controls
           </h2>
-          <div className="overflow-hidden rounded-3xl border border-white/8 bg-card/80 shadow-card">
+          <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
             <RestorePurchasesRow />
             <SignOutRow />
           </div>

@@ -48,8 +48,8 @@ export default async function NotificationSettingsPage() {
           <Link
             key={href}
             href={href}
-            className={`flex min-h-14 items-center gap-4 px-5 py-4 transition-colors hover:bg-white/6 focus-visible:bg-white/6 focus-visible:outline-none ${
-              i > 0 ? "border-t border-white/8" : ""
+            className={`flex min-h-14 items-center gap-4 px-5 py-4 transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:outline-none ${
+              i > 0 ? "border-t border-border" : ""
             }`}
           >
             <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">

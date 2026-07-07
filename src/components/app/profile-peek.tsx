@@ -40,10 +40,10 @@ export function ProfilePeek({
   return (
     <Drawer>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="border-white/10 bg-popover/95 backdrop-blur-2xl">
+      <DrawerContent className="border-border bg-popover/95 backdrop-blur-2xl">
         <DrawerHeader className="items-center text-center">
           <div className="relative mx-auto mb-2">
-            <Avatar className="size-24 border-2 border-white/15 shadow-float">
+            <Avatar className="size-24 border-2 border-border shadow-float">
               <AvatarImage src={profile.photoUrl ?? undefined} alt="" />
               <AvatarFallback className="text-2xl">
                 {initialsOf(profile.displayName)}

@@ -52,7 +52,7 @@ export default function SupportPage() {
       <div className="space-y-6">
         <a
           href="mailto:support@virelsy.app"
-          className="flex items-center gap-4 rounded-3xl border border-white/8 bg-card/80 px-5 py-5 shadow-card transition-colors hover:bg-muted"
+          className="flex items-center gap-4 rounded-3xl border border-border bg-card/80 px-5 py-5 shadow-card transition-colors hover:bg-muted"
         >
           <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
             <Mail className="size-5 text-accent-foreground" aria-hidden="true" />
@@ -66,7 +66,7 @@ export default function SupportPage() {
           <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         </a>
 
-        <div className="overflow-hidden rounded-3xl border border-white/8 bg-card/80 shadow-card">
+        <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
           <Link
             href="/settings/safety"
             className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted"

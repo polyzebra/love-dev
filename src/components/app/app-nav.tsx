@@ -39,7 +39,7 @@ export function AppNav() {
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "tap-target relative flex flex-col items-center justify-center gap-0.5 rounded-full py-1.5 text-[10px] font-medium transition-colors",
-                    active ? "text-white" : "text-muted-foreground hover:text-foreground",
+                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {active && (
@@ -59,7 +59,7 @@ export function AppNav() {
       </nav>
 
       {/* Desktop frosted rail */}
-      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-[28px] border border-white/8 bg-card/50 backdrop-blur-2xl lg:flex">
+      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-[28px] border border-border bg-card/50 backdrop-blur-2xl lg:flex">
         <div className="px-6 py-7">
           <Logo href="/discover" />
         </div>
@@ -75,15 +75,15 @@ export function AppNav() {
                     className={cn(
                       "relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
                       active
-                        ? "text-white"
-                        : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
                     )}
                   >
                     {active && (
                       <motion.span
                         layoutId="app-rail-halo"
                         transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                        className="absolute inset-0 rounded-2xl bg-primary/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_20px_rgba(225,29,72,0.25)]"
+                        className="absolute inset-0 rounded-2xl bg-primary/20 shadow-[inset_0_1px_0_var(--glass-highlight),0_0_20px_rgba(225,29,72,0.25)]"
                       />
                     )}
                     <Icon className="relative size-5" aria-hidden="true" />

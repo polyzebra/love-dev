@@ -7,8 +7,7 @@ import { Check, Moon, MonitorSmartphone, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { saveSettings } from "@/app/(app)/settings/actions";
 import { SPRING } from "@/lib/motion";
-
-type AppearanceMode = "SYSTEM" | "LIGHT" | "DARK";
+import { applyAppearance, type AppearanceMode } from "@/lib/theme";
 
 const OPTIONS: {
   value: AppearanceMode;
@@ -27,11 +26,10 @@ const OPTIONS: {
 ];
 
 /**
- * Appearance preference as selectable glass cards. Optimistic: the
- * selection moves instantly, persists via saveSettings, and reverts
- * with a toast if the save fails. Honesty note: the product ships a
- * single dark theme today, so LIGHT/SYSTEM show a quiet note rather
- * than pretending a light theme is active.
+ * Appearance preference as selectable glass cards. The theme applies
+ * to the whole app instantly (250ms token cross-fade, no reload),
+ * persists via saveSettings, and reverts - visually too - with a
+ * toast if the save fails.
  */
 export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
   const [value, setValue] = useState<AppearanceMode>(initial);
@@ -41,6 +39,7 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
     if (next === value) return;
     const previous = value;
     setValue(next);
+    applyAppearance(next);
     setPending(true);
 
     const result = await saveSettings({ appearance: next });
@@ -48,6 +47,7 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
     setPending(false);
     if (!result.ok) {
       setValue(previous);
+      applyAppearance(previous);
       toast.error(result.error);
     }
   }
@@ -66,7 +66,7 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
             value={option}
             disabled={pending}
             aria-label={label}
-            className="glass flex min-h-14 w-full items-center gap-4 rounded-3xl px-5 py-4 text-left outline-none transition-colors hover:bg-white/6 focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:border-white/25 data-[state=checked]:bg-white/6 data-[disabled]:opacity-70"
+            className="glass flex min-h-14 w-full items-center gap-4 rounded-3xl px-5 py-4 text-left outline-none transition-colors hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:border-primary/40 data-[state=checked]:bg-accent data-[disabled]:opacity-70"
           >
             <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
               <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
@@ -91,16 +91,6 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
         ))}
       </RadioGroupPrimitive.Root>
 
-      {value !== "DARK" ? (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={SPRING.snappy}
-          className="mt-3 px-1 text-xs leading-relaxed text-muted-foreground/80"
-        >
-          Virelsy currently looks its best in the dark - a light theme is on the way.
-        </motion.p>
-      ) : null}
     </div>
   );
 }

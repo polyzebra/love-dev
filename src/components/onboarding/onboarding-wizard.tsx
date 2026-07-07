@@ -103,11 +103,11 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 };
 
 const TOKEN_STYLES: Record<TaxonomyCategory["colorToken"], string> = {
-  rose: "bg-rose-500/10 text-rose-400",
-  amber: "bg-amber-500/10 text-amber-400",
-  emerald: "bg-emerald-500/10 text-emerald-400",
-  sky: "bg-sky-500/10 text-sky-400",
-  violet: "bg-violet-500/10 text-violet-400",
+  rose: "bg-rose-500/10 text-rose-400 light:text-rose-600",
+  amber: "bg-amber-500/10 text-amber-400 light:text-amber-600",
+  emerald: "bg-emerald-500/10 text-emerald-400 light:text-emerald-600",
+  sky: "bg-sky-500/10 text-sky-400 light:text-sky-600",
+  violet: "bg-violet-500/10 text-violet-400 light:text-violet-600",
   gold: "bg-gold/10 text-gold",
 };
 
@@ -190,7 +190,7 @@ function ChipToggle({
       className={cn(
         "tap-target inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
         selected
-          ? "border-transparent bg-linear-160 from-[#fb4a6e] to-[#be123c] text-white shadow-[0_4px_18px_rgba(225,29,72,0.35)]"
+          ? "border-transparent bg-linear-160 from-[#fb4a6e] to-[#be123c] text-primary-foreground shadow-[0_4px_18px_rgba(225,29,72,0.35)]"
           : "glass-chip text-muted-foreground hover:text-foreground",
       )}
     >
@@ -885,7 +885,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               >
                 <p className="font-medium">After this, two quick wins</p>
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400 light:text-rose-600">
                     <Camera className="size-5" aria-hidden="true" />
                   </span>
                   <p className="text-sm text-muted-foreground">
@@ -894,7 +894,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 light:text-sky-600">
                     <BadgeCheck className="size-5" aria-hidden="true" />
                   </span>
                   <p className="text-sm text-muted-foreground">

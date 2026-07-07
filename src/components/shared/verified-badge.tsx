@@ -11,7 +11,7 @@ export function VerifiedBadge({ className, label = "Photo verified" }: { classNa
           aria-label={label}
           role="img"
         >
-          <BadgeCheck className="size-[1.1em] fill-sky-500 text-white dark:text-neutral-900" />
+          <BadgeCheck className="size-[1.1em] fill-sky-500 text-background" />
         </span>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>

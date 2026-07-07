@@ -33,8 +33,8 @@ export function Aurora({
       <div className="absolute left-[8%] top-[6%] size-[42rem] animate-aurora-a rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.22),transparent_70%)] blur-3xl" />
       <div className="absolute right-[4%] top-[28%] size-[36rem] animate-aurora-b rounded-full bg-[radial-gradient(closest-side,rgba(167,139,250,0.13),transparent_70%)] blur-3xl" />
       <div className="absolute bottom-[-10%] left-[30%] size-[40rem] animate-aurora-c rounded-full bg-[radial-gradient(closest-side,rgba(231,201,161,0.10),transparent_70%)] blur-3xl" />
-      {/* Vignette to seat everything into the black */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_10%,transparent_50%,rgba(11,7,9,0.9)_100%)]" />
+      {/* Vignette to seat everything into the page surface */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_10%,transparent_50%,color-mix(in_oklab,var(--background)_90%,transparent)_100%)]" />
     </div>
   );
 }

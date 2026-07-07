@@ -242,7 +242,7 @@ export function ChatThread({
                   className={cn(
                     "max-w-[78%] px-4 py-2.5 text-sm/relaxed",
                     mine
-                      ? "bg-linear-160 from-[#f43f5e] to-[#be123c] text-white shadow-[0_4px_16px_rgba(225,29,72,0.25)]"
+                      ? "bg-linear-160 from-[#f43f5e] to-[#be123c] text-primary-foreground shadow-[0_4px_16px_rgba(225,29,72,0.25)]"
                       : "glass text-foreground",
                     // Bubble geometry by position in the burst
                     mine

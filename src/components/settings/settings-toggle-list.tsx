@@ -63,7 +63,7 @@ export function SettingsToggleList({
         <div
           key={field}
           className={`flex min-h-14 items-center gap-4 px-5 py-4 ${
-            i > 0 ? "border-t border-white/8" : ""
+            i > 0 ? "border-t border-border" : ""
           }`}
         >
           <div className="min-w-0 flex-1 space-y-0.5">

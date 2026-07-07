@@ -44,7 +44,7 @@ export function ExploreFilterSheet() {
           Filters{active ? " · on" : ""}
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="border-white/10 bg-popover/95 backdrop-blur-2xl">
+      <DrawerContent className="border-border bg-popover/95 backdrop-blur-2xl">
         <DrawerHeader>
           <DrawerTitle className="font-display text-2xl font-medium">Refine</DrawerTitle>
         </DrawerHeader>
@@ -64,7 +64,7 @@ export function ExploreFilterSheet() {
                   key={label} type="button" onClick={() => setCountry(value)}
                   className={cn(
                     "tap-target rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                    country === value ? "border-primary bg-primary/20 text-foreground" : "border-white/10 text-muted-foreground",
+                    country === value ? "border-primary bg-primary/20 text-foreground" : "border-border text-muted-foreground",
                   )}
                 >
                   {label}

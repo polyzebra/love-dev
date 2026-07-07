@@ -63,7 +63,7 @@ export function ExploreCard({ card }: { card: ExploreCardData }) {
   const empty = card.count === 0;
   return (
     <motion.div whileTap={{ scale: 0.97 }} transition={SPRING.snappy} className="h-full">
-      <div className="group relative flex h-full min-h-[248px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-card transition-shadow hover:shadow-float">
+      <div className="group relative flex h-full min-h-[248px] flex-col overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card transition-shadow hover:shadow-float">
         {/* Whole-card link, stretched under the content */}
         <Link
           href={`/explore/${card.slug}`}
@@ -115,8 +115,8 @@ export function ExploreCard({ card }: { card: ExploreCardData }) {
                   {card.count} {card.count === 1 ? "person" : "people"}
                 </span>
                 {card.onlineCount > 0 && (
-                  <span className="flex items-center gap-1 text-emerald-400">
-                    <span aria-hidden="true" className="size-1.5 rounded-full bg-emerald-400" />
+                  <span className="flex items-center gap-1 text-success">
+                    <span aria-hidden="true" className="size-1.5 rounded-full bg-success" />
                     <span className="tabular-nums">{card.onlineCount} online</span>
                   </span>
                 )}

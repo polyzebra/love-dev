@@ -240,7 +240,7 @@ export function ExploreProfileViewer({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[70] flex flex-col bg-background"
+      className="fixed inset-0 z-[70] flex flex-col bg-black"
     >
       <div className="safe-top relative mx-auto flex h-full w-full max-w-md flex-col p-3">
         {/* Photo card */}
@@ -295,22 +295,22 @@ export function ExploreProfileViewer({
 
           {/* Close / super */}
           <div className="absolute inset-x-3 top-7 flex items-start justify-between">
-            <Button variant="secondary" size="icon" className="glass-chip size-11 rounded-full border-0" aria-label="Close profile" onClick={close}>
+            <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md hover:bg-white/20" aria-label="Close profile" onClick={close}>
               <X className="size-5" />
             </Button>
-            <Button variant="secondary" size="icon" className="glass-chip size-11 rounded-full border-0" aria-label="Super Like" disabled={busy} onClick={() => decide("SUPER_LIKE")}>
+            <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md hover:bg-white/20" aria-label="Super Like" disabled={busy} onClick={() => decide("SUPER_LIKE")}>
               <Star className="size-5 fill-sky-400 text-sky-400" />
             </Button>
           </div>
 
           {/* Why write to them - intent and honest reply behaviour, up top */}
           <div className="pointer-events-none absolute left-3 top-[5.25rem] flex flex-col items-start gap-1.5">
-            <span className="glass-chip flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white">
+            <span className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
               <Heart className="size-3 fill-current text-rose-300" aria-hidden="true" />
               {GOAL_LABELS[profile.relationshipGoal] ?? "Open to connection"}
             </span>
             {profile.replySignal && (
-              <span className="glass-chip flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white">
+              <span className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
                 <MessageCircle className="size-3 text-emerald-300" aria-hidden="true" />
                 {profile.replySignal}
               </span>
@@ -339,7 +339,7 @@ export function ExploreProfileViewer({
             {profile.interests.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.slice(0, 5).map((i) => (
-                  <span key={i.label} className={cn("glass-chip rounded-full px-2.5 py-1 text-[11px] font-medium text-white", i.shared && "border-rose-300/40 bg-rose-500/25")}>
+                  <span key={i.label} className={cn("rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white", i.shared && "border-rose-300/40 bg-rose-500/25")}>
                     {i.shared && <Sparkles className="mr-1 inline size-3 text-rose-200" aria-hidden="true" />}
                     {i.label}
                   </span>
@@ -360,7 +360,7 @@ export function ExploreProfileViewer({
             </Button>
           </motion.div>
           <motion.div whileTap={{ scale: 0.85 }}>
-            <Button variant="outline" size="icon" aria-label="Pass" className="size-16 rounded-full border-white/16" disabled={busy} onClick={() => decide("PASS")}>
+            <Button variant="outline" size="icon" aria-label="Pass" className="size-16 rounded-full border-foreground/15" disabled={busy} onClick={() => decide("PASS")}>
               <X className="size-7 text-muted-foreground" />
             </Button>
           </motion.div>

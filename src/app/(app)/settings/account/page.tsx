@@ -89,7 +89,7 @@ export default async function AccountSettingsPage() {
                 <p>Photo +35 · ID +15</p>
               </div>
             </div>
-            <div className="mt-4 h-2 overflow-hidden rounded-full border border-white/8 bg-white/8">
+            <div className="mt-4 h-2 overflow-hidden rounded-full border border-border bg-foreground/10">
               <div className="h-full rounded-full bg-linear-90 from-[#fb4a6e] to-[#e7c9a1] shadow-[0_0_12px_rgba(225,29,72,0.4)] transition-[width] duration-700" style={{ width: `${score}%` }} />
             </div>
           </section>

@@ -1,3 +1,5 @@
+import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
+import { ThemeSync } from "@/components/theme/theme-sync";
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
@@ -42,7 +44,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0B0709",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0B0709" },
+    { media: "(prefers-color-scheme: light)", color: "#FAF6F4" },
+  ],
 };
 
 export default function RootLayout({
@@ -50,9 +55,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        {/* Pre-paint: correct theme class before first render - no flash */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} min-h-dvh font-sans`}>
+        <ThemeSync />
         {children}
-        <Toaster position="top-center" richColors theme="dark" />
+        <Toaster position="top-center" richColors theme="system" />
       </body>
     </html>
   );

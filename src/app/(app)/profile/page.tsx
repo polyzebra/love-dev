@@ -62,7 +62,7 @@ function CompletionRing({ value }: { value: number }) {
           </linearGradient>
         </defs>
       </svg>
-      <span className="text-sm font-semibold tabular-nums">{value}%</span>
+      <span className="text-sm font-semibold tabular-nums text-white">{value}%</span>
     </div>
   );
 }
@@ -104,7 +104,7 @@ export default async function ProfilePage() {
     <div className="space-y-6">
       {/* ================= COVER - magazine opener ================= */}
       <Reveal y={16}>
-        <section className="relative overflow-hidden rounded-[36px] border border-white/12 shadow-float">
+        <section className="relative overflow-hidden rounded-[36px] border border-border shadow-float">
           <div className="relative aspect-4/5 sm:aspect-square md:aspect-4/3">
             {cover ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -189,7 +189,7 @@ export default async function ProfilePage() {
           </div>
           <div className="grid grid-cols-3 gap-2.5">
             {photos.slice(1).map((photo, i) => (
-              <div key={photo.id} className="relative aspect-3/4 overflow-hidden rounded-2xl border border-white/8">
+              <div key={photo.id} className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photo.url} alt={`Photo ${i + 2}`} className="h-full w-full object-cover" />
               </div>
@@ -197,7 +197,7 @@ export default async function ProfilePage() {
             {photos.length < 9 && (
               <button
                 type="button"
-                className="flex aspect-3/4 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft"
+                className="flex aspect-3/4 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft"
                 aria-label="Add photo"
               >
                 <Camera className="size-5" aria-hidden="true" />
@@ -266,7 +266,7 @@ export default async function ProfilePage() {
       )}
       {prompts.length < 3 && (
         <Reveal>
-          <section className="glass flex flex-col items-center gap-3 rounded-[28px] border border-dashed border-white/15 p-7 text-center">
+          <section className="glass flex flex-col items-center gap-3 rounded-[28px] border border-dashed border-foreground/15 p-7 text-center">
             <span className="glass-chip flex size-12 items-center justify-center rounded-full">
               <MessageSquareQuote className="size-5 text-gold" aria-hidden="true" />
             </span>
@@ -297,7 +297,7 @@ export default async function ProfilePage() {
                 <span
                   key={interest.id}
                   className={cn(
-                    "rounded-full border border-white/10 bg-white/5 font-medium",
+                    "rounded-full border border-border bg-foreground/5 font-medium",
                     i % 3 === 0 ? "px-4 py-2 text-sm" : "px-3 py-1.5 text-xs",
                     i % 4 === 0 && "bg-primary/12 text-primary-soft",
                   )}
@@ -313,7 +313,7 @@ export default async function ProfilePage() {
       {/* ================= THE BASICS - demoted, collapsed ================= */}
       {basics.length > 0 && (
         <Reveal>
-          <details className="group rounded-[28px] border border-white/8 bg-card/40">
+          <details className="group rounded-[28px] border border-border bg-card/40">
             <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground [&::-webkit-details-marker]:hidden">
               The basics
               <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />

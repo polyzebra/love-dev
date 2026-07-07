@@ -28,7 +28,7 @@ const GROUPS = [
 
 export function MarketingFooter() {
   return (
-    <footer className="relative overflow-hidden border-t border-white/8">
+    <footer className="relative overflow-hidden border-t border-border">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-10">
         <div className="space-y-4">
           <p className="font-display text-3xl font-semibold tracking-tight">Virelsy</p>
@@ -69,16 +69,15 @@ export function MarketingFooter() {
           x="50%"
           y="115"
           textAnchor="middle"
-          className="font-display"
+          className="font-display fill-foreground/5"
           fontSize="150"
           fontWeight="600"
-          fill="rgba(255,255,255,0.045)"
         >
           Virelsy
         </text>
       </svg>
 
-      <div className="border-t border-white/8">
+      <div className="border-t border-border">
         <p className="mx-auto max-w-6xl px-6 py-6 text-xs text-muted-foreground md:px-10">
           © {new Date().getFullYear()} Virelsy Ltd. All rights reserved.
         </p>

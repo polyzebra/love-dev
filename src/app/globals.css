@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
 
 /* ------------------------------------------------------------------ */
 /*  AMORA v2 - cinematic dark luxury                                   */
@@ -77,11 +78,91 @@
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Materials - frosted glass, chips, luxe headline gradient */
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-shadow: rgba(0, 0, 0, 0.35);
+  --chip-bg: rgba(255, 255, 255, 0.08);
+  --chip-border: rgba(255, 255, 255, 0.14);
+  --luxe-0: #ffffff;
+  --luxe-55: #f4dfe2;
+  --luxe-100: #d9a5ad;
+  --glow-stop-1: rgba(255, 255, 255, 0.1);
+  --glow-stop-2: rgba(255, 255, 255, 0.04);
 }
 
-/* Single cinematic theme - .dark kept as alias so existing markup holds */
+/* .dark = explicit alias of the :root cinematic dark theme */
 .dark {
   --background: #0b0709;
+}
+
+/* Light theme - warm ivory, white glass, soft grey depth, same rose */
+.light {
+  --background: #faf6f4;
+  --foreground: #26181e;
+  --card: #ffffff;
+  --card-foreground: #26181e;
+  --popover: #ffffff;
+  --popover-foreground: #26181e;
+
+  --primary: #e11d48;
+  --primary-soft: #be123c;
+  --primary-foreground: #ffffff;
+  --secondary: #f3eaed;
+  --secondary-foreground: #26181e;
+  --muted: #f4edef;
+  --muted-foreground: #6b5a62;
+  --accent: #fceef2;
+  --accent-foreground: #9f1239;
+
+  --gold: #9a723d;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --warning: #a16207;
+  --warning-foreground: #ffffff;
+
+  --border: rgba(38, 24, 30, 0.1);
+  --input: rgba(38, 24, 30, 0.14);
+  --ring: #e11d48;
+
+  --chart-1: #e11d48;
+  --chart-2: #7c3aed;
+  --chart-3: #15803d;
+  --chart-4: #a16207;
+  --chart-5: #0e7490;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #26181e;
+  --sidebar-primary: #e11d48;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3eaed;
+  --sidebar-accent-foreground: #26181e;
+  --sidebar-border: rgba(38, 24, 30, 0.09);
+  --sidebar-ring: #e11d48;
+
+  --shadow-card:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 8px 24px rgba(38, 24, 30, 0.08);
+  --shadow-float:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 12px 40px rgba(38, 24, 30, 0.12),
+    0 32px 80px rgba(38, 24, 30, 0.08);
+  --glow-rose: 0 0 24px rgba(225, 29, 72, 0.16), 0 8px 32px rgba(225, 29, 72, 0.1);
+
+  --glass-border: rgba(38, 24, 30, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.85);
+  --glass-shadow: rgba(38, 24, 30, 0.1);
+  --chip-bg: rgba(255, 255, 255, 0.72);
+  --chip-border: rgba(38, 24, 30, 0.1);
+  --luxe-0: #33141d;
+  --luxe-55: #7c2338;
+  --luxe-100: #be123c;
+  --glow-stop-1: rgba(38, 24, 30, 0.08);
+  --glow-stop-2: rgba(38, 24, 30, 0.03);
 }
 
 @theme inline {
@@ -214,6 +295,24 @@
     color-scheme: dark;
   }
 
+  html.light {
+    color-scheme: light;
+  }
+
+  /* Applied for ~300ms around a theme switch - crossfades every
+     surface without flashing or reloading */
+  html.theming,
+  html.theming *,
+  html.theming *::before,
+  html.theming *::after {
+    transition:
+      background-color 0.25s var(--ease-luxe),
+      border-color 0.25s var(--ease-luxe),
+      color 0.25s var(--ease-luxe),
+      fill 0.25s var(--ease-luxe),
+      box-shadow 0.25s var(--ease-luxe) !important;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     text-rendering: optimizeLegibility;
@@ -243,16 +342,16 @@
   background: color-mix(in oklab, var(--card) 62%, transparent);
   backdrop-filter: blur(24px) saturate(1.5);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 8px 32px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 var(--glass-highlight) inset, 0 8px 32px var(--glass-shadow);
 }
 
 /* Lighter glass for chips & badges */
 @utility glass-chip {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--chip-bg);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--chip-border);
 }
 
 /* Fine film-grain over gradients (SVG turbulence, tiles at 160px) */
@@ -280,8 +379,8 @@
     background: linear-gradient(
       140deg,
       rgba(251, 113, 133, 0.55),
-      rgba(255, 255, 255, 0.1) 30%,
-      rgba(255, 255, 255, 0.04) 60%,
+      var(--glow-stop-1) 30%,
+      var(--glow-stop-2) 60%,
       rgba(231, 201, 161, 0.35)
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -294,7 +393,7 @@
 
 /* Editorial gradient headline text */
 @utility text-luxe {
-  background: linear-gradient(180deg, #ffffff 0%, #f4dfe2 55%, #d9a5ad 100%);
+  background: linear-gradient(180deg, var(--luxe-0) 0%, var(--luxe-55) 55%, var(--luxe-100) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

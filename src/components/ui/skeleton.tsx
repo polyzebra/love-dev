@@ -6,8 +6,8 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="skeleton"
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-white/6 bg-white/5",
-        "after:absolute after:inset-0 after:animate-sheen after:bg-gradient-to-r after:from-transparent after:via-white/6 after:to-transparent",
+        "relative overflow-hidden rounded-2xl border border-border bg-foreground/8",
+        "after:absolute after:inset-0 after:animate-sheen after:bg-gradient-to-r after:from-transparent after:via-foreground/6 after:to-transparent",
         className,
       )}
       {...props}

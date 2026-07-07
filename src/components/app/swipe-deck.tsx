@@ -109,8 +109,9 @@ function suggestedOpener(profile: DiscoverProfile): { label: string; send: strin
 const EXIT_VELOCITY = 600;
 const EXIT_OFFSET = 110;
 
+/* Sits ON the photo - theme-independent material, do not tokenize */
 const TRUST_CHIP_CLASS =
-  "glass-chip flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-medium text-white/80";
+  "flex items-center gap-1 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-medium text-white/80";
 const TRUST_CHIP_VARIANTS = {
   hidden: { opacity: 0, y: 8 },
   show: { opacity: 1, y: 0, transition: SPRING.snappy },
@@ -259,7 +260,7 @@ function TopCard({
         {/* Compatibility, demoted: a quiet corner pill, not the headline */}
         <div className="absolute right-4 top-4">
           <span
-            className="glass-chip flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/75"
+            className="flex items-center gap-1 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white/75"
             aria-label={`${profile.compatibility} percent match`}
           >
             <Heart className="size-3 fill-current text-rose-300/90" aria-hidden="true" />
@@ -503,7 +504,7 @@ export function SwipeDeck({
             variant="outline"
             size="icon"
             aria-label="Pass"
-            className="size-16 rounded-full border-white/16"
+            className="size-16 rounded-full border-foreground/15"
             onClick={() => act("PASS")}
           >
             <X className="size-7 text-muted-foreground" />
@@ -534,14 +535,14 @@ export function SwipeDeck({
 
       {/* Match celebration - the moment leads with what you share */}
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>
-        <DialogContent className="overflow-hidden rounded-[32px] border-white/10 text-center sm:max-w-sm">
+        <DialogContent className="overflow-hidden rounded-[32px] border-border text-center sm:max-w-sm">
           {matchedWith && <HeartBurst />}
           <DialogHeader className="relative items-center space-y-3">
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...SPRING.bounce, delay: 0.1 }}
-              className="flex size-16 items-center justify-center rounded-full bg-accent shadow-[0_0_40px_rgba(225,29,72,0.35)]"
+              className="flex size-16 items-center justify-center rounded-full bg-accent shadow-glow"
             >
               <Heart className="size-8 fill-primary text-primary" aria-hidden="true" />
             </motion.span>
@@ -567,7 +568,7 @@ export function SwipeDeck({
                         hidden: { opacity: 0, y: 10, scale: 0.92 },
                         show: { opacity: 1, y: 0, scale: 1, transition: SPRING.snappy },
                       }}
-                      className="rounded-full border border-rose-300/30 bg-rose-500/15 px-3 py-1 text-xs font-medium text-foreground"
+                      className="rounded-full border border-primary/30 bg-primary/15 px-3 py-1 text-xs font-medium text-foreground"
                     >
                       {chip}
                     </motion.li>

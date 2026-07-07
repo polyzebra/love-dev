@@ -166,7 +166,7 @@ export default async function ConversationPage({
             aria-label={`View ${otherName}'s profile`}
           >
             <div className="relative shrink-0">
-              <Avatar className="size-11 border border-white/15">
+              <Avatar className="size-11 border border-border">
                 <AvatarImage src={peek.photoUrl ?? undefined} alt="" />
                 <AvatarFallback>{initialsOf(otherName)}</AvatarFallback>
               </Avatar>

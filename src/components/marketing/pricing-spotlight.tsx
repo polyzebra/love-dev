@@ -55,7 +55,7 @@ export function PricingSpotlight() {
               onClick={() => setTier(p.tier)}
               className={cn(
                 "tap-target relative rounded-full px-5 py-2 text-sm font-semibold transition-colors sm:px-8",
-                active ? "text-white" : "text-muted-foreground hover:text-foreground",
+                active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {active && (
