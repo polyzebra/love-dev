@@ -722,6 +722,23 @@ export type EnumExploreGroupWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
 }
 
+export type EnumAppearanceModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppearanceMode | Prisma.EnumAppearanceModeFieldRefInput<$PrismaModel>
+  in?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel> | $Enums.AppearanceMode
+}
+
+export type EnumAppearanceModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppearanceMode | Prisma.EnumAppearanceModeFieldRefInput<$PrismaModel>
+  in?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppearanceModeWithAggregatesFilter<$PrismaModel> | $Enums.AppearanceMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1403,6 +1420,23 @@ export type NestedEnumExploreGroupWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
   _max?: Prisma.NestedEnumExploreGroupFilter<$PrismaModel>
+}
+
+export type NestedEnumAppearanceModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppearanceMode | Prisma.EnumAppearanceModeFieldRefInput<$PrismaModel>
+  in?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel> | $Enums.AppearanceMode
+}
+
+export type NestedEnumAppearanceModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppearanceMode | Prisma.EnumAppearanceModeFieldRefInput<$PrismaModel>
+  in?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppearanceMode[] | Prisma.ListEnumAppearanceModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppearanceModeWithAggregatesFilter<$PrismaModel> | $Enums.AppearanceMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
 }
 
 

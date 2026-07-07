@@ -142,3 +142,8 @@ export type BlockedIdentity = Prisma.BlockedIdentityModel
  * 
  */
 export type ProfilePrompt = Prisma.ProfilePromptModel
+/**
+ * Model UserSettings
+ * 
+ */
+export type UserSettings = Prisma.UserSettingsModel

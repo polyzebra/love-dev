@@ -278,3 +278,12 @@ export const ExploreGroup = {
 } as const
 
 export type ExploreGroup = (typeof ExploreGroup)[keyof typeof ExploreGroup]
+
+
+export const AppearanceMode = {
+  SYSTEM: 'SYSTEM',
+  LIGHT: 'LIGHT',
+  DARK: 'DARK'
+} as const
+
+export type AppearanceMode = (typeof AppearanceMode)[keyof typeof AppearanceMode]

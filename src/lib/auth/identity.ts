@@ -34,7 +34,7 @@ export async function isIdentityBlocked(email: string, provider?: string): Promi
 }
 
 /**
- * Tinder-style account deletion: profile data is deleted or
+ * Industry-standard deletion model: profile data is deleted or
  * GDPR-anonymized immediately; the EMAIL IS FREED so the person may
  * register again later - as a completely new identity. Chats/matches
  * keep an anonymized shell until the retention job hard-deletes them
@@ -66,6 +66,7 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
     db.userExplorePreference.deleteMany({ where: { userId } }),
     db.device.deleteMany({ where: { userId } }),
     db.notification.deleteMany({ where: { userId } }),
+    db.userSettings.deleteMany({ where: { userId } }),
   ]);
   console.info(`[identity] account ${userId} deleted (${reason}) - email freed`);
 }

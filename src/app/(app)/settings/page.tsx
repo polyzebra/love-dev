@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  LifeBuoy,
   Bell,
+  BookOpenText,
   ChevronRight,
   CreditCard,
+  LifeBuoy,
   MonitorSmartphone,
   ShieldCheck,
   SlidersHorizontal,
+  SunMoon,
+  Trash2,
   UserRound,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
-import { SignOutButton } from "@/components/app/sign-out-button";
+import { RestorePurchasesRow, SignOutRow } from "@/components/settings/restore-purchases";
 
 export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -26,6 +29,7 @@ const GROUPS = [
       { href: "/settings/account", icon: UserRound, label: "Account & verification", hint: "Email, phone, password" },
       { href: "/settings/discovery", icon: SlidersHorizontal, label: "Discovery preferences", hint: "Who you see, who sees you" },
       { href: "/settings/notifications", icon: Bell, label: "Notifications", hint: "Matches, messages, likes" },
+      { href: "/settings/appearance", icon: SunMoon, label: "Appearance", hint: "System, light or dark" },
     ],
   },
   {
@@ -39,7 +43,14 @@ const GROUPS = [
     items: [
       { href: "/settings/privacy", icon: ShieldCheck, label: "Privacy Centre", hint: "Data export, blocked users, deletion" },
       { href: "/settings/devices", icon: MonitorSmartphone, label: "Devices & sessions", hint: "Where you're signed in" },
-      { href: "/safety", icon: LifeBuoy, label: "Safety Centre", hint: "Guidelines, reporting, emergency help" },
+    ],
+  },
+  {
+    title: "Support",
+    items: [
+      { href: "/settings/support", icon: LifeBuoy, label: "Help & Support", hint: "FAQs and how to reach us" },
+      { href: "/settings/safety", icon: ShieldCheck, label: "Safety Centre", hint: "Tools and guidance for safer dating" },
+      { href: "/settings/community-guidelines", icon: BookOpenText, label: "Community Guidelines", hint: "What we expect from every member" },
     ],
   },
 ] as const;
@@ -93,7 +104,33 @@ export default async function SettingsPage() {
           </section>
         ))}
 
-        <SignOutButton />
+        <section aria-label="Account controls">
+          <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Account controls
+          </h2>
+          <div className="overflow-hidden rounded-3xl border border-white/8 bg-card/80 shadow-card">
+            <RestorePurchasesRow />
+            <SignOutRow />
+          </div>
+          {/* Destructive action - kept apart and danger-toned, per Privacy Centre. */}
+          <div className="mt-4 overflow-hidden rounded-3xl border border-destructive/30 bg-card/80 shadow-card">
+            <Link
+              href="/settings/privacy"
+              className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-destructive/10"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-destructive/15">
+                <Trash2 className="size-5 text-destructive" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium text-destructive">Delete account</span>
+                <span className="block truncate text-sm text-muted-foreground">
+                  Permanent, with a 30-day grace period
+                </span>
+              </span>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
 
         <p className="pb-4 text-center text-xs text-muted-foreground">
           Virelsy v1.0 · <Link href="/legal/terms" className="underline underline-offset-2">Terms</Link> ·{" "}

@@ -408,7 +408,8 @@ export const ModelName = {
   UserExplorePreference: 'UserExplorePreference',
   AnalyticsEvent: 'AnalyticsEvent',
   BlockedIdentity: 'BlockedIdentity',
-  ProfilePrompt: 'ProfilePrompt'
+  ProfilePrompt: 'ProfilePrompt',
+  UserSettings: 'UserSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt"
+    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2278,6 +2279,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserSettings: {
+      payload: Prisma.$UserSettingsPayload<ExtArgs>
+      fields: Prisma.UserSettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserSettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserSettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.UserSettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserSettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>
+        }
+        findMany: {
+          args: Prisma.UserSettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>[]
+        }
+        create: {
+          args: Prisma.UserSettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>
+        }
+        createMany: {
+          args: Prisma.UserSettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserSettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.UserSettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>
+        }
+        update: {
+          args: Prisma.UserSettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserSettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserSettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserSettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserSettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.UserSettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserSettings>
+        }
+        groupBy: {
+          args: Prisma.UserSettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserSettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserSettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserSettingsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2699,6 +2774,28 @@ export const ProfilePromptScalarFieldEnum = {
 } as const
 
 export type ProfilePromptScalarFieldEnum = (typeof ProfilePromptScalarFieldEnum)[keyof typeof ProfilePromptScalarFieldEnum]
+
+
+export const UserSettingsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  emailNewMatches: 'emailNewMatches',
+  emailMessages: 'emailMessages',
+  emailPromotions: 'emailPromotions',
+  pushNewMatches: 'pushNewMatches',
+  pushMessages: 'pushMessages',
+  pushMessageLikes: 'pushMessageLikes',
+  pushSuperLikes: 'pushSuperLikes',
+  pushDailyPicks: 'pushDailyPicks',
+  pushOffers: 'pushOffers',
+  smsEnabled: 'smsEnabled',
+  inAppVibrations: 'inAppVibrations',
+  inAppSounds: 'inAppSounds',
+  appearance: 'appearance',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3188,6 +3285,20 @@ export type EnumExploreGroupFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 export type ListEnumExploreGroupFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExploreGroup[]'>
     
 
+
+/**
+ * Reference to a field of type 'AppearanceMode'
+ */
+export type EnumAppearanceModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppearanceMode'>
+    
+
+
+/**
+ * Reference to a field of type 'AppearanceMode[]'
+ */
+export type ListEnumAppearanceModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppearanceMode[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -3323,6 +3434,7 @@ export type GlobalOmitConfig = {
   analyticsEvent?: Prisma.AnalyticsEventOmit
   blockedIdentity?: Prisma.BlockedIdentityOmit
   profilePrompt?: Prisma.ProfilePromptOmit
+  userSettings?: Prisma.UserSettingsOmit
 }
 
 /* Types for Logging */

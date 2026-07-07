@@ -243,6 +243,7 @@ model User {
   blocksReceived  Block[]  @relation("BlocksReceived")
 
   subscription       Subscription?
+  settings           UserSettings?
   payments           Payment[]
   notifications      Notification[]
   explorePreferences UserExplorePreference[]
@@ -723,4 +724,35 @@ model ProfilePrompt {
 
   @@unique([profileId, promptKey])
   @@index([profileId, sortOrder])
+}
+
+enum AppearanceMode {
+  SYSTEM
+  LIGHT
+  DARK
+}
+
+// Per-user notification + appearance preferences. Push/SMS values are
+// stored preferences; delivery activates when those transports ship.
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  emailNewMatches  Boolean @default(true)
+  emailMessages    Boolean @default(true)
+  emailPromotions  Boolean @default(false)
+  pushNewMatches   Boolean @default(true)
+  pushMessages     Boolean @default(true)
+  pushMessageLikes Boolean @default(true)
+  pushSuperLikes   Boolean @default(true)
+  pushDailyPicks   Boolean @default(false)
+  pushOffers       Boolean @default(false)
+  smsEnabled       Boolean @default(false)
+  inAppVibrations  Boolean @default(true)
+  inAppSounds      Boolean @default(false)
+
+  appearance AppearanceMode @default(SYSTEM)
+  updatedAt  DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
