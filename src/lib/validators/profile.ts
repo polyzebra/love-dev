@@ -1,6 +1,20 @@
 import { z } from "zod";
 import { BIO_MAX_LENGTH, MAX_AGE, MIN_AGE } from "@/lib/constants";
 import { PROFILE_PROMPTS, type PromptKey } from "@/config/prompts";
+import { TAXONOMY } from "@/lib/discovery/taxonomy";
+
+// Canonical taxonomy-derived value sets (src/lib/discovery/taxonomy.ts)
+const AVAILABILITY_TAG_IDS = TAXONOMY.filter(
+  (c) => c.profileFieldMapping === "availabilityTags",
+).map((c) => c.id);
+const COMMUNITY_TAG_IDS = TAXONOMY.filter(
+  (c) => c.profileFieldMapping === "communityTags",
+).map((c) => c.id);
+const TAXONOMY_INTEREST_SLUGS = [
+  ...new Set(TAXONOMY.flatMap((c) => c.interestSlugs ?? [])),
+];
+
+const idEnum = (values: string[]) => z.enum(values as [string, ...string[]]);
 
 const PROMPT_KEYS = PROFILE_PROMPTS.map((p) => p.key) as [PromptKey, ...PromptKey[]];
 export const promptKeyEnum = z.enum(PROMPT_KEYS);
@@ -23,6 +37,7 @@ export const profilePromptsSchema = z
 export const genderEnum = z.enum(["WOMAN", "MAN", "NON_BINARY", "OTHER"]);
 export const relationshipGoalEnum = z.enum([
   "LONG_TERM",
+  "MARRIAGE_MINDED",
   "SHORT_TERM",
   "OPEN_TO_EITHER",
   "FRIENDSHIP",
@@ -66,10 +81,14 @@ export const onboardingSchema = z
     languages: z.array(z.string().max(40)).max(8).default([]),
     occupation: z.string().trim().max(80).optional().nullable(),
     education: educationEnum.optional().nullable(),
-    availabilityTags: z.array(z.string().max(40)).max(5).optional().default([]),
-  personalityTags: z.array(z.string().max(40)).max(5).optional().default([]),
-  communityTags: z.array(z.string().max(40)).max(6).optional().default([]),
-  interests: z.array(z.string().max(48)).min(3, "Pick at least 3 interests").max(12),
+    // Taxonomy category ids ("right now" group) -> Profile.availabilityTags
+    availabilityTags: idEnum(AVAILABILITY_TAG_IDS).array().max(AVAILABILITY_TAG_IDS.length).optional().default([]),
+    // Secondary trait - no longer collected in onboarding, editable later
+    personalityTags: z.array(z.string().max(40)).max(5).optional().default([]),
+    // Taxonomy category ids ("community" group) -> Profile.communityTags
+    communityTags: idEnum(COMMUNITY_TAG_IDS).array().max(COMMUNITY_TAG_IDS.length).optional().default([]),
+    // Taxonomy-derived interest slugs -> ProfileInterest rows
+    interests: idEnum(TAXONOMY_INTEREST_SLUGS).array().max(TAXONOMY_INTEREST_SLUGS.length).optional().default([]),
     smoking: lifestyleEnum.optional().default("PREFER_NOT_TO_SAY"),
     drinking: lifestyleEnum.optional().default("PREFER_NOT_TO_SAY"),
     exercise: exerciseEnum.optional().nullable(),

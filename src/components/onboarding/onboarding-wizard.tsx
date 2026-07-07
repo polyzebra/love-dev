@@ -2,59 +2,141 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { emitInteraction } from "@/lib/interaction-events";
-import { EASE_LUXE } from "@/lib/motion";
+import { EASE_LUXE, SPRING } from "@/lib/motion";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, Heart, Loader2, PartyPopper } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  Camera,
+  Check,
+  Clapperboard,
+  Clover,
+  Coffee,
+  Compass,
+  Crown,
+  CupSoda,
+  Dumbbell,
+  Footprints,
+  Gamepad2,
+  Gem,
+  Globe,
+  Heart,
+  Loader2,
+  Music,
+  Palette,
+  PartyPopper,
+  Sparkles,
+  TreePine,
+  Users,
+  UtensilsCrossed,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { HeartBurst } from "@/components/fx/heart-burst";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { INTEREST_CATALOGUE, LANGUAGES, BIO_MAX_LENGTH } from "@/lib/constants";
-import { AVAILABILITY_OPTIONS, COMMUNITY_OPTIONS, PERSONALITY_OPTIONS } from "@/config/discovery-taxonomy";
+import {
+  GROUP_LABELS,
+  byId,
+  categoriesForOnboardingStep,
+  type TaxonomyCategory,
+} from "@/lib/discovery/taxonomy";
 import { PROFILE_PROMPTS, type PromptKey } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
 
 const PROMPT_ANSWER_MAX = 280;
 const MAX_PROMPTS = 4;
 
-const PROMPT_PLACEHOLDERS: Record<PromptKey, string> = {
+/** The six prompts surfaced during onboarding - the full catalogue stays in src/config/prompts.ts. */
+const ONBOARDING_PROMPT_KEYS: readonly PromptKey[] = [
+  "typical-saturday",
+  "perfect-first-date",
+  "green-flags",
+  "relationship-style",
+  "favourite-place",
+  "starter",
+];
+const ONBOARDING_PROMPTS = PROFILE_PROMPTS.filter((p) =>
+  ONBOARDING_PROMPT_KEYS.includes(p.key),
+);
+
+const PROMPT_PLACEHOLDERS: Partial<Record<PromptKey, string>> = {
   "typical-saturday": "Farmers market, sea swim, big breakfast…",
   "perfect-first-date": "Somewhere we can actually talk…",
   "green-flags": "Kind to waiters, texts back, laughs easily…",
   "relationship-style": "Slow burn? All in? Say it your way…",
   "favourite-place": "A beach, a bookshop, your nan's kitchen…",
-  "small-happy": "First coffee of the day, a dog saying hello…",
-  "looking-for": "Honest answers get honest replies…",
-  "starter": "Ask me about… tell me about…",
+  starter: "Ask me about… tell me about…",
 };
+
+// --------------------------------------------------- taxonomy plumbing
+
+/** Lucide renderers for taxonomy icon names - never emoji. */
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Sparkles,
+  CupSoda,
+  Footprints,
+  CalendarDays,
+  Heart,
+  Gem,
+  Zap,
+  Users,
+  Compass,
+  Coffee,
+  UtensilsCrossed,
+  Music,
+  TreePine,
+  Dumbbell,
+  Gamepad2,
+  Clapperboard,
+  Palette,
+  Clover,
+  Crown,
+  Globe,
+};
+
+const TOKEN_STYLES: Record<TaxonomyCategory["colorToken"], string> = {
+  rose: "bg-rose-500/10 text-rose-400",
+  amber: "bg-amber-500/10 text-amber-400",
+  emerald: "bg-emerald-500/10 text-emerald-400",
+  sky: "bg-sky-500/10 text-sky-400",
+  violet: "bg-violet-500/10 text-violet-400",
+  gold: "bg-gold/10 text-gold",
+};
+
+const INTENTION_CATS = categoriesForOnboardingStep("intentions");
+const DATE_STYLE_CATS = categoriesForOnboardingStep("date-style");
+const RIGHT_NOW_CATS = DATE_STYLE_CATS.filter((c) => c.group === "right-now");
+const LIFESTYLE_CATS = DATE_STYLE_CATS.filter((c) => c.group === "lifestyle");
+const IC_CATS = categoriesForOnboardingStep("interests-community");
+const INTEREST_CATS = IC_CATS.filter((c) => c.group === "interests");
+const COMMUNITY_CATS = IC_CATS.filter((c) => c.group === "community");
+
+const LIFESTYLE_IDS = new Set(LIFESTYLE_CATS.map((c) => c.id));
+const INTEREST_GROUP_IDS = new Set(INTEREST_CATS.map((c) => c.id));
 
 type WizardData = {
   displayName: string;
   birthDate: string;
   gender: string;
   interestedIn: string[];
+  /** RelationshipGoal enum value, set via a category's goalValue. */
   relationshipGoal: string;
+  /** Right-now taxonomy category ids -> Profile.availabilityTags. */
+  availabilityTags: string[];
+  /** Lifestyle + interests taxonomy category ids -> ProfileInterest slugs. */
+  interestCategoryIds: string[];
+  /** Community taxonomy category ids -> Profile.communityTags. */
+  communityTags: string[];
   country: "IE" | "GB";
   city: string;
-  bio: string;
-  heightCm: string;
-  occupation: string;
-  education: string;
-  languages: string[];
-  smoking: string;
-  drinking: string;
-  exercise: string;
-  children: string;
-  pets: string;
-  interests: string[];
-  availabilityTags: string[];
-  personalityTags: string[];
-  communityTags: string[];
   prompts: { key: PromptKey; answer: string }[];
 };
 
@@ -65,37 +147,20 @@ const GENDERS = [
   { value: "OTHER", label: "Other" },
 ] as const;
 
-const GOALS = [
-  { value: "LONG_TERM", label: "Long-term relationship", hint: "Something that lasts" },
-  { value: "SHORT_TERM", label: "Something casual", hint: "Fun, no pressure" },
-  { value: "OPEN_TO_EITHER", label: "Open to either", hint: "See where it goes" },
-  { value: "FRIENDSHIP", label: "New friends", hint: "Platonic connections" },
-  { value: "FIGURING_OUT", label: "Still figuring it out", hint: "And that's okay" },
-] as const;
-
-const LIFESTYLE = [
-  { value: "NEVER", label: "Never" },
-  { value: "RARELY", label: "Rarely" },
-  { value: "SOCIALLY", label: "Socially" },
-  { value: "OFTEN", label: "Often" },
-  { value: "PREFER_NOT_TO_SAY", label: "Prefer not to say" },
-] as const;
-
 const CITIES: Record<"IE" | "GB", string[]> = {
   IE: ["Dublin", "Cork", "Galway", "Limerick", "Waterford", "Kilkenny", "Belfast"],
   GB: ["London", "Manchester", "Birmingham", "Edinburgh", "Glasgow", "Bristol", "Leeds", "Liverpool", "Cardiff", "Newcastle"],
 };
 
-const STEPS = ["Basics", "Intentions", "Location", "About you", "Lifestyle", "Interests", "Prompts"] as const;
+const STEPS = ["Basics", "Intentions", "Date style", "Interests & community", "Prompts", "Finish"] as const;
 
 /** Honest value, shown after each completed step - explanation, not pressure. */
 const STEP_VALUE: Record<number, string> = {
   0: "Nice to meet you. Real names and real ages build real trust.",
   1: "Clear intentions get more replies - people know where they stand with you.",
-  2: "You'll only be shown to people within reach. Your exact location stays private.",
-  3: "Profiles with a bio start far more conversations.",
-  4: "Lifestyle details quietly improve who we introduce you to.",
-  5: "Shared interests give people an easy way to say hello.",
+  2: "Your date style powers real plans - we introduce you to people who'd say yes.",
+  3: "Shared interests give people an easy way to say hello.",
+  4: "Your answers become conversation starters in chat.",
 };
 
 /** Milestones worth pausing for. */
@@ -144,6 +209,108 @@ function ChipToggle({
   );
 }
 
+/**
+ * Premium selectable card for a taxonomy category - icon, label, one-line
+ * description. Selection state follows the house GOALS pattern:
+ * border-primary + bg-accent + a subtle transform scale (no layout shift).
+ */
+function CategoryCard({
+  category,
+  selected,
+  onToggle,
+  index,
+}: {
+  category: TaxonomyCategory;
+  selected: boolean;
+  onToggle: () => void;
+  index: number;
+}) {
+  const Icon = CATEGORY_ICONS[category.icon] ?? Sparkles;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: EASE_LUXE, delay: index * 0.04 }}
+    >
+      <motion.button
+        type="button"
+        aria-pressed={selected}
+        onClick={onToggle}
+        whileTap={{ scale: 0.98 }}
+        animate={{ scale: selected ? 1.015 : 1 }}
+        transition={SPRING.snappy}
+        className={cn(
+          "tap-target flex min-h-[68px] w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-colors",
+          selected ? "border-primary bg-accent shadow-card" : "bg-card hover:border-primary/40",
+        )}
+      >
+        <span
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-xl",
+            TOKEN_STYLES[category.colorToken],
+          )}
+        >
+          <Icon className="size-5" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-medium leading-tight">{category.label}</span>
+          <span className="mt-0.5 block truncate text-sm text-muted-foreground">
+            {category.description}
+          </span>
+        </span>
+        <span
+          className={cn(
+            "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+            selected ? "border-primary bg-primary" : "border-muted-foreground/30",
+          )}
+          aria-hidden="true"
+        >
+          {selected && (
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING.snappy}>
+              <Check className="size-3 text-primary-foreground" strokeWidth={3} />
+            </motion.span>
+          )}
+        </span>
+      </motion.button>
+    </motion.div>
+  );
+}
+
+function CategoryGroup({
+  title,
+  categories,
+  startIndex,
+  isSelected,
+  onToggle,
+}: {
+  title?: string;
+  categories: TaxonomyCategory[];
+  startIndex?: number;
+  isSelected: (cat: TaxonomyCategory) => boolean;
+  onToggle: (cat: TaxonomyCategory) => void;
+}) {
+  return (
+    <fieldset className="space-y-2.5">
+      {title && (
+        <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          {title}
+        </legend>
+      )}
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        {categories.map((cat, i) => (
+          <CategoryCard
+            key={cat.id}
+            category={cat}
+            selected={isSelected(cat)}
+            onToggle={() => onToggle(cat)}
+            index={(startIndex ?? 0) + i}
+          />
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 export function OnboardingWizard({ initialName }: { initialName: string }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -157,35 +324,58 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     gender: "",
     interestedIn: [],
     relationshipGoal: "",
+    availabilityTags: [],
+    interestCategoryIds: [],
+    communityTags: [],
     country: "IE",
     city: "",
-    bio: "",
-    heightCm: "",
-    occupation: "",
-    education: "",
-    languages: ["English"],
-    smoking: "PREFER_NOT_TO_SAY",
-    drinking: "PREFER_NOT_TO_SAY",
-    exercise: "",
-    children: "",
-    pets: "",
-    interests: [],
-    availabilityTags: [],
-    personalityTags: [],
-    communityTags: [],
     prompts: [],
   });
 
   const set = <K extends keyof WizardData>(key: K, value: WizardData[K]) =>
     setData((d) => ({ ...d, [key]: value }));
 
-  const toggleIn = (key: "interestedIn" | "languages" | "interests" | "availabilityTags" | "personalityTags" | "communityTags", value: string, max = 99) =>
+  const toggleIn = (
+    key: "interestedIn" | "availabilityTags" | "interestCategoryIds" | "communityTags",
+    value: string,
+  ) =>
     setData((d) => {
       const list = d[key];
-      if (list.includes(value)) return { ...d, [key]: list.filter((v) => v !== value) };
-      if (list.length >= max) return d;
-      return { ...d, [key]: [...list, value] };
+      return list.includes(value)
+        ? { ...d, [key]: list.filter((v) => v !== value) }
+        : { ...d, [key]: [...list, value] };
     });
+
+  /** Selecting a category routes its signal to the right profile field. */
+  const toggleCategory = (cat: TaxonomyCategory) => {
+    switch (cat.profileFieldMapping) {
+      case "relationshipGoal":
+        set("relationshipGoal", cat.goalValue ?? "");
+        return;
+      case "availabilityTags":
+        toggleIn("availabilityTags", cat.id);
+        return;
+      case "communityTags":
+        toggleIn("communityTags", cat.id);
+        return;
+      case "interests":
+        toggleIn("interestCategoryIds", cat.id);
+        return;
+    }
+  };
+
+  const categorySelected = (cat: TaxonomyCategory) => {
+    switch (cat.profileFieldMapping) {
+      case "relationshipGoal":
+        return data.relationshipGoal !== "" && data.relationshipGoal === cat.goalValue;
+      case "availabilityTags":
+        return data.availabilityTags.includes(cat.id);
+      case "communityTags":
+        return data.communityTags.includes(cat.id);
+      case "interests":
+        return data.interestCategoryIds.includes(cat.id);
+    }
+  };
 
   /** Selection order is preserved - it becomes sortOrder on the profile. */
   const togglePrompt = (key: PromptKey) =>
@@ -212,6 +402,13 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     [data.birthDate],
   );
 
+  const dateStyleCount =
+    data.availabilityTags.length +
+    data.interestCategoryIds.filter((id) => LIFESTYLE_IDS.has(id)).length;
+  const interestsCommunityCount =
+    data.communityTags.length +
+    data.interestCategoryIds.filter((id) => INTEREST_GROUP_IDS.has(id)).length;
+
   /** Live profile glow - grows as the profile gets richer. */
   const profileScore = useMemo(() => {
     let score = 0;
@@ -219,18 +416,13 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     if (age !== null && age >= 18) score += 10;
     if (data.gender) score += 8;
     if (data.interestedIn.length) score += 8;
-    if (data.relationshipGoal) score += 10;
-    if (data.city) score += 10;
-    if (data.bio.trim().length >= 40) score += 14;
-    else if (data.bio.trim().length > 0) score += 7;
-    if (data.heightCm) score += 4;
-    if (data.occupation.trim()) score += 5;
-    if (data.education) score += 4;
-    if (data.exercise || data.children || data.pets) score += 5;
-    score += Math.min(12, data.interests.length * 2);
-    score += Math.min(9, answeredPrompts * 3);
+    if (data.relationshipGoal) score += 12;
+    score += Math.min(14, dateStyleCount * 4);
+    score += Math.min(8, interestsCommunityCount * 3);
+    score += Math.min(18, answeredPrompts * 6);
+    if (data.city) score += 12;
     return Math.min(100, score);
-  }, [data, age, answeredPrompts]);
+  }, [data, age, answeredPrompts, dateStyleCount, interestsCommunityCount]);
 
   // Celebrate genuine milestones once each - explanation, not manipulation
   useEffect(() => {
@@ -248,25 +440,38 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const stepValid = useMemo(() => {
     switch (step) {
       case 0:
-        return data.displayName.trim().length >= 2 && age !== null && age >= 18 && !!data.gender;
+        return (
+          data.displayName.trim().length >= 2 &&
+          age !== null &&
+          age >= 18 &&
+          !!data.gender &&
+          data.interestedIn.length > 0
+        );
       case 1:
-        return data.interestedIn.length > 0 && !!data.relationshipGoal;
+        return !!data.relationshipGoal;
       case 2:
-        return !!data.city;
+        return dateStyleCount >= 1;
       case 3:
+        return interestsCommunityCount >= 1;
       case 4:
-        return true; // optional enrichment
-      case 5:
-        return data.interests.length >= 3;
-      case 6:
         return true; // prompts encouraged, never required
+      case 5:
+        return !!data.city;
       default:
         return false;
     }
-  }, [step, data, age]);
+  }, [step, data, age, dateStyleCount, interestsCommunityCount]);
 
   async function submit() {
     setSubmitting(true);
+    // Lifestyle + interest categories persist as their canonical interest slug
+    const interests = [
+      ...new Set(
+        data.interestCategoryIds
+          .map((id) => byId.get(id)?.interestSlugs?.[0])
+          .filter((slug): slug is string => Boolean(slug)),
+      ),
+    ];
     const res = await fetch("/api/onboarding", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -278,19 +483,8 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         relationshipGoal: data.relationshipGoal,
         country: data.country,
         city: data.city,
-        bio: data.bio.trim(),
-        heightCm: data.heightCm ? Number(data.heightCm) : null,
-        occupation: data.occupation.trim() || null,
-        education: data.education || null,
-        languages: data.languages,
-        smoking: data.smoking,
-        drinking: data.drinking,
-        exercise: data.exercise || null,
-        children: data.children || null,
-        pets: data.pets || null,
-        interests: data.interests,
+        interests,
         availabilityTags: data.availabilityTags,
-        personalityTags: data.personalityTags,
         communityTags: data.communityTags,
         prompts: data.prompts
           .map((p) => ({ key: p.key, answer: p.answer.trim() }))
@@ -360,6 +554,9 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               exit={{ opacity: 0, y: -6 }}
               className="font-medium"
             >
+              <span className="mr-2 tabular-nums text-muted-foreground">
+                {step + 1}/{STEPS.length}
+              </span>
               {STEPS[step]}
             </motion.p>
           </AnimatePresence>
@@ -404,6 +601,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           transition={{ duration: 0.38, ease: EASE_LUXE }}
           className="min-h-[50dvh]"
         >
+          {/* ------------------------------------------------ 1. Basics */}
           {step === 0 && (
             <div className="space-y-6">
               <div className="space-y-1">
@@ -453,19 +651,6 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   ))}
                 </div>
               </fieldset>
-            </div>
-          )}
-
-          {step === 1 && (
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                  What are you here for?
-                </h1>
-                <p className="text-muted-foreground">
-                  Honest intentions lead to better matches.
-                </p>
-              </div>
               <fieldset className="space-y-2">
                 <legend className="text-sm font-medium">Show me…</legend>
                 <div className="flex flex-wrap gap-2">
@@ -480,313 +665,90 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   ))}
                 </div>
               </fieldset>
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">I&apos;m looking for…</legend>
-                <div className="grid gap-2">
-                  {GOALS.map((goal) => (
-                    <button
-                      key={goal.value}
-                      type="button"
-                      aria-pressed={data.relationshipGoal === goal.value}
-                      onClick={() => set("relationshipGoal", goal.value)}
-                      className={cn(
-                        "flex items-center justify-between rounded-2xl border px-5 py-4 text-left transition-all",
-                        data.relationshipGoal === goal.value
-                          ? "border-primary bg-accent shadow-card"
-                          : "bg-card hover:border-primary/40",
-                      )}
-                    >
-                      <span>
-                        <span className="block font-medium">{goal.label}</span>
-                        <span className="block text-sm text-muted-foreground">{goal.hint}</span>
-                      </span>
-                      <span
-                        className={cn(
-                          "size-5 rounded-full border-2 transition-colors",
-                          data.relationshipGoal === goal.value
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground/30",
-                        )}
-                        aria-hidden="true"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
             </div>
           )}
 
+          {/* -------------------------------------------- 2. Intentions */}
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  What are you here for?
+                </h1>
+                <p className="text-muted-foreground">
+                  One honest answer - it leads to better matches.
+                </p>
+              </div>
+              <div className="grid gap-2.5" role="radiogroup" aria-label="I'm looking for">
+                {INTENTION_CATS.map((cat, i) => (
+                  <CategoryCard
+                    key={cat.id}
+                    category={cat}
+                    selected={categorySelected(cat)}
+                    onToggle={() => toggleCategory(cat)}
+                    index={i}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* -------------------------------------------- 3. Date style */}
           {step === 2 && (
-            <div className="space-y-6">
+            <div className="space-y-7">
               <div className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
-                  Where are you based?
+                  How do you like to meet?
                 </h1>
                 <p className="text-muted-foreground">
-                  We only ever show your city - never your exact location.
+                  Pick everything that sounds like you - it shapes who we introduce you to.
                 </p>
               </div>
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Country</legend>
-                <div className="flex gap-2">
-                  <ChipToggle selected={data.country === "IE"} onToggle={() => { set("country", "IE"); set("city", ""); }}>
-                    🇮🇪 Ireland
-                  </ChipToggle>
-                  <ChipToggle selected={data.country === "GB"} onToggle={() => { set("country", "GB"); set("city", ""); }}>
-                    🇬🇧 United Kingdom
-                  </ChipToggle>
-                </div>
-              </fieldset>
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">City</legend>
-                <div className="flex flex-wrap gap-2">
-                  {CITIES[data.country].map((city) => (
-                    <ChipToggle
-                      key={city}
-                      selected={data.city === city}
-                      onToggle={() => set("city", city)}
-                    >
-                      {city}
-                    </ChipToggle>
-                  ))}
-                </div>
-                <Input
-                  value={CITIES[data.country].includes(data.city) ? "" : data.city}
-                  onChange={(e) => set("city", e.target.value)}
-                  placeholder="Or type your town…"
-                  maxLength={80}
-                  className="h-12 rounded-2xl"
-                  aria-label="Other town or city"
-                />
-              </fieldset>
+              <CategoryGroup
+                title={GROUP_LABELS["right-now"]}
+                categories={RIGHT_NOW_CATS}
+                isSelected={categorySelected}
+                onToggle={toggleCategory}
+              />
+              <CategoryGroup
+                title={GROUP_LABELS.lifestyle}
+                categories={LIFESTYLE_CATS}
+                startIndex={RIGHT_NOW_CATS.length}
+                isSelected={categorySelected}
+                onToggle={toggleCategory}
+              />
             </div>
           )}
 
+          {/* ------------------------------- 4. Interests & community */}
           {step === 3 && (
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                  Tell your story
-                </h1>
-                <p className="text-muted-foreground">
-                  All optional - but profiles with a bio get far more matches.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bio">About you</Label>
-                <Textarea
-                  id="bio"
-                  value={data.bio}
-                  onChange={(e) => set("bio", e.target.value)}
-                  maxLength={BIO_MAX_LENGTH}
-                  rows={4}
-                  placeholder="What makes you laugh? Where would we find you on a Saturday?"
-                  className="rounded-2xl"
-                  aria-describedby="bio-count"
-                />
-                <p id="bio-count" className="text-right text-xs tabular-nums text-muted-foreground">
-                  {data.bio.length}/{BIO_MAX_LENGTH}
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="height">Height (cm)</Label>
-                  <Input
-                    id="height"
-                    type="number"
-                    inputMode="numeric"
-                    min={120}
-                    max={230}
-                    value={data.heightCm}
-                    onChange={(e) => set("heightCm", e.target.value)}
-                    placeholder="e.g. 175"
-                    className="h-12 rounded-2xl"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="occupation">Occupation</Label>
-                  <Input
-                    id="occupation"
-                    value={data.occupation}
-                    onChange={(e) => set("occupation", e.target.value)}
-                    maxLength={80}
-                    placeholder="What do you do?"
-                    className="h-12 rounded-2xl"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Education</Label>
-                <Select value={data.education} onValueChange={(v) => set("education", v)}>
-                  <SelectTrigger className="h-12 w-full rounded-2xl">
-                    <SelectValue placeholder="Select (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SECONDARY">Secondary school</SelectItem>
-                    <SelectItem value="UNDERGRADUATE">Undergraduate degree</SelectItem>
-                    <SelectItem value="POSTGRADUATE">Postgraduate degree</SelectItem>
-                    <SelectItem value="DOCTORATE">Doctorate</SelectItem>
-                    <SelectItem value="TRADE_SCHOOL">Trade / apprenticeship</SelectItem>
-                    <SelectItem value="OTHER">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Languages you speak</legend>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGES.slice(0, 10).map((lang) => (
-                    <ChipToggle
-                      key={lang}
-                      selected={data.languages.includes(lang)}
-                      onToggle={() => toggleIn("languages", lang, 8)}
-                    >
-                      {lang}
-                    </ChipToggle>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">Lifestyle</h1>
-                <p className="text-muted-foreground">
-                  Compatibility lives in the details. All optional.
-                </p>
-              </div>
-              {(
-                [
-                  ["smoking", "Smoking"],
-                  ["drinking", "Drinking"],
-                ] as const
-              ).map(([key, label]) => (
-                <fieldset key={key} className="space-y-2">
-                  <legend className="text-sm font-medium">{label}</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {LIFESTYLE.map((option) => (
-                      <ChipToggle
-                        key={option.value}
-                        selected={data[key] === option.value}
-                        onToggle={() => set(key, option.value)}
-                      >
-                        {option.label}
-                      </ChipToggle>
-                    ))}
-                  </div>
-                </fieldset>
-              ))}
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Exercise</legend>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    ["NEVER", "Never"],
-                    ["SOMETIMES", "Sometimes"],
-                    ["REGULARLY", "Regularly"],
-                    ["DAILY", "Daily"],
-                  ].map(([value, label]) => (
-                    <ChipToggle
-                      key={value}
-                      selected={data.exercise === value}
-                      onToggle={() => set("exercise", data.exercise === value ? "" : value)}
-                    >
-                      {label}
-                    </ChipToggle>
-                  ))}
-                </div>
-              </fieldset>
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Children</legend>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    ["DONT_HAVE_WANT", "Want kids someday"],
-                    ["DONT_HAVE_DONT_WANT", "Don't want kids"],
-                    ["HAVE_AND_WANT_MORE", "Have kids, want more"],
-                    ["HAVE_AND_DONT_WANT_MORE", "Have kids"],
-                    ["NOT_SURE", "Not sure yet"],
-                  ].map(([value, label]) => (
-                    <ChipToggle
-                      key={value}
-                      selected={data.children === value}
-                      onToggle={() => set("children", data.children === value ? "" : value)}
-                    >
-                      {label}
-                    </ChipToggle>
-                  ))}
-                </div>
-              </fieldset>
-              {/* Taxonomy: availability, vibe, communities - powers Explore */}
-              {([
-                ["availabilityTags", "Open to right now", AVAILABILITY_OPTIONS],
-                ["personalityTags", "Your vibe", PERSONALITY_OPTIONS],
-                ["communityTags", "Your circles", COMMUNITY_OPTIONS],
-              ] as const).map(([key, legend, options]) => (
-                <fieldset key={key} className="space-y-2">
-                  <legend className="text-sm font-medium">{legend}</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {options.map((o) => (
-                      <ChipToggle key={o.id} selected={data[key].includes(o.id)} onToggle={() => toggleIn(key, o.id, 6)}>
-                        {o.label}
-                      </ChipToggle>
-                    ))}
-                  </div>
-                </fieldset>
-              ))}
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Pets</legend>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    ["DOG", "Dog person"],
-                    ["CAT", "Cat person"],
-                    ["BOTH", "Both"],
-                    ["OTHER_PETS", "Other pets"],
-                    ["NONE", "No pets"],
-                    ["ALLERGIC", "Allergic"],
-                  ].map(([value, label]) => (
-                    <ChipToggle
-                      key={value}
-                      selected={data.pets === value}
-                      onToggle={() => set("pets", data.pets === value ? "" : value)}
-                    >
-                      {label}
-                    </ChipToggle>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-6">
+            <div className="space-y-7">
               <div className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                   What are you into?
                 </h1>
-                <p className="text-muted-foreground" aria-live="polite">
-                  Pick at least 3 - you&apos;ve chosen {data.interests.length} of 12.
+                <p className="text-muted-foreground">
+                  Shared ground gives people an easy way to say hello.
                 </p>
               </div>
-              {INTEREST_CATALOGUE.map((group) => (
-                <fieldset key={group.category} className="space-y-2">
-                  <legend className="text-sm font-semibold">{group.category}</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {group.items.map((interest) => (
-                      <ChipToggle
-                        key={interest}
-                        selected={data.interests.includes(interest)}
-                        onToggle={() => toggleIn("interests", interest, 12)}
-                      >
-                        {interest}
-                      </ChipToggle>
-                    ))}
-                  </div>
-                </fieldset>
-              ))}
+              <CategoryGroup
+                title={GROUP_LABELS.interests}
+                categories={INTEREST_CATS}
+                isSelected={categorySelected}
+                onToggle={toggleCategory}
+              />
+              <CategoryGroup
+                title={GROUP_LABELS.community}
+                categories={COMMUNITY_CATS}
+                startIndex={INTEREST_CATS.length}
+                isSelected={categorySelected}
+                onToggle={toggleCategory}
+              />
             </div>
           )}
 
-          {step === 6 && (
+          {/* ------------------------------------------------ 5. Prompts */}
+          {step === 4 && (
             <div className="space-y-6">
               <div className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
@@ -803,7 +765,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   : `${answeredPrompts} answered${answeredPrompts < 3 ? " - a couple more and your profile really talks" : ". Lovely."}`}
               </p>
               <div className="grid gap-2">
-                {PROFILE_PROMPTS.map((prompt) => {
+                {ONBOARDING_PROMPTS.map((prompt) => {
                   const entry = data.prompts.find((p) => p.key === prompt.key);
                   const selected = Boolean(entry);
                   const atLimit = !selected && data.prompts.length >= MAX_PROMPTS;
@@ -853,7 +815,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                                 onChange={(e) => setPromptAnswer(prompt.key, e.target.value)}
                                 maxLength={PROMPT_ANSWER_MAX}
                                 rows={3}
-                                placeholder={PROMPT_PLACEHOLDERS[prompt.key]}
+                                placeholder={PROMPT_PLACEHOLDERS[prompt.key] ?? ""}
                                 className="rounded-2xl"
                                 aria-label={prompt.label}
                               />
@@ -868,6 +830,78 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* ------------------------------------------------- 6. Finish */}
+          {step === 5 && (
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  Last thing - where are you based?
+                </h1>
+                <p className="text-muted-foreground">
+                  We only ever show your city - never your exact location.
+                </p>
+              </div>
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-medium">Country</legend>
+                <div className="flex gap-2">
+                  <ChipToggle selected={data.country === "IE"} onToggle={() => { set("country", "IE"); set("city", ""); }}>
+                    Ireland
+                  </ChipToggle>
+                  <ChipToggle selected={data.country === "GB"} onToggle={() => { set("country", "GB"); set("city", ""); }}>
+                    United Kingdom
+                  </ChipToggle>
+                </div>
+              </fieldset>
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-medium">City</legend>
+                <div className="flex flex-wrap gap-2">
+                  {CITIES[data.country].map((city) => (
+                    <ChipToggle
+                      key={city}
+                      selected={data.city === city}
+                      onToggle={() => set("city", city)}
+                    >
+                      {city}
+                    </ChipToggle>
+                  ))}
+                </div>
+                <Input
+                  value={CITIES[data.country].includes(data.city) ? "" : data.city}
+                  onChange={(e) => set("city", e.target.value)}
+                  placeholder="Or type your town…"
+                  maxLength={80}
+                  className="h-12 rounded-2xl"
+                  aria-label="Other town or city"
+                />
+              </fieldset>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: EASE_LUXE, delay: 0.08 }}
+                className="space-y-3 rounded-2xl border bg-card p-5"
+              >
+                <p className="font-medium">After this, two quick wins</p>
+                <div className="flex items-start gap-3">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400">
+                    <Camera className="size-5" aria-hidden="true" />
+                  </span>
+                  <p className="text-sm text-muted-foreground">
+                    Add your photos from your profile - profiles with photos
+                    get seen first.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400">
+                    <BadgeCheck className="size-5" aria-hidden="true" />
+                  </span>
+                  <p className="text-sm text-muted-foreground">
+                    Get verified - a verified badge builds instant trust.
+                  </p>
+                </div>
+              </motion.div>
             </div>
           )}
         </motion.div>

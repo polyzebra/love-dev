@@ -2,17 +2,22 @@ import { db } from "@/lib/db";
 import { calculateAge } from "@/lib/utils";
 import { promptLabel } from "@/config/prompts";
 import { getReplySignals } from "@/lib/services/signals";
+import {
+  GROUP_LABELS,
+  bySlug,
+  exploreCategories,
+  type TaxonomyGroup,
+} from "@/lib/discovery/taxonomy";
 import type { Prisma } from "@/generated/prisma/client";
 
 /**
- * Explore - data-driven discovery categories.
- *
- * A category's `matcher` JSON decides who belongs to it:
- *   {kind:"interests", values:[interestSlug...]}  profile interest match
- *   {kind:"goal", values:[RelationshipGoal...]}   relationship goal match
- *   {kind:"country", values:["IE"|"GB"]}          community by country
- *   {kind:"recentlyActive", hours?:24}            the "Today" group
- *   {kind:"preference"}                           opt-in only (saved pref)
+ * Explore - discovery categories driven by the canonical taxonomy
+ * (src/lib/discovery/taxonomy.ts). Each ExploreCategory row carries a
+ * `matcher` JSON derived from its taxonomy profileFieldMapping:
+ *   {kind:"availability", values:[categoryId]}    Profile.availabilityTags
+ *   {kind:"goal", values:[RelationshipGoal]}      Profile.relationshipGoal
+ *   {kind:"interests", values:[interestSlug...]}  ProfileInterest by slug
+ *   {kind:"community", values:[categoryId]}       Profile.communityTags
  * Saved preferences (UserExplorePreference) always count as membership,
  * so every category works even before profiles carry matching tags.
  */
@@ -20,11 +25,8 @@ import type { Prisma } from "@/generated/prisma/client";
 export type Matcher =
   | { kind: "interests"; values: string[] }
   | { kind: "goal"; values: string[] }
-  | { kind: "country"; values: string[] }
   | { kind: "availability"; values: string[] }
-  | { kind: "personality"; values: string[] }
   | { kind: "community"; values: string[] }
-  | { kind: "recentlyActive"; hours?: number }
   | { kind: "preference" };
 
 export type ExploreFilters = {
@@ -63,22 +65,11 @@ function membershipWhere(categoryId: string, matcher: Matcher | null): Prisma.Us
         },
       };
       break;
-    case "country":
-      viaProfile = { profile: { is: { country: { in: matcher.values } } } };
-      break;
     case "availability":
       viaProfile = { profile: { is: { availabilityTags: { hasSome: matcher.values } } } };
       break;
-    case "personality":
-      viaProfile = { profile: { is: { personalityTags: { hasSome: matcher.values } } } };
-      break;
     case "community":
       viaProfile = { profile: { is: { communityTags: { hasSome: matcher.values } } } };
-      break;
-    case "recentlyActive":
-      viaProfile = {
-        lastActiveAt: { gte: new Date(Date.now() - (matcher.hours ?? 24) * 3600_000) },
-      };
       break;
   }
   return { OR: [viaPreference, viaProfile] };
@@ -102,44 +93,99 @@ async function blockedIdsFor(viewerId: string): Promise<string[]> {
   return blocks.flatMap((b) => [b.blockerId, b.blockedId]).filter((id) => id !== viewerId);
 }
 
-/** All active categories, grouped and with live member counts. */
-export async function getExploreCategories(viewerId: string) {
+const ONLINE_WINDOW_MS = 5 * 60_000;
+
+const GROUP_ORDER: TaxonomyGroup[] = [
+  "right-now",
+  "relationship",
+  "lifestyle",
+  "interests",
+  "community",
+];
+
+export type ExploreCategorySummary = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  group: TaxonomyGroup;
+  iconKey: string;
+  imageUrl: string | null;
+  gradientFrom: string;
+  gradientTo: string;
+  /** Real member count - a live query, never invented. */
+  count: number;
+  /** Members active within the last 5 minutes. */
+  onlineCount: number;
+  saved: boolean;
+  taxonomyOrder: number;
+};
+
+export type ExploreGroupSection = {
+  group: TaxonomyGroup;
+  label: string;
+  categories: ExploreCategorySummary[];
+};
+
+/**
+ * Active categories grouped by taxonomy group (Right now / Relationship /
+ * Lifestyle / Interests / Community), with real people + online counts.
+ * Within a group: the viewer's saved categories first, then people count,
+ * then online count, then taxonomy order.
+ */
+export async function getExploreCategories(viewerId: string): Promise<ExploreGroupSection[]> {
   const [categories, blockedIds, myPrefs] = await Promise.all([
-    db.exploreCategory.findMany({
-      where: { isActive: true },
-      orderBy: [{ group: "asc" }, { sortOrder: "asc" }],
-    }),
+    db.exploreCategory.findMany({ where: { isActive: true } }),
     blockedIdsFor(viewerId),
     db.userExplorePreference.findMany({ where: { userId: viewerId }, select: { categoryId: true } }),
   ]);
   const mine = new Set(myPrefs.map((p) => p.categoryId));
+  const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS);
+  const orderBySlug = new Map(exploreCategories().map((c, i) => [c.slug, i]));
 
-  const counts = await Promise.all(
-    categories.map((c) =>
-      db.user.count({
-        where: {
-          AND: [
-            visibleWhere(viewerId, blockedIds),
-            membershipWhere(c.id, c.matcher as Matcher | null),
-          ],
-        },
+  const rows: ExploreCategorySummary[] = await Promise.all(
+    categories
+      // Only taxonomy-backed categories surface; anything else is stale data.
+      .filter((c) => bySlug.has(c.slug))
+      .map(async (c) => {
+        const member: Prisma.UserWhereInput[] = [
+          visibleWhere(viewerId, blockedIds),
+          membershipWhere(c.id, c.matcher as Matcher | null),
+        ];
+        const [count, onlineCount] = await Promise.all([
+          db.user.count({ where: { AND: member } }),
+          db.user.count({ where: { AND: [...member, { lastActiveAt: { gte: onlineSince } }] } }),
+        ]);
+        const taxonomy = bySlug.get(c.slug)!;
+        return {
+          id: c.id,
+          slug: c.slug,
+          title: c.title,
+          description: c.description ?? taxonomy.description,
+          group: taxonomy.group,
+          iconKey: c.iconKey,
+          imageUrl: c.imageUrl,
+          gradientFrom: c.gradientFrom,
+          gradientTo: c.gradientTo,
+          count,
+          onlineCount,
+          saved: mine.has(c.id),
+          taxonomyOrder: orderBySlug.get(c.slug) ?? 0,
+        };
       }),
-    ),
   );
 
-  return categories.map((c, i) => ({
-    id: c.id,
-    slug: c.slug,
-    title: c.title,
-    description: c.description,
-    group: c.group,
-    iconKey: c.iconKey,
-    imageUrl: c.imageUrl,
-    gradientFrom: c.gradientFrom,
-    gradientTo: c.gradientTo,
-    count: counts[i],
-    saved: mine.has(c.id),
-  }));
+  const rank = (a: ExploreCategorySummary, b: ExploreCategorySummary) =>
+    Number(b.saved) - Number(a.saved) ||
+    b.count - a.count ||
+    b.onlineCount - a.onlineCount ||
+    a.taxonomyOrder - b.taxonomyOrder;
+
+  return GROUP_ORDER.map((group) => ({
+    group,
+    label: GROUP_LABELS[group],
+    categories: rows.filter((r) => r.group === group).sort(rank),
+  })).filter((section) => section.categories.length > 0);
 }
 
 const PAGE_SIZE = 12;

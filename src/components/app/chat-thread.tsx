@@ -71,6 +71,7 @@ export function ChatThread({
   currentUserId,
   initialMessages,
   otherName,
+  sharedCategoryIds = [],
   sharedInterests = [],
   theirPrompts = [],
   theyAreOnline = false,
@@ -80,6 +81,8 @@ export function ChatThread({
   currentUserId: string;
   initialMessages: ThreadMessage[];
   otherName: string;
+  /** Taxonomy category ids both people belong to - drives cold-open openers. */
+  sharedCategoryIds?: string[];
   sharedInterests?: string[];
   theirPrompts?: { key: string; label: string; answer: string }[];
   theyAreOnline?: boolean;
@@ -97,6 +100,7 @@ export function ChatThread({
     const settled = messages.filter((m) => !m.pending);
     const last = settled[settled.length - 1] ?? null;
     return assistant.suggest({
+      sharedCategoryIds,
       sharedInterests,
       theirName: otherName,
       theirPrompts,
@@ -105,7 +109,7 @@ export function ChatThread({
       messageCount: settled.length,
       theyAreOnline,
     });
-  }, [messages, sharedInterests, otherName, theirPrompts, currentUserId, theyAreOnline]);
+  }, [messages, sharedCategoryIds, sharedInterests, otherName, theirPrompts, currentUserId, theyAreOnline]);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);

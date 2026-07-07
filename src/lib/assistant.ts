@@ -1,15 +1,23 @@
+import {
+  byId,
+  pickTemplate,
+  type TaxonomyCategory,
+} from "@/lib/discovery/taxonomy";
+
 /**
  * Conversation assistant - rule-based today, LLM-swappable tomorrow.
  *
- * Every suggestion is derived ONLY from real context data (shared
- * interests both people actually picked, prompt answers the other
+ * Every suggestion is derived ONLY from real context data (taxonomy
+ * categories both people actually belong to, prompt answers the other
  * person actually wrote, real message timestamps). Nothing is invented,
  * and the interface is deliberately narrow so a future LLM-backed
  * implementation can slot in behind `assistant` without touching the UI.
  */
 
 export type AssistantContext = {
-  /** Interest labels both people selected. */
+  /** Taxonomy category ids BOTH people belong to (see categoriesForProfile). */
+  sharedCategoryIds: string[];
+  /** Interest labels both people selected - generic fallback only. */
   sharedInterests: string[];
   theirName: string;
   /** The other person's real profile prompt answers. */
@@ -61,75 +69,74 @@ function topicOf(label: string): string {
   return s.charAt(0).toLowerCase() + s.slice(1);
 }
 
-/** Interest-specific openers - matched against real shared interests. */
-const INTEREST_OPENERS: {
-  match: RegExp;
-  text: (name: string) => string;
-  send: string;
-}[] = [
-  {
-    match: /coffee/i,
-    text: (n) => `You both like coffee - ask ${n} for their go-to cafe`,
-    send: "Important question first: what's your go-to cafe?",
-  },
-  {
-    match: /hik/i,
-    text: (n) => `You both love hiking - ask ${n} about a favourite trail`,
-    send: "I saw you're into hiking too - what's the best trail you've done?",
-  },
-  {
-    match: /travel/i,
-    text: (n) => `You both love travelling - ask ${n} their dream destination`,
-    send: "Fellow traveller - where's next on your list?",
-  },
-  {
-    match: /dog/i,
-    text: (n) => `You're both dog people - ask ${n} about that`,
-    send: "Dog person too, I see - do you have one?",
-  },
-  {
-    match: /run/i,
-    text: (n) => `You both run - ask ${n} about their route`,
-    send: "A fellow runner - where do you usually run?",
-  },
-  {
-    match: /swim/i,
-    text: (n) => `You both swim - ask ${n} where they brave the water`,
-    send: "Where do you swim - pool, or braving the open water?",
-  },
-  {
-    match: /read|book/i,
-    text: (n) => `You both read - ask ${n} what they'd recommend`,
-    send: "Book person too - what should I read next?",
-  },
-  {
-    match: /music/i,
-    text: (n) => `You both love live music - ask ${n} about the best gig they've seen`,
-    send: "Best gig you've ever been to - go.",
-  },
-  {
-    match: /cook|bak/i,
-    text: (n) => `You both cook - ask ${n} their signature dish`,
-    send: "What's your signature dish? Asking for research purposes.",
-  },
-  {
-    match: /film|cinema|movie/i,
-    text: (n) => `You both love films - ask ${n} for a favourite`,
-    send: "Film person too - what's one you could rewatch forever?",
-  },
-];
+/**
+ * Rewrite a coach-voice taxonomy template ("Ask about their favourite
+ * cafe.") in the second person ("my profile" fix runs first so "your
+ * profile" in a template means the sender's own profile).
+ */
+function toSecondPerson(s: string): string {
+  return s
+    .replace(/\byour\b/g, "my")
+    .replace(/\btheir\b/g, "your")
+    .replace(/\bthey're\b/g, "you're")
+    .replace(/\bthey've\b/g, "you've")
+    .replace(/\bthey'd\b/g, "you'd")
+    .replace(/\bthey\b/g, "you")
+    .replace(/\bthem\b/g, "you");
+}
 
-function interestOpeners(shared: string[], name: string): Suggestion[] {
-  return shared.map((interest) => {
-    const hit = INTEREST_OPENERS.find((t) => t.match.test(interest));
-    if (hit) return { kind: "opener" as const, text: hit.text(name), send: hit.send };
-    const lower = interest.toLowerCase();
-    return {
+/**
+ * Turn a taxonomy chatPromptTemplate (coach voice, e.g. "Ask about
+ * their favourite cafe.") into a ready-to-send message ("What's your
+ * favourite cafe?"). Deterministic string rules - no invention.
+ */
+export function messageFromTemplate(template: string): string {
+  const t = template.trim().replace(/\.$/, "");
+  let m: RegExpMatchArray | null;
+  if ((m = t.match(/^Ask (?:about|for) (.+)$/)))
+    return `What's ${toSecondPerson(m[1])}?`;
+  if ((m = t.match(/^Ask if they (.+)$/)))
+    return `Do you ${toSecondPerson(m[1])}?`;
+  if ((m = t.match(/^Ask (what|where|which|when|how|who) (.+)$/)))
+    return `Tell me ${m[1]} ${toSecondPerson(m[2])}.`;
+  if ((m = t.match(/^Suggest (.+)$/)))
+    return `How about ${toSecondPerson(m[1])}?`;
+  return `${toSecondPerson(t)}.`;
+}
+
+/**
+ * Cold-open openers from the taxonomy: one per SHARED category,
+ * strongest first, template picked deterministically per pair.
+ */
+function taxonomyOpeners(sharedCategoryIds: string[], name: string): Suggestion[] {
+  return sharedCategoryIds
+    .map((id) => byId.get(id))
+    .filter((c): c is TaxonomyCategory => c != null)
+    .sort((a, b) => b.scoringWeight - a.scoringWeight)
+    .map((cat): Suggestion | null => {
+      const template = pickTemplate(cat.chatPromptTemplates, `${name}:${cat.id}`);
+      if (!template) return null;
+      return {
+        kind: "opener",
+        text: template.replace(/^Ask /, `Ask ${name} `).replace(/\.$/, ""),
+        send: messageFromTemplate(template),
+      };
+    })
+    .filter((s): s is Suggestion => s != null);
+}
+
+/** ONE honest generic fallback when no taxonomy category is shared. */
+function genericOpener(shared: string[], name: string): Suggestion[] {
+  const interest = shared[0];
+  if (!interest) return [];
+  const lower = interest.toLowerCase();
+  return [
+    {
       kind: "opener" as const,
       text: `You both like ${lower} - ask ${name} about it`,
       send: `I noticed we both like ${lower} - what got you into it?`,
-    };
-  });
+    },
+  ];
 }
 
 function promptOpeners(
@@ -165,15 +172,14 @@ export const ruleBasedAssistant: ConversationAssistant = {
     const ageMs = ctx.lastMessageAt ? Date.now() - ctx.lastMessageAt.getTime() : null;
     const suggestions: Suggestion[] = [];
 
-    // Rule 1 - fresh match, nothing said yet: openers built from real
-    // shared interests and their real prompt answers, interleaved.
+    // Rule 1 - fresh match, nothing said yet: openers built from the
+    // taxonomy categories both people actually share and the other
+    // person's real prompt answers, interleaved.
     if (ctx.messageCount === 0) {
-      suggestions.push(
-        ...interleave(
-          interestOpeners(ctx.sharedInterests, name),
-          promptOpeners(ctx.theirPrompts, name),
-        ),
-      );
+      const fromTaxonomy = taxonomyOpeners(ctx.sharedCategoryIds, name);
+      const cold =
+        fromTaxonomy.length > 0 ? fromTaxonomy : genericOpener(ctx.sharedInterests, name);
+      suggestions.push(...interleave(cold, promptOpeners(ctx.theirPrompts, name)));
     }
 
     // Rule 2 - going well: a real back-and-forth that's still warm.

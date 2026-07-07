@@ -41,6 +41,7 @@ export type Gender = (typeof Gender)[keyof typeof Gender]
 
 export const RelationshipGoal = {
   LONG_TERM: 'LONG_TERM',
+  MARRIAGE_MINDED: 'MARRIAGE_MINDED',
   SHORT_TERM: 'SHORT_TERM',
   OPEN_TO_EITHER: 'OPEN_TO_EITHER',
   FRIENDSHIP: 'FRIENDSHIP',

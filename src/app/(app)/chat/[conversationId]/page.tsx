@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline as presenceOnline } from "@/lib/presence";
 import { promptLabel } from "@/config/prompts";
+import { categoriesForProfile } from "@/lib/discovery/taxonomy";
 
 export const metadata: Metadata = { title: "Conversation" };
 export const dynamic = "force-dynamic";
@@ -46,6 +47,9 @@ export default async function ConversationPage({
                 bio: true,
                 birthDate: true,
                 city: true,
+                relationshipGoal: true,
+                availabilityTags: true,
+                communityTags: true,
                 interests: { select: { interest: { select: { label: true, slug: true } } } },
                 prompts: {
                   orderBy: { sortOrder: "asc" },
@@ -67,6 +71,9 @@ export default async function ConversationPage({
       where: { userId },
       select: {
         city: true,
+        relationshipGoal: true,
+        availabilityTags: true,
+        communityTags: true,
         interests: { select: { interest: { select: { slug: true } } } },
       },
     }),
@@ -90,6 +97,31 @@ export default async function ConversationPage({
     answer: p.answer,
   }));
   const suggestedDraft = typeof suggest === "string" ? suggest.slice(0, 500) : "";
+
+  // Taxonomy categories BOTH people belong to - the assistant's cold-open
+  // openers come from these categories' chatPromptTemplates.
+  const otherProfile = other?.user.profile;
+  const sharedCategoryIds =
+    myProfile && otherProfile
+      ? (() => {
+          const mine = new Set(
+            categoriesForProfile({
+              relationshipGoal: myProfile.relationshipGoal,
+              availabilityTags: myProfile.availabilityTags,
+              communityTags: myProfile.communityTags,
+              interestSlugs: myProfile.interests.map((i) => i.interest.slug),
+            }).map((c) => c.id),
+          );
+          return categoriesForProfile({
+            relationshipGoal: otherProfile.relationshipGoal,
+            availabilityTags: otherProfile.availabilityTags,
+            communityTags: otherProfile.communityTags,
+            interestSlugs: otherProfile.interests.map((i) => i.interest.slug),
+          })
+            .filter((c) => mine.has(c.id))
+            .map((c) => c.id);
+        })()
+      : [];
 
   const peek = {
     displayName: otherName,
@@ -170,6 +202,7 @@ export default async function ConversationPage({
         conversationId={conversationId}
         currentUserId={userId}
         otherName={otherName}
+        sharedCategoryIds={sharedCategoryIds}
         sharedInterests={peek.sharedInterests}
         theirPrompts={theirPrompts}
         theyAreOnline={online}

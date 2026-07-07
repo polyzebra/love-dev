@@ -3,6 +3,7 @@ import { calculateAge } from "@/lib/utils";
 import { computeCompatibility, type ScoringProfile } from "@/lib/services/scoring";
 import { getReplySignals } from "@/lib/services/signals";
 import { promptLabel } from "@/config/prompts";
+import { GOAL_LINES } from "@/lib/discovery/taxonomy";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
 
 /**
@@ -27,6 +28,8 @@ export type DiscoverProfile = {
   photos: { url: string; blurDataUrl: string | null }[];
   compatibility: number;
   reasons: string[];
+  /** Taxonomy categories viewer AND candidate share, strongest first. */
+  sharedCategoryIds: string[];
   /** Raw goal - lets the client detect real shared-goal overlap. */
   relationshipGoal: RelationshipGoal;
   /** Human phrasing of relationshipGoal - the card's opening line. */
@@ -35,14 +38,6 @@ export type DiscoverProfile = {
   promptTease: { label: string; answer: string } | null;
   /** Honest reply-behaviour label from real message timestamps. */
   replySignal: string | null;
-};
-
-const GOAL_LINES: Record<RelationshipGoal, string> = {
-  LONG_TERM: "Looking for something real",
-  SHORT_TERM: "Keeping it light for now",
-  OPEN_TO_EITHER: "Open to where it goes",
-  FRIENDSHIP: "Here for real friendship",
-  FIGURING_OUT: "Figuring out what they want",
 };
 
 const ONLINE_WINDOW_MS = 5 * 60_000;
@@ -59,6 +54,7 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
 
 /** Map a Prisma profile row (with interests) onto the scoring engine's shape. */
 function toScoringProfile(p: {
+  userId: string;
   relationshipGoal: ScoringProfile["relationshipGoal"];
   gender: ScoringProfile["gender"];
   city: string | null; country: string;
@@ -66,21 +62,22 @@ function toScoringProfile(p: {
   languages: string[];
   smoking: ScoringProfile["smoking"]; drinking: ScoringProfile["drinking"];
   exercise: string | null;
-  personalityTags: string[]; communityTags: string[];
+  availabilityTags: string[]; communityTags: string[];
   birthDate: Date; minAge: number; maxAge: number;
   interests: { interest: { slug: string; label: string } }[];
 }): ScoringProfile {
   return {
+    userId: p.userId,
     relationshipGoal: p.relationshipGoal,
     gender: p.gender,
     city: p.city, country: p.country,
     latitude: p.latitude, longitude: p.longitude,
     languages: p.languages,
     interestSlugs: p.interests.map((i) => i.interest.slug),
-    interestLabels: p.interests.map((i) => i.interest.label),
+    availabilityTags: p.availabilityTags,
+    communityTags: p.communityTags,
     smoking: p.smoking, drinking: p.drinking,
     exercise: p.exercise,
-    personalityTags: p.personalityTags, communityTags: p.communityTags,
     birthDate: p.birthDate, minAge: p.minAge, maxAge: p.maxAge,
   };
 }
@@ -187,7 +184,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
         : null,
       replySignal: null, // filled in below for the final result set only
       ...(() => {
-        const { score, reasons } = computeCompatibility(
+        const { score, reasons, sharedCategoryIds } = computeCompatibility(
           viewerScoring,
           toScoringProfile(c),
           {
@@ -197,7 +194,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
             isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,
           },
         );
-        return { compatibility: score, reasons };
+        return { compatibility: score, reasons, sharedCategoryIds };
       })(),
     });
   }

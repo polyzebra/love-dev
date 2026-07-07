@@ -9,47 +9,35 @@ import { Compass } from "lucide-react";
 export const metadata: Metadata = { title: "Explore" };
 export const dynamic = "force-dynamic";
 
-const GROUP_LABELS: Record<string, string> = {
-  LIFESTYLE: "Lifestyle",
-  INTERESTS: "Interests",
-  GOALS: "Relationship goals",
-  TODAY: "Today",
-  PERSONALITY: "Personality",
-  COMMUNITIES: "Communities",
-};
-const GROUP_ORDER = ["TODAY", "GOALS", "LIFESTYLE", "INTERESTS", "PERSONALITY", "COMMUNITIES"];
-
 export default async function ExplorePage() {
   const user = await requireUser();
-  const categories = await getExploreCategories(user.id);
+  // Grouped in taxonomy order: Right now / Relationship / Lifestyle /
+  // Interests / Community. Saved categories float first inside each group.
+  const groups = await getExploreCategories(user.id);
   track("explore_opened", user.id);
 
-  if (categories.length === 0) {
+  if (groups.length === 0) {
     return (
       <>
-        <PageHeader title="Explore" description="Find people with similar relationship goals." />
+        <PageHeader title="Explore" description="Find people by intent, energy and shared ground." />
         <EmptyState icon={Compass} title="Explore is warming up" description="Categories are being curated. Check back soon." />
       </>
     );
   }
 
-  const grouped = GROUP_ORDER.map((g) => ({
-    group: g,
-    label: GROUP_LABELS[g],
-    cards: categories.filter((c) => c.group === g),
-  })).filter((s) => s.cards.length > 0);
-
   return (
     <>
-      <PageHeader title="Explore" description="Find people with similar relationship goals." />
-      <div className="space-y-10">
-        {grouped.map(({ group, label, cards }) => (
+      <PageHeader title="Explore" description="Find people by intent, energy and shared ground." />
+      <div className="mx-auto w-full max-w-6xl space-y-10">
+        {groups.map(({ group, label, categories }) => (
           <section key={group} aria-labelledby={`explore-${group}`}>
             <h2 id={`explore-${group}`} className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
               {label}
             </h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {cards.map((card) => <ExploreCard key={card.slug} card={card} />)}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {categories.map((card) => (
+                <ExploreCard key={card.slug} card={card} />
+              ))}
             </div>
           </section>
         ))}

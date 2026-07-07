@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { GROUP_LABELS, TAXONOMY } from "@/lib/discovery/taxonomy";
 import type { OnboardingInput } from "@/lib/validators/profile";
 
 /** Weighted profile completion - drives the progress ring in the UI. */
@@ -31,32 +32,37 @@ export function computeCompletion(profile: {
   return Math.min(100, score);
 }
 
-function slugify(label: string): string {
-  return label
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+/** The taxonomy category an interest slug belongs to (canonical labels). */
+function taxonomyCategoryForSlug(slug: string) {
+  return TAXONOMY.find((c) => c.interestSlugs?.includes(slug));
 }
 
 export async function completeOnboarding(userId: string, input: OnboardingInput) {
   const { interests, prompts, ...fields } = input;
+  // Interests arrive as canonical taxonomy slugs (validated upstream)
+  const interestSlugs = [...new Set(interests)];
 
   return db.$transaction(async (tx) => {
     // Ensure the interest catalogue rows exist, then connect them
     const interestRows = await Promise.all(
-      interests.map((label) =>
-        tx.interest.upsert({
-          where: { slug: slugify(label) },
-          create: { slug: slugify(label), label, category: "Custom" },
+      interestSlugs.map((slug) => {
+        const category = taxonomyCategoryForSlug(slug);
+        return tx.interest.upsert({
+          where: { slug },
+          create: {
+            slug,
+            label: category?.label ?? slug,
+            category: category ? GROUP_LABELS[category.group] : "Custom",
+          },
           update: {},
-        }),
-      ),
+        });
+      }),
     );
 
     const photoCount = await tx.photo.count({ where: { userId } });
     const completionPct = computeCompletion({
       ...fields,
-      interestCount: interests.length,
+      interestCount: interestSlugs.length,
       photoCount,
     });
 

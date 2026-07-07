@@ -1,16 +1,21 @@
 import type { Gender, LifestyleFrequency, RelationshipGoal } from "@/generated/prisma/enums";
+import { categoriesForProfile, pickTemplate } from "@/lib/discovery/taxonomy";
 
 /**
  * Canonical compatibility engine - the ONE place a match score is
  * computed. Explore, Discover and match celebrations all consume this;
  * never duplicate scoring logic elsewhere.
  *
- * Every factor is weighted and every point traces to real profile
- * data - reasons are generated from the same factors, so the UI can
- * always explain WHY (no fake percentages).
+ * Shared-signal points come straight from the discovery taxonomy: both
+ * profiles are mapped onto taxonomy categories and every SHARED
+ * category adds its scoringWeight. Reasons are the taxonomy's own
+ * matchReasonTemplates - picked deterministically per pair - so the UI
+ * always explains WHY in human language (no fake percentages, no
+ * database-speak).
  */
 
 export type ScoringProfile = {
+  userId: string;
   relationshipGoal: RelationshipGoal;
   gender: Gender;
   city: string | null;
@@ -19,12 +24,11 @@ export type ScoringProfile = {
   longitude: number | null;
   languages: string[];
   interestSlugs: string[];
-  interestLabels: string[];
+  availabilityTags: string[];
+  communityTags: string[];
   smoking: LifestyleFrequency;
   drinking: LifestyleFrequency;
   exercise: string | null;
-  personalityTags: string[];
-  communityTags: string[];
   birthDate: Date;
   minAge: number;
   maxAge: number;
@@ -40,18 +44,17 @@ export type ScoringCandidateMeta = {
 export type CompatibilityResult = {
   /** 55-99, deterministic, never random */
   score: number;
-  /** Honest, ordered explanations of the top factors */
+  /** Honest, ordered explanations of the top factors - story language only. */
   reasons: string[];
+  /** Taxonomy categories BOTH profiles belong to, strongest first. */
+  sharedCategoryIds: string[];
 };
 
 const W = {
-  goal: 20,
-  interests: 20, // 5 per shared, capped
-  location: 15, // same city 15, same country 8, <=25km 12
+  taxonomy: 30, // sum of shared-category scoringWeights, capped
+  location: 15, // same city 15, <=25km 12, same country 8
   languages: 8,
   lifestyle: 10, // smoking/drinking/exercise similarity
-  personality: 8, // 4 per shared tag, capped
-  community: 5,
   agePref: 5, // candidate inside viewer's window
   verified: 5,
   activity: 7, // active within 24h
@@ -80,39 +83,41 @@ export function computeCompatibility(
   meta: ScoringCandidateMeta,
 ): CompatibilityResult {
   let pts = 0;
+  // Story reasons (taxonomy templates) always lead; contextual facts
+  // (location, language, lifestyle) fill the remaining slots.
+  const storyReasons: { weight: number; text: string }[] = [];
   const reasons: { weight: number; text: string }[] = [];
 
-  // Relationship goal
-  const goalCompat =
-    viewer.relationshipGoal === candidate.relationshipGoal ||
-    [viewer.relationshipGoal, candidate.relationshipGoal].includes("OPEN_TO_EITHER");
-  if (goalCompat) {
-    pts += W.goal;
-    if (viewer.relationshipGoal === candidate.relationshipGoal)
-      reasons.push({ weight: W.goal, text: "Same relationship goal" });
-  }
-
-  // Shared interests
-  const mine = new Set(viewer.interestSlugs);
-  const shared = candidate.interestSlugs.filter((s) => mine.has(s));
-  pts += Math.min(W.interests, shared.length * 5);
-  if (shared.length >= 2) reasons.push({ weight: shared.length * 5, text: `${shared.length} shared interests` });
-  else if (shared.length === 1) {
-    const label = candidate.interestLabels[candidate.interestSlugs.indexOf(shared[0])] ?? shared[0];
-    reasons.push({ weight: 5, text: `You both love ${label.toLowerCase()}` });
+  // Shared taxonomy categories - the goal match rides on the shared
+  // relationship category (same goalValue), interests/availability/
+  // community on theirs. Each shared category adds its scoringWeight.
+  const candidateCategoryIds = new Set(categoriesForProfile(candidate).map((c) => c.id));
+  const shared = categoriesForProfile(viewer)
+    .filter((c) => candidateCategoryIds.has(c.id))
+    .sort((a, b) => b.scoringWeight - a.scoringWeight);
+  pts += Math.min(
+    W.taxonomy,
+    shared.reduce((sum, c) => sum + c.scoringWeight, 0),
+  );
+  const pairSeed = `${viewer.userId}:${candidate.userId}`;
+  for (const cat of shared) {
+    storyReasons.push({
+      weight: cat.scoringWeight,
+      text: pickTemplate(cat.matchReasonTemplates, `${pairSeed}:${cat.id}`),
+    });
   }
 
   // Location
   if (viewer.city && candidate.city && viewer.city === candidate.city) {
     pts += W.location;
-    reasons.push({ weight: W.location, text: `Both in ${candidate.city}` });
+    reasons.push({ weight: W.location, text: `You're both in ${candidate.city}.` });
   } else if (
     viewer.latitude != null && viewer.longitude != null &&
     candidate.latitude != null && candidate.longitude != null &&
     haversineKm(viewer.latitude, viewer.longitude, candidate.latitude, candidate.longitude) <= 25
   ) {
     pts += 12;
-    reasons.push({ weight: 12, text: "Less than 25 km apart" });
+    reasons.push({ weight: 12, text: "You're less than 25 km apart." });
   } else if (viewer.country === candidate.country) {
     pts += 8;
   }
@@ -121,8 +126,9 @@ export function computeCompatibility(
   const langShared = candidate.languages.filter((l) => viewer.languages.includes(l));
   if (langShared.length > 0) {
     pts += W.languages;
-    if (langShared.some((l) => l !== "English"))
-      reasons.push({ weight: W.languages, text: `Speaks ${langShared.find((l) => l !== "English")}` });
+    const beyondEnglish = langShared.find((l) => l !== "English");
+    if (beyondEnglish)
+      reasons.push({ weight: W.languages, text: `You both speak ${beyondEnglish}.` });
   }
 
   // Lifestyle similarity (declared habits only)
@@ -131,37 +137,26 @@ export function computeCompatibility(
   if (viewer.drinking !== "PREFER_NOT_TO_SAY" && viewer.drinking === candidate.drinking) lifestyle += 3;
   if (viewer.exercise && viewer.exercise === candidate.exercise) lifestyle += 3;
   pts += Math.min(W.lifestyle, lifestyle);
-  if (lifestyle >= 7) reasons.push({ weight: lifestyle, text: "Similar lifestyle" });
-
-  // Personality + community overlap
-  const persShared = candidate.personalityTags.filter((t) => viewer.personalityTags.includes(t));
-  pts += Math.min(W.personality, persShared.length * 4);
-  if (persShared.length > 0) reasons.push({ weight: persShared.length * 4, text: "Similar vibe" });
-  const commShared = candidate.communityTags.filter((t) => viewer.communityTags.includes(t));
-  pts += Math.min(W.community, commShared.length * 3);
+  if (lifestyle >= 7) reasons.push({ weight: lifestyle, text: "Your day-to-day habits line up." });
 
   // Age preference fit
   const cAge = ageOf(candidate.birthDate);
   if (cAge >= viewer.minAge && cAge <= viewer.maxAge) pts += W.agePref;
 
-  // Trust + liveliness
-  if (meta.isVerified) {
-    pts += W.verified;
-    reasons.push({ weight: W.verified, text: "Photo verified" });
-  }
+  // Trust + liveliness: points only - these facts live in the trust
+  // row of the UI and are never part of the top story reasons.
+  if (meta.isVerified) pts += W.verified;
   if (Date.now() - meta.lastActiveAt.getTime() < 24 * 3600_000) pts += W.activity;
-  if (Date.now() - meta.createdAt.getTime() < 7 * 24 * 3600_000) {
-    pts += W.freshness;
-    reasons.push({ weight: W.freshness, text: "New this week" });
-  }
-  if (meta.isOnline) {
-    pts += W.online;
-    reasons.push({ weight: W.online, text: "Online right now" });
-  }
+  if (Date.now() - meta.createdAt.getTime() < 7 * 24 * 3600_000) pts += W.freshness;
+  if (meta.isOnline) pts += W.online;
 
   const score = Math.round(55 + (pts / MAX) * 44);
+  const byWeight = (a: { weight: number }, b: { weight: number }) => b.weight - a.weight;
   return {
     score: Math.min(99, score),
-    reasons: reasons.sort((a, b) => b.weight - a.weight).slice(0, 3).map((r) => r.text),
+    reasons: [...storyReasons.sort(byWeight), ...reasons.sort(byWeight)]
+      .slice(0, 3)
+      .map((r) => r.text),
+    sharedCategoryIds: shared.map((c) => c.id),
   };
 }

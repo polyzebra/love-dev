@@ -1,5 +1,6 @@
 "use client";
 
+import { GOAL_LINES } from "@/lib/discovery/taxonomy";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
@@ -30,13 +31,7 @@ export type ViewerProfile = {
   interests: { label: string; shared: boolean }[];
 };
 
-const GOAL_LABELS: Record<string, string> = {
-  LONG_TERM: "Looking for something real",
-  SHORT_TERM: "Keeping it light for now",
-  OPEN_TO_EITHER: "Open to where it goes",
-  FRIENDSHIP: "Here for real friendship",
-  FIGURING_OUT: "Figuring it out",
-};
+const GOAL_LABELS: Record<string, string> = GOAL_LINES;
 
 /** One swipeable "page" of the story: a photo or a prompt answer. */
 type StoryPage =

@@ -79,7 +79,7 @@ export default async function ExploreCategoryPage({
           }
           action={
             <Button variant="outline" className="rounded-full" asChild>
-              <Link href={hasFilters ? `/explore/${slug}` : "/settings"}>{hasFilters ? "Clear filters" : "Update profile"}</Link>
+              <Link href={hasFilters ? `/explore/${slug}` : "/profile"}>{hasFilters ? "Clear filters" : "Add this to your profile"}</Link>
             </Button>
           }
         />

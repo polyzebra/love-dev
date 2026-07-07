@@ -3,24 +3,17 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import {
-  Coffee, UtensilsCrossed, Headphones, Leaf, Plane, PawPrint, Dumbbell,
-  Gamepad2, Palette, Camera, BookOpen, Clapperboard, Car, Cpu,
-  HeartHandshake, Gem, Church, Users, Sparkles, MoonStar, CalendarHeart,
-  CupSoda, Footprints, UtensilsCrossed as Dinner, Snail, Zap, Mountain,
-  Sunrise, Moon, MapPin, GraduationCap, Baby, Dog, type LucideIcon,
+  ArrowRight, CalendarDays, Clapperboard, Clover, Coffee, Compass, Crown,
+  CupSoda, Dumbbell, Footprints, Gamepad2, Gem, Globe, Heart, Music,
+  Palette, Sparkles, TreePine, Users, UtensilsCrossed, Zap, type LucideIcon,
 } from "lucide-react";
 import { SPRING } from "@/lib/motion";
 
+/** Keyed by the Lucide icon names used in src/lib/discovery/taxonomy.ts. */
 const ICONS: Record<string, LucideIcon> = {
-  coffee: Coffee, food: UtensilsCrossed, music: Headphones, nature: Leaf,
-  travel: Plane, pets: PawPrint, gym: Dumbbell, gaming: Gamepad2,
-  creative: Palette, photo: Camera, reading: BookOpen, movies: Clapperboard,
-  cars: Car, tech: Cpu, "long-term": HeartHandshake, ring: Gem,
-  marriage: Church, friends: Users, casual: Sparkles, tonight: MoonStar,
-  weekend: CalendarHeart, "coffee-now": CupSoda, walk: Footprints,
-  dinner: Dinner, introvert: Snail, extrovert: Zap, adventure: Mountain,
-  "early-bird": Sunrise, "night-owl": Moon, "map-ie": MapPin, "map-uk": MapPin,
-  expat: Plane, student: GraduationCap, parent: Baby, "dog-lover": Dog,
+  Sparkles, CupSoda, Footprints, CalendarDays, Heart, Gem, Zap, Users,
+  Compass, Coffee, UtensilsCrossed, Music, TreePine, Dumbbell, Gamepad2,
+  Clapperboard, Palette, Clover, Crown, Globe,
 };
 
 /**
@@ -29,17 +22,21 @@ const ICONS: Record<string, LucideIcon> = {
  * when the category provides one.
  */
 export function ExploreCard3DVisual({
-  iconKey, imageUrl, from, to, title,
-}: { iconKey: string; imageUrl?: string | null; from: string; to: string; title: string }) {
+  iconKey, imageUrl, from, to, title, size = "lg",
+}: {
+  iconKey: string; imageUrl?: string | null; from: string; to: string;
+  title: string; size?: "md" | "lg";
+}) {
+  const box = size === "lg" ? "size-24" : "size-20";
   if (imageUrl) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={imageUrl} alt="" className="size-24 object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.45)]" />;
+    return <img src={imageUrl} alt="" className={`${box} object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.45)]`} />;
   }
   const Icon = ICONS[iconKey] ?? Sparkles;
   return (
     <span
       aria-hidden="true"
-      className="animate-float-slow relative flex size-24 items-center justify-center rounded-[30%]"
+      className={`animate-float-slow relative flex ${box} items-center justify-center rounded-[30%]`}
       style={{
         background: `radial-gradient(120% 120% at 30% 20%, ${from} 0%, ${to} 62%, color-mix(in oklab, ${to} 55%, black) 100%)`,
         boxShadow: `inset 0 2px 6px rgba(255,255,255,0.5), inset 0 -10px 18px rgba(0,0,0,0.35), 0 18px 30px -12px color-mix(in oklab, ${to} 60%, black)`,
@@ -47,7 +44,11 @@ export function ExploreCard3DVisual({
     >
       {/* specular highlight */}
       <span className="absolute left-3 top-2 h-5 w-10 rounded-full bg-white/45 blur-[6px]" />
-      <Icon className="relative size-11 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" strokeWidth={1.8} aria-label={title} />
+      <Icon
+        className={`relative ${size === "lg" ? "size-11" : "size-9"} text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]`}
+        strokeWidth={1.8}
+        aria-label={title}
+      />
     </span>
   );
 }
@@ -55,33 +56,79 @@ export function ExploreCard3DVisual({
 export type ExploreCardData = {
   slug: string; title: string; description?: string | null; iconKey: string;
   imageUrl?: string | null; gradientFrom: string; gradientTo: string;
-  count: number; saved: boolean;
+  count: number; onlineCount: number; saved: boolean;
 };
 
 export function ExploreCard({ card }: { card: ExploreCardData }) {
+  const empty = card.count === 0;
   return (
-    <motion.div whileTap={{ scale: 0.97 }} transition={SPRING.snappy}>
-      <Link
-        href={`/explore/${card.slug}`}
-        className="group relative flex h-[230px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-card transition-shadow hover:shadow-float"
-        aria-label={`${card.title}, ${card.count} people`}
-      >
+    <motion.div whileTap={{ scale: 0.97 }} transition={SPRING.snappy} className="h-full">
+      <div className="group relative flex h-full min-h-[248px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-card transition-shadow hover:shadow-float">
+        {/* Whole-card link, stretched under the content */}
+        <Link
+          href={`/explore/${card.slug}`}
+          className="absolute inset-0 z-[1] rounded-3xl"
+          aria-label={
+            empty
+              ? `${card.title}, be the first - see people`
+              : `${card.title}, ${card.count} people${card.onlineCount > 0 ? `, ${card.onlineCount} online` : ""} - see people`
+          }
+        />
         {/* ambient category tint */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-25 transition-opacity duration-300 group-hover:opacity-40"
           style={{ background: `radial-gradient(140% 100% at 50% 0%, ${card.gradientFrom}66, transparent 65%)` }}
         />
-        <div className="relative flex flex-1 items-center justify-center pt-4">
-          <ExploreCard3DVisual iconKey={card.iconKey} imageUrl={card.imageUrl} from={card.gradientFrom} to={card.gradientTo} title={card.title} />
-        </div>
-        <div className="relative flex items-end justify-between p-4">
-          <span className="text-base font-semibold tracking-tight">{card.title}</span>
-          <span className="glass-chip rounded-full px-2.5 py-0.5 text-xs font-medium tabular-nums text-foreground/90">
-            {card.count}
+        {card.saved && (
+          <span className="glass-chip pointer-events-none absolute right-3 top-3 z-[2] rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">
+            Yours
           </span>
+        )}
+        <div className="pointer-events-none relative flex flex-1 items-center justify-center pt-5">
+          <ExploreCard3DVisual
+            iconKey={card.iconKey}
+            imageUrl={card.imageUrl}
+            from={card.gradientFrom}
+            to={card.gradientTo}
+            title={card.title}
+            size="md"
+          />
         </div>
-      </Link>
+        <div className="pointer-events-none relative space-y-1 p-4 pt-3">
+          <p className="truncate text-base font-semibold tracking-tight">{card.title}</p>
+          {card.description && <p className="truncate text-xs text-muted-foreground">{card.description}</p>}
+          <div className="flex items-end justify-between gap-3 pt-2">
+            {empty ? (
+              <span className="flex min-w-0 flex-col text-xs">
+                <span className="text-muted-foreground">Be the first</span>
+                <Link
+                  href="/profile"
+                  className="pointer-events-auto relative z-[2] truncate font-medium text-gold/80 underline-offset-4 hover:underline"
+                >
+                  Add this to your profile
+                </Link>
+              </span>
+            ) : (
+              <span className="flex min-w-0 items-center gap-2.5 text-xs text-muted-foreground">
+                <span className="font-medium tabular-nums text-foreground/90">
+                  {card.count} {card.count === 1 ? "person" : "people"}
+                </span>
+                {card.onlineCount > 0 && (
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <span aria-hidden="true" className="size-1.5 rounded-full bg-emerald-400" />
+                    <span className="tabular-nums">{card.onlineCount} online</span>
+                  </span>
+                )}
+              </span>
+            )}
+            <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-gold">
+              See people
+              <ArrowRight aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </span>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }

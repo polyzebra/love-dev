@@ -1,3 +1,4 @@
+import { GOAL_LINES } from "@/lib/discovery/taxonomy";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -27,13 +28,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 export const metadata: Metadata = { title: "Profile" };
 export const dynamic = "force-dynamic";
 
-const GOAL_LABELS: Record<string, string> = {
-  LONG_TERM: "Looking for something real",
-  SHORT_TERM: "Keeping it light for now",
-  OPEN_TO_EITHER: "Open to where it goes",
-  FRIENDSHIP: "Here for real friendship",
-  FIGURING_OUT: "Figuring it out",
-};
+const GOAL_LABELS: Record<string, string> = GOAL_LINES;
 
 function coverGradient(seed: string): string {
   const hues = [346, 12, 262, 200];

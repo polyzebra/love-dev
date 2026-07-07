@@ -8,8 +8,7 @@ export async function GET() {
   const limited = await guardRate(`api:${user.id}`, RATE_LIMITS.api);
   if (limited) return limited;
 
-  const categories = await getExploreCategories(user.id);
-  const grouped: Record<string, typeof categories> = {};
-  for (const c of categories) (grouped[c.group] ??= []).push(c);
-  return ok(grouped);
+  // Already grouped by taxonomy group, sorted and counted by the service.
+  const groups = await getExploreCategories(user.id);
+  return ok(groups);
 }

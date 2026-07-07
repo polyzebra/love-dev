@@ -38,6 +38,7 @@ enum Gender {
 
 enum RelationshipGoal {
   LONG_TERM
+  MARRIAGE_MINDED
   SHORT_TERM
   OPEN_TO_EITHER
   FRIENDSHIP
@@ -298,7 +299,7 @@ model Profile {
 
   languages String[] @default([])
 
-  // Structured discovery tags (canonical values in src/config/discovery-taxonomy.ts)
+  // Structured discovery tags (canonical values in src/lib/discovery/taxonomy.ts)
   availabilityTags String[] @default([])
   personalityTags  String[] @default([])
   communityTags    String[] @default([])

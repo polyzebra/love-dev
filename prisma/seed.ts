@@ -13,7 +13,7 @@ const db = new PrismaClient({ adapter });
 
 const INTERESTS: { category: string; items: string[] }[] = [
   { category: "Going out", items: ["Live music", "Pubs", "Comedy", "Theatre", "Festivals", "Foodie", "Coffee dates"] },
-  { category: "Staying in", items: ["Cooking", "Baking", "Board games", "Gardening", "Reading", "Films", "Podcasts"] },
+  { category: "Staying in", items: ["Cooking", "Baking", "Board games", "Gardening", "Reading", "Films", "TV series", "Gaming", "Podcasts"] },
   { category: "Sports", items: ["GAA", "Rugby", "Football", "Running", "Gym", "Sea swimming", "Hiking", "Yoga", "Cycling", "Golf"] },
   { category: "Creativity", items: ["Photography", "Writing", "Painting", "Music", "Dancing", "Crafts"] },
   { category: "Values & lifestyle", items: ["Volunteering", "Sustainability", "Politics", "Spirituality", "Travel", "Languages", "Dogs", "Cats"] },
@@ -123,30 +123,87 @@ main()
   });
 
 // ---------------------------------------------------------------------------
-// Explore categories
+// Explore categories - built 1:1 from the canonical discovery taxonomy
+// (src/lib/discovery/taxonomy.ts). Exactly the 20 taxonomy categories exist
+// as ExploreCategory rows; anything else is deleted. Profile interests and
+// tags are never touched here - retired categories live on as secondary
+// profile attributes only.
 // ---------------------------------------------------------------------------
-import { DISCOVERY_TAXONOMY } from "../src/config/discovery-taxonomy";
-async function seedExplore() {
-for (let i = 0; i < DISCOVERY_TAXONOMY.length; i++) {
-  const c = DISCOVERY_TAXONOMY[i];
-  await db.exploreCategory.upsert({
-    where: { slug: c.id },
-    create: { slug: c.id, title: c.label, group: c.group, description: c.description, iconKey: c.icon, gradientFrom: c.gradientFrom, gradientTo: c.gradientTo, matcher: c.matchingRule, sortOrder: i, isActive: true },
-    update: { title: c.label, group: c.group, description: c.description, iconKey: c.icon, gradientFrom: c.gradientFrom, gradientTo: c.gradientTo, matcher: c.matchingRule, sortOrder: i },
-  });
+import { exploreCategories } from "../src/lib/discovery/taxonomy";
+import type { TaxonomyCategory, TaxonomyGroup } from "../src/lib/discovery/taxonomy";
+import type { ExploreGroup } from "../src/generated/prisma/enums";
+
+const GROUP_TO_ENUM: Record<TaxonomyGroup, ExploreGroup> = {
+  "right-now": "TODAY",
+  relationship: "GOALS",
+  lifestyle: "LIFESTYLE",
+  interests: "INTERESTS",
+  community: "COMMUNITIES",
+};
+
+/** Premium gradient pair for each taxonomy colour token. */
+const GRADIENTS: Record<TaxonomyCategory["colorToken"], { from: string; to: string }> = {
+  rose: { from: "#fb7185", to: "#be123c" },
+  amber: { from: "#fbbf24", to: "#b45309" },
+  emerald: { from: "#34d399", to: "#047857" },
+  sky: { from: "#38bdf8", to: "#0369a1" },
+  violet: { from: "#a78bfa", to: "#6d28d9" },
+  gold: { from: "#eac557", to: "#96690e" },
+};
+
+/** Matcher JSON consumed by membershipWhere() in src/lib/services/explore.ts. */
+function matcherFor(c: TaxonomyCategory): { kind: string; values: string[] } {
+  switch (c.profileFieldMapping) {
+    case "availabilityTags":
+      return { kind: "availability", values: [c.id] };
+    case "relationshipGoal":
+      return { kind: "goal", values: [c.goalValue!] };
+    case "interests":
+      return { kind: "interests", values: c.interestSlugs ?? [] };
+    case "communityTags":
+      return { kind: "community", values: [c.id] };
+  }
 }
-console.log(`✓ ${DISCOVERY_TAXONOMY.length} explore categories (from taxonomy)`);
+
+async function seedExplore() {
+  const cats = exploreCategories();
+  // Stale categories (old taxonomy) disappear from Explore entirely.
+  // UserExplorePreference rows cascade with the category (onDelete: Cascade).
+  const { count: removed } = await db.exploreCategory.deleteMany({
+    where: { slug: { notIn: cats.map((c) => c.slug) } },
+  });
+  for (let i = 0; i < cats.length; i++) {
+    const c = cats[i];
+    const data = {
+      title: c.label,
+      description: c.description,
+      group: GROUP_TO_ENUM[c.group],
+      iconKey: c.icon,
+      gradientFrom: GRADIENTS[c.colorToken].from,
+      gradientTo: GRADIENTS[c.colorToken].to,
+      matcher: matcherFor(c),
+      sortOrder: i,
+      isActive: true,
+    };
+    await db.exploreCategory.upsert({
+      where: { slug: c.slug },
+      create: { slug: c.slug, ...data },
+      update: data,
+    });
+  }
+  const total = await db.exploreCategory.count();
+  console.log(`✓ ${cats.length} explore categories from taxonomy (${removed} stale removed, ${total} total)`);
 }
 
 async function seedExtras() {
     // Spread structured tags across demo profiles so every Explore group has people
 const TAG_SPREADS = [
-  { availabilityTags: ["free-tonight", "coffee-now"], personalityTags: ["extrovert", "night-owl"], communityTags: ["dog-lover"] },
-  { availabilityTags: ["weekend-plans"], personalityTags: ["introvert", "early-bird"], communityTags: ["student"] },
-  { availabilityTags: ["walk-together", "weekend-plans"], personalityTags: ["adventurer"], communityTags: ["expat"] },
-  { availabilityTags: ["dinner-tonight"], personalityTags: ["extrovert"], communityTags: ["parent"] },
-  { availabilityTags: ["coffee-now", "free-tonight"], personalityTags: ["night-owl", "adventurer"], communityTags: ["expat", "dog-lover"] },
-  { availabilityTags: ["weekend-plans", "dinner-tonight"], personalityTags: ["introvert"], communityTags: ["student", "dog-lover"] },
+  { availabilityTags: ["free-tonight", "coffee-now"], personalityTags: ["extrovert", "night-owl"], communityTags: ["irish"] },
+  { availabilityTags: ["weekend-plans"], personalityTags: ["introvert", "early-bird"], communityTags: ["uk"] },
+  { availabilityTags: ["walk-together", "weekend-plans"], personalityTags: ["adventurer"], communityTags: ["international"] },
+  { availabilityTags: ["free-tonight"], personalityTags: ["extrovert"], communityTags: ["irish"] },
+  { availabilityTags: ["coffee-now", "free-tonight"], personalityTags: ["night-owl", "adventurer"], communityTags: ["uk", "international"] },
+  { availabilityTags: ["weekend-plans", "coffee-now"], personalityTags: ["introvert"], communityTags: ["irish", "international"] },
 ];
 const demoProfiles = await db.profile.findMany({
   where: { user: { email: { endsWith: "@demo.virelsy.app" } } },
@@ -163,8 +220,8 @@ await db.user.updateMany({
 console.log(`✓ structured tags on ${demoProfiles.length} demo profiles`);
 // Expand the demo cast to 12 so every taxonomy circle has people (dev only)
 const EXTRA = [
-  { name: "Nia", gender: "WOMAN", goal: "SHORT_TERM", country: "GB", city: "Bristol", interests: ["films", "tech"], tags: TAG_SPREADS[0] },
-  { name: "Tomas", gender: "MAN", goal: "LONG_TERM", country: "IE", city: "Limerick", interests: ["photography", "hiking"], tags: TAG_SPREADS[1] },
+  { name: "Nia", gender: "WOMAN", goal: "SHORT_TERM", country: "GB", city: "Bristol", interests: ["films", "gaming"], tags: TAG_SPREADS[0] },
+  { name: "Tomas", gender: "MAN", goal: "MARRIAGE_MINDED", country: "IE", city: "Limerick", interests: ["photography", "hiking"], tags: TAG_SPREADS[1] },
   { name: "Freya", gender: "WOMAN", goal: "FRIENDSHIP", country: "GB", city: "Leeds", interests: ["reading", "crafts"], tags: TAG_SPREADS[2] },
   { name: "Marco", gender: "MAN", goal: "OPEN_TO_EITHER", country: "IE", city: "Waterford", interests: ["cooking", "travel"], tags: TAG_SPREADS[3] },
   { name: "Priya", gender: "WOMAN", goal: "LONG_TERM", country: "GB", city: "Birmingham", interests: ["live-music", "gym"], tags: TAG_SPREADS[4] },

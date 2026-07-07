@@ -27,6 +27,8 @@ import { SPRING } from "@/lib/motion";
 import { useDominantColor, type RGB } from "@/hooks/use-dominant-color";
 import type { DiscoverProfile } from "@/lib/services/discovery";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
+import { byId, pickTemplate, type TaxonomyCategory } from "@/lib/discovery/taxonomy";
+import { messageFromTemplate } from "@/lib/assistant";
 import { cn, formatDistance } from "@/lib/utils";
 
 type SwipeAction = "LIKE" | "PASS" | "SUPER_LIKE";
@@ -50,20 +52,11 @@ const NON_STORY_REASONS = new Set([
 ]);
 
 /**
- * ONE human line for the card face: real shared interests first, then the
- * scoring engine's most human reason, then the person's own prompt answer.
- * Never invented - every branch traces to real data.
+ * ONE human line for the card face: the server's taxonomy-driven reason
+ * first, then the person's own prompt answer. Never invented - every
+ * branch traces to real data.
  */
-function storyFor(profile: DiscoverProfile, viewer: ViewerContext | null): Story | null {
-  const mine = new Set(viewer?.interests ?? []);
-  const shared = profile.interests.filter((i) => mine.has(i));
-  if (shared.length >= 2)
-    return {
-      kind: "reason",
-      text: `You both like ${shared[0].toLowerCase()} and ${shared[1].toLowerCase()}`,
-    };
-  if (shared.length === 1)
-    return { kind: "reason", text: `You both love ${shared[0].toLowerCase()}` };
+function storyFor(profile: DiscoverProfile): Story | null {
   const human = profile.reasons.find((r) => !NON_STORY_REASONS.has(r));
   if (human) return { kind: "reason", text: human };
   if (profile.promptTease) return { kind: "prompt", ...profile.promptTease };
@@ -75,27 +68,42 @@ function lowerLabel(label: string): string {
   return label.charAt(0).toLowerCase() + label.slice(1);
 }
 
-const SHARED_GOAL_LINES: Record<RelationshipGoal, string> = {
-  LONG_TERM: "You both want something long-term",
-  SHORT_TERM: "You both want to keep it light",
-  OPEN_TO_EITHER: "You're both open to where it goes",
-  FRIENDSHIP: "You both want real friendship",
-  FIGURING_OUT: "You're both still figuring it out",
-};
+/** Taxonomy categories the pair shares, as resolved category objects. */
+function sharedCategories(profile: DiscoverProfile): TaxonomyCategory[] {
+  return profile.sharedCategoryIds
+    .map((id) => byId.get(id))
+    .filter((c): c is TaxonomyCategory => c != null);
+}
 
-/** Up to 3 REAL overlaps between viewer and match - never invented. */
-function sharedContextChips(viewer: ViewerContext | null, profile: DiscoverProfile): string[] {
-  if (!viewer) return [];
-  const chips: string[] = [];
-  if (viewer.goal && viewer.goal === profile.relationshipGoal)
-    chips.push(SHARED_GOAL_LINES[profile.relationshipGoal]);
-  const mine = new Set(viewer.interests);
-  for (const interest of profile.interests) {
-    if (mine.has(interest)) chips.push(`You both chose ${interest}`);
-  }
-  if (viewer.city && profile.city && viewer.city === profile.city)
-    chips.push(`You're both in ${profile.city}`);
-  return chips.slice(0, 3);
+/**
+ * Up to 3 REAL overlaps for the match dialog, in taxonomy language:
+ * the shared relationship-goal category first, then a shared lifestyle
+ * or right-now category, then a shared interest category. Never invented.
+ */
+function sharedContextChips(profile: DiscoverProfile): string[] {
+  const shared = sharedCategories(profile);
+  const first = (...groups: TaxonomyCategory["group"][]) =>
+    shared.find((c) => groups.includes(c.group)) ?? null;
+  return [first("relationship"), first("lifestyle", "right-now"), first("interests")]
+    .filter((c): c is TaxonomyCategory => c != null)
+    .map((c) => pickTemplate(c.matchReasonTemplates, `${profile.userId}:${c.id}`))
+    .slice(0, 3);
+}
+
+/**
+ * Suggested first message from the strongest shared category's chat
+ * prompt templates - the CTA label is the coach-voice template, the
+ * prefilled composer text its ready-to-send form.
+ */
+function suggestedOpener(profile: DiscoverProfile): { label: string; send: string } | null {
+  const strongest = sharedCategories(profile)[0]; // server sorts by weight
+  if (!strongest) return null;
+  const template = pickTemplate(
+    strongest.chatPromptTemplates,
+    `${profile.userId}:${strongest.id}`,
+  );
+  if (!template) return null;
+  return { label: template.replace(/\.$/, ""), send: messageFromTemplate(template) };
 }
 
 const EXIT_VELOCITY = 600;
@@ -339,10 +347,12 @@ export function SwipeDeck({
   const next = deck[1];
 
   // ONE human line for the card on top - real data only
-  const story = top ? storyFor(top, viewer) : null;
+  const story = top ? storyFor(top) : null;
 
-  // Shared-context moment for the match dialog - only real overlaps
-  const matchChips = matchedWith ? sharedContextChips(viewer, matchedWith) : [];
+  // Shared-context moment for the match dialog - only real taxonomy overlaps
+  const matchChips = matchedWith ? sharedContextChips(matchedWith) : [];
+  const opener = matchedWith ? suggestedOpener(matchedWith) : null;
+  // Fallback CTA when no taxonomy category is shared but an interest is
   const firstSharedInterest =
     matchedWith && viewer
       ? matchedWith.interests.find((i) => viewer.interests.includes(i)) ?? null
@@ -577,7 +587,15 @@ export function SwipeDeck({
             <Button className="h-12 rounded-full" asChild>
               <Link href={matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}>Say hello</Link>
             </Button>
-            {firstSharedInterest && (
+            {opener ? (
+              <Button variant="outline" className="h-11 rounded-full" asChild>
+                <Link
+                  href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(opener.send)}`}
+                >
+                  {opener.label}
+                </Link>
+              </Button>
+            ) : firstSharedInterest ? (
               <Button variant="outline" className="h-11 rounded-full" asChild>
                 <Link
                   href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(
@@ -587,7 +605,7 @@ export function SwipeDeck({
                   Ask about {firstSharedInterest.toLowerCase()}
                 </Link>
               </Button>
-            )}
+            ) : null}
             <Button variant="ghost" className="rounded-full" onClick={() => setMatchedWith(null)}>
               Keep swiping
             </Button>
