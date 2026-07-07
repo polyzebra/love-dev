@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { db } from "@/lib/db";
 
 /**
  * OAuth / magic-link callback: exchanges the auth code for a Supabase
@@ -26,7 +27,27 @@ export async function GET(request: NextRequest) {
         },
       },
     );
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data: exchanged, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && exchanged.user?.email) {
+      const u = exchanged.user;
+      const email = u.email!;
+      // Adopt any legacy row sharing this email, then ensure the app row
+      const legacy = await db.user.findUnique({ where: { email } });
+      if (legacy && legacy.id !== u.id) {
+        await db.user.update({ where: { email }, data: { id: u.id } }).catch(() => {});
+      }
+      await db.user.upsert({
+        where: { id: u.id },
+        create: {
+          id: u.id,
+          email,
+          emailVerified: u.email_confirmed_at ? new Date(u.email_confirmed_at) : null,
+          name: (u.user_metadata?.full_name as string | undefined) ?? null,
+          image: (u.user_metadata?.avatar_url as string | undefined) ?? null,
+        },
+        update: { email, lastActiveAt: new Date() },
+      });
+    }
     if (error) {
       console.error(`[auth:callback] exchange failed: ${error.message}`);
       return NextResponse.redirect(new URL("/login?error=OAuthCallbackError", url.origin));

@@ -1,18 +1,12 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { AppNav } from "@/components/app/app-nav";
 import { Aurora } from "@/components/fx/aurora";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/login");
-
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    select: { onboardingDone: true, status: true },
-  });
-  if (!user || user.status === "DELETED") redirect("/login");
+  // Central guard: Supabase session + auth user + app user + status
+  const user = await requireUser();
   if (!user.onboardingDone) redirect("/onboarding");
 
   return (

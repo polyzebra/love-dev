@@ -135,6 +135,9 @@ export type ProfileCountAggregateOutputType = {
   education: number
   school: number
   languages: number
+  availabilityTags: number
+  personalityTags: number
+  communityTags: number
   smoking: number
   drinking: number
   exercise: number
@@ -264,6 +267,9 @@ export type ProfileCountAggregateInputType = {
   education?: true
   school?: true
   languages?: true
+  availabilityTags?: true
+  personalityTags?: true
+  communityTags?: true
   smoking?: true
   drinking?: true
   exercise?: true
@@ -388,6 +394,9 @@ export type ProfileGroupByOutputType = {
   education: $Enums.EducationLevel | null
   school: string | null
   languages: string[]
+  availabilityTags: string[]
+  personalityTags: string[]
+  communityTags: string[]
   smoking: $Enums.LifestyleFrequency
   drinking: $Enums.LifestyleFrequency
   exercise: $Enums.ExerciseLevel | null
@@ -448,6 +457,9 @@ export type ProfileWhereInput = {
   education?: Prisma.EnumEducationLevelNullableFilter<"Profile"> | $Enums.EducationLevel | null
   school?: Prisma.StringNullableFilter<"Profile"> | string | null
   languages?: Prisma.StringNullableListFilter<"Profile">
+  availabilityTags?: Prisma.StringNullableListFilter<"Profile">
+  personalityTags?: Prisma.StringNullableListFilter<"Profile">
+  communityTags?: Prisma.StringNullableListFilter<"Profile">
   smoking?: Prisma.EnumLifestyleFrequencyFilter<"Profile"> | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFilter<"Profile"> | $Enums.LifestyleFrequency
   exercise?: Prisma.EnumExerciseLevelNullableFilter<"Profile"> | $Enums.ExerciseLevel | null
@@ -487,6 +499,9 @@ export type ProfileOrderByWithRelationInput = {
   education?: Prisma.SortOrderInput | Prisma.SortOrder
   school?: Prisma.SortOrderInput | Prisma.SortOrder
   languages?: Prisma.SortOrder
+  availabilityTags?: Prisma.SortOrder
+  personalityTags?: Prisma.SortOrder
+  communityTags?: Prisma.SortOrder
   smoking?: Prisma.SortOrder
   drinking?: Prisma.SortOrder
   exercise?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -529,6 +544,9 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   education?: Prisma.EnumEducationLevelNullableFilter<"Profile"> | $Enums.EducationLevel | null
   school?: Prisma.StringNullableFilter<"Profile"> | string | null
   languages?: Prisma.StringNullableListFilter<"Profile">
+  availabilityTags?: Prisma.StringNullableListFilter<"Profile">
+  personalityTags?: Prisma.StringNullableListFilter<"Profile">
+  communityTags?: Prisma.StringNullableListFilter<"Profile">
   smoking?: Prisma.EnumLifestyleFrequencyFilter<"Profile"> | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFilter<"Profile"> | $Enums.LifestyleFrequency
   exercise?: Prisma.EnumExerciseLevelNullableFilter<"Profile"> | $Enums.ExerciseLevel | null
@@ -568,6 +586,9 @@ export type ProfileOrderByWithAggregationInput = {
   education?: Prisma.SortOrderInput | Prisma.SortOrder
   school?: Prisma.SortOrderInput | Prisma.SortOrder
   languages?: Prisma.SortOrder
+  availabilityTags?: Prisma.SortOrder
+  personalityTags?: Prisma.SortOrder
+  communityTags?: Prisma.SortOrder
   smoking?: Prisma.SortOrder
   drinking?: Prisma.SortOrder
   exercise?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -613,6 +634,9 @@ export type ProfileScalarWhereWithAggregatesInput = {
   education?: Prisma.EnumEducationLevelNullableWithAggregatesFilter<"Profile"> | $Enums.EducationLevel | null
   school?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   languages?: Prisma.StringNullableListFilter<"Profile">
+  availabilityTags?: Prisma.StringNullableListFilter<"Profile">
+  personalityTags?: Prisma.StringNullableListFilter<"Profile">
+  communityTags?: Prisma.StringNullableListFilter<"Profile">
   smoking?: Prisma.EnumLifestyleFrequencyWithAggregatesFilter<"Profile"> | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyWithAggregatesFilter<"Profile"> | $Enums.LifestyleFrequency
   exercise?: Prisma.EnumExerciseLevelNullableWithAggregatesFilter<"Profile"> | $Enums.ExerciseLevel | null
@@ -649,6 +673,9 @@ export type ProfileCreateInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -688,6 +715,9 @@ export type ProfileUncheckedCreateInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -725,6 +755,9 @@ export type ProfileUpdateInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -764,6 +797,9 @@ export type ProfileUncheckedUpdateInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -802,6 +838,9 @@ export type ProfileCreateManyInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -838,6 +877,9 @@ export type ProfileUpdateManyMutationInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -875,6 +917,9 @@ export type ProfileUncheckedUpdateManyInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -933,6 +978,9 @@ export type ProfileCountOrderByAggregateInput = {
   education?: Prisma.SortOrder
   school?: Prisma.SortOrder
   languages?: Prisma.SortOrder
+  availabilityTags?: Prisma.SortOrder
+  personalityTags?: Prisma.SortOrder
+  communityTags?: Prisma.SortOrder
   smoking?: Prisma.SortOrder
   drinking?: Prisma.SortOrder
   exercise?: Prisma.SortOrder
@@ -1082,6 +1130,18 @@ export type ProfileCreatelanguagesInput = {
   set: string[]
 }
 
+export type ProfileCreateavailabilityTagsInput = {
+  set: string[]
+}
+
+export type ProfileCreatepersonalityTagsInput = {
+  set: string[]
+}
+
+export type ProfileCreatecommunityTagsInput = {
+  set: string[]
+}
+
 export type ProfileCreateinterestedInInput = {
   set: $Enums.Gender[]
 }
@@ -1115,6 +1175,21 @@ export type NullableEnumEducationLevelFieldUpdateOperationsInput = {
 }
 
 export type ProfileUpdatelanguagesInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProfileUpdateavailabilityTagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProfileUpdatepersonalityTagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProfileUpdatecommunityTagsInput = {
   set?: string[]
   push?: string | string[]
 }
@@ -1180,6 +1255,9 @@ export type ProfileCreateWithoutUserInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -1217,6 +1295,9 @@ export type ProfileUncheckedCreateWithoutUserInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -1270,6 +1351,9 @@ export type ProfileUpdateWithoutUserInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -1307,6 +1391,9 @@ export type ProfileUncheckedUpdateWithoutUserInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -1344,6 +1431,9 @@ export type ProfileCreateWithoutInterestsInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -1382,6 +1472,9 @@ export type ProfileUncheckedCreateWithoutInterestsInput = {
   education?: $Enums.EducationLevel | null
   school?: string | null
   languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
   smoking?: $Enums.LifestyleFrequency
   drinking?: $Enums.LifestyleFrequency
   exercise?: $Enums.ExerciseLevel | null
@@ -1434,6 +1527,9 @@ export type ProfileUpdateWithoutInterestsInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -1472,6 +1568,9 @@ export type ProfileUncheckedUpdateWithoutInterestsInput = {
   education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
   school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
   smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
   exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
@@ -1540,6 +1639,9 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   education?: boolean
   school?: boolean
   languages?: boolean
+  availabilityTags?: boolean
+  personalityTags?: boolean
+  communityTags?: boolean
   smoking?: boolean
   drinking?: boolean
   exercise?: boolean
@@ -1580,6 +1682,9 @@ export type ProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   education?: boolean
   school?: boolean
   languages?: boolean
+  availabilityTags?: boolean
+  personalityTags?: boolean
+  communityTags?: boolean
   smoking?: boolean
   drinking?: boolean
   exercise?: boolean
@@ -1618,6 +1723,9 @@ export type ProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   education?: boolean
   school?: boolean
   languages?: boolean
+  availabilityTags?: boolean
+  personalityTags?: boolean
+  communityTags?: boolean
   smoking?: boolean
   drinking?: boolean
   exercise?: boolean
@@ -1656,6 +1764,9 @@ export type ProfileSelectScalar = {
   education?: boolean
   school?: boolean
   languages?: boolean
+  availabilityTags?: boolean
+  personalityTags?: boolean
+  communityTags?: boolean
   smoking?: boolean
   drinking?: boolean
   exercise?: boolean
@@ -1674,7 +1785,7 @@ export type ProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "displayName" | "bio" | "birthDate" | "gender" | "heightCm" | "relationshipGoal" | "city" | "region" | "country" | "latitude" | "longitude" | "occupation" | "employer" | "education" | "school" | "languages" | "smoking" | "drinking" | "exercise" | "religion" | "children" | "pets" | "interestedIn" | "minAge" | "maxAge" | "maxDistanceKm" | "isVisible" | "isBoosted" | "boostedUntil" | "completionPct" | "createdAt" | "updatedAt", ExtArgs["result"]["profile"]>
+export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "displayName" | "bio" | "birthDate" | "gender" | "heightCm" | "relationshipGoal" | "city" | "region" | "country" | "latitude" | "longitude" | "occupation" | "employer" | "education" | "school" | "languages" | "availabilityTags" | "personalityTags" | "communityTags" | "smoking" | "drinking" | "exercise" | "religion" | "children" | "pets" | "interestedIn" | "minAge" | "maxAge" | "maxDistanceKm" | "isVisible" | "isBoosted" | "boostedUntil" | "completionPct" | "createdAt" | "updatedAt", ExtArgs["result"]["profile"]>
 export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   interests?: boolean | Prisma.Profile$interestsArgs<ExtArgs>
@@ -1712,6 +1823,9 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     education: $Enums.EducationLevel | null
     school: string | null
     languages: string[]
+    availabilityTags: string[]
+    personalityTags: string[]
+    communityTags: string[]
     smoking: $Enums.LifestyleFrequency
     drinking: $Enums.LifestyleFrequency
     exercise: $Enums.ExerciseLevel | null
@@ -2171,6 +2285,9 @@ export interface ProfileFieldRefs {
   readonly education: Prisma.FieldRef<"Profile", 'EducationLevel'>
   readonly school: Prisma.FieldRef<"Profile", 'String'>
   readonly languages: Prisma.FieldRef<"Profile", 'String[]'>
+  readonly availabilityTags: Prisma.FieldRef<"Profile", 'String[]'>
+  readonly personalityTags: Prisma.FieldRef<"Profile", 'String[]'>
+  readonly communityTags: Prisma.FieldRef<"Profile", 'String[]'>
   readonly smoking: Prisma.FieldRef<"Profile", 'LifestyleFrequency'>
   readonly drinking: Prisma.FieldRef<"Profile", 'LifestyleFrequency'>
   readonly exercise: Prisma.FieldRef<"Profile", 'ExerciseLevel'>

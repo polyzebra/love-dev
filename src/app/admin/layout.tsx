@@ -11,7 +11,7 @@ import {
   Users,
   Compass
 } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth/require-user";
 import { isStaff } from "@/lib/rbac";
 import { Logo } from "@/components/shared/logo";
 import { Badge } from "@/components/ui/badge";
@@ -30,9 +30,7 @@ const NAV = [
 ] as const;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/login");
-  if (!isStaff(session.user.role)) redirect("/discover");
+  const adminUser = await requireAdmin();
 
   return (
     <div className="min-h-dvh bg-background">
@@ -59,9 +57,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </ul>
         </nav>
         <div className="border-t px-5 py-4 text-xs text-muted-foreground">
-          Signed in as {session.user.email}
+          Signed in as {adminUser.email}
           <br />
-          Role: {session.user.role}
+          Role: {adminUser.role}
         </div>
       </aside>
 

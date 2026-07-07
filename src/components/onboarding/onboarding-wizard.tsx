@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { INTEREST_CATALOGUE, LANGUAGES, BIO_MAX_LENGTH } from "@/lib/constants";
+import { AVAILABILITY_OPTIONS, COMMUNITY_OPTIONS, PERSONALITY_OPTIONS } from "@/config/discovery-taxonomy";
 import { calculateAge, cn } from "@/lib/utils";
 
 type WizardData = {
@@ -36,6 +37,9 @@ type WizardData = {
   children: string;
   pets: string;
   interests: string[];
+  availabilityTags: string[];
+  personalityTags: string[];
+  communityTags: string[];
 };
 
 const GENDERS = [
@@ -149,12 +153,15 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     children: "",
     pets: "",
     interests: [],
+    availabilityTags: [],
+    personalityTags: [],
+    communityTags: [],
   });
 
   const set = <K extends keyof WizardData>(key: K, value: WizardData[K]) =>
     setData((d) => ({ ...d, [key]: value }));
 
-  const toggleIn = (key: "interestedIn" | "languages" | "interests", value: string, max = 99) =>
+  const toggleIn = (key: "interestedIn" | "languages" | "interests" | "availabilityTags" | "personalityTags" | "communityTags", value: string, max = 99) =>
     setData((d) => {
       const list = d[key];
       if (list.includes(value)) return { ...d, [key]: list.filter((v) => v !== value) };
@@ -241,6 +248,9 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         children: data.children || null,
         pets: data.pets || null,
         interests: data.interests,
+        availabilityTags: data.availabilityTags,
+        personalityTags: data.personalityTags,
+        communityTags: data.communityTags,
       }),
     });
     setSubmitting(false);
@@ -662,6 +672,23 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   ))}
                 </div>
               </fieldset>
+              {/* Taxonomy: availability, vibe, communities - powers Explore */}
+              {([
+                ["availabilityTags", "Open to right now", AVAILABILITY_OPTIONS],
+                ["personalityTags", "Your vibe", PERSONALITY_OPTIONS],
+                ["communityTags", "Your circles", COMMUNITY_OPTIONS],
+              ] as const).map(([key, legend, options]) => (
+                <fieldset key={key} className="space-y-2">
+                  <legend className="text-sm font-medium">{legend}</legend>
+                  <div className="flex flex-wrap gap-2">
+                    {options.map((o) => (
+                      <ChipToggle key={o.id} selected={data[key].includes(o.id)} onToggle={() => toggleIn(key, o.id, 6)}>
+                        {o.label}
+                      </ChipToggle>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
               <fieldset className="space-y-2">
                 <legend className="text-sm font-medium">Pets</legend>
                 <div className="flex flex-wrap gap-2">

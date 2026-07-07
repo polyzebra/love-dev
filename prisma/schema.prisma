@@ -298,6 +298,11 @@ model Profile {
 
   languages String[] @default([])
 
+  // Structured discovery tags (canonical values in src/config/discovery-taxonomy.ts)
+  availabilityTags String[] @default([])
+  personalityTags  String[] @default([])
+  communityTags    String[] @default([])
+
   smoking  LifestyleFrequency @default(PREFER_NOT_TO_SAY)
   drinking LifestyleFrequency @default(PREFER_NOT_TO_SAY)
   exercise ExerciseLevel?

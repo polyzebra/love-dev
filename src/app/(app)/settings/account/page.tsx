@@ -62,6 +62,40 @@ export default async function AccountSettingsPage() {
     <>
       <PageHeader title="Account" description="Identity, verification and sign-in." />
 
+      {/* Trust score - real verification state, never faked */}
+      {(() => {
+        const score =
+          (user?.emailVerified ? 25 : 0) +
+          (user?.phoneVerified ? 25 : 0) +
+          (photoVerification?.status === "APPROVED" ? 35 : 0) +
+          (idVerification?.status === "APPROVED" ? 15 : 0);
+        const nextStep = !user?.phoneVerified
+          ? "Add phone verification to build trust with matches."
+          : photoVerification?.status !== "APPROVED"
+            ? "Photo verification increases profile trust the most."
+            : idVerification?.status !== "APPROVED"
+              ? "Optional ID verification completes your trust profile."
+              : "Fully verified - matches can trust who they're meeting.";
+        return (
+          <section className="glass mb-6 rounded-[28px] p-6" aria-label={`Trust score ${score} percent`}>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Trust score</p>
+                <p className="mt-1 font-display text-4xl font-medium tabular-nums">{score}%</p>
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">{nextStep}</p>
+              </div>
+              <div className="hidden text-right text-xs text-muted-foreground sm:block">
+                <p>Email +25 · Phone +25</p>
+                <p>Photo +35 · ID +15</p>
+              </div>
+            </div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full border border-white/8 bg-white/8">
+              <div className="h-full rounded-full bg-linear-90 from-[#fb4a6e] to-[#e7c9a1] shadow-[0_0_12px_rgba(225,29,72,0.4)] transition-[width] duration-700" style={{ width: `${score}%` }} />
+            </div>
+          </section>
+        );
+      })()}
+
       <Card className="mb-6 rounded-3xl">
         <CardHeader>
           <CardTitle className="text-base">Verification</CardTitle>

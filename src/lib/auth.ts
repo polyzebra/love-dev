@@ -35,34 +35,18 @@ export const auth = cache(async (): Promise<AppSession | null> => {
     `[auth:session] provider=${user.app_metadata?.provider ?? "?"} auth.uid=${user.id} email=${user.email}`,
   );
 
-  // One-time adoption: a row created by the previous auth system has
-  // this email under a different id. Re-key it to the Supabase auth
-  // uid so history stays attached to the right person.
-  const legacy = await db.user.findUnique({ where: { email: user.email } });
-  if (legacy && legacy.id !== user.id) {
-    await db.user
-      .update({ where: { email: user.email }, data: { id: user.id } })
-      .catch(() => {}); // FK references present -> leave as-is; upsert below reports the conflict
+  // Pure verification - the app row is created ONLY in /auth/callback.
+  // A session whose app user vanished (deleted account, revoked access)
+  // is terminated on the spot: sign out, clear cookies, return null.
+  const appUser = await db.user.findUnique({ where: { id: user.id } });
+  if (!appUser || appUser.status === "SUSPENDED" || appUser.status === "DELETED") {
+    console.warn(`[auth:guard] invalid app user for auth.uid=${user.id} - signing out`);
+    await supabase.auth.signOut().catch(() => {});
+    return null;
   }
-
-  // Ensure the app row exists, keyed by the Supabase auth user id.
-  const appUser = await db.user.upsert({
-    where: { id: user.id },
-    create: {
-      id: user.id,
-      email: user.email,
-      emailVerified: user.email_confirmed_at ? new Date(user.email_confirmed_at) : null,
-      name:
-        (user.user_metadata?.full_name as string | undefined) ??
-        (user.user_metadata?.name as string | undefined) ??
-        null,
-      image: (user.user_metadata?.avatar_url as string | undefined) ?? null,
-    },
-    // Keep email in sync with the auth identity; never touch role here
-    update: { email: user.email, lastActiveAt: new Date() },
-  });
-
-  if (appUser.status === "SUSPENDED" || appUser.status === "DELETED") return null;
+  db.user
+    .update({ where: { id: user.id }, data: { lastActiveAt: new Date() } })
+    .catch(() => {});
 
   return {
     user: {

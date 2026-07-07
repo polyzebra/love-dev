@@ -19,6 +19,9 @@ export type Matcher =
   | { kind: "interests"; values: string[] }
   | { kind: "goal"; values: string[] }
   | { kind: "country"; values: string[] }
+  | { kind: "availability"; values: string[] }
+  | { kind: "personality"; values: string[] }
+  | { kind: "community"; values: string[] }
   | { kind: "recentlyActive"; hours?: number }
   | { kind: "preference" };
 
@@ -60,6 +63,15 @@ function membershipWhere(categoryId: string, matcher: Matcher | null): Prisma.Us
       break;
     case "country":
       viaProfile = { profile: { is: { country: { in: matcher.values } } } };
+      break;
+    case "availability":
+      viaProfile = { profile: { is: { availabilityTags: { hasSome: matcher.values } } } };
+      break;
+    case "personality":
+      viaProfile = { profile: { is: { personalityTags: { hasSome: matcher.values } } } };
+      break;
+    case "community":
+      viaProfile = { profile: { is: { communityTags: { hasSome: matcher.values } } } };
       break;
     case "recentlyActive":
       viaProfile = {
