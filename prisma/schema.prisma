@@ -208,7 +208,6 @@ model User {
   emailVerified DateTime?
   phone         String?       @unique
   phoneVerified DateTime?
-  passwordHash  String?
   name          String?
   image         String?
   role          Role          @default(USER)
@@ -223,8 +222,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  accounts      Account[]
-  sessions      Session[]
   devices       Device[]
   profile       Profile?
   verifications Verification[]
@@ -253,62 +250,16 @@ model User {
   @@index([role])
 }
 
-// Auth.js OAuth accounts (Google, Apple)
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  deviceId     String?
-
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  device Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-}
-
-// One-time tokens: email verification, magic links, password reset, phone OTP
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  purpose    String   @default("email") // email | password-reset | phone-otp | magic-link
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@index([identifier, purpose])
-}
-
 model Device {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
   fingerprint String
   userAgent   String?
   platform    String?
   ip          String?
-  trusted     Boolean   @default(false)
-  lastSeenAt  DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  sessions    Session[]
+  trusted     Boolean  @default(false)
+  lastSeenAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -1,91 +1,82 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { cache } from "react";
 import { db } from "@/lib/db";
-import { authConfig } from "@/lib/auth.config";
-import { verifyPassword } from "@/lib/passwords";
-import { loginSchema } from "@/lib/validators/auth";
-import { rateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { supabaseServer } from "@/lib/supabase/server";
+import type { Role } from "@/generated/prisma/enums";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  ...authConfig,
-  adapter: PrismaAdapter(db),
-  providers: [
-    ...authConfig.providers,
-    Credentials({
-      name: "Email & password",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-        const { email, password } = parsed.data;
+/**
+ * Supabase-backed session, same shape the app has always consumed:
+ * `auth()` returns { user: { id, email, role, onboardingDone } } | null.
+ *
+ * Identity is the Supabase auth user id (auth.users.id) - NEVER email
+ * or display name. The app row in our User table is keyed by that id,
+ * so two Google accounts can never resolve to one profile.
+ */
 
-        // Brute-force protection per account identifier
-        const rl = await rateLimit(`login:${email}`, RATE_LIMITS.login);
-        if (!rl.ok) return null;
+export type AppSession = {
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+    image: string | null;
+    role: Role;
+    onboardingDone: boolean;
+  };
+};
 
-        const user = await db.user.findUnique({
-          where: { email },
-          include: { profile: { select: { id: true } } },
-        });
-        if (!user?.passwordHash) return null;
-        if (user.status === "SUSPENDED" || user.status === "DELETED") return null;
-        // Email must be confirmed before password sign-in is allowed
-        if (!user.emailVerified) return null;
+export const auth = cache(async (): Promise<AppSession | null> => {
+  const supabase = await supabaseServer();
+  // getUser() validates the JWT against Supabase Auth - source of truth
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) return null;
 
-        const valid = await verifyPassword(password, user.passwordHash);
-        if (!valid) return null;
+  console.info(
+    `[auth:session] provider=${user.app_metadata?.provider ?? "?"} auth.uid=${user.id} email=${user.email}`,
+  );
 
-        await db.user.update({
-          where: { id: user.id },
-          data: { lastActiveAt: new Date() },
-        });
+  // One-time adoption: a row created by the previous auth system has
+  // this email under a different id. Re-key it to the Supabase auth
+  // uid so history stays attached to the right person.
+  const legacy = await db.user.findUnique({ where: { email: user.email } });
+  if (legacy && legacy.id !== user.id) {
+    await db.user
+      .update({ where: { email: user.email }, data: { id: user.id } })
+      .catch(() => {}); // FK references present -> leave as-is; upsert below reports the conflict
+  }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          role: user.role,
-          onboardingDone: user.onboardingDone,
-        };
-      },
-    }),
-  ],
-  events: {
-    async signIn({ user, account, isNewUser }) {
-      // Identity audit line - answers "which provider account resolved
-      // to which app user" for every sign-in. No secrets logged.
-      console.info(
-        `[auth:signIn] provider=${account?.provider ?? "credentials"}` +
-          ` providerAccountId=${account?.providerAccountId ?? "-"}` +
-          ` user.id=${user.id} email=${user.email} newUser=${isNewUser ?? false}`,
-      );
-      if (user.id) {
-        await db.user
-          .update({ where: { id: user.id }, data: { lastActiveAt: new Date() } })
-          .catch(() => {});
-      }
+  // Ensure the app row exists, keyed by the Supabase auth user id.
+  const appUser = await db.user.upsert({
+    where: { id: user.id },
+    create: {
+      id: user.id,
+      email: user.email,
+      emailVerified: user.email_confirmed_at ? new Date(user.email_confirmed_at) : null,
+      name:
+        (user.user_metadata?.full_name as string | undefined) ??
+        (user.user_metadata?.name as string | undefined) ??
+        null,
+      image: (user.user_metadata?.avatar_url as string | undefined) ?? null,
     },
-    async signOut(message) {
-      const token = "token" in message ? message.token : null;
-      console.info(`[auth:signOut] user.id=${token?.id ?? "-"} email=${token?.email ?? "-"}`);
+    // Keep email in sync with the auth identity; never touch role here
+    update: { email: user.email, lastActiveAt: new Date() },
+  });
+
+  if (appUser.status === "SUSPENDED" || appUser.status === "DELETED") return null;
+
+  return {
+    user: {
+      id: appUser.id,
+      email: appUser.email,
+      name: appUser.name,
+      image: appUser.image,
+      role: appUser.role,
+      onboardingDone: appUser.onboardingDone,
     },
-  },
+  };
 });
 
 /** Server-side helper: current user or null. */
 export async function currentUser() {
-  const session = await auth();
-  return session?.user ?? null;
-}
-
-/** Server-side helper: throws a redirect-friendly error when unauthenticated. */
-export async function requireUser() {
-  const user = await currentUser();
-  if (!user) throw new Error("UNAUTHENTICATED");
-  return user;
+  return (await auth())?.user ?? null;
 }

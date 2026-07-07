@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { supabaseBrowser } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,14 +41,13 @@ function LoginForm() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     setSubmitting(true);
-    const result = await signIn("credentials", {
+    const { error } = await supabaseBrowser().auth.signInWithPassword({
       email: String(form.get("email")),
       password: String(form.get("password")),
-      redirect: false,
     });
     setSubmitting(false);
 
-    if (result?.error) {
+    if (error) {
       toast.error(
         "Sign-in failed. Check your details - and make sure you've confirmed your email.",
       );

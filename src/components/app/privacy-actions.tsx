@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOutEverywhere } from "@/components/auth/sign-out";
 import { toast } from "sonner";
 import { FileDown, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,8 +43,7 @@ export function DeleteAccountButton() {
       return;
     }
     toast.success("Account scheduled for deletion.");
-    await signOut({ redirect: false });
-    router.push("/");
+    await signOutEverywhere("/");
   }
 
   return (

@@ -19,7 +19,6 @@ export default async function AccountSettingsPage() {
       emailVerified: true,
       phone: true,
       phoneVerified: true,
-      passwordHash: true,
       verifications: { select: { type: true, status: true } },
     },
   });
@@ -97,15 +96,13 @@ export default async function AccountSettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Password</CardTitle>
           <CardDescription>
-            {user?.passwordHash
-              ? "Change your password via a secure email link."
-              : "You signed up with Google or Apple - set a password to also sign in with email."}
+            "Change or set your password via a secure email link."
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" className="rounded-full" asChild>
             <Link href="/forgot-password">
-              {user?.passwordHash ? "Change password" : "Set a password"}
+              Change password
             </Link>
           </Button>
         </CardContent>

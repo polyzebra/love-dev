@@ -1,92 +1,58 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
-function ResetPasswordForm() {
+/**
+ * Arrived via the Supabase recovery link (/auth/callback exchanged the
+ * code, so a recovery session is active). Setting the new password
+ * happens directly against Supabase Auth.
+ */
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email") ?? "";
-  const token = searchParams.get("token") ?? "";
   const [submitting, setSubmitting] = useState(false);
-
-  const invalidLink = !email || !token;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const password = String(form.get("password"));
-    const confirm = String(form.get("confirm"));
-    if (password !== confirm) {
+    if (password !== String(form.get("confirm"))) {
       toast.error("Passwords don't match.");
       return;
     }
     setSubmitting(true);
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, token, password }),
-    });
+    const { error } = await supabaseBrowser().auth.updateUser({ password });
     setSubmitting(false);
-    if (!res.ok) {
-      const payload = await res.json().catch(() => null);
-      toast.error(payload?.error?.message ?? "This link is invalid or has expired.");
+    if (error) {
+      toast.error(
+        "Couldn't update the password. The reset link may have expired - request a new one.",
+      );
       return;
     }
-    toast.success("Password updated. Sign in with your new password.");
-    router.push("/login");
-  }
-
-  if (invalidLink) {
-    return (
-      <div className="space-y-4 text-center">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Link expired</h1>
-        <p className="text-muted-foreground">This reset link is invalid or incomplete.</p>
-        <Button className="rounded-full" asChild>
-          <Link href="/forgot-password">Request a new link</Link>
-        </Button>
-      </div>
-    );
+    toast.success("Password updated.");
+    router.push("/discover");
   }
 
   return (
     <div className="space-y-8">
       <div className="space-y-2 text-center">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Choose a new password</h1>
-        <p className="text-muted-foreground">For {email}</p>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Set a new password</h1>
+        <p className="text-muted-foreground">Choose something long - a passphrase works great.</p>
       </div>
       <form onSubmit={onSubmit} className="space-y-5" noValidate>
         <div className="space-y-2">
           <Label htmlFor="password">New password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={10}
-            placeholder="10+ characters"
-            className="h-12 rounded-2xl"
-          />
+          <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={10} placeholder="10+ characters" className="h-12 rounded-2xl" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirm">Confirm password</Label>
-          <Input
-            id="confirm"
-            name="confirm"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={10}
-            placeholder="Repeat your new password"
-            className="h-12 rounded-2xl"
-          />
+          <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required minLength={10} placeholder="Repeat your new password" className="h-12 rounded-2xl" />
         </div>
         <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
@@ -94,13 +60,5 @@ function ResetPasswordForm() {
         </Button>
       </form>
     </div>
-  );
-}
-
-export default function ResetPasswordPage() {
-  return (
-    <Suspense>
-      <ResetPasswordForm />
-    </Suspense>
   );
 }

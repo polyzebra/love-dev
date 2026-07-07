@@ -7,6 +7,7 @@ import { Loader2, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
@@ -16,16 +17,10 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     setSubmitting(true);
-    const res = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: String(form.get("email")) }),
+    await supabaseBrowser().auth.resetPasswordForEmail(String(form.get("email")), {
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     });
     setSubmitting(false);
-    if (res.status === 429) {
-      toast.error("Too many attempts. Please try again shortly.");
-      return;
-    }
     setSent(true);
   }
 

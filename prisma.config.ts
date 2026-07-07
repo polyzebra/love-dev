@@ -8,9 +8,9 @@ export default defineConfig({
     seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
-    // Use the pooled Supabase connection from .env
-    url:
-      process.env.DATABASE_URL ??
-      "postgresql://localhost:5432/amora",
+    url: process.env.DATABASE_URL ?? "postgresql://localhost:5432/virelsy",
+    shadowDatabaseUrl:
+      process.env.SHADOW_DATABASE_URL ??
+      "postgresql://amora:amora@localhost:5433/virelsy_shadow",
   },
 });

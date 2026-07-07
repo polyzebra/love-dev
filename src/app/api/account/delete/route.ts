@@ -21,7 +21,6 @@ export async function POST() {
       where: { userId: user.id },
       data: { isVisible: false },
     }),
-    db.session.deleteMany({ where: { userId: user.id } }),
   ]);
 
   await audit({

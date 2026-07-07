@@ -5,7 +5,6 @@
  * Run: npx prisma db seed   (or: npx tsx prisma/seed.ts)
  */
 import "dotenv/config";
-import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -46,7 +45,6 @@ async function main() {
   console.log("✓ interest catalogue");
 
   // Admin
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "admin-virelsy-2026";
   await db.user.upsert({
     where: { email: "admin@virelsy.app" },
     create: {
@@ -55,15 +53,13 @@ async function main() {
       role: "ADMIN",
       emailVerified: new Date(),
       onboardingDone: true,
-      passwordHash: await bcrypt.hash(adminPassword, 12),
       subscription: { create: { tier: "PREMIUM" } },
     },
     update: { role: "ADMIN" },
   });
-  console.log(`✓ admin@virelsy.app (password: ${adminPassword})`);
+  console.log("✓ admin@virelsy.app app-row (role only; sign-in lives in Supabase Auth)");
 
   // Demo members
-  const demoPassword = await bcrypt.hash("demo-virelsy-2026", 12);
   for (const demo of DEMO_PROFILES) {
     const email = `${demo.name.toLowerCase()}@demo.virelsy.app`;
     const birthDate = new Date(1994 + (demo.name.length % 6), (demo.name.length * 3) % 12, 12);
@@ -75,7 +71,6 @@ async function main() {
         name: demo.name,
         emailVerified: new Date(),
         onboardingDone: true,
-        passwordHash: demoPassword,
         subscription: { create: { tier: "FREE" } },
         verifications: {
           create: [
@@ -114,7 +109,7 @@ async function main() {
       update: {},
     });
   }
-  console.log(`✓ ${DEMO_PROFILES.length} demo profiles (password: demo-virelsy-2026)`);
+  console.log(`✓ ${DEMO_PROFILES.length} demo profiles (content fixtures; not sign-in accounts)`);
 }
 
 main()

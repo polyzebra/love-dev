@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,26 +23,24 @@ export default function RegisterPage() {
     setSubmitting(true);
     setFieldErrors({});
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: String(form.get("name")),
-        email: String(form.get("email")),
-        password: String(form.get("password")),
-        marketingOptIn: form.get("marketing") === "on",
-      }),
+    // Supabase Auth owns registration: the user is created in
+    // auth.users and Supabase sends the confirmation email.
+    const { error } = await supabaseBrowser().auth.signUp({
+      email: String(form.get("email")),
+      password: String(form.get("password")),
+      options: {
+        data: {
+          full_name: String(form.get("name")),
+          marketing_opt_in: form.get("marketing") === "on",
+        },
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
+      },
     });
     setSubmitting(false);
 
-    if (res.status === 429) {
-      toast.error("Too many attempts. Please try again shortly.");
-      return;
-    }
-    if (!res.ok) {
-      const payload = await res.json().catch(() => null);
-      setFieldErrors(payload?.error?.fields ?? {});
-      toast.error(payload?.error?.message ?? "Something went wrong. Please try again.");
+    if (error) {
+      setFieldErrors({});
+      toast.error(error.message);
       return;
     }
     setDone(true);

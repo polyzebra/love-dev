@@ -11,6 +11,8 @@ const optionalStr = z.preprocess(
 );
 
 const serverSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: optionalStr,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalStr,
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: optionalStr,
   DIRECT_URL: optionalStr,
@@ -18,19 +20,6 @@ const serverSchema = z.object({
     (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
     z.string().min(32).optional(),
   ),
-  AUTH_URL: optionalStr,
-  NEXTAUTH_URL: optionalStr,
-  AUTH_GOOGLE_ID: optionalStr,
-  AUTH_GOOGLE_SECRET: optionalStr,
-  GOOGLE_CLIENT_ID: optionalStr,
-  GOOGLE_CLIENT_SECRET: optionalStr,
-  AUTH_APPLE_ID: optionalStr,
-  AUTH_APPLE_SECRET: optionalStr,
-  APPLE_ID: optionalStr,
-  APPLE_SECRET: optionalStr,
-  APPLE_TEAM_ID: optionalStr,
-  APPLE_KEY_ID: optionalStr,
-  APPLE_PRIVATE_KEY: optionalStr,
   STRIPE_SECRET_KEY: optionalStr,
   STRIPE_WEBHOOK_SECRET: optionalStr,
   RESEND_API_KEY: optionalStr,

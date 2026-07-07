@@ -1,36 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-
-type ConfigStatus = {
-  google: boolean;
-  apple: boolean;
-  missingGoogleVars: string[];
-};
+import { supabaseBrowser } from "@/lib/supabase/client";
 
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true">
-      <path
-        fill="#4285F4"
-        d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.2v3.1A12 12 0 0 0 12 24Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.2a12 12 0 0 0 0 10.8l4.1-3.1Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.2A12 12 0 0 0 1.2 6.6l4.1 3.1c.9-2.9 3.6-4.9 6.7-4.9Z"
-      />
+      <path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z" />
+      <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.2v3.1A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.2a12 12 0 0 0 0 10.8l4.1-3.1Z" />
+      <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.2A12 12 0 0 0 1.2 6.6l4.1 3.1c.9-2.9 3.6-4.9 6.7-4.9Z" />
     </svg>
   );
 }
@@ -44,80 +26,53 @@ function AppleIcon() {
 }
 
 /**
- * OAuth entry points, configuration-aware:
- * - Apple renders only when its credentials exist (never a broken button)
- * - Google always renders; if unconfigured it explains exactly which
- *   variables are missing instead of redirecting into a Google error
+ * Supabase OAuth entry points. Every user lands in Supabase Auth ->
+ * Users; identity is the provider account, never name or stale email.
+ * prompt=select_account forces Google's chooser so switching accounts
+ * after sign-out is always explicit (never a silent re-auth).
  */
 export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: string }) {
   const [pending, setPending] = useState<"google" | "apple" | null>(null);
-  const [config, setConfig] = useState<ConfigStatus | null>(null);
+  const configured = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const appleEnabled = process.env.NEXT_PUBLIC_APPLE_OAUTH === "1";
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/auth/config-status")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!cancelled && data) setConfig(data);
-      })
-      .catch(() => {
-        /* endpoint unreachable - leave buttons functional; Auth.js will guard */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  function start(provider: "google" | "apple") {
-    if (provider === "google" && config && !config.google) {
+  async function start(provider: "google" | "apple") {
+    if (!configured) {
       toast.error(
-        `Google sign-in isn't configured. Set ${config.missingGoogleVars.join(
-          " and ",
-        )} in your .env (see .env.example), then restart the server.`,
+        "Sign-in isn't configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (see .env.example).",
       );
       return;
     }
     setPending(provider);
-    void signIn(provider, { callbackUrl });
+    const { error } = await supabaseBrowser().auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+        queryParams: provider === "google" ? { prompt: "select_account" } : undefined,
+      },
+    });
+    if (error) {
+      setPending(null);
+      toast.error("Couldn't start sign-in. Please try again.");
+    }
   }
-
-  const showApple = config === null ? false : config.apple;
 
   return (
     <div className="grid gap-3">
-      <Button
-        type="button"
-        variant="outline"
-        size="lg"
-        className="h-12 rounded-full"
-        disabled={pending !== null}
-        aria-disabled={config ? !config.google : undefined}
-        onClick={() => start("google")}
-      >
+      <Button type="button" variant="outline" size="lg" className="h-12 rounded-full" disabled={pending !== null} onClick={() => start("google")}>
         {pending === "google" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
         Continue with Google
       </Button>
-      {showApple && (
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          className="h-12 rounded-full"
-          disabled={pending !== null}
-          onClick={() => start("apple")}
-        >
+      {appleEnabled && (
+        <Button type="button" variant="outline" size="lg" className="h-12 rounded-full" disabled={pending !== null} onClick={() => start("apple")}>
           {pending === "apple" ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
           Continue with Apple
         </Button>
       )}
       <div className="relative py-2" role="separator" aria-label="or">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
+        <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
         <div className="relative flex justify-center">
-          <span className="rounded-full bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">
-            or
-          </span>
+          <span className="rounded-full bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">or</span>
         </div>
       </div>
     </div>
