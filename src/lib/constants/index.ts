@@ -26,7 +26,13 @@ export const PLANS = [
     name: "Free",
     priceMonthlyCents: 0,
     tagline: "Start meeting people",
-    features: ["25 likes a day", "1 Super Like a day", "Match & chat freely", "Photo verification"],
+    features: [
+      "25 daily picks, each with real reasons you match",
+      "Conversation starters built from what you share",
+      "First-date ideas once the chat gets going",
+      "1 Super Like a day to show real interest",
+      "Photo verification so people know it's you",
+    ],
   },
   {
     tier: "PLUS",
@@ -34,11 +40,11 @@ export const PLANS = [
     priceMonthlyCents: 1499,
     tagline: "Date with momentum",
     features: [
-      "Unlimited likes",
-      "5 Super Likes a day",
-      "Undo accidental passes",
-      "1 Boost a month",
-      "See who likes you",
+      "Like without a daily cap - never lose momentum",
+      "See who is already waiting for you - reply first",
+      "Take back an accidental pass",
+      "5 Super Likes a day to open with intent",
+      "1 Boost a month to be seen first",
     ],
   },
   {
@@ -48,11 +54,11 @@ export const PLANS = [
     tagline: "The full experience",
     features: [
       "Everything in Plus",
+      "Priority discovery - shown to more of the right people",
+      "Say hello before you match",
+      "Sharper filters to find exactly your kind of person",
       "10 Super Likes a day",
-      "4 Boosts a month",
-      "Priority in Discover",
-      "Message before matching",
-      "Advanced filters",
+      "4 Boosts a month for the moments that matter",
     ],
   },
 ] as const;

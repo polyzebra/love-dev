@@ -23,7 +23,7 @@ export async function PATCH(req: Request) {
   const { data, response: invalid } = await parseBody(req, profileUpdateSchema);
   if (invalid) return invalid;
 
-  const { interests, ...fields } = data;
+  const { interests, prompts, ...fields } = data;
   void interests; // interest edits go through the onboarding/profile service
 
   const updated = await db.profile.update({
@@ -31,6 +31,25 @@ export async function PATCH(req: Request) {
     data: fields,
     include: { interests: true, user: { select: { photos: { select: { id: true } } } } },
   });
+
+  // Prompts are a relation - replace the whole answered set when provided
+  if (prompts) {
+    await db.$transaction([
+      db.profilePrompt.deleteMany({ where: { profileId: updated.id } }),
+      ...(prompts.length > 0
+        ? [
+            db.profilePrompt.createMany({
+              data: prompts.map((p, i) => ({
+                profileId: updated.id,
+                promptKey: p.key,
+                answer: p.answer,
+                sortOrder: i,
+              })),
+            }),
+          ]
+        : []),
+    ]);
+  }
 
   const completionPct = computeCompletion({
     ...updated,

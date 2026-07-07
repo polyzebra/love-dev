@@ -11,7 +11,7 @@ import {
   useTransform,
 } from "motion/react";
 import { toast } from "sonner";
-import { BadgeCheck, Heart, MapPin, RotateCcw, SearchX, Sparkles, Star, X } from "lucide-react";
+import { BadgeCheck, Heart, MapPin, RotateCcw, SearchX, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,11 +21,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
-import { MatchRing } from "@/components/shared/match-ring";
 import { HeartBurst } from "@/components/fx/heart-burst";
 import { emitInteraction } from "@/lib/interaction-events";
+import { SPRING } from "@/lib/motion";
 import { useDominantColor, type RGB } from "@/hooks/use-dominant-color";
 import type { DiscoverProfile } from "@/lib/services/discovery";
+import type { RelationshipGoal } from "@/generated/prisma/enums";
 import { cn, formatDistance } from "@/lib/utils";
 
 type SwipeAction = "LIKE" | "PASS" | "SUPER_LIKE";
@@ -33,28 +34,79 @@ type SwipeAction = "LIKE" | "PASS" | "SUPER_LIKE";
 export type ViewerContext = {
   city: string | null;
   interests: string[];
+  goal: RelationshipGoal | null;
 };
 
-/** Honest, data-backed reasons this profile appears - never invented. */
-function compatibilityReasons(
-  profile: DiscoverProfile,
-  viewer: ViewerContext | null,
-  shared: string[],
-): string[] {
-  const reasons: string[] = [];
-  if (shared.length === 1) reasons.push(`You both love ${shared[0].toLowerCase()}`);
-  if (shared.length > 1) reasons.push(`${shared.length} shared interests`);
-  if (viewer?.city && profile.city && viewer.city === profile.city)
-    reasons.push(`Both in ${profile.city}`);
-  else if (profile.distanceKm != null && profile.distanceKm <= 15)
-    reasons.push("Practically neighbours");
-  if (profile.isVerified) reasons.push("Photo verified");
-  if (profile.isOnline) reasons.push("Online right now");
-  return reasons.slice(0, 3);
+type Story =
+  | { kind: "reason"; text: string }
+  | { kind: "prompt"; label: string; answer: string };
+
+/** Trust facts live in the trust row - never repeat them as the story line. */
+const NON_STORY_REASONS = new Set([
+  "Photo verified",
+  "Online right now",
+  "New this week",
+  "Same relationship goal",
+]);
+
+/**
+ * ONE human line for the card face: real shared interests first, then the
+ * scoring engine's most human reason, then the person's own prompt answer.
+ * Never invented - every branch traces to real data.
+ */
+function storyFor(profile: DiscoverProfile, viewer: ViewerContext | null): Story | null {
+  const mine = new Set(viewer?.interests ?? []);
+  const shared = profile.interests.filter((i) => mine.has(i));
+  if (shared.length >= 2)
+    return {
+      kind: "reason",
+      text: `You both like ${shared[0].toLowerCase()} and ${shared[1].toLowerCase()}`,
+    };
+  if (shared.length === 1)
+    return { kind: "reason", text: `You both love ${shared[0].toLowerCase()}` };
+  const human = profile.reasons.find((r) => !NON_STORY_REASONS.has(r));
+  if (human) return { kind: "reason", text: human };
+  if (profile.promptTease) return { kind: "prompt", ...profile.promptTease };
+  return null;
+}
+
+/** "A typical Saturday" -> "a typical Saturday" for mid-sentence use. */
+function lowerLabel(label: string): string {
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
+
+const SHARED_GOAL_LINES: Record<RelationshipGoal, string> = {
+  LONG_TERM: "You both want something long-term",
+  SHORT_TERM: "You both want to keep it light",
+  OPEN_TO_EITHER: "You're both open to where it goes",
+  FRIENDSHIP: "You both want real friendship",
+  FIGURING_OUT: "You're both still figuring it out",
+};
+
+/** Up to 3 REAL overlaps between viewer and match - never invented. */
+function sharedContextChips(viewer: ViewerContext | null, profile: DiscoverProfile): string[] {
+  if (!viewer) return [];
+  const chips: string[] = [];
+  if (viewer.goal && viewer.goal === profile.relationshipGoal)
+    chips.push(SHARED_GOAL_LINES[profile.relationshipGoal]);
+  const mine = new Set(viewer.interests);
+  for (const interest of profile.interests) {
+    if (mine.has(interest)) chips.push(`You both chose ${interest}`);
+  }
+  if (viewer.city && profile.city && viewer.city === profile.city)
+    chips.push(`You're both in ${profile.city}`);
+  return chips.slice(0, 3);
 }
 
 const EXIT_VELOCITY = 600;
 const EXIT_OFFSET = 110;
+
+const TRUST_CHIP_CLASS =
+  "glass-chip flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-medium text-white/80";
+const TRUST_CHIP_VARIANTS = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: SPRING.snappy },
+};
 
 function photoGradient(seed: string): string {
   const hues = [346, 12, 262, 200, 160];
@@ -70,14 +122,12 @@ function photoGradient(seed: string): string {
  */
 function TopCard({
   profile,
-  reasons,
-  sharedSet,
+  story,
   onDecide,
   registerDecider,
 }: {
   profile: DiscoverProfile;
-  reasons: string[];
-  sharedSet: Set<string>;
+  story: Story | null;
   onDecide: (action: SwipeAction) => void;
   registerDecider: (fn: (action: SwipeAction) => void) => void;
 }) {
@@ -198,100 +248,75 @@ function TopCard({
           Pass
         </motion.span>
 
-        {/* Floating badges + the WHY behind the number */}
-        <div className="absolute inset-x-4 top-4 flex items-start justify-between">
-          <div className="flex flex-col items-start gap-1.5">
-            <MatchRing value={profile.compatibility} />
-            <motion.ul
-              initial="hidden"
-              animate="show"
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.35, delayChildren: 0.7 } } }}
-              className="space-y-1"
-              aria-label="Why you match"
-            >
-              {reasons.map((reason) => (
-                <motion.li
-                  key={reason}
-                  variants={{
-                    hidden: { opacity: 0, x: -12 },
-                    show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 26 } },
-                  }}
-                  className="glass-chip w-fit rounded-full px-2.5 py-0.5 text-[10px] font-medium text-white/90"
-                >
-                  {reason}
-                </motion.li>
-              ))}
-            </motion.ul>
-          </div>
-          {profile.isOnline && (
-            <span className="glass-chip flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white">
-              <span className="relative flex size-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
-                <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
-              </span>
-              Online
-            </span>
-          )}
+        {/* Compatibility, demoted: a quiet corner pill, not the headline */}
+        <div className="absolute right-4 top-4">
+          <span
+            className="glass-chip flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/75"
+            aria-label={`${profile.compatibility} percent match`}
+          >
+            <Heart className="size-3 fill-current text-rose-300/90" aria-hidden="true" />
+            {profile.compatibility}%
+          </span>
         </div>
 
-        {/* Identity */}
-        <div className="relative space-y-2.5 p-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-3xl font-semibold tracking-tight text-white">
-              {profile.displayName}, {profile.age}
-            </h2>
-            {profile.isVerified && (
-              <span role="img" className="relative flex items-center justify-center" aria-label="Photo verified">
-                <span className="absolute size-6 animate-ping-soft rounded-full bg-sky-400/30" />
-                <BadgeCheck className="relative size-6 fill-sky-400 text-white" />
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/85">
+        {/* Story-first identity */}
+        <div className="relative space-y-2 p-6">
+          <h2 className="text-3xl font-semibold tracking-tight text-white">
+            {profile.displayName}, {profile.age}
+          </h2>
+          {profile.goalLine && (
+            <p className="text-sm font-medium text-rose-200/95">{profile.goalLine}</p>
+          )}
+          {story &&
+            (story.kind === "reason" ? (
+              <p className="text-sm/relaxed text-white/90">{story.text}</p>
+            ) : (
+              <p className="text-sm/relaxed text-white/90">
+                <span className="italic">&ldquo;{story.answer}&rdquo;</span>
+                <span className="text-white/65"> - {lowerLabel(story.label)}</span>
+              </p>
+            ))}
+
+          {/* Trust row: quiet, real signals only */}
+          {(profile.isVerified || profile.isOnline || profile.replySignal) && (
+            <motion.div
+              className="flex flex-wrap gap-1.5 pt-1"
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } } }}
+            >
+              {profile.isVerified && (
+                <motion.span variants={TRUST_CHIP_VARIANTS} className={TRUST_CHIP_CLASS}>
+                  <BadgeCheck className="size-3 text-sky-300" aria-hidden="true" />
+                  Verified
+                </motion.span>
+              )}
+              {profile.isOnline && (
+                <motion.span variants={TRUST_CHIP_VARIANTS} className={TRUST_CHIP_CLASS}>
+                  <span className="relative flex size-1.5" aria-hidden="true">
+                    <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
+                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
+                  </span>
+                  Online now
+                </motion.span>
+              )}
+              {profile.replySignal && (
+                <motion.span variants={TRUST_CHIP_VARIANTS} className={TRUST_CHIP_CLASS}>
+                  {profile.replySignal}
+                </motion.span>
+              )}
+            </motion.div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/70">
             {profile.city && (
               <span className="flex items-center gap-1">
-                <MapPin className="size-3.5" aria-hidden="true" />
+                <MapPin className="size-3" aria-hidden="true" />
                 {profile.city}
               </span>
             )}
             {profile.distanceKm != null && <span>{formatDistance(profile.distanceKm)}</span>}
           </div>
-          {profile.bio && (
-            <p className="line-clamp-2 text-sm/relaxed text-white/90">{profile.bio}</p>
-          )}
-          {profile.interests.length > 0 && (
-            <motion.div
-              className="flex flex-wrap gap-1.5 pt-1"
-              initial="hidden"
-              animate="show"
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.35 } } }}
-            >
-              {[...profile.interests]
-                .sort((a, b) => Number(sharedSet.has(b)) - Number(sharedSet.has(a)))
-                .slice(0, 4)
-                .map((interest) => {
-                  const shared = sharedSet.has(interest);
-                  return (
-                    <motion.span
-                      key={interest}
-                      variants={{
-                        hidden: { opacity: 0, y: 10, scale: 0.9 },
-                        show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 380, damping: 24 } },
-                      }}
-                      className={cn(
-                        "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium",
-                        shared
-                          ? "border border-rose-300/40 bg-rose-500/30 text-white shadow-[0_0_14px_rgba(225,29,72,0.35)] backdrop-blur-md"
-                          : "glass-chip text-white",
-                      )}
-                    >
-                      {shared && <Sparkles className="size-3 text-rose-200" aria-hidden="true" />}
-                      {interest}
-                    </motion.span>
-                  );
-                })}
-            </motion.div>
-          )}
         </div>
       </motion.div>
     </motion.article>
@@ -306,18 +331,22 @@ export function SwipeDeck({
   viewer: ViewerContext | null;
 }) {
   const [deck, setDeck] = useState(initialProfiles);
-  const [matchedWith, setMatchedWith] = useState<DiscoverProfile | null>(null);
+  const [matchedWith, setMatchedWith] = useState<(DiscoverProfile & { conversationId?: string }) | null>(null);
   const busy = useRef(false);
   const deciderRef = useRef<((action: SwipeAction) => void) | null>(null);
 
   const top = deck[0];
   const next = deck[1];
 
-  // Shared ground with the person on top - drives reasons & highlights
-  const viewerSet = new Set(viewer?.interests ?? []);
-  const shared = top ? top.interests.filter((i) => viewerSet.has(i)) : [];
-  const sharedSet = new Set(shared);
-  const reasons = top ? (top.reasons?.length ? top.reasons : compatibilityReasons(top, viewer, shared)) : [];
+  // ONE human line for the card on top - real data only
+  const story = top ? storyFor(top, viewer) : null;
+
+  // Shared-context moment for the match dialog - only real overlaps
+  const matchChips = matchedWith ? sharedContextChips(viewer, matchedWith) : [];
+  const firstSharedInterest =
+    matchedWith && viewer
+      ? matchedWith.interests.find((i) => viewer.interests.includes(i)) ?? null
+      : null;
 
   // Ambient light sampled from the top card's photo; falls back to brand rose
   const dominant = useDominantColor(top?.photos[0]?.url);
@@ -349,13 +378,13 @@ export function SwipeDeck({
           toast.error("Something went wrong. Try again.");
           return;
         }
-        const { data } = (await res.json()) as { data: { matched: boolean } };
+        const { data } = (await res.json()) as { data: { matched: boolean; conversationId?: string } };
         emitInteraction(
           action === "LIKE" ? "like" : action === "PASS" ? "pass" : "superlike",
         );
         if (data.matched) {
           emitInteraction("match");
-          setMatchedWith(current);
+          setMatchedWith({ ...current, conversationId: data.conversationId });
         }
       } catch {
         setDeck((d) => [current, ...d]);
@@ -438,8 +467,7 @@ export function SwipeDeck({
             <TopCard
               key={top.userId}
               profile={top}
-              reasons={reasons}
-              sharedSet={sharedSet}
+              story={story}
               onDecide={commit}
               registerDecider={(fn) => (deciderRef.current = fn)}
             />
@@ -494,7 +522,7 @@ export function SwipeDeck({
         </motion.div>
       </div>
 
-      {/* Match celebration */}
+      {/* Match celebration - the moment leads with what you share */}
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>
         <DialogContent className="overflow-hidden rounded-[32px] border-white/10 text-center sm:max-w-sm">
           {matchedWith && <HeartBurst />}
@@ -502,7 +530,7 @@ export function SwipeDeck({
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 320, damping: 14, delay: 0.1 }}
+              transition={{ ...SPRING.bounce, delay: 0.1 }}
               className="flex size-16 items-center justify-center rounded-full bg-accent shadow-[0_0_40px_rgba(225,29,72,0.35)]"
             >
               <Heart className="size-8 fill-primary text-primary" aria-hidden="true" />
@@ -512,10 +540,54 @@ export function SwipeDeck({
               You and {matchedWith?.displayName} liked each other. Break the ice while it&apos;s warm.
             </DialogDescription>
           </DialogHeader>
+          {matchedWith && (
+            <div className="relative pb-1">
+              {matchChips.length > 0 ? (
+                <motion.ul
+                  initial="hidden"
+                  animate="show"
+                  variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.25 } } }}
+                  className="flex flex-wrap justify-center gap-1.5"
+                  aria-label="What you share"
+                >
+                  {matchChips.map((chip) => (
+                    <motion.li
+                      key={chip}
+                      variants={{
+                        hidden: { opacity: 0, y: 10, scale: 0.92 },
+                        show: { opacity: 1, y: 0, scale: 1, transition: SPRING.snappy },
+                      }}
+                      className="rounded-full border border-rose-300/30 bg-rose-500/15 px-3 py-1 text-xs font-medium text-foreground"
+                    >
+                      {chip}
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              ) : matchedWith.promptTease ? (
+                <p className="text-sm text-muted-foreground">
+                  <span className="italic">&ldquo;{matchedWith.promptTease.answer}&rdquo;</span>
+                  {" - "}their {lowerLabel(matchedWith.promptTease.label)}
+                </p>
+              ) : matchedWith.goalLine ? (
+                <p className="text-sm text-muted-foreground">{matchedWith.goalLine}</p>
+              ) : null}
+            </div>
+          )}
           <div className="relative grid gap-2">
             <Button className="h-12 rounded-full" asChild>
-              <Link href="/chat">Say hello</Link>
+              <Link href={matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}>Say hello</Link>
             </Button>
+            {firstSharedInterest && (
+              <Button variant="outline" className="h-11 rounded-full" asChild>
+                <Link
+                  href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(
+                    `We both picked ${firstSharedInterest.toLowerCase()} - I have to ask, what's your favourite?`,
+                  )}`}
+                >
+                  Ask about {firstSharedInterest.toLowerCase()}
+                </Link>
+              </Button>
+            )}
             <Button variant="ghost" className="rounded-full" onClick={() => setMatchedWith(null)}>
               Keep swiping
             </Button>

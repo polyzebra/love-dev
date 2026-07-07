@@ -39,7 +39,7 @@ function slugify(label: string): string {
 }
 
 export async function completeOnboarding(userId: string, input: OnboardingInput) {
-  const { interests, ...fields } = input;
+  const { interests, prompts, ...fields } = input;
 
   return db.$transaction(async (tx) => {
     // Ensure the interest catalogue rows exist, then connect them
@@ -79,6 +79,19 @@ export async function completeOnboarding(userId: string, input: OnboardingInput)
         },
       },
     });
+
+    // Prompt answers: replace wholesale, sortOrder preserves selection order
+    await tx.profilePrompt.deleteMany({ where: { profileId: profile.id } });
+    if (prompts.length > 0) {
+      await tx.profilePrompt.createMany({
+        data: prompts.map((p, index) => ({
+          profileId: profile.id,
+          promptKey: p.key,
+          answer: p.answer,
+          sortOrder: index,
+        })),
+      });
+    }
 
     await tx.user.update({
       where: { id: userId },

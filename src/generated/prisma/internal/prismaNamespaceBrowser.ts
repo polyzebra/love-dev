@@ -74,7 +74,8 @@ export const ModelName = {
   ExploreCategory: 'ExploreCategory',
   UserExplorePreference: 'UserExplorePreference',
   AnalyticsEvent: 'AnalyticsEvent',
-  BlockedIdentity: 'BlockedIdentity'
+  BlockedIdentity: 'BlockedIdentity',
+  ProfilePrompt: 'ProfilePrompt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -463,6 +464,18 @@ export const BlockedIdentityScalarFieldEnum = {
 } as const
 
 export type BlockedIdentityScalarFieldEnum = (typeof BlockedIdentityScalarFieldEnum)[keyof typeof BlockedIdentityScalarFieldEnum]
+
+
+export const ProfilePromptScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  promptKey: 'promptKey',
+  answer: 'answer',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfilePromptScalarFieldEnum = (typeof ProfilePromptScalarFieldEnum)[keyof typeof ProfilePromptScalarFieldEnum]
 
 
 export const SortOrder = {

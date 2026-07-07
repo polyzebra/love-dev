@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { toast } from "sonner";
-import { BadgeCheck, Heart, MapPin, RotateCcw, Sparkles, Star, X } from "lucide-react";
+import { BadgeCheck, Heart, MapPin, MessageCircle, Quote, RotateCcw, Sparkles, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { emitInteraction } from "@/lib/interaction-events";
@@ -19,19 +19,48 @@ export type ViewerProfile = {
   city: string | null;
   country: string;
   relationshipGoal: string;
+  replySignal: string | null;
   isVerified: boolean;
   isOnline: boolean;
   photos: { url: string; blurDataUrl: string | null }[];
+  prompts: { label: string; answer: string }[];
+  heightCm: number | null;
+  occupation: string | null;
+  education: string | null;
   interests: { label: string; shared: boolean }[];
 };
 
 const GOAL_LABELS: Record<string, string> = {
-  LONG_TERM: "Long-term relationship",
-  SHORT_TERM: "Something casual",
-  OPEN_TO_EITHER: "Open to either",
-  FRIENDSHIP: "New friends",
+  LONG_TERM: "Looking for something real",
+  SHORT_TERM: "Keeping it light for now",
+  OPEN_TO_EITHER: "Open to where it goes",
+  FRIENDSHIP: "Here for real friendship",
   FIGURING_OUT: "Figuring it out",
 };
+
+/** One swipeable "page" of the story: a photo or a prompt answer. */
+type StoryPage =
+  | { kind: "photo"; url: string }
+  | { kind: "prompt"; label: string; answer: string };
+
+/** Interleave prompt answers between photos: photo, prompt, photo, ... */
+function buildPages(profile: ViewerProfile): StoryPage[] {
+  const photos: StoryPage[] = profile.photos.map((p) => ({ kind: "photo", url: p.url }));
+  const prompts: StoryPage[] = profile.prompts.map((p) => ({
+    kind: "prompt",
+    label: p.label,
+    answer: p.answer,
+  }));
+  if (photos.length === 0) return prompts;
+  const pages: StoryPage[] = [];
+  let pi = 0;
+  for (const photo of photos) {
+    pages.push(photo);
+    if (pi < prompts.length) pages.push(prompts[pi++]);
+  }
+  pages.push(...prompts.slice(pi));
+  return pages;
+}
 
 function sendEvent(name: string, data?: Record<string, string | number | boolean>) {
   void fetch("/api/analytics", {
@@ -65,12 +94,19 @@ export function ExploreProfileViewer({
 }) {
   const router = useRouter();
   const [profile, setProfile] = useState<ViewerProfile>(initialProfile);
-  const [photoIndex, setPhotoIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [exhausted, setExhausted] = useState(false);
   const [acted, setActed] = useState<Set<string>>(new Set());
-  const photos = profile.photos;
-  const hasPhotos = photos.length > 0;
+  const pages = useMemo(() => buildPages(profile), [profile]);
+  const page: StoryPage | undefined = pages[pageIndex];
+
+  // Demoted vitals - one quiet line at the very bottom of the card
+  const basics = [
+    profile.heightCm ? `${profile.heightCm} cm` : null,
+    profile.occupation,
+    profile.education ? profile.education.toLowerCase().replace(/_/g, " ") : null,
+  ].filter((b): b is string => Boolean(b));
 
   // Preload the next queue profile's first photo for a seamless advance
   useEffect(() => {
@@ -81,6 +117,11 @@ export function ExploreProfileViewer({
     }
   }, [profile.userId, acted, queue]);
 
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 200], [-8, 8]);
+  const likeOpacity = useTransform(x, [30, 110], [0, 1]);
+  const passOpacity = useTransform(x, [-110, -30], [1, 0]);
+
   const advance = useCallback(
     async (from: string) => {
       const remaining = queue.filter((q) => q.userId !== from && !acted.has(q.userId));
@@ -89,7 +130,7 @@ export function ExploreProfileViewer({
         if (res.ok) {
           const { data } = (await res.json()) as { data: ViewerProfile };
           setProfile(data);
-          setPhotoIndex(0);
+          setPageIndex(0);
           x.set(0);
           // keep the modal route alive; replace so Back still exits to grid
           router.replace(`/explore/${slug}?profile=${entry.userId}`, { scroll: false });
@@ -101,13 +142,8 @@ export function ExploreProfileViewer({
       setExhausted(true);
       router.replace(`/explore/${slug}`, { scroll: false });
     },
-    [queue, acted, router, slug],
+    [queue, acted, router, slug, x],
   );
-
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-8, 8]);
-  const likeOpacity = useTransform(x, [30, 110], [0, 1]);
-  const passOpacity = useTransform(x, [-110, -30], [1, 0]);
 
   const close = useCallback(() => {
     sendEvent("explore_profile_closed", { userId: profile.userId });
@@ -127,10 +163,10 @@ export function ExploreProfileViewer({
     };
   }, [close, profile.userId]);
 
-  function changePhoto(dir: 1 | -1) {
-    if (photos.length < 2) return;
-    setPhotoIndex((i) => {
-      const next = Math.min(Math.max(i + dir, 0), photos.length - 1);
+  function changePage(dir: 1 | -1) {
+    if (pages.length < 2) return;
+    setPageIndex((i) => {
+      const next = Math.min(Math.max(i + dir, 0), pages.length - 1);
       if (next !== i) sendEvent("explore_profile_photo_changed", { userId: profile.userId, index: next });
       return next;
     });
@@ -225,27 +261,38 @@ export function ExploreProfileViewer({
           }}
           transition={SPRING.standard}
         >
-          {hasPhotos ? (
+          {page?.kind === "photo" ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photos[photoIndex].url} alt="" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
+            <img src={page.url} alt="" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
           ) : (
             <div className="absolute inset-0" style={{ background: fallbackGradient(profile.userId) }} />
           )}
           <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
           <div className="absolute inset-0 rounded-[30px] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
 
-          {/* Photo progress bars */}
-          {photos.length > 1 && (
-            <div className="absolute inset-x-3 top-3 flex gap-1.5" aria-label={`Photo ${photoIndex + 1} of ${photos.length}`}>
-              {photos.map((_, i) => (
-                <span key={i} className={cn("h-1 flex-1 rounded-full transition-colors", i <= photoIndex ? "bg-white/90" : "bg-white/25")} />
+          {/* Prompt story block - their words, full stage */}
+          {page?.kind === "prompt" && (
+            <div className="absolute inset-x-0 top-[22%] px-7">
+              <Quote className="size-6 text-white/40" aria-hidden="true" />
+              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/65">{page.label}</p>
+              <p className="mt-3 font-display text-3xl font-medium leading-snug tracking-tight text-white">
+                {page.answer}
+              </p>
+            </div>
+          )}
+
+          {/* Story progress bars - photos and prompts alike */}
+          {pages.length > 1 && (
+            <div className="absolute inset-x-3 top-3 flex gap-1.5" aria-label={`Section ${pageIndex + 1} of ${pages.length}`}>
+              {pages.map((_, i) => (
+                <span key={i} className={cn("h-1 flex-1 rounded-full transition-colors", i <= pageIndex ? "bg-white/90" : "bg-white/25")} />
               ))}
             </div>
           )}
 
-          {/* Tap zones for photo navigation */}
-          <button type="button" aria-label="Previous photo" className="absolute inset-y-0 left-0 w-1/3" onClick={() => changePhoto(-1)} />
-          <button type="button" aria-label="Next photo" className="absolute inset-y-0 right-0 w-1/3" onClick={() => changePhoto(1)} />
+          {/* Tap zones for story navigation */}
+          <button type="button" aria-label="Previous" className="absolute inset-y-0 left-0 w-1/3" onClick={() => changePage(-1)} />
+          <button type="button" aria-label="Next" className="absolute inset-y-0 right-0 w-1/3" onClick={() => changePage(1)} />
 
           {/* Verdict stamps while dragging */}
           <motion.span style={{ opacity: likeOpacity }} aria-hidden="true" className="absolute left-6 top-12 -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-emerald-400">Like</motion.span>
@@ -261,6 +308,20 @@ export function ExploreProfileViewer({
             </Button>
           </div>
 
+          {/* Why write to them - intent and honest reply behaviour, up top */}
+          <div className="pointer-events-none absolute left-3 top-[5.25rem] flex flex-col items-start gap-1.5">
+            <span className="glass-chip flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white">
+              <Heart className="size-3 fill-current text-rose-300" aria-hidden="true" />
+              {GOAL_LABELS[profile.relationshipGoal] ?? "Open to connection"}
+            </span>
+            {profile.replySignal && (
+              <span className="glass-chip flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white">
+                <MessageCircle className="size-3 text-emerald-300" aria-hidden="true" />
+                {profile.replySignal}
+              </span>
+            )}
+          </div>
+
           {/* Identity */}
           <div className="absolute inset-x-0 bottom-0 space-y-2.5 p-5 pb-6">
             <p className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-white">
@@ -273,17 +334,12 @@ export function ExploreProfileViewer({
               )}
               <OnlineDot online={profile.isOnline} className="ml-1" />
             </p>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-white/85">
-              <span className="glass-chip rounded-full px-3 py-1 text-xs font-medium">
-                Looking for · {GOAL_LABELS[profile.relationshipGoal] ?? "Connection"}
-              </span>
-              {profile.city && (
-                <span className="flex items-center gap-1 text-xs">
-                  <MapPin className="size-3.5" aria-hidden="true" />
-                  {profile.city}, {profile.country === "IE" ? "Ireland" : "UK"}
-                </span>
-              )}
-            </div>
+            {profile.city && (
+              <p className="flex items-center gap-1 text-xs text-white/85">
+                <MapPin className="size-3.5" aria-hidden="true" />
+                {profile.city}, {profile.country === "IE" ? "Ireland" : "UK"}
+              </p>
+            )}
             {profile.bio && <p className="line-clamp-2 text-sm/relaxed text-white/90">{profile.bio}</p>}
             {profile.interests.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
@@ -294,6 +350,9 @@ export function ExploreProfileViewer({
                   </span>
                 ))}
               </div>
+            )}
+            {basics.length > 0 && (
+              <p className="text-[11px] capitalize text-white/55">{basics.join(" · ")}</p>
             )}
           </div>
         </motion.div>

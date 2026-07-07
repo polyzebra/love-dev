@@ -13,16 +13,16 @@ const cache = new Map<string, RGB | null>();
  */
 export function useDominantColor(url: string | null | undefined): RGB | null {
   const [color, setColor] = useState<RGB | null>(url ? (cache.get(url) ?? null) : null);
+  const [prevUrl, setPrevUrl] = useState(url);
+  if (url !== prevUrl) {
+    // React-sanctioned render-time reset on prop change - keeps the
+    // effect purely async and avoids cascading-render setState.
+    setPrevUrl(url);
+    setColor(url ? (cache.get(url) ?? null) : null);
+  }
 
   useEffect(() => {
-    if (!url) {
-      setColor(null);
-      return;
-    }
-    if (cache.has(url)) {
-      const id = window.setTimeout(() => setColor(cache.get(url)!), 0);
-      return () => window.clearTimeout(id);
-    }
+    if (!url || cache.has(url)) return;
     let cancelled = false;
     const img = new Image();
     img.crossOrigin = "anonymous";

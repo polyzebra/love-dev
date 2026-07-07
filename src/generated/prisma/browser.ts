@@ -137,3 +137,8 @@ export type AnalyticsEvent = Prisma.AnalyticsEventModel
  * 
  */
 export type BlockedIdentity = Prisma.BlockedIdentityModel
+/**
+ * Model ProfilePrompt
+ * 
+ */
+export type ProfilePrompt = Prisma.ProfilePromptModel

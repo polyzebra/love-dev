@@ -46,6 +46,7 @@ async function Deck() {
     ? {
         city: me.city,
         interests: me.interests.map((i) => i.interest.label),
+        goal: me.relationshipGoal,
       }
     : null;
 

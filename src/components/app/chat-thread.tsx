@@ -1,23 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import {
   Check,
   CheckCheck,
+  Clock,
   Coffee,
   ImageIcon,
   Mic,
   Plus,
-  RefreshCcw,
   SendHorizontal,
   ShieldCheck,
   Sparkles,
-  Wine,
-  X,
 } from "lucide-react";
+import { assistant, type Suggestion } from "@/lib/assistant";
 import { emitInteraction } from "@/lib/interaction-events";
+import { SPRING } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -40,51 +40,12 @@ export type ThreadMessage = {
 const POLL_INTERVAL_MS = 5000;
 const GROUP_WINDOW_MS = 3 * 60_000;
 
-/**
- * Conversation intelligence - everything below derives from REAL shared
- * interests between the two people; nothing is invented.
- */
-const STARTER_TEMPLATES: [RegExp, (name: string) => string][] = [
-  [/hik/i, (n) => `You both love hiking - ask ${n} about a favourite trail`],
-  [/coffee/i, (n) => `You both rate coffee - ask ${n} for their go-to café`],
-  [/travel/i, (n) => `You both love travelling - ask ${n} their dream destination`],
-  [/dog/i, (n) => `You're both dog people - ask about ${n}'s dog`],
-  [/run/i, (n) => `You both run - ask ${n} about their route`],
-  [/swim/i, (n) => `You both swim - ask ${n} where they brave the water`],
-  [/read/i, (n) => `You both read - ask ${n} what they'd recommend`],
-  [/music/i, (n) => `You both love live music - ask ${n} about the best gig they've seen`],
-  [/cook|bak/i, (n) => `You both cook - ask ${n} their signature dish`],
-  [/film/i, (n) => `You both love films - ask ${n} for a favourite`],
-];
-
-function startersFor(shared: string[], name: string): string[] {
-  const out: string[] = [];
-  for (const interest of shared) {
-    const hit = STARTER_TEMPLATES.find(([re]) => re.test(interest));
-    out.push(
-      hit ? hit[1](name) : `You both love ${interest.toLowerCase()} - ask ${name} about it`,
-    );
-  }
-  return out;
-}
-
-/** First-date ideas, personal ones (from shared ground) first. */
-function dateIdeasFor(shared: string[]): { icon: typeof Coffee; label: string }[] {
-  const personal: { icon: typeof Coffee; label: string }[] = [];
-  const has = (re: RegExp) => shared.some((s) => re.test(s));
-  if (has(/coffee/i)) personal.push({ icon: Coffee, label: "Coffee at a café you both rate?" });
-  if (has(/hik|walk|run/i)) personal.push({ icon: Sparkles, label: "A walk somewhere green this weekend?" });
-  if (has(/swim/i)) personal.push({ icon: Sparkles, label: "A sea swim, then breakfast?" });
-  if (has(/read/i)) personal.push({ icon: Sparkles, label: "A bookshop wander?" });
-  if (has(/music/i)) personal.push({ icon: Sparkles, label: "A gig this month?" });
-  if (has(/dog/i)) personal.push({ icon: Sparkles, label: "A dog walk date?" });
-  if (has(/food|bak|cook/i)) personal.push({ icon: Coffee, label: "Breakfast somewhere new?" });
-  return [
-    ...personal,
-    { icon: Coffee, label: "Coffee this week?" },
-    { icon: Wine, label: "Drinks on Friday?" },
-  ];
-}
+/** Chip icon per suggestion kind. */
+const KIND_ICON: Record<Suggestion["kind"], typeof Sparkles> = {
+  opener: Sparkles,
+  "follow-up": Clock,
+  "next-step": Coffee,
+};
 
 /** Position of a message within a same-sender burst, for bubble shape. */
 function positionIn(messages: ThreadMessage[], i: number): "solo" | "first" | "middle" | "last" {
@@ -111,42 +72,44 @@ export function ChatThread({
   initialMessages,
   otherName,
   sharedInterests = [],
+  theirPrompts = [],
+  theyAreOnline = false,
+  initialDraft = "",
 }: {
   conversationId: string;
   currentUserId: string;
   initialMessages: ThreadMessage[];
   otherName: string;
   sharedInterests?: string[];
+  theirPrompts?: { key: string; label: string; answer: string }[];
+  theyAreOnline?: boolean;
+  /** Prefill for the composer, e.g. from a ?suggest= link. */
+  initialDraft?: string;
 }) {
   const [messages, setMessages] = useState<ThreadMessage[]>(initialMessages);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(initialDraft);
   const [sending, setSending] = useState(false);
-  const [ideaIndex, setIdeaIndex] = useState(0);
-  const [nudgeDismissed, setNudgeDismissed] = useState(true);
 
-  useEffect(() => {
-    // A gentle, once-per-session suggestion - never on first paint
-    const dismissed = window.sessionStorage.getItem(`virelsy:nudge:${conversationId}`) === "1";
-    const id = window.setTimeout(() => setNudgeDismissed(dismissed), 0);
-    return () => window.clearTimeout(id);
-  }, [conversationId]);
+  // The assistant is the single source of conversation suggestions.
+  // Message meta is derived live from the thread so chips stay honest
+  // as the conversation moves.
+  const suggestions = useMemo(() => {
+    const settled = messages.filter((m) => !m.pending);
+    const last = settled[settled.length - 1] ?? null;
+    return assistant.suggest({
+      sharedInterests,
+      theirName: otherName,
+      theirPrompts,
+      lastMessageAt: last ? new Date(last.createdAt) : null,
+      lastMessageFromMe: last ? last.senderId === currentUserId : null,
+      messageCount: settled.length,
+      theyAreOnline,
+    });
+  }, [messages, sharedInterests, otherName, theirPrompts, currentUserId, theyAreOnline]);
 
-  const firstName = otherName.split(" ")[0];
-  const starters = startersFor(sharedInterests, firstName);
-  const dateIdeas = dateIdeasFor(sharedInterests);
-  const idea = dateIdeas[ideaIndex % dateIdeas.length];
-
-  // The conversation has real back-and-forth: both people, enough said
-  const bothTalking =
-    new Set(messages.map((m) => m.senderId)).size >= 2 && messages.length >= 12;
-  const showNudge = bothTalking && !nudgeDismissed;
-
-  function dismissNudge() {
-    setNudgeDismissed(true);
-    window.sessionStorage.setItem(`virelsy:nudge:${conversationId}`, "1");
-  }
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = useCallback((smooth = true) => {
     bottomRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "instant", block: "end" });
@@ -319,77 +282,49 @@ export function ChatThread({
         <div ref={bottomRef} />
       </div>
 
-      {/* Guided moment - the right suggestion for where you are */}
-      {showNudge ? (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 26 }}
-          className="glass mb-2.5 flex items-center gap-3 rounded-3xl p-4"
-          role="note"
+      {/* Assistant suggestions - honest chips derived from real context.
+          Tapping inserts the ready-to-send text; nothing is auto-sent. */}
+      {suggestions.length > 0 && (
+        <div
+          className="scrollbar-none flex gap-2 overflow-x-auto pb-2.5"
+          aria-label="Conversation suggestions"
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/15">
-            <Sparkles className="size-4.5 text-primary-soft" aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">You two seem to have a lot in common.</p>
-            <p className="text-xs text-muted-foreground">Maybe it&apos;s time to plan your first date.</p>
-          </div>
-          <Button
-            size="sm"
-            className="shrink-0 rounded-full"
-            onClick={() => {
-              setDraft(idea.label);
-              dismissNudge();
-            }}
-          >
-            Suggest it
-          </Button>
-          <button
-            type="button"
-            onClick={dismissNudge}
-            aria-label="Dismiss suggestion"
-            className="tap-target -mr-1 shrink-0 rounded-full p-1 text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-4" />
-          </button>
-        </motion.div>
-      ) : messages.length > 0 && messages.length < 8 && starters.length > 0 ? (
-        /* Early conversation: openers built from real shared ground */
-        <div className="scrollbar-none flex gap-2 overflow-x-auto pb-2.5" aria-label="Conversation starters">
-          {starters.slice(0, 3).map((starter) => (
-            <button
-              key={starter}
-              type="button"
-              onClick={() => setDraft(starter.split(" - ")[1] ?? starter)}
-              className="glass-chip tap-target flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-foreground/90 transition-transform active:scale-95"
-            >
-              <Sparkles className="size-3.5 text-gold" aria-hidden="true" />
-              {starter}
-            </button>
-          ))}
+          {suggestions.map((s) => {
+            const Icon = KIND_ICON[s.kind];
+            const chipClass =
+              "glass-chip tap-target flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-foreground/90";
+            return (
+              <motion.div
+                key={`${s.kind}:${s.text}`}
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={SPRING.snappy}
+                className="shrink-0"
+              >
+                {s.send ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDraft(s.send ?? "");
+                      inputRef.current?.focus();
+                    }}
+                    className={cn(chipClass, "transition-transform active:scale-95")}
+                  >
+                    <Icon className="size-3.5 text-gold" aria-hidden="true" />
+                    {s.text}
+                  </button>
+                ) : (
+                  /* No canned line to offer - the chip is a gentle note */
+                  <p role="note" className={chipClass}>
+                    <Icon className="size-3.5 text-gold" aria-hidden="true" />
+                    {s.text}
+                  </p>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
-      ) : messages.length >= 8 && messages.length < 40 ? (
-        /* Mid conversation: one date idea at a time, cycle at will */
-        <div className="flex items-center gap-2 pb-2.5" aria-label="First date idea">
-          <button
-            type="button"
-            onClick={() => setDraft(idea.label)}
-            className="glass-chip tap-target flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-foreground/90 transition-transform active:scale-95"
-          >
-            <idea.icon className="size-3.5 text-gold" aria-hidden="true" />
-            {idea.label}
-          </button>
-          <button
-            type="button"
-            onClick={() => setIdeaIndex((i) => i + 1)}
-            aria-label="Another idea"
-            className="tap-target rounded-full p-1.5 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <RefreshCcw className="size-3.5" />
-          </button>
-        </div>
-      ) : null}
+      )}
 
       {/* Glass composer */}
       <form
@@ -421,6 +356,7 @@ export function ChatThread({
           </DropdownMenuContent>
         </DropdownMenu>
         <Textarea
+          ref={inputRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {

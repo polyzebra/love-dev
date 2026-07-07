@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 import { calculateAge } from "@/lib/utils";
+import { promptLabel } from "@/config/prompts";
+import { getReplySignals } from "@/lib/services/signals";
 import type { Prisma } from "@/generated/prisma/client";
 
 /**
@@ -264,7 +266,12 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
     db.user.findFirst({
       where: { id: targetId, ...visibleWhere(viewerId, blockedIds) },
       include: {
-        profile: { include: { interests: { select: { interest: { select: { slug: true, label: true } } } } } },
+        profile: {
+          include: {
+            interests: { select: { interest: { select: { slug: true, label: true } } } },
+            prompts: { orderBy: { sortOrder: "asc" }, select: { promptKey: true, answer: true } },
+          },
+        },
         photos: {
           where: { moderation: { not: "REJECTED" } },
           orderBy: [{ isCover: "desc" }, { position: "asc" }],
@@ -281,6 +288,9 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
   ]);
   if (!target?.profile) return null;
 
+  // Honest behavioural signal - one query for the single target
+  const signals = await getReplySignals([target.id], new Map([[target.id, target.createdAt]]));
+
   const mySlugs = new Set(me?.interests.map((i) => i.interest.slug) ?? []);
   const p = target.profile;
   return {
@@ -291,9 +301,14 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
     city: p.city,
     country: p.country,
     relationshipGoal: p.relationshipGoal,
+    replySignal: signals.get(target.id) ?? null,
     isVerified: target.verifications.length > 0,
     isOnline: Date.now() - target.lastActiveAt.getTime() < 5 * 60_000,
     photos: target.photos,
+    prompts: p.prompts.map((pr) => ({ label: promptLabel(pr.promptKey), answer: pr.answer })),
+    heightCm: p.heightCm,
+    occupation: p.occupation,
+    education: p.education,
     interests: p.interests.map((i) => ({
       label: i.interest.label,
       shared: mySlugs.has(i.interest.slug),

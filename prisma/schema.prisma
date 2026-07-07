@@ -327,6 +327,7 @@ model Profile {
 
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   interests ProfileInterest[]
+  prompts   ProfilePrompt[]
 
   @@index([isVisible, gender, country])
   @@index([latitude, longitude])
@@ -705,4 +706,20 @@ model BlockedIdentity {
   createdBy String?
 
   @@index([email])
+}
+
+// Human voice on profiles - answers to curated prompts. These power
+// Discover story cards, chat openers and the match moment.
+model ProfilePrompt {
+  id        String   @id @default(cuid())
+  profileId String
+  promptKey String // canonical key from src/config/prompts.ts
+  answer    String   @db.Text
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, promptKey])
+  @@index([profileId, sortOrder])
 }

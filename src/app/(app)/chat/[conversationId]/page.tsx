@@ -13,16 +13,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline as presenceOnline } from "@/lib/presence";
+import { promptLabel } from "@/config/prompts";
 
 export const metadata: Metadata = { title: "Conversation" };
 export const dynamic = "force-dynamic";
 
 export default async function ConversationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ conversationId: string }>;
+  searchParams: Promise<{ suggest?: string | string[] }>;
 }) {
-  const { conversationId } = await params;
+  const [{ conversationId }, { suggest }] = await Promise.all([params, searchParams]);
   const user = await requireUser();
   const userId = user.id;
 
@@ -44,6 +47,10 @@ export default async function ConversationPage({
                 birthDate: true,
                 city: true,
                 interests: { select: { interest: { select: { label: true, slug: true } } } },
+                prompts: {
+                  orderBy: { sortOrder: "asc" },
+                  select: { promptKey: true, answer: true },
+                },
               },
             },
             verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
@@ -77,6 +84,12 @@ export default async function ConversationPage({
   const online = other ? presenceOnline(other.user.lastActiveAt) : false;
   const mySlugs = new Set(myProfile?.interests.map((i) => i.interest.slug) ?? []);
   const otherInterests = other?.user.profile?.interests ?? [];
+  const theirPrompts = (other?.user.profile?.prompts ?? []).map((p) => ({
+    key: p.promptKey,
+    label: promptLabel(p.promptKey),
+    answer: p.answer,
+  }));
+  const suggestedDraft = typeof suggest === "string" ? suggest.slice(0, 500) : "";
 
   const peek = {
     displayName: otherName,
@@ -158,6 +171,9 @@ export default async function ConversationPage({
         currentUserId={userId}
         otherName={otherName}
         sharedInterests={peek.sharedInterests}
+        theirPrompts={theirPrompts}
+        theyAreOnline={online}
+        initialDraft={suggestedDraft}
         initialMessages={messages as ThreadMessage[]}
       />
     </>

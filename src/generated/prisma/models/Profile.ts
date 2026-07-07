@@ -478,6 +478,7 @@ export type ProfileWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Profile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   interests?: Prisma.ProfileInterestListRelationFilter
+  prompts?: Prisma.ProfilePromptListRelationFilter
 }
 
 export type ProfileOrderByWithRelationInput = {
@@ -520,6 +521,7 @@ export type ProfileOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   interests?: Prisma.ProfileInterestOrderByRelationAggregateInput
+  prompts?: Prisma.ProfilePromptOrderByRelationAggregateInput
 }
 
 export type ProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -565,6 +567,7 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Profile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   interests?: Prisma.ProfileInterestListRelationFilter
+  prompts?: Prisma.ProfilePromptListRelationFilter
 }, "id" | "userId">
 
 export type ProfileOrderByWithAggregationInput = {
@@ -694,6 +697,7 @@ export type ProfileCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfileInput
   interests?: Prisma.ProfileInterestCreateNestedManyWithoutProfileInput
+  prompts?: Prisma.ProfilePromptCreateNestedManyWithoutProfileInput
 }
 
 export type ProfileUncheckedCreateInput = {
@@ -735,6 +739,7 @@ export type ProfileUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   interests?: Prisma.ProfileInterestUncheckedCreateNestedManyWithoutProfileInput
+  prompts?: Prisma.ProfilePromptUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type ProfileUpdateInput = {
@@ -776,6 +781,7 @@ export type ProfileUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput
   interests?: Prisma.ProfileInterestUpdateManyWithoutProfileNestedInput
+  prompts?: Prisma.ProfilePromptUpdateManyWithoutProfileNestedInput
 }
 
 export type ProfileUncheckedUpdateInput = {
@@ -817,6 +823,7 @@ export type ProfileUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interests?: Prisma.ProfileInterestUncheckedUpdateManyWithoutProfileNestedInput
+  prompts?: Prisma.ProfilePromptUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type ProfileCreateManyInput = {
@@ -1237,6 +1244,20 @@ export type ProfileUpdateOneRequiredWithoutInterestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutInterestsInput, Prisma.ProfileUpdateWithoutInterestsInput>, Prisma.ProfileUncheckedUpdateWithoutInterestsInput>
 }
 
+export type ProfileCreateNestedOneWithoutPromptsInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutPromptsInput, Prisma.ProfileUncheckedCreateWithoutPromptsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutPromptsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+}
+
+export type ProfileUpdateOneRequiredWithoutPromptsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutPromptsInput, Prisma.ProfileUncheckedCreateWithoutPromptsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutPromptsInput
+  upsert?: Prisma.ProfileUpsertWithoutPromptsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutPromptsInput, Prisma.ProfileUpdateWithoutPromptsInput>, Prisma.ProfileUncheckedUpdateWithoutPromptsInput>
+}
+
 export type ProfileCreateWithoutUserInput = {
   id?: string
   displayName: string
@@ -1275,6 +1296,7 @@ export type ProfileCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   interests?: Prisma.ProfileInterestCreateNestedManyWithoutProfileInput
+  prompts?: Prisma.ProfilePromptCreateNestedManyWithoutProfileInput
 }
 
 export type ProfileUncheckedCreateWithoutUserInput = {
@@ -1315,6 +1337,7 @@ export type ProfileUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   interests?: Prisma.ProfileInterestUncheckedCreateNestedManyWithoutProfileInput
+  prompts?: Prisma.ProfilePromptUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type ProfileCreateOrConnectWithoutUserInput = {
@@ -1371,6 +1394,7 @@ export type ProfileUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interests?: Prisma.ProfileInterestUpdateManyWithoutProfileNestedInput
+  prompts?: Prisma.ProfilePromptUpdateManyWithoutProfileNestedInput
 }
 
 export type ProfileUncheckedUpdateWithoutUserInput = {
@@ -1411,6 +1435,7 @@ export type ProfileUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interests?: Prisma.ProfileInterestUncheckedUpdateManyWithoutProfileNestedInput
+  prompts?: Prisma.ProfilePromptUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type ProfileCreateWithoutInterestsInput = {
@@ -1451,6 +1476,7 @@ export type ProfileCreateWithoutInterestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfileInput
+  prompts?: Prisma.ProfilePromptCreateNestedManyWithoutProfileInput
 }
 
 export type ProfileUncheckedCreateWithoutInterestsInput = {
@@ -1491,6 +1517,7 @@ export type ProfileUncheckedCreateWithoutInterestsInput = {
   completionPct?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  prompts?: Prisma.ProfilePromptUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type ProfileCreateOrConnectWithoutInterestsInput = {
@@ -1547,6 +1574,7 @@ export type ProfileUpdateWithoutInterestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput
+  prompts?: Prisma.ProfilePromptUpdateManyWithoutProfileNestedInput
 }
 
 export type ProfileUncheckedUpdateWithoutInterestsInput = {
@@ -1587,6 +1615,187 @@ export type ProfileUncheckedUpdateWithoutInterestsInput = {
   completionPct?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  prompts?: Prisma.ProfilePromptUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileCreateWithoutPromptsInput = {
+  id?: string
+  displayName: string
+  bio?: string | null
+  birthDate: Date | string
+  gender: $Enums.Gender
+  heightCm?: number | null
+  relationshipGoal?: $Enums.RelationshipGoal
+  city?: string | null
+  region?: string | null
+  country?: string
+  latitude?: number | null
+  longitude?: number | null
+  occupation?: string | null
+  employer?: string | null
+  education?: $Enums.EducationLevel | null
+  school?: string | null
+  languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
+  smoking?: $Enums.LifestyleFrequency
+  drinking?: $Enums.LifestyleFrequency
+  exercise?: $Enums.ExerciseLevel | null
+  religion?: string | null
+  children?: $Enums.ChildrenStatus | null
+  pets?: $Enums.PetPreference | null
+  interestedIn?: Prisma.ProfileCreateinterestedInInput | $Enums.Gender[]
+  minAge?: number
+  maxAge?: number
+  maxDistanceKm?: number
+  isVisible?: boolean
+  isBoosted?: boolean
+  boostedUntil?: Date | string | null
+  completionPct?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProfileInput
+  interests?: Prisma.ProfileInterestCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileUncheckedCreateWithoutPromptsInput = {
+  id?: string
+  userId: string
+  displayName: string
+  bio?: string | null
+  birthDate: Date | string
+  gender: $Enums.Gender
+  heightCm?: number | null
+  relationshipGoal?: $Enums.RelationshipGoal
+  city?: string | null
+  region?: string | null
+  country?: string
+  latitude?: number | null
+  longitude?: number | null
+  occupation?: string | null
+  employer?: string | null
+  education?: $Enums.EducationLevel | null
+  school?: string | null
+  languages?: Prisma.ProfileCreatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileCreateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileCreatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileCreatecommunityTagsInput | string[]
+  smoking?: $Enums.LifestyleFrequency
+  drinking?: $Enums.LifestyleFrequency
+  exercise?: $Enums.ExerciseLevel | null
+  religion?: string | null
+  children?: $Enums.ChildrenStatus | null
+  pets?: $Enums.PetPreference | null
+  interestedIn?: Prisma.ProfileCreateinterestedInInput | $Enums.Gender[]
+  minAge?: number
+  maxAge?: number
+  maxDistanceKm?: number
+  isVisible?: boolean
+  isBoosted?: boolean
+  boostedUntil?: Date | string | null
+  completionPct?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  interests?: Prisma.ProfileInterestUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileCreateOrConnectWithoutPromptsInput = {
+  where: Prisma.ProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutPromptsInput, Prisma.ProfileUncheckedCreateWithoutPromptsInput>
+}
+
+export type ProfileUpsertWithoutPromptsInput = {
+  update: Prisma.XOR<Prisma.ProfileUpdateWithoutPromptsInput, Prisma.ProfileUncheckedUpdateWithoutPromptsInput>
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutPromptsInput, Prisma.ProfileUncheckedCreateWithoutPromptsInput>
+  where?: Prisma.ProfileWhereInput
+}
+
+export type ProfileUpdateToOneWithWhereWithoutPromptsInput = {
+  where?: Prisma.ProfileWhereInput
+  data: Prisma.XOR<Prisma.ProfileUpdateWithoutPromptsInput, Prisma.ProfileUncheckedUpdateWithoutPromptsInput>
+}
+
+export type ProfileUpdateWithoutPromptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  heightCm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  relationshipGoal?: Prisma.EnumRelationshipGoalFieldUpdateOperationsInput | $Enums.RelationshipGoal
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  occupation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
+  smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
+  drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
+  exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
+  religion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  children?: Prisma.NullableEnumChildrenStatusFieldUpdateOperationsInput | $Enums.ChildrenStatus | null
+  pets?: Prisma.NullableEnumPetPreferenceFieldUpdateOperationsInput | $Enums.PetPreference | null
+  interestedIn?: Prisma.ProfileUpdateinterestedInInput | $Enums.Gender[]
+  minAge?: Prisma.IntFieldUpdateOperationsInput | number
+  maxAge?: Prisma.IntFieldUpdateOperationsInput | number
+  maxDistanceKm?: Prisma.IntFieldUpdateOperationsInput | number
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBoosted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  boostedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completionPct?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput
+  interests?: Prisma.ProfileInterestUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileUncheckedUpdateWithoutPromptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  heightCm?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  relationshipGoal?: Prisma.EnumRelationshipGoalFieldUpdateOperationsInput | $Enums.RelationshipGoal
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  occupation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  languages?: Prisma.ProfileUpdatelanguagesInput | string[]
+  availabilityTags?: Prisma.ProfileUpdateavailabilityTagsInput | string[]
+  personalityTags?: Prisma.ProfileUpdatepersonalityTagsInput | string[]
+  communityTags?: Prisma.ProfileUpdatecommunityTagsInput | string[]
+  smoking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
+  drinking?: Prisma.EnumLifestyleFrequencyFieldUpdateOperationsInput | $Enums.LifestyleFrequency
+  exercise?: Prisma.NullableEnumExerciseLevelFieldUpdateOperationsInput | $Enums.ExerciseLevel | null
+  religion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  children?: Prisma.NullableEnumChildrenStatusFieldUpdateOperationsInput | $Enums.ChildrenStatus | null
+  pets?: Prisma.NullableEnumPetPreferenceFieldUpdateOperationsInput | $Enums.PetPreference | null
+  interestedIn?: Prisma.ProfileUpdateinterestedInInput | $Enums.Gender[]
+  minAge?: Prisma.IntFieldUpdateOperationsInput | number
+  maxAge?: Prisma.IntFieldUpdateOperationsInput | number
+  maxDistanceKm?: Prisma.IntFieldUpdateOperationsInput | number
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBoosted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  boostedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completionPct?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  interests?: Prisma.ProfileInterestUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 
@@ -1596,10 +1805,12 @@ export type ProfileUncheckedUpdateWithoutInterestsInput = {
 
 export type ProfileCountOutputType = {
   interests: number
+  prompts: number
 }
 
 export type ProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   interests?: boolean | ProfileCountOutputTypeCountInterestsArgs
+  prompts?: boolean | ProfileCountOutputTypeCountPromptsArgs
 }
 
 /**
@@ -1617,6 +1828,13 @@ export type ProfileCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type ProfileCountOutputTypeCountInterestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ProfileInterestWhereInput
+}
+
+/**
+ * ProfileCountOutputType without action
+ */
+export type ProfileCountOutputTypeCountPromptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfilePromptWhereInput
 }
 
 
@@ -1660,6 +1878,7 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   interests?: boolean | Prisma.Profile$interestsArgs<ExtArgs>
+  prompts?: boolean | Prisma.Profile$promptsArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["profile"]>
 
@@ -1789,6 +2008,7 @@ export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   interests?: boolean | Prisma.Profile$interestsArgs<ExtArgs>
+  prompts?: boolean | Prisma.Profile$promptsArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1803,6 +2023,7 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     interests: Prisma.$ProfileInterestPayload<ExtArgs>[]
+    prompts: Prisma.$ProfilePromptPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2238,6 +2459,7 @@ export interface Prisma__ProfileClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   interests<T extends Prisma.Profile$interestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$interestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfileInterestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  prompts<T extends Prisma.Profile$promptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$promptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfilePromptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2726,6 +2948,30 @@ export type Profile$interestsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.ProfileInterestScalarFieldEnum | Prisma.ProfileInterestScalarFieldEnum[]
+}
+
+/**
+ * Profile.prompts
+ */
+export type Profile$promptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfilePrompt
+   */
+  select?: Prisma.ProfilePromptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfilePrompt
+   */
+  omit?: Prisma.ProfilePromptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfilePromptInclude<ExtArgs> | null
+  where?: Prisma.ProfilePromptWhereInput
+  orderBy?: Prisma.ProfilePromptOrderByWithRelationInput | Prisma.ProfilePromptOrderByWithRelationInput[]
+  cursor?: Prisma.ProfilePromptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfilePromptScalarFieldEnum | Prisma.ProfilePromptScalarFieldEnum[]
 }
 
 /**

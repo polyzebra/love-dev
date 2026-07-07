@@ -115,6 +115,7 @@ async function main() {
 main()
   .then(() => seedExplore())
   .then(() => seedExtras())
+  .then(() => seedPrompts())
   .then(() => db.$disconnect())
   .catch(async (e) => {
     console.error(e);
@@ -199,4 +200,102 @@ for (let i = 0; i < EXTRA.length; i++) {
   }
 }
 console.log(`✓ ${EXTRA.length} extra demo profiles (12 total)`);
+}
+
+// ---------------------------------------------------------------------------
+// Profile prompts - the human voice on every demo profile. Keys come from
+// src/config/prompts.ts; delete-then-create keeps the seed idempotent.
+// ---------------------------------------------------------------------------
+const DEMO_PROMPTS: Record<string, { key: string; answer: string }[]> = {
+  saoirse: [
+    { key: "typical-saturday", answer: "Forty Foot swim before the crowds, flat white on the walk back, then an afternoon lost in the Hugh Lane." },
+    { key: "green-flags", answer: "You have a library card and you are not afraid to lose at Scrabble gracefully." },
+    { key: "favourite-place", answer: "The Great South Wall at low tide. Half the city behind you, all that sky in front." },
+    { key: "starter", answer: "Tell me the last book you pressed into someone's hands." },
+  ],
+  cian: [
+    { key: "typical-saturday", answer: "Long cycle out to Spiddal, back for a toastie, then a trad session in the Crane Bar until they turn the lights on." },
+    { key: "perfect-first-date", answer: "Pints and a corner seat near the music. If you can sit through a slow air without checking your phone, we are grand." },
+    { key: "small-happy", answer: "When the whole pub goes quiet for the sean nos singer." },
+  ],
+  aoife: [
+    { key: "typical-saturday", answer: "English Market first thing for cheese and good bread, then up a hill somewhere with the leftovers." },
+    { key: "small-happy", answer: "The crackle a proper sourdough crust makes when it is cooling. Twelve hour shifts melt away." },
+    { key: "looking-for", answer: "Someone patient, a bit soft, and honest about wanting the long thing." },
+    { key: "starter", answer: "Bring me a bake you are proud of and I will give you an honest review." },
+  ],
+  oliver: [
+    { key: "typical-saturday", answer: "Five-a-side in the morning, record shopping in Camden after, and whoever wins the group chat picks the gig." },
+    { key: "perfect-first-date", answer: "A matinee at the Prince Charles, then arguing about the film over a Sunday roast." },
+    { key: "green-flags", answer: "You rate the support act. You tip properly. You have one film you defend against all critics." },
+  ],
+  amelia: [
+    { key: "typical-saturday", answer: "Parkrun at 9, Northern Quarter coffee by 11, and I will absolutely judge the latte art." },
+    { key: "relationship-style", answer: "Steady and curious. I like plans, but I like being talked into better ones more." },
+    { key: "small-happy", answer: "A new PB and a podcast episode that makes me miss my tram stop." },
+    { key: "starter", answer: "Recommend me a podcast and I will actually listen to it before we meet." },
+  ],
+  rory: [
+    { key: "typical-saturday", answer: "Up the Mournes with Murphy the collie, camera in the bag, pints in the Crown after to earn it." },
+    { key: "green-flags", answer: "The dog likes you. Honestly that is most of it. Bonus points if you carry your own snacks uphill." },
+    { key: "favourite-place", answer: "The saddle below Slieve Donard just as the cloud lifts. Best office in Ireland." },
+  ],
+  nia: [
+    { key: "perfect-first-date", answer: "Watershed screening, then cider by the harbourside while we pull the plot apart." },
+    { key: "small-happy", answer: "Shipping something on a Friday and closing the laptop like a car door." },
+    { key: "looking-for", answer: "Fun, honestly. Good company, good chat, no five year plan required." },
+  ],
+  tomas: [
+    { key: "typical-saturday", answer: "Golden hour on the Clare hills with the camera, then chips on the drive home while the shots back up." },
+    { key: "favourite-place", answer: "Lough Gur just after sunrise, mist still on the water. I have a hundred photos and none of them do it justice." },
+    { key: "looking-for", answer: "Someone to share the quiet moments with. The loud ones sort themselves out." },
+    { key: "green-flags", answer: "You do not mind waiting twenty minutes for the light to be right." },
+  ],
+  freya: [
+    { key: "typical-saturday", answer: "Charity bookshops in the morning, knitting group in the afternoon, and a stack of library holds to collect in between." },
+    { key: "small-happy", answer: "Finishing a jumper and realising the sleeves actually match this time." },
+    { key: "starter", answer: "Tell me a book that changed your mind about something. I am here for new friends and good recommendations." },
+  ],
+  marco: [
+    { key: "typical-saturday", answer: "Farmers market haul, then an afternoon cooking something from wherever I travelled last. Neighbours get the leftovers." },
+    { key: "perfect-first-date", answer: "You bring the wine, I cook. If that feels like too much, the Greenway and an ice cream works too." },
+    { key: "favourite-place", answer: "A tiny trattoria in Lecce where the nonna decided my order for me. She was right." },
+    { key: "relationship-style", answer: "Easy going. I am open to casual or serious, mostly I just want it to feel natural." },
+  ],
+  priya: [
+    { key: "typical-saturday", answer: "Heavy leg day, massive brunch, then queueing early for whoever is playing the O2 Institute." },
+    { key: "green-flags", answer: "You sing along wrong and do not care. You re-rack your weights. You text when you say you will." },
+    { key: "looking-for", answer: "Something real. I am done auditioning people who are just passing time." },
+  ],
+  sean: [
+    { key: "typical-saturday", answer: "Beach run at Strandhill with the dog going absolutely feral in the dunes, then a chicken fillet roll each. He earned his." },
+    { key: "small-happy", answer: "That first stretch of a run when the rain holds off and the tunes hit right." },
+    { key: "starter", answer: "Dog photos first, questions later." },
+  ],
+};
+
+async function seedPrompts() {
+  let total = 0;
+  for (const [handle, prompts] of Object.entries(DEMO_PROMPTS)) {
+    const profile = await db.profile.findFirst({
+      where: { user: { email: `${handle}@demo.virelsy.app` } },
+      select: { id: true },
+    });
+    if (!profile) {
+      console.warn(`  ! no profile for ${handle}, skipping prompts`);
+      continue;
+    }
+    await db.profilePrompt.deleteMany({ where: { profileId: profile.id } });
+    await db.profilePrompt.createMany({
+      data: prompts.map((p, index) => ({
+        profileId: profile.id,
+        promptKey: p.key,
+        answer: p.answer,
+        sortOrder: index,
+      })),
+      skipDuplicates: true,
+    });
+    total += prompts.length;
+  }
+  console.log(`✓ ${total} profile prompts across ${Object.keys(DEMO_PROMPTS).length} demo profiles`);
 }

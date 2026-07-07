@@ -16,7 +16,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { INTEREST_CATALOGUE, LANGUAGES, BIO_MAX_LENGTH } from "@/lib/constants";
 import { AVAILABILITY_OPTIONS, COMMUNITY_OPTIONS, PERSONALITY_OPTIONS } from "@/config/discovery-taxonomy";
+import { PROFILE_PROMPTS, type PromptKey } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
+
+const PROMPT_ANSWER_MAX = 280;
+const MAX_PROMPTS = 4;
+
+const PROMPT_PLACEHOLDERS: Record<PromptKey, string> = {
+  "typical-saturday": "Farmers market, sea swim, big breakfast…",
+  "perfect-first-date": "Somewhere we can actually talk…",
+  "green-flags": "Kind to waiters, texts back, laughs easily…",
+  "relationship-style": "Slow burn? All in? Say it your way…",
+  "favourite-place": "A beach, a bookshop, your nan's kitchen…",
+  "small-happy": "First coffee of the day, a dog saying hello…",
+  "looking-for": "Honest answers get honest replies…",
+  "starter": "Ask me about… tell me about…",
+};
 
 type WizardData = {
   displayName: string;
@@ -40,6 +55,7 @@ type WizardData = {
   availabilityTags: string[];
   personalityTags: string[];
   communityTags: string[];
+  prompts: { key: PromptKey; answer: string }[];
 };
 
 const GENDERS = [
@@ -70,7 +86,7 @@ const CITIES: Record<"IE" | "GB", string[]> = {
   GB: ["London", "Manchester", "Birmingham", "Edinburgh", "Glasgow", "Bristol", "Leeds", "Liverpool", "Cardiff", "Newcastle"],
 };
 
-const STEPS = ["Basics", "Intentions", "Location", "About you", "Lifestyle", "Interests"] as const;
+const STEPS = ["Basics", "Intentions", "Location", "About you", "Lifestyle", "Interests", "Prompts"] as const;
 
 /** Honest value, shown after each completed step - explanation, not pressure. */
 const STEP_VALUE: Record<number, string> = {
@@ -79,6 +95,7 @@ const STEP_VALUE: Record<number, string> = {
   2: "You'll only be shown to people within reach. Your exact location stays private.",
   3: "Profiles with a bio start far more conversations.",
   4: "Lifestyle details quietly improve who we introduce you to.",
+  5: "Shared interests give people an easy way to say hello.",
 };
 
 /** Milestones worth pausing for. */
@@ -156,6 +173,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     availabilityTags: [],
     personalityTags: [],
     communityTags: [],
+    prompts: [],
   });
 
   const set = <K extends keyof WizardData>(key: K, value: WizardData[K]) =>
@@ -168,6 +186,26 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
       if (list.length >= max) return d;
       return { ...d, [key]: [...list, value] };
     });
+
+  /** Selection order is preserved - it becomes sortOrder on the profile. */
+  const togglePrompt = (key: PromptKey) =>
+    setData((d) => {
+      if (d.prompts.some((p) => p.key === key))
+        return { ...d, prompts: d.prompts.filter((p) => p.key !== key) };
+      if (d.prompts.length >= MAX_PROMPTS) return d;
+      return { ...d, prompts: [...d.prompts, { key, answer: "" }] };
+    });
+
+  const setPromptAnswer = (key: PromptKey, answer: string) =>
+    setData((d) => ({
+      ...d,
+      prompts: d.prompts.map((p) => (p.key === key ? { ...p, answer } : p)),
+    }));
+
+  const answeredPrompts = useMemo(
+    () => data.prompts.filter((p) => p.answer.trim().length > 0).length,
+    [data.prompts],
+  );
 
   const age = useMemo(
     () => (data.birthDate ? calculateAge(data.birthDate) : null),
@@ -190,8 +228,9 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     if (data.education) score += 4;
     if (data.exercise || data.children || data.pets) score += 5;
     score += Math.min(12, data.interests.length * 2);
+    score += Math.min(9, answeredPrompts * 3);
     return Math.min(100, score);
-  }, [data, age]);
+  }, [data, age, answeredPrompts]);
 
   // Celebrate genuine milestones once each - explanation, not manipulation
   useEffect(() => {
@@ -219,6 +258,8 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         return true; // optional enrichment
       case 5:
         return data.interests.length >= 3;
+      case 6:
+        return true; // prompts encouraged, never required
       default:
         return false;
     }
@@ -251,6 +292,9 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         availabilityTags: data.availabilityTags,
         personalityTags: data.personalityTags,
         communityTags: data.communityTags,
+        prompts: data.prompts
+          .map((p) => ({ key: p.key, answer: p.answer.trim() }))
+          .filter((p) => p.answer.length > 0),
       }),
     });
     setSubmitting(false);
@@ -739,6 +783,91 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   </div>
                 </fieldset>
               ))}
+            </div>
+          )}
+
+          {step === 6 && (
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  A few words in your voice
+                </h1>
+                <p className="text-muted-foreground">
+                  Your answers become conversation starters. Three is the sweet
+                  spot - but you can always add them later.
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground" aria-live="polite">
+                {answeredPrompts === 0
+                  ? `Pick up to ${MAX_PROMPTS} prompts that sound like you.`
+                  : `${answeredPrompts} answered${answeredPrompts < 3 ? " - a couple more and your profile really talks" : ". Lovely."}`}
+              </p>
+              <div className="grid gap-2">
+                {PROFILE_PROMPTS.map((prompt) => {
+                  const entry = data.prompts.find((p) => p.key === prompt.key);
+                  const selected = Boolean(entry);
+                  const atLimit = !selected && data.prompts.length >= MAX_PROMPTS;
+                  return (
+                    <div
+                      key={prompt.key}
+                      className={cn(
+                        "rounded-2xl border transition-all",
+                        selected
+                          ? "border-primary bg-accent shadow-card"
+                          : "bg-card",
+                        !selected && !atLimit && "hover:border-primary/40",
+                        atLimit && "opacity-45",
+                      )}
+                    >
+                      <button
+                        type="button"
+                        aria-expanded={selected}
+                        disabled={atLimit}
+                        onClick={() => togglePrompt(prompt.key)}
+                        className="tap-target flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                      >
+                        <span className="font-medium">{prompt.label}</span>
+                        <span
+                          className={cn(
+                            "size-5 shrink-0 rounded-full border-2 transition-colors",
+                            selected
+                              ? "border-primary bg-primary"
+                              : "border-muted-foreground/30",
+                          )}
+                          aria-hidden="true"
+                        />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {entry && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.32, ease: EASE_LUXE }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-1 px-5 pb-4">
+                              <Textarea
+                                autoFocus
+                                value={entry.answer}
+                                onChange={(e) => setPromptAnswer(prompt.key, e.target.value)}
+                                maxLength={PROMPT_ANSWER_MAX}
+                                rows={3}
+                                placeholder={PROMPT_PLACEHOLDERS[prompt.key]}
+                                className="rounded-2xl"
+                                aria-label={prompt.label}
+                              />
+                              <p className="text-right text-xs tabular-nums text-muted-foreground">
+                                {entry.answer.length}/{PROMPT_ANSWER_MAX}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </motion.div>

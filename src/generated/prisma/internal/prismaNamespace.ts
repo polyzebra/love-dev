@@ -407,7 +407,8 @@ export const ModelName = {
   ExploreCategory: 'ExploreCategory',
   UserExplorePreference: 'UserExplorePreference',
   AnalyticsEvent: 'AnalyticsEvent',
-  BlockedIdentity: 'BlockedIdentity'
+  BlockedIdentity: 'BlockedIdentity',
+  ProfilePrompt: 'ProfilePrompt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity"
+    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2203,6 +2204,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProfilePrompt: {
+      payload: Prisma.$ProfilePromptPayload<ExtArgs>
+      fields: Prisma.ProfilePromptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfilePromptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfilePromptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfilePromptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfilePromptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>
+        }
+        findMany: {
+          args: Prisma.ProfilePromptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>[]
+        }
+        create: {
+          args: Prisma.ProfilePromptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>
+        }
+        createMany: {
+          args: Prisma.ProfilePromptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfilePromptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfilePromptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>
+        }
+        update: {
+          args: Prisma.ProfilePromptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfilePromptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfilePromptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfilePromptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfilePromptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePromptPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfilePromptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfilePrompt>
+        }
+        groupBy: {
+          args: Prisma.ProfilePromptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfilePromptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfilePromptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfilePromptCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2612,6 +2687,18 @@ export const BlockedIdentityScalarFieldEnum = {
 } as const
 
 export type BlockedIdentityScalarFieldEnum = (typeof BlockedIdentityScalarFieldEnum)[keyof typeof BlockedIdentityScalarFieldEnum]
+
+
+export const ProfilePromptScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  promptKey: 'promptKey',
+  answer: 'answer',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfilePromptScalarFieldEnum = (typeof ProfilePromptScalarFieldEnum)[keyof typeof ProfilePromptScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3235,6 +3322,7 @@ export type GlobalOmitConfig = {
   userExplorePreference?: Prisma.UserExplorePreferenceOmit
   analyticsEvent?: Prisma.AnalyticsEventOmit
   blockedIdentity?: Prisma.BlockedIdentityOmit
+  profilePrompt?: Prisma.ProfilePromptOmit
 }
 
 /* Types for Logging */

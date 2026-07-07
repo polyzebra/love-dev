@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { calculateAge } from "@/lib/utils";
 import { computeCompatibility, type ScoringProfile } from "@/lib/services/scoring";
+import { getReplySignals } from "@/lib/services/signals";
+import { promptLabel } from "@/config/prompts";
+import type { RelationshipGoal } from "@/generated/prisma/enums";
 
 /**
  * Discovery feed. Excludes: self, already-swiped, blocked (either way),
@@ -24,6 +27,22 @@ export type DiscoverProfile = {
   photos: { url: string; blurDataUrl: string | null }[];
   compatibility: number;
   reasons: string[];
+  /** Raw goal - lets the client detect real shared-goal overlap. */
+  relationshipGoal: RelationshipGoal;
+  /** Human phrasing of relationshipGoal - the card's opening line. */
+  goalLine: string | null;
+  /** The candidate's first prompt answer, in their own words. */
+  promptTease: { label: string; answer: string } | null;
+  /** Honest reply-behaviour label from real message timestamps. */
+  replySignal: string | null;
+};
+
+const GOAL_LINES: Record<RelationshipGoal, string> = {
+  LONG_TERM: "Looking for something real",
+  SHORT_TERM: "Keeping it light for now",
+  OPEN_TO_EITHER: "Open to where it goes",
+  FRIENDSHIP: "Here for real friendship",
+  FIGURING_OUT: "Figuring out what they want",
 };
 
 const ONLINE_WINDOW_MS = 5 * 60_000;
@@ -104,6 +123,11 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
     },
     include: {
       interests: { include: { interest: true } },
+      prompts: {
+        orderBy: { sortOrder: "asc" },
+        take: 2,
+        select: { promptKey: true, answer: true },
+      },
       user: {
         select: {
           lastActiveAt: true,
@@ -127,6 +151,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
   const viewerScoring = toScoringProfile(me);
 
   const results: DiscoverProfile[] = [];
+  const createdAtById = new Map<string, Date>();
   for (const c of candidates) {
     let distanceKm: number | null = null;
     if (
@@ -139,6 +164,9 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       if (distanceKm > me.maxDistanceKm) continue;
     }
 
+    createdAtById.set(c.userId, c.user.createdAt);
+
+    const firstPrompt = c.prompts[0];
     results.push({
       userId: c.userId,
       displayName: c.displayName,
@@ -152,6 +180,12 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       isBoosted: c.isBoosted,
       interests: c.interests.map((i) => i.interest.label),
       photos: c.user.photos,
+      relationshipGoal: c.relationshipGoal,
+      goalLine: GOAL_LINES[c.relationshipGoal] ?? null,
+      promptTease: firstPrompt
+        ? { label: promptLabel(firstPrompt.promptKey), answer: firstPrompt.answer }
+        : null,
+      replySignal: null, // filled in below for the final result set only
       ...(() => {
         const { score, reasons } = computeCompatibility(
           viewerScoring,
@@ -170,5 +204,14 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
 
   // Deterministic ranking: best compatibility first - never random order
   results.sort((a, b) => b.compatibility - a.compatibility);
-  return results.slice(0, take);
+  const feed = results.slice(0, take);
+
+  // One batched reply-signal lookup for the profiles we actually return
+  const signals = await getReplySignals(
+    feed.map((p) => p.userId),
+    createdAtById,
+  );
+  for (const p of feed) p.replySignal = signals.get(p.userId) ?? null;
+
+  return feed;
 }

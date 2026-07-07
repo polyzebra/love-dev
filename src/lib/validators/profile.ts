@@ -1,5 +1,24 @@
 import { z } from "zod";
 import { BIO_MAX_LENGTH, MAX_AGE, MIN_AGE } from "@/lib/constants";
+import { PROFILE_PROMPTS, type PromptKey } from "@/config/prompts";
+
+const PROMPT_KEYS = PROFILE_PROMPTS.map((p) => p.key) as [PromptKey, ...PromptKey[]];
+export const promptKeyEnum = z.enum(PROMPT_KEYS);
+
+export const PROMPT_ANSWER_MAX_LENGTH = 280;
+
+export const profilePromptsSchema = z
+  .array(
+    z.object({
+      key: promptKeyEnum,
+      answer: z.string().trim().min(1).max(PROMPT_ANSWER_MAX_LENGTH),
+    }),
+  )
+  .max(4, "Answer at most 4 prompts")
+  .refine(
+    (list) => new Set(list.map((p) => p.key)).size === list.length,
+    "Each prompt can only be answered once",
+  );
 
 export const genderEnum = z.enum(["WOMAN", "MAN", "NON_BINARY", "OTHER"]);
 export const relationshipGoalEnum = z.enum([
@@ -57,6 +76,7 @@ export const onboardingSchema = z
     children: childrenEnum.optional().nullable(),
     pets: petsEnum.optional().nullable(),
     religion: z.string().trim().max(60).optional().nullable(),
+    prompts: profilePromptsSchema.optional().default([]),
   })
   .strict();
 
