@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { db } from "@/lib/db";
-import { isIdentityBlocked, teardownAccount } from "@/lib/auth/identity";
+import { isIdentityBlocked, recycleDeletedRow, teardownAccount } from "@/lib/auth/identity";
 
 /**
  * OAuth / magic-link callback - the ONLY place an app User row is
@@ -57,15 +57,31 @@ export async function GET(request: NextRequest) {
 
   const existing = await db.user.findUnique({ where: { id: u.id } });
   if (existing) {
-    if (existing.status === "DELETED" || existing.status === "SUSPENDED") {
+    // Bans stay banned - but normal deletion is NOT a ban
+    if (existing.status === "SUSPENDED") {
       await supabase.auth.signOut().catch(() => {});
       return fail("AccountBlocked");
     }
-    await db.user.update({
-      where: { id: u.id },
-      data: { email, lastActiveAt: new Date() },
-    });
-    return redirect;
+    if (existing.status === "DELETED") {
+      // Tinder-style re-registration: drop the anonymized shell and
+      // fall through to a completely fresh account (same auth uid,
+      // zero history - onboarding starts from scratch)
+      await recycleDeletedRow(existing.id);
+    } else {
+      // DEACTIVATED = in-app deletion within the grace window:
+      // signing in cancels it, as promised at deletion time
+      await db.user.update({
+        where: { id: u.id },
+        data: {
+          email,
+          lastActiveAt: new Date(),
+          ...(existing.status === "DEACTIVATED"
+            ? { status: "ACTIVE", deletionRequested: null }
+            : {}),
+        },
+      });
+      return redirect;
+    }
   }
 
   // New identity. If a DELETED row still holds this email, tombstone it

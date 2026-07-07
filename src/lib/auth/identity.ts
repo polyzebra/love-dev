@@ -17,16 +17,19 @@ export async function isIdentityBlocked(email: string, provider?: string): Promi
 }
 
 /**
- * Full account teardown for an auth-user deletion. Marks the row
- * DELETED, frees the email with a tombstone (so a future signup is a
- * genuinely NEW account - never resurrection), hides the profile and
- * clears device/push state. GDPR hard-delete rides deletionRequested.
+ * Tinder-style account deletion: profile data is deleted or
+ * GDPR-anonymized immediately; the EMAIL IS FREED so the person may
+ * register again later - as a completely new identity. Chats/matches
+ * keep an anonymized shell until the retention job hard-deletes them
+ * (deletionRequested drives the 30-day GDPR cleanup). Normal deletion
+ * is NOT a ban: nothing is written to BlockedIdentity here.
  */
 export async function teardownAccount(userId: string, reason: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
   const tombstone = `deleted+${userId}@tombstone.virelsy.app`;
   await db.$transaction([
+    // Anonymized shell - identity gone, email freed for re-registration
     db.user.update({
       where: { id: userId },
       data: {
@@ -35,11 +38,28 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
         deletionRequested: new Date(),
         name: null,
         image: null,
+        phone: null,
+        phoneVerified: null,
       },
     }),
-    db.profile.updateMany({ where: { userId }, data: { isVisible: false } }),
+    // Hard-delete everything personal right away
+    db.photo.deleteMany({ where: { userId } }),
+    db.verification.deleteMany({ where: { userId } }),
+    db.profile.deleteMany({ where: { userId } }),
+    db.userExplorePreference.deleteMany({ where: { userId } }),
     db.device.deleteMany({ where: { userId } }),
     db.notification.deleteMany({ where: { userId } }),
   ]);
-  console.info(`[identity] account ${userId} torn down (${reason})`);
+  console.info(`[identity] account ${userId} deleted (${reason}) - email freed`);
+}
+
+/**
+ * A DELETED shell whose auth uid signs in again: remove the shell so
+ * a brand-new account can be created under the same auth uid. Chats/
+ * matches attached to the shell fall away with it (cascade) - nothing
+ * from the old life reconnects.
+ */
+export async function recycleDeletedRow(userId: string): Promise<void> {
+  await db.user.delete({ where: { id: userId } }).catch(() => {});
+  console.info(`[identity] deleted shell ${userId} recycled for fresh registration`);
 }
