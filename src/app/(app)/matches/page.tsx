@@ -66,7 +66,7 @@ export default async function MatchesPage() {
         title="Matches"
         description={`${matches.length} ${matches.length === 1 ? "person" : "people"} liked you back.`}
       />
-      <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <ul className="grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
         {matches.map((m) => {
           const other = m.userAId === userId ? m.userB : m.userA;
           const name = other.profile?.displayName ?? "Member";
