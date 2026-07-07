@@ -105,7 +105,7 @@ export function ExploreCard({ card }: { card: ExploreCardData }) {
           )}
           <div className="flex items-center justify-between pt-1">
             <span className="flex items-center gap-2 text-xs tabular-nums text-muted-foreground">
-              {card.count > 0 ? `${card.count} people` : "New here"}
+              {card.count} people
               {card.online > 0 && (
                 <span className="flex items-center gap-1 text-emerald-400">
                   <span className="relative flex size-1.5">
@@ -117,7 +117,7 @@ export function ExploreCard({ card }: { card: ExploreCardData }) {
               )}
             </span>
             <span className="glass-chip rounded-full px-3 py-1 text-[11px] font-semibold text-foreground/90 transition-colors group-hover:bg-primary/25 group-hover:text-white">
-              {card.count > 0 ? "See people" : "Be the first"}
+              See people
             </span>
           </div>
         </div>

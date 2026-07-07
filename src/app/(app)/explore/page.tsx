@@ -4,9 +4,7 @@ import { BadgeCheck, ChevronRight, Compass, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getDiscoverFeed, type DiscoverProfile } from "@/lib/services/discovery";
-import { getExploreCategories, getExploreMatches, track } from "@/lib/services/explore";
-import { ExploreCard, type ExploreCardData } from "@/components/explore/explore-card";
-import { Button } from "@/components/ui/button";
+import { getExploreMatches, track } from "@/lib/services/explore";
 import { EmptyState } from "@/components/shared/empty-state";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { initialsOf } from "@/lib/utils";
@@ -134,9 +132,8 @@ export default async function ExplorePage() {
     { slug: "music-lovers", reason: "Gig buddies and playlist swappers" },
   ].filter((r, i, all) => all.findIndex((x) => x.slug === r.slug) === i);
 
-  const [recommended, categories, ...rows] = await Promise.all([
+  const [recommended, ...rows] = await Promise.all([
     getDiscoverFeed(userId, 10),
-    getExploreCategories(userId),
     ...rowSlugs.map((r) => getExploreMatches(userId, r.slug, { pageSize: 10 })),
   ]);
 
@@ -146,26 +143,7 @@ export default async function ExplorePage() {
 
   const interestBits = me?.interests.map((i) => i.interest.label) ?? [];
 
-  // Development safety net: never a blank Explore while iterating locally.
-  const DEV_DEMO: (ExploreCardData & { group: string })[] =
-    process.env.NODE_ENV === "development" && categories.length === 0
-      ? [
-          { slug: "coffee-dates", title: "Coffee dates", description: "Demo - run npx prisma db seed", group: "LIFESTYLE", iconKey: "coffee", imageUrl: null, gradientFrom: "#d9a066", gradientTo: "#7a4a21", count: 0, online: 0, saved: false, preview: [] },
-          { slug: "long-term-partner", title: "Long-term partner", description: "Demo - run npx prisma db seed", group: "GOALS", iconKey: "long-term", imageUrl: null, gradientFrom: "#fb7185", gradientTo: "#881337", count: 0, online: 0, saved: false, preview: [] },
-          { slug: "free-tonight", title: "Free tonight", description: "Demo - run npx prisma db seed", group: "TODAY", iconKey: "tonight", imageUrl: null, gradientFrom: "#818cf8", gradientTo: "#1e1b4b", count: 0, online: 0, saved: false, preview: [] },
-        ]
-      : [];
-  const allCategories = categories.length > 0 ? categories : DEV_DEMO;
-
-  const GROUP_LABELS: Record<string, string> = {
-    TODAY: "Today", GOALS: "Relationship goals", LIFESTYLE: "Lifestyle",
-    INTERESTS: "Interests", PERSONALITY: "Personality", COMMUNITIES: "Communities",
-  };
-  const catSections = ["TODAY", "GOALS", "LIFESTYLE", "INTERESTS", "PERSONALITY", "COMMUNITIES"]
-    .map((g) => ({ group: g, label: GROUP_LABELS[g], cards: allCategories.filter((c) => c.group === g) }))
-    .filter((sec) => sec.cards.length > 0);
-
-  if (recommended.length === 0 && liveRows.length === 0 && catSections.length === 0) {
+  if (recommended.length === 0 && liveRows.length === 0) {
     return (
       <>
         <h1 className="pb-6 font-display text-3xl font-medium tracking-tight md:text-4xl">Explore</h1>
@@ -173,13 +151,6 @@ export default async function ExplorePage() {
           icon={Compass}
           title="No one to show just yet"
           description="Widen your discovery preferences, or check back soon - new people join every day."
-          action={
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button className="rounded-full" asChild><Link href="/settings/discovery">Update preferences</Link></Button>
-              <Button variant="outline" className="rounded-full" asChild><Link href="/discover">Go to Discover</Link></Button>
-              <Button variant="outline" className="rounded-full" asChild><Link href="/profile">Complete profile</Link></Button>
-            </div>
-          }
         />
       </>
     );
@@ -210,22 +181,6 @@ export default async function ExplorePage() {
       )}
 
       {/* Category rows - people inside, category as the "See all" gateway */}
-      {/* Category layer - always present, the gateway grid */}
-      {catSections.map(({ group, label, cards }) => (
-        <section key={group} aria-labelledby={`explore-cat-${group}`}>
-          <h2 id={`explore-cat-${group}`} className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
-            {label}
-          </h2>
-          <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] md:overflow-visible md:px-0">
-            {cards.map((card) => (
-              <div key={card.slug} className="w-[260px] shrink-0 md:w-auto">
-                <ExploreCard card={card} />
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
-
       {liveRows.map(({ res, reason }) => (
         <Row
           key={res.category.slug}
