@@ -100,36 +100,20 @@ export async function getExploreCategories(viewerId: string) {
   ]);
   const mine = new Set(myPrefs.map((p) => p.categoryId));
 
-  const ONLINE = new Date(Date.now() - 5 * 60_000);
-  const enriched = await Promise.all(
-    categories.map(async (c) => {
-      const where = {
-        AND: [visibleWhere(viewerId, blockedIds), membershipWhere(c.id, c.matcher as Matcher | null)],
-      };
-      const [count, online, preview] = await Promise.all([
-        db.user.count({ where }),
-        db.user.count({ where: { AND: [where, { lastActiveAt: { gte: ONLINE } }] } }),
-        db.user.findMany({
-          where,
-          take: 3,
-          orderBy: { lastActiveAt: "desc" },
-          select: {
-            profile: { select: { displayName: true } },
-            photos: { where: { isCover: true }, take: 1, select: { url: true } },
-          },
-        }),
-      ]);
-      return { count, online, preview };
-    }),
+  const counts = await Promise.all(
+    categories.map((c) =>
+      db.user.count({
+        where: {
+          AND: [
+            visibleWhere(viewerId, blockedIds),
+            membershipWhere(c.id, c.matcher as Matcher | null),
+          ],
+        },
+      }),
+    ),
   );
-  const counts = enriched.map((e) => e.count);
 
   return categories.map((c, i) => ({
-    online: enriched[i].online,
-    preview: enriched[i].preview.map((u) => ({
-      name: u.profile?.displayName ?? "?",
-      photoUrl: u.photos[0]?.url ?? null,
-    })),
     id: c.id,
     slug: c.slug,
     title: c.title,

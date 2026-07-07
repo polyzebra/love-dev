@@ -55,35 +55,15 @@ export function ExploreCard3DVisual({
 export type ExploreCardData = {
   slug: string; title: string; description?: string | null; iconKey: string;
   imageUrl?: string | null; gradientFrom: string; gradientTo: string;
-  count: number; online: number; saved: boolean;
-  preview: { name: string; photoUrl: string | null }[];
+  count: number; saved: boolean;
 };
-
-/** Up-to-3 overlapping member avatars - real people behind the card. */
-function AvatarStack({ preview }: { preview: ExploreCardData["preview"] }) {
-  if (preview.length === 0) return null;
-  return (
-    <span className="flex -space-x-2.5" aria-hidden="true">
-      {preview.map((p, i) =>
-        p.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={i} src={p.photoUrl} alt="" className="size-7 rounded-full border-2 border-[#171114] object-cover" />
-        ) : (
-          <span key={i} className="flex size-7 items-center justify-center rounded-full border-2 border-[#171114] bg-white/12 text-[10px] font-semibold text-white/80">
-            {p.name[0]}
-          </span>
-        ),
-      )}
-    </span>
-  );
-}
 
 export function ExploreCard({ card }: { card: ExploreCardData }) {
   return (
     <motion.div whileTap={{ scale: 0.97 }} transition={SPRING.snappy}>
       <Link
         href={`/explore/${card.slug}`}
-        className="group relative flex h-[236px] w-full flex-col snap-start overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-card transition-shadow hover:shadow-float"
+        className="group relative flex h-[230px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-card transition-shadow hover:shadow-float"
         aria-label={`${card.title}, ${card.count} people`}
       >
         {/* ambient category tint */}
@@ -92,34 +72,14 @@ export function ExploreCard({ card }: { card: ExploreCardData }) {
           className="pointer-events-none absolute inset-0 opacity-25 transition-opacity duration-300 group-hover:opacity-40"
           style={{ background: `radial-gradient(140% 100% at 50% 0%, ${card.gradientFrom}66, transparent 65%)` }}
         />
-        <div className="relative flex items-start justify-between p-4 pb-0">
-          <div className="scale-[0.62] origin-top-left -mb-8">
-            <ExploreCard3DVisual iconKey={card.iconKey} imageUrl={card.imageUrl} from={card.gradientFrom} to={card.gradientTo} title={card.title} />
-          </div>
-          <AvatarStack preview={card.preview} />
+        <div className="relative flex flex-1 items-center justify-center pt-4">
+          <ExploreCard3DVisual iconKey={card.iconKey} imageUrl={card.imageUrl} from={card.gradientFrom} to={card.gradientTo} title={card.title} />
         </div>
-        <div className="relative mt-auto space-y-1.5 p-4">
-          <p className="text-base font-semibold tracking-tight">{card.title}</p>
-          {card.description && (
-            <p className="line-clamp-1 text-xs text-muted-foreground">{card.description}</p>
-          )}
-          <div className="flex items-center justify-between pt-1">
-            <span className="flex items-center gap-2 text-xs tabular-nums text-muted-foreground">
-              {card.count} people
-              {card.online > 0 && (
-                <span className="flex items-center gap-1 text-emerald-400">
-                  <span className="relative flex size-1.5">
-                    <span className="absolute h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
-                    <span className="relative size-1.5 rounded-full bg-emerald-400" />
-                  </span>
-                  {card.online} online
-                </span>
-              )}
-            </span>
-            <span className="glass-chip rounded-full px-3 py-1 text-[11px] font-semibold text-foreground/90 transition-colors group-hover:bg-primary/25 group-hover:text-white">
-              See people
-            </span>
-          </div>
+        <div className="relative flex items-end justify-between p-4">
+          <span className="text-base font-semibold tracking-tight">{card.title}</span>
+          <span className="glass-chip rounded-full px-2.5 py-0.5 text-xs font-medium tabular-nums text-foreground/90">
+            {card.count}
+          </span>
         </div>
       </Link>
     </motion.div>
