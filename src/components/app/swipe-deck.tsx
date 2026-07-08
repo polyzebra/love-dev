@@ -17,6 +17,7 @@ import {
   Bell,
   Heart,
   MapPin,
+  MessageCircle,
   RotateCcw,
   SearchX,
   SlidersHorizontal,
@@ -32,6 +33,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import {
+  FirstMessageSheet,
+  type FirstMessageResult,
+} from "@/components/app/first-message-sheet";
 import { PhotoFrame } from "@/components/shared/photo-frame";
 import { HeartBurst } from "@/components/fx/heart-burst";
 import { emitInteraction } from "@/lib/interaction-events";
@@ -46,6 +51,8 @@ import { cn, formatDistance } from "@/lib/utils";
 type SwipeAction = "LIKE" | "PASS" | "SUPER_LIKE";
 
 export type ViewerContext = {
+  /** Viewer's user id - seeds deterministic per-pair opener templates. */
+  id?: string | null;
   city: string | null;
   interests: string[];
   goal: RelationshipGoal | null;
@@ -465,6 +472,14 @@ export function SwipeDeck({
   const [matchedWith, setMatchedWith] = useState<(DiscoverProfile & { conversationId?: string }) | null>(null);
   const busy = useRef(false);
   const deciderRef = useRef<((action: SwipeAction) => void) | null>(null);
+  // First-message composer: who it's for, whether it's showing, and the
+  // transient "Message sent" confirmation chip.
+  const [composeFor, setComposeFor] = useState<DiscoverProfile | null>(null);
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [sentChip, setSentChip] = useState(false);
+  // Set when the backend already created the Like (first message sent):
+  // the next decide() advances the deck WITHOUT calling /api/swipes.
+  const skipApi = useRef(false);
 
   const top = deck[0];
   const next = deck[1];
@@ -519,6 +534,14 @@ export function SwipeDeck({
     async (action: SwipeAction) => {
       const current = deck[0];
       if (!current || busy.current) return;
+      if (skipApi.current) {
+        // A first message already created the Like server-side - the
+        // card got the same LIKE exit physics, we only advance locally.
+        skipApi.current = false;
+        setDeck((d) => d.slice(1));
+        emitInteraction("like");
+        return;
+      }
       busy.current = true;
       setDeck((d) => d.slice(1));
 
@@ -563,6 +586,37 @@ export function SwipeDeck({
     // Route through the top card so buttons get the same exit physics
     if (deciderRef.current) deciderRef.current(action);
   }, []);
+
+  // ONE emotional line for the composer header - first human server
+  // reason, else the goal line. Real data only, like the card itself.
+  const composeReason = composeFor
+    ? composeFor.reasons.find((r) => !NON_STORY_REASONS.has(r)) ?? composeFor.goalLine
+    : null;
+
+  /**
+   * A first message landed (201): the backend already created the Like,
+   * so confirm in-card, fly the card out with LIKE physics and advance
+   * WITHOUT calling /api/swipes. A modal sheet covered the stage, so the
+   * top card is still the person who was messaged.
+   */
+  const handleMessageSent = useCallback(
+    (result: FirstMessageResult) => {
+      const recipient = composeFor;
+      setComposeOpen(false);
+      setSentChip(true);
+      window.setTimeout(() => setSentChip(false), 1200);
+      // Let the chip land before the card leaves
+      window.setTimeout(() => {
+        skipApi.current = true;
+        deciderRef.current?.("LIKE");
+      }, 350);
+      if (result.matched && recipient) {
+        emitInteraction("match");
+        setMatchedWith({ ...recipient, conversationId: result.conversationId });
+      }
+    },
+    [composeFor],
+  );
 
   const undo = useCallback(async () => {
     const res = await fetch("/api/swipes", { method: "DELETE" });
@@ -719,11 +773,57 @@ export function SwipeDeck({
                 >
                   <Star className="size-5 fill-sky-400 text-sky-400" aria-hidden="true" />
                 </motion.button>
+                {/* Message before matching - a plain button OUTSIDE the drag
+                    surface, so opening the sheet can never read as a drag
+                    (the card's own suppressTap guard covers on-card taps). */}
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.85 }}
+                  whileHover={{ scale: 1.06 }}
+                  aria-label={`Send ${top.displayName} a first message`}
+                  className={cn(PHOTO_GLASS_BUTTON, "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
+                  onClick={() => {
+                    setComposeFor(top);
+                    setComposeOpen(true);
+                  }}
+                >
+                  {/* Fixed gold - matches the assistant/suggestion colour in
+                      chat; on-photo material stays theme-independent */}
+                  <MessageCircle className="size-5 text-[#e7c9a1]" aria-hidden="true" />
+                </motion.button>
               </div>
             )}
+
+            {/* Subtle in-card confirmation after a first message lands */}
+            <AnimatePresence>
+              {sentChip && (
+                <motion.div
+                  key="message-sent"
+                  role="status"
+                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1, transition: SPRING.snappy }}
+                  exit={{ opacity: 0, transition: { duration: 0.25 } }}
+                  className="absolute inset-x-0 bottom-[calc(max(1rem,var(--safe-bottom))+11.25rem)] z-30 flex justify-center lg:bottom-[calc(var(--safe-bottom)+8rem)]"
+                >
+                  <span className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white shadow-[0_12px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                    Message sent
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
+
+      {/* First-message composer: bottom sheet on mobile, dialog on md+ */}
+      <FirstMessageSheet
+        profile={composeFor}
+        viewerId={viewer?.id ?? null}
+        reasonLine={composeReason}
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+        onSent={handleMessageSent}
+      />
 
       {/* Match celebration - the moment leads with what you share */}
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>

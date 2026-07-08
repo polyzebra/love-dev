@@ -394,6 +394,7 @@ export const ModelName = {
   Verification: 'Verification',
   Like: 'Like',
   Match: 'Match',
+  FirstMessage: 'FirstMessage',
   Conversation: 'Conversation',
   Participant: 'Participant',
   Message: 'Message',
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1167,6 +1168,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MatchCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MatchCountAggregateOutputType> | number
+        }
+      }
+    }
+    FirstMessage: {
+      payload: Prisma.$FirstMessagePayload<ExtArgs>
+      fields: Prisma.FirstMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FirstMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FirstMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.FirstMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FirstMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>
+        }
+        findMany: {
+          args: Prisma.FirstMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>[]
+        }
+        create: {
+          args: Prisma.FirstMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>
+        }
+        createMany: {
+          args: Prisma.FirstMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FirstMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.FirstMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>
+        }
+        update: {
+          args: Prisma.FirstMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.FirstMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FirstMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FirstMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.FirstMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FirstMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.FirstMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFirstMessage>
+        }
+        groupBy: {
+          args: Prisma.FirstMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FirstMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FirstMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FirstMessageCountAggregateOutputType> | number
         }
       }
     }
@@ -2647,6 +2722,21 @@ export const MatchScalarFieldEnum = {
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
 
 
+export const FirstMessageScalarFieldEnum = {
+  id: 'id',
+  senderId: 'senderId',
+  receiverId: 'receiverId',
+  body: 'body',
+  status: 'status',
+  createdAt: 'createdAt',
+  acceptedAt: 'acceptedAt',
+  declinedAt: 'declinedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type FirstMessageScalarFieldEnum = (typeof FirstMessageScalarFieldEnum)[keyof typeof FirstMessageScalarFieldEnum]
+
+
 export const ConversationScalarFieldEnum = {
   id: 'id',
   matchId: 'matchId',
@@ -3219,6 +3309,20 @@ export type ListEnumMatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'FirstMessageStatus'
+ */
+export type EnumFirstMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FirstMessageStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FirstMessageStatus[]'
+ */
+export type ListEnumFirstMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FirstMessageStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ConversationStatus'
  */
 export type EnumConversationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ConversationStatus'>
@@ -3533,6 +3637,7 @@ export type GlobalOmitConfig = {
   verification?: Prisma.VerificationOmit
   like?: Prisma.LikeOmit
   match?: Prisma.MatchOmit
+  firstMessage?: Prisma.FirstMessageOmit
   conversation?: Prisma.ConversationOmit
   participant?: Prisma.ParticipantOmit
   message?: Prisma.MessageOmit

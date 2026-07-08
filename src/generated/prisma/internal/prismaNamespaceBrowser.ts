@@ -61,6 +61,7 @@ export const ModelName = {
   Verification: 'Verification',
   Like: 'Like',
   Match: 'Match',
+  FirstMessage: 'FirstMessage',
   Conversation: 'Conversation',
   Participant: 'Participant',
   Message: 'Message',
@@ -274,6 +275,21 @@ export const MatchScalarFieldEnum = {
 } as const
 
 export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof MatchScalarFieldEnum]
+
+
+export const FirstMessageScalarFieldEnum = {
+  id: 'id',
+  senderId: 'senderId',
+  receiverId: 'receiverId',
+  body: 'body',
+  status: 'status',
+  createdAt: 'createdAt',
+  acceptedAt: 'acceptedAt',
+  declinedAt: 'declinedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type FirstMessageScalarFieldEnum = (typeof FirstMessageScalarFieldEnum)[keyof typeof FirstMessageScalarFieldEnum]
 
 
 export const ConversationScalarFieldEnum = {

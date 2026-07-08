@@ -193,6 +193,14 @@ enum NotificationType {
   SYSTEM
 }
 
+enum FirstMessageStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  DELETED
+}
+
 enum ModerationStatus {
   PENDING
   APPROVED
@@ -240,6 +248,9 @@ model User {
 
   likesSent     Like[] @relation("LikesSent")
   likesReceived Like[] @relation("LikesReceived")
+
+  firstMessagesSent     FirstMessage[] @relation("FirstMessagesSent")
+  firstMessagesReceived FirstMessage[] @relation("FirstMessagesReceived")
 
   matchesAsA Match[] @relation("MatchUserA")
   matchesAsB Match[] @relation("MatchUserB")
@@ -469,6 +480,28 @@ model Match {
   @@unique([userAId, userBId])
   @@index([userAId, status])
   @@index([userBId, status])
+}
+
+// "Message before match" (Premium): a first message rides along with a Like
+// and waits in the receiver's inbox. Only ONE PENDING row may exist per
+// sender/receiver pair - status-dependent, so it cannot be a @@unique;
+// the service checks inside the send transaction before creating.
+model FirstMessage {
+  id         String             @id @default(cuid())
+  senderId   String
+  receiverId String
+  body       String             @db.Text
+  status     FirstMessageStatus @default(PENDING)
+  createdAt  DateTime           @default(now())
+  acceptedAt DateTime?
+  declinedAt DateTime?
+  expiresAt  DateTime?
+
+  sender   User @relation("FirstMessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("FirstMessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([receiverId, status])
+  @@index([senderId, receiverId, status])
 }
 
 // ---------------------------------------------------------------------------

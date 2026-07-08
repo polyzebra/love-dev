@@ -27,6 +27,7 @@ async function Deck({ backHref }: { backHref: string | null }) {
 
   const viewer: ViewerContext | null = me
     ? {
+        id: user.id,
         city: me.city,
         interests: me.interests.map((i) => i.interest.label),
         goal: me.relationshipGoal,

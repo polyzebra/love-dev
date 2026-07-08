@@ -68,6 +68,11 @@ export type Like = Prisma.LikeModel
  */
 export type Match = Prisma.MatchModel
 /**
+ * Model FirstMessage
+ * 
+ */
+export type FirstMessage = Prisma.FirstMessageModel
+/**
  * Model Conversation
  * 
  */

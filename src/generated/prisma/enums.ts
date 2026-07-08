@@ -259,6 +259,17 @@ export const NotificationType = {
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
 
 
+export const FirstMessageStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED',
+  DELETED: 'DELETED'
+} as const
+
+export type FirstMessageStatus = (typeof FirstMessageStatus)[keyof typeof FirstMessageStatus]
+
+
 export const ModerationStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',

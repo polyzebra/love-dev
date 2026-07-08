@@ -20,6 +20,18 @@ export const SWIPE_LIMITS = {
   PREMIUM: { likesPerDay: Infinity, superLikesPerDay: 10, undo: true, boostsPerMonth: 4 },
 } as const;
 
+/** "Message before match" first messages per day, by plan tier. */
+export const FIRST_MESSAGE_LIMITS = {
+  FREE: 3,
+  PLUS: 10,
+  PREMIUM: 25,
+} as const;
+
+export const FIRST_MESSAGE_MAX_LENGTH = 280;
+
+/** A pending first message waits this long before it expires. */
+export const FIRST_MESSAGE_TTL_DAYS = 14;
+
 export const PLANS = [
   {
     tier: "FREE",

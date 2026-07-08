@@ -268,6 +268,8 @@ export type UserWhereInput = {
   photos?: Prisma.PhotoListRelationFilter
   likesSent?: Prisma.LikeListRelationFilter
   likesReceived?: Prisma.LikeListRelationFilter
+  firstMessagesSent?: Prisma.FirstMessageListRelationFilter
+  firstMessagesReceived?: Prisma.FirstMessageListRelationFilter
   matchesAsA?: Prisma.MatchListRelationFilter
   matchesAsB?: Prisma.MatchListRelationFilter
   participants?: Prisma.ParticipantListRelationFilter
@@ -306,6 +308,8 @@ export type UserOrderByWithRelationInput = {
   photos?: Prisma.PhotoOrderByRelationAggregateInput
   likesSent?: Prisma.LikeOrderByRelationAggregateInput
   likesReceived?: Prisma.LikeOrderByRelationAggregateInput
+  firstMessagesSent?: Prisma.FirstMessageOrderByRelationAggregateInput
+  firstMessagesReceived?: Prisma.FirstMessageOrderByRelationAggregateInput
   matchesAsA?: Prisma.MatchOrderByRelationAggregateInput
   matchesAsB?: Prisma.MatchOrderByRelationAggregateInput
   participants?: Prisma.ParticipantOrderByRelationAggregateInput
@@ -347,6 +351,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   photos?: Prisma.PhotoListRelationFilter
   likesSent?: Prisma.LikeListRelationFilter
   likesReceived?: Prisma.LikeListRelationFilter
+  firstMessagesSent?: Prisma.FirstMessageListRelationFilter
+  firstMessagesReceived?: Prisma.FirstMessageListRelationFilter
   matchesAsA?: Prisma.MatchListRelationFilter
   matchesAsB?: Prisma.MatchListRelationFilter
   participants?: Prisma.ParticipantListRelationFilter
@@ -427,6 +433,8 @@ export type UserCreateInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -465,6 +473,8 @@ export type UserUncheckedCreateInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -503,6 +513,8 @@ export type UserUpdateInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -541,6 +553,8 @@ export type UserUncheckedUpdateInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -810,6 +824,34 @@ export type UserUpdateOneRequiredWithoutMatchesAsBNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMatchesAsBInput, Prisma.UserUpdateWithoutMatchesAsBInput>, Prisma.UserUncheckedUpdateWithoutMatchesAsBInput>
 }
 
+export type UserCreateNestedOneWithoutFirstMessagesSentInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesSentInput, Prisma.UserUncheckedCreateWithoutFirstMessagesSentInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFirstMessagesSentInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutFirstMessagesReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesReceivedInput, Prisma.UserUncheckedCreateWithoutFirstMessagesReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFirstMessagesReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutFirstMessagesSentNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesSentInput, Prisma.UserUncheckedCreateWithoutFirstMessagesSentInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFirstMessagesSentInput
+  upsert?: Prisma.UserUpsertWithoutFirstMessagesSentInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFirstMessagesSentInput, Prisma.UserUpdateWithoutFirstMessagesSentInput>, Prisma.UserUncheckedUpdateWithoutFirstMessagesSentInput>
+}
+
+export type UserUpdateOneRequiredWithoutFirstMessagesReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesReceivedInput, Prisma.UserUncheckedCreateWithoutFirstMessagesReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFirstMessagesReceivedInput
+  upsert?: Prisma.UserUpsertWithoutFirstMessagesReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFirstMessagesReceivedInput, Prisma.UserUpdateWithoutFirstMessagesReceivedInput>, Prisma.UserUncheckedUpdateWithoutFirstMessagesReceivedInput>
+}
+
 export type UserCreateNestedOneWithoutParticipantsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutParticipantsInput, Prisma.UserUncheckedCreateWithoutParticipantsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutParticipantsInput
@@ -999,6 +1041,8 @@ export type UserCreateWithoutDevicesInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -1036,6 +1080,8 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1089,6 +1135,8 @@ export type UserUpdateWithoutDevicesInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -1126,6 +1174,8 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1163,6 +1213,8 @@ export type UserCreateWithoutProfileInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -1200,6 +1252,8 @@ export type UserUncheckedCreateWithoutProfileInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1253,6 +1307,8 @@ export type UserUpdateWithoutProfileInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -1290,6 +1346,8 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1327,6 +1385,8 @@ export type UserCreateWithoutPhotosInput = {
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -1364,6 +1424,8 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1417,6 +1479,8 @@ export type UserUpdateWithoutPhotosInput = {
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -1454,6 +1518,8 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1491,6 +1557,8 @@ export type UserCreateWithoutVerificationsInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -1528,6 +1596,8 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1581,6 +1651,8 @@ export type UserUpdateWithoutVerificationsInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -1618,6 +1690,8 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1655,6 +1729,8 @@ export type UserCreateWithoutLikesSentInput = {
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -1692,6 +1768,8 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1734,6 +1812,8 @@ export type UserCreateWithoutLikesReceivedInput = {
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -1771,6 +1851,8 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1824,6 +1906,8 @@ export type UserUpdateWithoutLikesSentInput = {
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -1861,6 +1945,8 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1909,6 +1995,8 @@ export type UserUpdateWithoutLikesReceivedInput = {
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -1946,6 +2034,8 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1984,6 +2074,8 @@ export type UserCreateWithoutMatchesAsAInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2021,6 +2113,8 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2063,6 +2157,8 @@ export type UserCreateWithoutMatchesAsBInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2100,6 +2196,8 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2153,6 +2251,8 @@ export type UserUpdateWithoutMatchesAsAInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2190,6 +2290,8 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -2238,6 +2340,8 @@ export type UserUpdateWithoutMatchesAsBInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2275,7 +2379,353 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutFirstMessagesSentInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutFirstMessagesSentInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesSentInput, Prisma.UserUncheckedCreateWithoutFirstMessagesSentInput>
+}
+
+export type UserCreateWithoutFirstMessagesReceivedInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutFirstMessagesReceivedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesReceivedInput, Prisma.UserUncheckedCreateWithoutFirstMessagesReceivedInput>
+}
+
+export type UserUpsertWithoutFirstMessagesSentInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFirstMessagesSentInput, Prisma.UserUncheckedUpdateWithoutFirstMessagesSentInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesSentInput, Prisma.UserUncheckedCreateWithoutFirstMessagesSentInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFirstMessagesSentInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFirstMessagesSentInput, Prisma.UserUncheckedUpdateWithoutFirstMessagesSentInput>
+}
+
+export type UserUpdateWithoutFirstMessagesSentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserUpsertWithoutFirstMessagesReceivedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFirstMessagesReceivedInput, Prisma.UserUncheckedUpdateWithoutFirstMessagesReceivedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFirstMessagesReceivedInput, Prisma.UserUncheckedCreateWithoutFirstMessagesReceivedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFirstMessagesReceivedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFirstMessagesReceivedInput, Prisma.UserUncheckedUpdateWithoutFirstMessagesReceivedInput>
+}
+
+export type UserUpdateWithoutFirstMessagesReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -2312,6 +2762,8 @@ export type UserCreateWithoutParticipantsInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
@@ -2349,6 +2801,8 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -2402,6 +2856,8 @@ export type UserUpdateWithoutParticipantsInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
@@ -2439,6 +2895,8 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -2476,6 +2934,8 @@ export type UserCreateWithoutMessagesInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -2513,6 +2973,8 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2566,6 +3028,8 @@ export type UserUpdateWithoutMessagesInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -2603,6 +3067,8 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2640,6 +3106,8 @@ export type UserCreateWithoutReportsMadeInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -2677,6 +3145,8 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2719,6 +3189,8 @@ export type UserCreateWithoutReportsReceivedInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -2756,6 +3228,8 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2809,6 +3283,8 @@ export type UserUpdateWithoutReportsMadeInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -2846,6 +3322,8 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2894,6 +3372,8 @@ export type UserUpdateWithoutReportsReceivedInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -2931,6 +3411,8 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2968,6 +3450,8 @@ export type UserCreateWithoutBlocksMadeInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3005,6 +3489,8 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3047,6 +3533,8 @@ export type UserCreateWithoutBlocksReceivedInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3084,6 +3572,8 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3137,6 +3627,8 @@ export type UserUpdateWithoutBlocksMadeInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -3174,6 +3666,8 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3222,6 +3716,8 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -3259,6 +3755,8 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3296,6 +3794,8 @@ export type UserCreateWithoutSubscriptionInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3333,6 +3833,8 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3386,6 +3888,8 @@ export type UserUpdateWithoutSubscriptionInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -3423,6 +3927,8 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3460,6 +3966,8 @@ export type UserCreateWithoutPaymentsInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3497,6 +4005,8 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3550,6 +4060,8 @@ export type UserUpdateWithoutPaymentsInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -3587,6 +4099,8 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3624,6 +4138,8 @@ export type UserCreateWithoutNotificationsInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3661,6 +4177,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3714,6 +4232,8 @@ export type UserUpdateWithoutNotificationsInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -3751,6 +4271,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3788,6 +4310,8 @@ export type UserCreateWithoutAdminLogsInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3825,6 +4349,8 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3878,6 +4404,8 @@ export type UserUpdateWithoutAdminLogsInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -3915,6 +4443,8 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3952,6 +4482,8 @@ export type UserCreateWithoutExplorePreferencesInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -3989,6 +4521,8 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -4042,6 +4576,8 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -4079,6 +4615,8 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -4116,6 +4654,8 @@ export type UserCreateWithoutSettingsInput = {
   photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
@@ -4153,6 +4693,8 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
   likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
   likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
   matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
   matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
   participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -4206,6 +4748,8 @@ export type UserUpdateWithoutSettingsInput = {
   photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
@@ -4243,6 +4787,8 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
   likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
   likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
   matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
   matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
   participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -4269,6 +4815,8 @@ export type UserCountOutputType = {
   photos: number
   likesSent: number
   likesReceived: number
+  firstMessagesSent: number
+  firstMessagesReceived: number
   matchesAsA: number
   matchesAsB: number
   participants: number
@@ -4289,6 +4837,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   photos?: boolean | UserCountOutputTypeCountPhotosArgs
   likesSent?: boolean | UserCountOutputTypeCountLikesSentArgs
   likesReceived?: boolean | UserCountOutputTypeCountLikesReceivedArgs
+  firstMessagesSent?: boolean | UserCountOutputTypeCountFirstMessagesSentArgs
+  firstMessagesReceived?: boolean | UserCountOutputTypeCountFirstMessagesReceivedArgs
   matchesAsA?: boolean | UserCountOutputTypeCountMatchesAsAArgs
   matchesAsB?: boolean | UserCountOutputTypeCountMatchesAsBArgs
   participants?: boolean | UserCountOutputTypeCountParticipantsArgs
@@ -4346,6 +4896,20 @@ export type UserCountOutputTypeCountLikesSentArgs<ExtArgs extends runtime.Types.
  */
 export type UserCountOutputTypeCountLikesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LikeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFirstMessagesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FirstMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFirstMessagesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FirstMessageWhereInput
 }
 
 /**
@@ -4455,6 +5019,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   photos?: boolean | Prisma.User$photosArgs<ExtArgs>
   likesSent?: boolean | Prisma.User$likesSentArgs<ExtArgs>
   likesReceived?: boolean | Prisma.User$likesReceivedArgs<ExtArgs>
+  firstMessagesSent?: boolean | Prisma.User$firstMessagesSentArgs<ExtArgs>
+  firstMessagesReceived?: boolean | Prisma.User$firstMessagesReceivedArgs<ExtArgs>
   matchesAsA?: boolean | Prisma.User$matchesAsAArgs<ExtArgs>
   matchesAsB?: boolean | Prisma.User$matchesAsBArgs<ExtArgs>
   participants?: boolean | Prisma.User$participantsArgs<ExtArgs>
@@ -4534,6 +5100,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   photos?: boolean | Prisma.User$photosArgs<ExtArgs>
   likesSent?: boolean | Prisma.User$likesSentArgs<ExtArgs>
   likesReceived?: boolean | Prisma.User$likesReceivedArgs<ExtArgs>
+  firstMessagesSent?: boolean | Prisma.User$firstMessagesSentArgs<ExtArgs>
+  firstMessagesReceived?: boolean | Prisma.User$firstMessagesReceivedArgs<ExtArgs>
   matchesAsA?: boolean | Prisma.User$matchesAsAArgs<ExtArgs>
   matchesAsB?: boolean | Prisma.User$matchesAsBArgs<ExtArgs>
   participants?: boolean | Prisma.User$participantsArgs<ExtArgs>
@@ -4562,6 +5130,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     photos: Prisma.$PhotoPayload<ExtArgs>[]
     likesSent: Prisma.$LikePayload<ExtArgs>[]
     likesReceived: Prisma.$LikePayload<ExtArgs>[]
+    firstMessagesSent: Prisma.$FirstMessagePayload<ExtArgs>[]
+    firstMessagesReceived: Prisma.$FirstMessagePayload<ExtArgs>[]
     matchesAsA: Prisma.$MatchPayload<ExtArgs>[]
     matchesAsB: Prisma.$MatchPayload<ExtArgs>[]
     participants: Prisma.$ParticipantPayload<ExtArgs>[]
@@ -4993,6 +5563,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   photos<T extends Prisma.User$photosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$photosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   likesSent<T extends Prisma.User$likesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$likesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   likesReceived<T extends Prisma.User$likesReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$likesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  firstMessagesSent<T extends Prisma.User$firstMessagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$firstMessagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FirstMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  firstMessagesReceived<T extends Prisma.User$firstMessagesReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$firstMessagesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FirstMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   matchesAsA<T extends Prisma.User$matchesAsAArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$matchesAsAArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   matchesAsB<T extends Prisma.User$matchesAsBArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$matchesAsBArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   participants<T extends Prisma.User$participantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5580,6 +6152,54 @@ export type User$likesReceivedArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.LikeScalarFieldEnum | Prisma.LikeScalarFieldEnum[]
+}
+
+/**
+ * User.firstMessagesSent
+ */
+export type User$firstMessagesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FirstMessage
+   */
+  select?: Prisma.FirstMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FirstMessage
+   */
+  omit?: Prisma.FirstMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FirstMessageInclude<ExtArgs> | null
+  where?: Prisma.FirstMessageWhereInput
+  orderBy?: Prisma.FirstMessageOrderByWithRelationInput | Prisma.FirstMessageOrderByWithRelationInput[]
+  cursor?: Prisma.FirstMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FirstMessageScalarFieldEnum | Prisma.FirstMessageScalarFieldEnum[]
+}
+
+/**
+ * User.firstMessagesReceived
+ */
+export type User$firstMessagesReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FirstMessage
+   */
+  select?: Prisma.FirstMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FirstMessage
+   */
+  omit?: Prisma.FirstMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FirstMessageInclude<ExtArgs> | null
+  where?: Prisma.FirstMessageWhereInput
+  orderBy?: Prisma.FirstMessageOrderByWithRelationInput | Prisma.FirstMessageOrderByWithRelationInput[]
+  cursor?: Prisma.FirstMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FirstMessageScalarFieldEnum | Prisma.FirstMessageScalarFieldEnum[]
 }
 
 /**
