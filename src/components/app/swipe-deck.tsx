@@ -132,7 +132,7 @@ const TRUST_CHIP_VARIANTS = {
 const STAGE_COLUMN_WIDTH =
   "md:w-[min(100%,calc((100dvh-1.5rem)*0.78))] lg:w-[min(100%,calc((100dvh-2rem)*0.78))]";
 /* Edge-to-edge on mobile; rounded inside the ambient field on md+ */
-const STAGE_RADIUS = "rounded-none md:rounded-[20px] lg:rounded-[24px]";
+const STAGE_RADIUS = "rounded-[24px] md:rounded-[28px] lg:rounded-[32px]";
 /* Action row floats over the photo, clear of the mobile nav capsule */
 const ACTION_ROW_BOTTOM =
   "bottom-[calc(max(1rem,var(--safe-bottom))+4.75rem)] lg:bottom-[calc(var(--safe-bottom)+2rem)]";
@@ -298,7 +298,7 @@ function TopCard({
         }}
         transition={{ type: "spring", stiffness: 320, damping: 26 }}
         className={cn(
-          "relative flex h-full w-full flex-col justify-end overflow-hidden md:border md:border-white/10",
+          "relative flex h-full w-full flex-col justify-end overflow-hidden",
           STAGE_RADIUS,
         )}
       >
@@ -326,7 +326,6 @@ function TopCard({
         {/* Cinematic grade: top scrim for controls, deep bottom scrim for info */}
         <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/55 via-black/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-        <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
         {/* Pointer lighting */}
         <motion.div aria-hidden="true" className="absolute inset-0" style={{ background: light }} />
 
@@ -608,7 +607,7 @@ export function SwipeDeck({
               initial={{ scale: 0.92, opacity: 0.3 }}
               animate={{ scale: 0.96, opacity: 0.7 }}
               transition={{ type: "spring", stiffness: 260, damping: 26 }}
-              className={cn("absolute inset-0 overflow-hidden border border-white/8", STAGE_RADIUS)}
+              className={cn("absolute inset-0 overflow-hidden", STAGE_RADIUS)}
             >
               {next.photos[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element
