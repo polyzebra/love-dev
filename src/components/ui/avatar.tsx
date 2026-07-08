@@ -32,6 +32,8 @@ function AvatarImage({
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
+      draggable={false}
+      onContextMenu={(e) => e.preventDefault()}
       className={cn("aspect-square size-full", className)}
       {...props}
     />

@@ -147,3 +147,9 @@ export function PhotoFrame({
     </div>
   );
 }
+
+/**
+ * Contract alias: every surface renders user photos through this one
+ * protected component - PhotoFrame IS the ProtectedImage.
+ */
+export const ProtectedImage = PhotoFrame;
