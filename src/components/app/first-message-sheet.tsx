@@ -258,9 +258,10 @@ export function FirstMessageSheet({
           aria-label={title}
           aria-invalid={bodyError ? true : undefined}
           aria-describedby={bodyError ? "first-message-body-error" : undefined}
-          // Neutral-border focus and aria-invalid error treatment both
-          // come from the Textarea primitive now - no local overrides.
-          className="min-h-24"
+          // Spec states: default + focus keep a TRANSPARENT border - the
+          // field is a calm filled surface with only a soft brand glow on
+          // focus. Destructive styling exists solely via aria-invalid.
+          className="min-h-24 border-transparent bg-foreground/6 hover:border-transparent focus-visible:border-transparent focus-visible:ring-4 focus-visible:ring-ring/10 dark:focus-visible:ring-ring/20"
           disabled={pending}
         />
         <div className="flex items-start justify-between gap-3">
