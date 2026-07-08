@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { InlineFieldError } from "@/components/ui/field-error";
@@ -227,17 +228,14 @@ export function FirstMessageSheet({
                 // brand-tint hover; the picked one gets the calm selected
                 // state (accent tint + soft primary border) - never a
                 // full-opacity rose border.
-                "rounded-full border px-3.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+                // Quiet utilitarian chips - no rings, no rose outlines.
+                "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:border-foreground/30",
                 body === o.send
-                  ? "border-primary/40 bg-accent text-foreground"
-                  : cn(
-                      "bg-foreground/5 text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-                      o.tone === "gold"
-                        ? "border-gold/30"
-                        : "border-border hover:border-primary/25",
-                    ),
+                  ? "border-border bg-foreground/10 text-primary"
+                  : "border-border bg-foreground/5 text-muted-foreground hover:bg-foreground/10 hover:text-foreground",
               )}
             >
+              {body === o.send && <Check className="size-3" aria-hidden="true" />}
               {o.label}
             </button>
           ))}
@@ -261,7 +259,7 @@ export function FirstMessageSheet({
           // Spec states: default + focus keep a TRANSPARENT border - the
           // field is a calm filled surface with only a soft brand glow on
           // focus. Destructive styling exists solely via aria-invalid.
-          className="min-h-24 border-transparent bg-foreground/6 hover:border-transparent focus-visible:border-transparent focus-visible:ring-4 focus-visible:ring-ring/10 dark:focus-visible:ring-ring/20"
+          className="min-h-24 border-border bg-foreground/5 shadow-none hover:border-border focus-visible:border-border focus-visible:ring-0"
           disabled={pending}
         />
         <div className="flex items-start justify-between gap-3">
