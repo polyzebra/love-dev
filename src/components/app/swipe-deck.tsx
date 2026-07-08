@@ -154,7 +154,16 @@ function photoGradient(seed: string): string {
  */
 function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-background">
+    <div
+      aria-hidden="true"
+      className={cn(
+        "absolute inset-0 overflow-hidden",
+        // With a card up, the stage margins are a dark photo-stage in BOTH
+        // themes - --background here painted the light theme's ivory as a
+        // white frame around the card. Empty state keeps the theme surface.
+        url ? "bg-[#0a0a0c]" : "bg-background",
+      )}
+    >
       <AnimatePresence initial={false}>
         {url && (
           <motion.img
@@ -171,7 +180,7 @@ function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
         )}
       </AnimatePresence>
       {/* Theme veil - keeps the field cinematic in dark, airy in light */}
-      <div className="absolute inset-0 bg-background/55" />
+      <div className="absolute inset-0 bg-black/55" />
       {/* Dominant-tone wash sampled from the person's photo */}
       <div
         className="absolute inset-0 transition-[background] duration-[1200ms] ease-out"
