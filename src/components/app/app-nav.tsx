@@ -83,7 +83,10 @@ export function AppNav() {
                       <motion.span
                         layoutId="app-rail-halo"
                         transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                        className="absolute inset-0 rounded-2xl bg-primary/20 shadow-[inset_0_1px_0_var(--glass-highlight),0_0_20px_rgba(225,29,72,0.25)]"
+                        // Calm active tint - the old inset glass-highlight
+                        // painted a near-white 1px seam across the pill top
+                        // in light mode, and the outer glow is decoration.
+                        className="absolute inset-0 rounded-2xl bg-primary/15"
                       />
                     )}
                     <Icon className="relative size-5" aria-hidden="true" />
