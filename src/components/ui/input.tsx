@@ -14,7 +14,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         // Focus: the border stays NEUTRAL; a soft brand halo alone marks
         // focus. The theme's --ring is visually a red, so a full-opacity
         // focus-visible:border-ring reads as a validation error.
-        "focus-visible:border-input focus-visible:ring-[3px] focus-visible:ring-ring/40",
+        "focus-visible:border-input focus-visible:ring-2 focus-visible:ring-ring/15 dark:focus-visible:ring-ring/25",
         // Error: destructive treatment ONLY for a real validation failure,
         // signalled by aria-invalid. Compound variants keep the red border
         // while the invalid field is focused or hovered.

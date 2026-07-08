@@ -12,7 +12,7 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
         "hover:border-foreground/25",
         // Focus: neutral border + soft brand halo only (--ring is visually
         // a red - a full-opacity rose border reads as a validation error).
-        "focus-visible:border-input focus-visible:ring-[3px] focus-visible:ring-ring/40",
+        "focus-visible:border-input focus-visible:ring-2 focus-visible:ring-ring/15 dark:focus-visible:ring-ring/25",
         // Error: destructive ONLY via aria-invalid (a real failure), kept
         // through hover/focus by the compound variants.
         "aria-invalid:border-destructive aria-invalid:ring-destructive/25 aria-invalid:hover:border-destructive aria-invalid:focus-visible:border-destructive aria-invalid:focus-visible:ring-destructive/25 dark:aria-invalid:ring-destructive/40 dark:aria-invalid:focus-visible:ring-destructive/40",
