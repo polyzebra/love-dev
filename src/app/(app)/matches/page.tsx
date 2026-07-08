@@ -8,6 +8,7 @@ import { isOnline } from "@/lib/presence";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { OnlineDot } from "@/components/shared/online-dot";
+import { PhotoFrame } from "@/components/shared/photo-frame";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -27,7 +28,7 @@ export default async function MatchesPage() {
           id: true,
           lastActiveAt: true,
           profile: { select: { displayName: true, birthDate: true, city: true } },
-          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true } },
+          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, blurDataUrl: true } },
         },
       },
       userB: {
@@ -35,7 +36,7 @@ export default async function MatchesPage() {
           id: true,
           lastActiveAt: true,
           profile: { select: { displayName: true, birthDate: true, city: true } },
-          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true } },
+          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, blurDataUrl: true } },
         },
       },
     },
@@ -80,28 +81,27 @@ export default async function MatchesPage() {
                 href={m.conversation ? `/chat/${m.conversation.id}` : "/chat"}
                 className="group block overflow-hidden rounded-3xl border bg-card shadow-card transition-shadow hover:shadow-float"
               >
-                <div className="relative aspect-4/5 bg-muted">
-                  {other.photos[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={other.photos[0].url}
-                      alt={`${name}'s photo`}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
-                  ) : (
+                <PhotoFrame
+                  photo={other.photos[0] ?? null}
+                  alt={`${name}'s photo`}
+                  radius="none"
+                  className="bg-muted"
+                  imgClassName="transition-[opacity,filter,transform] duration-300 group-hover:scale-[1.03]"
+                  fallback={
                     <div className="flex h-full items-center justify-center">
                       <Avatar className="size-16">
                         <AvatarImage src={undefined} alt="" />
                         <AvatarFallback className="text-xl">{initialsOf(name)}</AvatarFallback>
                       </Avatar>
                     </div>
-                  )}
+                  }
+                >
                   {isNew && (
                     <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground">
                       New match
                     </span>
                   )}
-                </div>
+                </PhotoFrame>
                 <div className="flex items-center gap-2 p-3">
                   <p className="truncate text-sm font-medium">
                     {name}

@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { PhotoFrame } from "@/components/shared/photo-frame";
 import { HeartBurst } from "@/components/fx/heart-burst";
 import { emitInteraction } from "@/lib/interaction-events";
 import { SPRING } from "@/lib/motion";
@@ -221,16 +222,10 @@ function TopCard({
   const light = useMotionTemplate`radial-gradient(26rem 26rem at ${lx}% ${ly}%, rgba(255,255,255,0.09), transparent 60%)`;
 
   const [grabbed, setGrabbed] = useState(false);
-  const [loadedUrls, setLoadedUrls] = useState<ReadonlySet<string>>(() => new Set());
   const leaving = useRef(false);
   const suppressTap = useRef(false); // a drag must never read as a photo tap
   const photos = profile.photos;
   const photo = photos[photoIndex] ?? photos[0];
-  const photoLoaded = photo ? loadedUrls.has(photo.url) : false;
-
-  const markLoaded = useCallback((url: string) => {
-    setLoadedUrls((s) => (s.has(url) ? s : new Set(s).add(url)));
-  }, []);
 
   const flyOut = useCallback(
     (action: SwipeAction, velocity = 0) => {
@@ -302,27 +297,16 @@ function TopCard({
           STAGE_RADIUS,
         )}
       >
-        {/* Photo - fills the stage */}
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={photo.url}
-            src={photo.url}
-            alt=""
-            // Covers the load-before-hydration race: onLoad may never fire
-            ref={(el) => {
-              if (el?.complete) markLoaded(photo.url);
-            }}
-            onLoad={() => markLoaded(photo.url)}
-            className={cn(
-              "absolute inset-0 h-full w-full object-cover transition-[opacity,filter] duration-700 ease-out",
-              photoLoaded ? "opacity-100 blur-0" : "opacity-0 blur-md",
-            )}
-            draggable={false}
-          />
-        ) : (
-          <div className="absolute inset-0" style={{ background: photoGradient(profile.userId) }} />
-        )}
+        {/* Photo - fills the stage; the stage element owns rounding/clipping */}
+        <PhotoFrame
+          mode="fill"
+          variant="full"
+          photo={photo ?? null}
+          draggable={false}
+          fallback={
+            <div className="h-full w-full" style={{ background: photoGradient(profile.userId) }} />
+          }
+        />
         {/* Cinematic grade: top scrim for controls, deep bottom scrim for info */}
         <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/55 via-black/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
@@ -610,8 +594,7 @@ export function SwipeDeck({
               className={cn("absolute inset-0 overflow-hidden", STAGE_RADIUS)}
             >
               {next.photos[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={next.photos[0].url} alt="" className="h-full w-full object-cover opacity-60" />
+                <PhotoFrame mode="fill" photo={next.photos[0]} className="opacity-60" />
               ) : (
                 <div className="h-full w-full" style={{ background: photoGradient(next.userId) }} />
               )}

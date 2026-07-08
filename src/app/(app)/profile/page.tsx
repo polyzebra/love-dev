@@ -23,6 +23,7 @@ import { promptLabel } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PhotoFrame } from "@/components/shared/photo-frame";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -105,13 +106,16 @@ export default async function ProfilePage() {
       {/* ================= COVER - magazine opener ================= */}
       <Reveal y={16}>
         <section className="relative overflow-hidden rounded-[36px] border border-border shadow-float">
-          <div className="relative aspect-4/5 sm:aspect-square md:aspect-4/3">
-            {cover ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={cover.url} alt="Your cover photo" className="absolute inset-0 h-full w-full object-cover" />
-            ) : (
+          <PhotoFrame
+            photo={cover ?? null}
+            alt="Your cover photo"
+            variant="full"
+            radius="none"
+            className="rounded-[36px] sm:aspect-square md:aspect-4/3"
+            fallback={
               <div className="absolute inset-0" style={{ background: coverGradient(profile.userId) }} />
-            )}
+            }
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
             <div className="absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]" />
 
@@ -146,7 +150,7 @@ export default async function ProfilePage() {
                 {GOAL_LABELS[profile.relationshipGoal]}
               </Badge>
             </div>
-          </div>
+          </PhotoFrame>
         </section>
       </Reveal>
 
@@ -189,15 +193,19 @@ export default async function ProfilePage() {
           </div>
           <div className="grid grid-cols-3 gap-2.5">
             {photos.slice(1).map((photo, i) => (
-              <div key={photo.id} className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo.url} alt={`Photo ${i + 2}`} className="h-full w-full object-cover" />
-              </div>
+              <PhotoFrame
+                key={photo.id}
+                photo={photo}
+                alt={`Photo ${i + 2}`}
+                loading="lazy"
+                radius="none"
+                className="rounded-2xl border border-border"
+              />
             ))}
             {photos.length < 9 && (
               <button
                 type="button"
-                className="flex aspect-3/4 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft"
+                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft"
                 aria-label="Add photo"
               >
                 <Camera className="size-5" aria-hidden="true" />

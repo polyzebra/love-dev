@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { BadgeCheck, Heart, MapPin, MessageCircle, Quote, RotateCcw, Sparkles, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OnlineDot } from "@/components/shared/online-dot";
+import { PhotoFrame } from "@/components/shared/photo-frame";
 import { emitInteraction } from "@/lib/interaction-events";
 import { SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -35,12 +36,16 @@ const GOAL_LABELS: Record<string, string> = GOAL_LINES;
 
 /** One swipeable "page" of the story: a photo or a prompt answer. */
 type StoryPage =
-  | { kind: "photo"; url: string }
+  | { kind: "photo"; url: string; blurDataUrl: string | null }
   | { kind: "prompt"; label: string; answer: string };
 
 /** Interleave prompt answers between photos: photo, prompt, photo, ... */
 function buildPages(profile: ViewerProfile): StoryPage[] {
-  const photos: StoryPage[] = profile.photos.map((p) => ({ kind: "photo", url: p.url }));
+  const photos: StoryPage[] = profile.photos.map((p) => ({
+    kind: "photo",
+    url: p.url,
+    blurDataUrl: p.blurDataUrl,
+  }));
   const prompts: StoryPage[] = profile.prompts.map((p) => ({
     kind: "prompt",
     label: p.label,
@@ -257,8 +262,12 @@ export function ExploreProfileViewer({
           transition={SPRING.standard}
         >
           {page?.kind === "photo" ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={page.url} alt="" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
+            <PhotoFrame
+              mode="fill"
+              variant="full"
+              photo={{ url: page.url, blurDataUrl: page.blurDataUrl }}
+              draggable={false}
+            />
           ) : (
             <div className="absolute inset-0" style={{ background: fallbackGradient(profile.userId) }} />
           )}

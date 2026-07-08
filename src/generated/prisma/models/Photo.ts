@@ -42,6 +42,8 @@ export type PhotoMinAggregateOutputType = {
   id: string | null
   userId: string | null
   url: string | null
+  thumbUrl: string | null
+  fullUrl: string | null
   blurDataUrl: string | null
   width: number | null
   height: number | null
@@ -57,6 +59,8 @@ export type PhotoMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   url: string | null
+  thumbUrl: string | null
+  fullUrl: string | null
   blurDataUrl: string | null
   width: number | null
   height: number | null
@@ -72,6 +76,8 @@ export type PhotoCountAggregateOutputType = {
   id: number
   userId: number
   url: number
+  thumbUrl: number
+  fullUrl: number
   blurDataUrl: number
   width: number
   height: number
@@ -101,6 +107,8 @@ export type PhotoMinAggregateInputType = {
   id?: true
   userId?: true
   url?: true
+  thumbUrl?: true
+  fullUrl?: true
   blurDataUrl?: true
   width?: true
   height?: true
@@ -116,6 +124,8 @@ export type PhotoMaxAggregateInputType = {
   id?: true
   userId?: true
   url?: true
+  thumbUrl?: true
+  fullUrl?: true
   blurDataUrl?: true
   width?: true
   height?: true
@@ -131,6 +141,8 @@ export type PhotoCountAggregateInputType = {
   id?: true
   userId?: true
   url?: true
+  thumbUrl?: true
+  fullUrl?: true
   blurDataUrl?: true
   width?: true
   height?: true
@@ -233,6 +245,8 @@ export type PhotoGroupByOutputType = {
   id: string
   userId: string
   url: string
+  thumbUrl: string | null
+  fullUrl: string | null
   blurDataUrl: string | null
   width: number | null
   height: number | null
@@ -271,6 +285,8 @@ export type PhotoWhereInput = {
   id?: Prisma.StringFilter<"Photo"> | string
   userId?: Prisma.StringFilter<"Photo"> | string
   url?: Prisma.StringFilter<"Photo"> | string
+  thumbUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
+  fullUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
   blurDataUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
   width?: Prisma.IntNullableFilter<"Photo"> | number | null
   height?: Prisma.IntNullableFilter<"Photo"> | number | null
@@ -287,6 +303,8 @@ export type PhotoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  thumbUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  fullUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   blurDataUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   width?: Prisma.SortOrderInput | Prisma.SortOrder
   height?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -306,6 +324,8 @@ export type PhotoWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PhotoWhereInput | Prisma.PhotoWhereInput[]
   userId?: Prisma.StringFilter<"Photo"> | string
   url?: Prisma.StringFilter<"Photo"> | string
+  thumbUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
+  fullUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
   blurDataUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
   width?: Prisma.IntNullableFilter<"Photo"> | number | null
   height?: Prisma.IntNullableFilter<"Photo"> | number | null
@@ -322,6 +342,8 @@ export type PhotoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  thumbUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  fullUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   blurDataUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   width?: Prisma.SortOrderInput | Prisma.SortOrder
   height?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -345,6 +367,8 @@ export type PhotoScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Photo"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Photo"> | string
   url?: Prisma.StringWithAggregatesFilter<"Photo"> | string
+  thumbUrl?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  fullUrl?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   blurDataUrl?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   width?: Prisma.IntNullableWithAggregatesFilter<"Photo"> | number | null
   height?: Prisma.IntNullableWithAggregatesFilter<"Photo"> | number | null
@@ -359,6 +383,8 @@ export type PhotoScalarWhereWithAggregatesInput = {
 export type PhotoCreateInput = {
   id?: string
   url: string
+  thumbUrl?: string | null
+  fullUrl?: string | null
   blurDataUrl?: string | null
   width?: number | null
   height?: number | null
@@ -375,6 +401,8 @@ export type PhotoUncheckedCreateInput = {
   id?: string
   userId: string
   url: string
+  thumbUrl?: string | null
+  fullUrl?: string | null
   blurDataUrl?: string | null
   width?: number | null
   height?: number | null
@@ -389,6 +417,8 @@ export type PhotoUncheckedCreateInput = {
 export type PhotoUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -405,6 +435,8 @@ export type PhotoUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -420,6 +452,8 @@ export type PhotoCreateManyInput = {
   id?: string
   userId: string
   url: string
+  thumbUrl?: string | null
+  fullUrl?: string | null
   blurDataUrl?: string | null
   width?: number | null
   height?: number | null
@@ -434,6 +468,8 @@ export type PhotoCreateManyInput = {
 export type PhotoUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -449,6 +485,8 @@ export type PhotoUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -474,6 +512,8 @@ export type PhotoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  thumbUrl?: Prisma.SortOrder
+  fullUrl?: Prisma.SortOrder
   blurDataUrl?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
@@ -495,6 +535,8 @@ export type PhotoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  thumbUrl?: Prisma.SortOrder
+  fullUrl?: Prisma.SortOrder
   blurDataUrl?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
@@ -510,6 +552,8 @@ export type PhotoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  thumbUrl?: Prisma.SortOrder
+  fullUrl?: Prisma.SortOrder
   blurDataUrl?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
@@ -576,6 +620,8 @@ export type EnumModerationStatusFieldUpdateOperationsInput = {
 export type PhotoCreateWithoutUserInput = {
   id?: string
   url: string
+  thumbUrl?: string | null
+  fullUrl?: string | null
   blurDataUrl?: string | null
   width?: number | null
   height?: number | null
@@ -590,6 +636,8 @@ export type PhotoCreateWithoutUserInput = {
 export type PhotoUncheckedCreateWithoutUserInput = {
   id?: string
   url: string
+  thumbUrl?: string | null
+  fullUrl?: string | null
   blurDataUrl?: string | null
   width?: number | null
   height?: number | null
@@ -634,6 +682,8 @@ export type PhotoScalarWhereInput = {
   id?: Prisma.StringFilter<"Photo"> | string
   userId?: Prisma.StringFilter<"Photo"> | string
   url?: Prisma.StringFilter<"Photo"> | string
+  thumbUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
+  fullUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
   blurDataUrl?: Prisma.StringNullableFilter<"Photo"> | string | null
   width?: Prisma.IntNullableFilter<"Photo"> | number | null
   height?: Prisma.IntNullableFilter<"Photo"> | number | null
@@ -648,6 +698,8 @@ export type PhotoScalarWhereInput = {
 export type PhotoCreateManyUserInput = {
   id?: string
   url: string
+  thumbUrl?: string | null
+  fullUrl?: string | null
   blurDataUrl?: string | null
   width?: number | null
   height?: number | null
@@ -662,6 +714,8 @@ export type PhotoCreateManyUserInput = {
 export type PhotoUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -676,6 +730,8 @@ export type PhotoUpdateWithoutUserInput = {
 export type PhotoUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -690,6 +746,8 @@ export type PhotoUncheckedUpdateWithoutUserInput = {
 export type PhotoUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -707,6 +765,8 @@ export type PhotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   userId?: boolean
   url?: boolean
+  thumbUrl?: boolean
+  fullUrl?: boolean
   blurDataUrl?: boolean
   width?: boolean
   height?: boolean
@@ -723,6 +783,8 @@ export type PhotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   userId?: boolean
   url?: boolean
+  thumbUrl?: boolean
+  fullUrl?: boolean
   blurDataUrl?: boolean
   width?: boolean
   height?: boolean
@@ -739,6 +801,8 @@ export type PhotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   userId?: boolean
   url?: boolean
+  thumbUrl?: boolean
+  fullUrl?: boolean
   blurDataUrl?: boolean
   width?: boolean
   height?: boolean
@@ -755,6 +819,8 @@ export type PhotoSelectScalar = {
   id?: boolean
   userId?: boolean
   url?: boolean
+  thumbUrl?: boolean
+  fullUrl?: boolean
   blurDataUrl?: boolean
   width?: boolean
   height?: boolean
@@ -766,7 +832,7 @@ export type PhotoSelectScalar = {
   createdAt?: boolean
 }
 
-export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "url" | "blurDataUrl" | "width" | "height" | "position" | "isCover" | "moderation" | "moderatedById" | "moderatedAt" | "createdAt", ExtArgs["result"]["photo"]>
+export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "url" | "thumbUrl" | "fullUrl" | "blurDataUrl" | "width" | "height" | "position" | "isCover" | "moderation" | "moderatedById" | "moderatedAt" | "createdAt", ExtArgs["result"]["photo"]>
 export type PhotoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -786,6 +852,8 @@ export type $PhotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     userId: string
     url: string
+    thumbUrl: string | null
+    fullUrl: string | null
     blurDataUrl: string | null
     width: number | null
     height: number | null
@@ -1222,6 +1290,8 @@ export interface PhotoFieldRefs {
   readonly id: Prisma.FieldRef<"Photo", 'String'>
   readonly userId: Prisma.FieldRef<"Photo", 'String'>
   readonly url: Prisma.FieldRef<"Photo", 'String'>
+  readonly thumbUrl: Prisma.FieldRef<"Photo", 'String'>
+  readonly fullUrl: Prisma.FieldRef<"Photo", 'String'>
   readonly blurDataUrl: Prisma.FieldRef<"Photo", 'String'>
   readonly width: Prisma.FieldRef<"Photo", 'Int'>
   readonly height: Prisma.FieldRef<"Photo", 'Int'>

@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BadgeCheck, Sparkles } from "lucide-react";
 import { OnlineDot } from "@/components/shared/online-dot";
+import { PhotoFrame } from "@/components/shared/photo-frame";
 import { initialsOf } from "@/lib/utils";
 
 export type PersonCardData = {
@@ -39,15 +40,19 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
       aria-label={`View ${person.displayName}'s profile`}
       className="group relative block w-full overflow-hidden rounded-3xl border border-border bg-card/80 text-left shadow-card transition-shadow hover:shadow-float"
     >
-      <div className="relative aspect-3/4 bg-muted">
-        {person.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={person.photo.url} alt={`${person.displayName}'s photo`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-        ) : (
+      <PhotoFrame
+        photo={person.photo}
+        alt={`${person.displayName}'s photo`}
+        loading="lazy"
+        radius="none"
+        className="bg-muted"
+        imgClassName="transition-[opacity,filter,transform] duration-300 group-hover:scale-[1.03]"
+        fallback={
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-foreground/10 to-transparent font-display text-3xl text-foreground/60">
             {initialsOf(person.displayName)}
           </div>
-        )}
+        }
+      >
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
           <p className="flex items-center gap-1.5 text-sm font-semibold text-white">
             {person.displayName}, {person.age}
@@ -61,7 +66,7 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
             </p>
           )}
         </div>
-      </div>
+      </PhotoFrame>
     </button>
   );
 }
