@@ -281,7 +281,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/60;
+    @apply border-border outline-ring/40;
   }
 
   html {
