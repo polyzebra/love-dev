@@ -11,10 +11,10 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "h-9 w-full min-w-0 rounded-2xl border border-input bg-foreground/5 px-3.5 py-1 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-[color,box-shadow,border-color] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
         // Hover: slightly stronger neutral border - never a color shift.
         "hover:border-foreground/25",
-        // Focus: the border stays NEUTRAL; a soft brand halo alone marks
-        // focus. The theme's --ring is visually a red, so a full-opacity
-        // focus-visible:border-ring reads as a validation error.
-        "focus-visible:border-input focus-visible:ring-2 focus-visible:ring-ring/15 dark:focus-visible:ring-ring/25",
+        // Focus: the neutral border simply strengthens - no ring, no rose.
+        // The theme's --ring is visually a red, so any rose halo or border
+        // on focus reads as a validation error.
+        "focus-visible:border-foreground/30 focus-visible:ring-0",
         // Error: destructive treatment ONLY for a real validation failure,
         // signalled by aria-invalid. Compound variants keep the red border
         // while the invalid field is focused or hovered.

@@ -282,7 +282,8 @@ export function PhotoManager({
   }
 
   const controlClass =
-    "glass-chip flex items-center justify-center rounded-full text-white outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/40 hover:brightness-110 active:scale-95";
+    // Controls sit on photo material - a white ring is the neutral there.
+    "glass-chip flex items-center justify-center rounded-full text-white outline-none transition-all focus-visible:ring-2 focus-visible:ring-white/60 hover:brightness-110 active:scale-95";
 
   return (
     <>
@@ -430,7 +431,7 @@ export function PhotoManager({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft disabled:pointer-events-none"
+                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-foreground/25 hover:text-foreground disabled:pointer-events-none"
                 aria-label="Add photo"
                 aria-busy={uploading}
               >

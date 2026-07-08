@@ -212,9 +212,10 @@ function ChipToggle({
 /**
  * Premium selectable card for a taxonomy category - icon, label, one-line
  * description. Selection state is the house calm pattern: subtle brand
- * tint (bg-accent) + soft border-primary/40 + filled check indicator +
- * a subtle transform scale (no layout shift). Never a full-opacity rose
- * border - that reads as a validation error.
+ * tint (bg-accent) + filled check indicator + a subtle transform scale
+ * (no layout shift). The border stays neutral - selection is carried by
+ * the fill and the check, never by a rose border (rose borders read as
+ * validation errors).
  */
 function CategoryCard({
   category,
@@ -243,7 +244,7 @@ function CategoryCard({
         transition={SPRING.snappy}
         className={cn(
           "tap-target flex min-h-[68px] w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-colors",
-          selected ? "border-primary/40 bg-accent shadow-card" : "bg-card hover:border-primary/40",
+          selected ? "border-border bg-accent shadow-card" : "bg-card hover:border-foreground/25",
         )}
       >
         <span
@@ -797,12 +798,13 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                       key={prompt.key}
                       className={cn(
                         "rounded-2xl border transition-all",
-                        // Calm selected state - accent tint + soft primary
-                        // border + check. Never a full-opacity rose border.
+                        // Calm selected state - accent tint + check on a
+                        // neutral border. Selection is the fill, never a
+                        // rose border.
                         selected
-                          ? "border-primary/40 bg-accent shadow-card"
+                          ? "border-border bg-accent shadow-card"
                           : "bg-card",
-                        !selected && !atLimit && "hover:border-primary/40",
+                        !selected && !atLimit && "hover:border-foreground/25",
                         atLimit && "opacity-45",
                       )}
                     >

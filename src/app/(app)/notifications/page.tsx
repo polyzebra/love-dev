@@ -39,7 +39,7 @@ export default async function NotificationsPage() {
           {notifications.map((n) => {
             const Icon = ICONS[n.type] ?? Bell;
             return (
-              <li key={n.id} className={cn("glass flex items-start gap-3 rounded-3xl p-4", !n.readAt && "border-primary/30")}>
+              <li key={n.id} className={cn("glass flex items-start gap-3 rounded-3xl p-4", !n.readAt && "border-foreground/20")}>
                 <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-full", n.readAt ? "bg-foreground/5" : "bg-primary/15")}>
                   <Icon className={cn("size-4.5", n.readAt ? "text-muted-foreground" : "text-primary-soft")} aria-hidden="true" />
                 </span>

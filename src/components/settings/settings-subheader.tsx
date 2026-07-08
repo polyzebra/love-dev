@@ -23,7 +23,7 @@ export function SettingsSubheader({
       <Link
         href={backHref}
         aria-label={backLabel}
-        className="glass-chip mb-5 inline-flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        className="glass-chip mb-5 inline-flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
       >
         <ArrowLeft className="size-5" aria-hidden="true" />
       </Link>

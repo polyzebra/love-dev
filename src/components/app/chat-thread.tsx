@@ -11,6 +11,7 @@ import {
   ImageIcon,
   Mic,
   Plus,
+  Quote,
   SendHorizontal,
   ShieldCheck,
   Sparkles,
@@ -294,9 +295,14 @@ export function ChatThread({
           aria-label="Conversation suggestions"
         >
           {suggestions.map((s) => {
-            const Icon = KIND_ICON[s.kind];
-            const chipClass =
-              "glass-chip tap-target flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-foreground/90";
+            // Quote chips repeat their own words back - inspiration, not
+            // validation: quote mark + italic muted text, no accent.
+            const Icon = s.quote ? Quote : KIND_ICON[s.kind];
+            const iconClass = s.quote ? "size-3.5 text-muted-foreground" : "size-3.5 text-gold";
+            const chipClass = cn(
+              "glass-chip tap-target flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium",
+              s.quote ? "italic text-muted-foreground" : "text-foreground/90",
+            );
             return (
               <motion.div
                 key={`${s.kind}:${s.text}`}
@@ -314,13 +320,13 @@ export function ChatThread({
                     }}
                     className={cn(chipClass, "transition-transform active:scale-95")}
                   >
-                    <Icon className="size-3.5 text-gold" aria-hidden="true" />
+                    <Icon className={iconClass} aria-hidden="true" />
                     {s.text}
                   </button>
                 ) : (
                   /* No canned line to offer - the chip is a gentle note */
                   <p role="note" className={chipClass}>
-                    <Icon className="size-3.5 text-gold" aria-hidden="true" />
+                    <Icon className={iconClass} aria-hidden="true" />
                     {s.text}
                   </p>
                 )}

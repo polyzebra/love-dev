@@ -34,6 +34,11 @@ export type Suggestion = {
   text: string;
   /** Ready-to-send message inserted into the composer on tap. */
   send?: string;
+  /**
+   * Quotes the other person's own words ("they said: ..."). The UI
+   * styles these as quotes - inspiration, not validation.
+   */
+  quote?: boolean;
 };
 
 export interface ConversationAssistant {
@@ -152,6 +157,7 @@ function promptOpeners(
         kind: "opener" as const,
         text: `Ask ${name} about ${topic} - they said: "${ex}"`,
         send: `You wrote "${ex}" - I need to hear more about that.`,
+        quote: true,
       };
     });
 }

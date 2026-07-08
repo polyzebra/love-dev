@@ -63,12 +63,13 @@ export function ExploreFilterSheet() {
                 <button
                   key={label} type="button" onClick={() => setCountry(value)}
                   className={cn(
-                    // Calm selected state: accent tint + soft primary
-                    // border - a full-opacity rose border reads as an error.
+                    // Calm selected state: accent tint + primary text on a
+                    // neutral border - selection is the fill, never a rose
+                    // border (rose borders read as errors).
                     "tap-target rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                     country === value
-                      ? "border-primary/40 bg-accent text-foreground"
-                      : "border-border text-muted-foreground hover:border-primary/25 hover:text-foreground",
+                      ? "border-border bg-accent text-foreground"
+                      : "border-border text-muted-foreground hover:border-foreground/25 hover:text-foreground",
                   )}
                 >
                   {label}
