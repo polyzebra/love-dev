@@ -61,7 +61,9 @@ export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string,
                   maxLength={PROMPT_ANSWER_MAX_LENGTH}
                   rows={2}
                   placeholder="Write something only you could say"
-                  className="mt-2.5 min-h-16 resize-none rounded-2xl border-input bg-foreground/5"
+                  // Neutral border, hover and calm focus glow all come
+                  // from the Textarea primitive.
+                  className="mt-2.5 min-h-16 resize-none rounded-2xl"
                 />
                 {value.length > 0 && (
                   <p className="mt-1.5 text-right text-[11px] tabular-nums text-muted-foreground">

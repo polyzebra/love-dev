@@ -211,8 +211,10 @@ function ChipToggle({
 
 /**
  * Premium selectable card for a taxonomy category - icon, label, one-line
- * description. Selection state follows the house GOALS pattern:
- * border-primary + bg-accent + a subtle transform scale (no layout shift).
+ * description. Selection state is the house calm pattern: subtle brand
+ * tint (bg-accent) + soft border-primary/40 + filled check indicator +
+ * a subtle transform scale (no layout shift). Never a full-opacity rose
+ * border - that reads as a validation error.
  */
 function CategoryCard({
   category,
@@ -241,7 +243,7 @@ function CategoryCard({
         transition={SPRING.snappy}
         className={cn(
           "tap-target flex min-h-[68px] w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-colors",
-          selected ? "border-primary bg-accent shadow-card" : "bg-card hover:border-primary/40",
+          selected ? "border-primary/40 bg-accent shadow-card" : "bg-card hover:border-primary/40",
         )}
       >
         <span
@@ -318,6 +320,8 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const [celebrating, setCelebrating] = useState(false);
   const [valueNote, setValueNote] = useState<string | null>(null);
   const milestonesShown = useRef(new Set<number>());
+  /** The one prompt whose answer editor is currently open. */
+  const [activePromptKey, setActivePromptKey] = useState<PromptKey | null>(null);
   const [data, setData] = useState<WizardData>({
     displayName: initialName,
     birthDate: "",
@@ -377,14 +381,32 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     }
   };
 
-  /** Selection order is preserved - it becomes sortOrder on the profile. */
-  const togglePrompt = (key: PromptKey) =>
-    setData((d) => {
-      if (d.prompts.some((p) => p.key === key))
-        return { ...d, prompts: d.prompts.filter((p) => p.key !== key) };
-      if (d.prompts.length >= MAX_PROMPTS) return d;
-      return { ...d, prompts: [...d.prompts, { key, answer: "" }] };
-    });
+  /**
+   * Selection order is preserved - it becomes sortOrder on the profile.
+   * Only ONE answer editor is open at a time (activePromptKey); picking
+   * another prompt collapses the previous editor while earlier selections
+   * stay selected and keep their answers. Tapping a collapsed selected
+   * prompt re-opens its editor; tapping the open one deselects it.
+   */
+  const togglePrompt = (key: PromptKey) => {
+    const isSelected = data.prompts.some((p) => p.key === key);
+    if (!isSelected) {
+      if (data.prompts.length >= MAX_PROMPTS) return;
+      setData((d) =>
+        d.prompts.some((p) => p.key === key) || d.prompts.length >= MAX_PROMPTS
+          ? d
+          : { ...d, prompts: [...d.prompts, { key, answer: "" }] },
+      );
+      setActivePromptKey(key);
+      return;
+    }
+    if (activePromptKey === key) {
+      setData((d) => ({ ...d, prompts: d.prompts.filter((p) => p.key !== key) }));
+      setActivePromptKey(null);
+    } else {
+      setActivePromptKey(key);
+    }
+  };
 
   const setPromptAnswer = (key: PromptKey, answer: string) =>
     setData((d) => ({
@@ -768,14 +790,17 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 {ONBOARDING_PROMPTS.map((prompt) => {
                   const entry = data.prompts.find((p) => p.key === prompt.key);
                   const selected = Boolean(entry);
+                  const expanded = selected && activePromptKey === prompt.key;
                   const atLimit = !selected && data.prompts.length >= MAX_PROMPTS;
                   return (
                     <div
                       key={prompt.key}
                       className={cn(
                         "rounded-2xl border transition-all",
+                        // Calm selected state - accent tint + soft primary
+                        // border + check. Never a full-opacity rose border.
                         selected
-                          ? "border-primary bg-accent shadow-card"
+                          ? "border-primary/40 bg-accent shadow-card"
                           : "bg-card",
                         !selected && !atLimit && "hover:border-primary/40",
                         atLimit && "opacity-45",
@@ -783,7 +808,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                     >
                       <button
                         type="button"
-                        aria-expanded={selected}
+                        aria-expanded={expanded}
                         disabled={atLimit}
                         onClick={() => togglePrompt(prompt.key)}
                         className="tap-target flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
@@ -791,16 +816,29 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                         <span className="font-medium">{prompt.label}</span>
                         <span
                           className={cn(
-                            "size-5 shrink-0 rounded-full border-2 transition-colors",
+                            "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
                             selected
                               ? "border-primary bg-primary"
                               : "border-muted-foreground/30",
                           )}
                           aria-hidden="true"
-                        />
+                        >
+                          {selected && (
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={SPRING.snappy}
+                            >
+                              <Check
+                                className="size-3 text-primary-foreground"
+                                strokeWidth={3}
+                              />
+                            </motion.span>
+                          )}
+                        </span>
                       </button>
                       <AnimatePresence initial={false}>
-                        {entry && (
+                        {expanded && entry && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}

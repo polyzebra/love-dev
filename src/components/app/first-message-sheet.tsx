@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { InlineFieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -38,7 +39,12 @@ const MAX_LENGTH = 280;
 
 export type FirstMessageResult = { matched: boolean; conversationId?: string };
 
-type Opener = { label: string; send: string };
+type Opener = {
+  label: string;
+  send: string;
+  /** "gold" marks the prompt-tease ("They said:") chip - a warmer accent. */
+  tone?: "gold";
+};
 
 /** Trim a prompt answer to a short, single-line excerpt. */
 function excerptOf(answer: string, max = 56): string {
@@ -73,6 +79,7 @@ function openersFor(profile: DiscoverProfile, viewerId: string | null): Opener[]
     fromPrompt.push({
       label: `They said: "${ex}" - ask about it`,
       send: `You wrote "${ex}" - I need to hear more about that.`,
+      tone: "gold",
     });
   }
 
@@ -216,10 +223,19 @@ export function FirstMessageSheet({
                 textareaRef.current?.focus();
               }}
               className={cn(
-                "rounded-full border px-3.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                // Suggestions, not warnings: quiet neutral chips with a
+                // brand-tint hover; the picked one gets the calm selected
+                // state (accent tint + soft primary border) - never a
+                // full-opacity rose border.
+                "rounded-full border px-3.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
                 body === o.send
-                  ? "border-primary bg-primary/15 text-foreground"
-                  : "border-border bg-foreground/5 text-muted-foreground hover:bg-foreground/10 hover:text-foreground",
+                  ? "border-primary/40 bg-accent text-foreground"
+                  : cn(
+                      "bg-foreground/5 text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+                      o.tone === "gold"
+                        ? "border-gold/30"
+                        : "border-border hover:border-primary/25",
+                    ),
               )}
             >
               {o.label}
@@ -242,25 +258,13 @@ export function FirstMessageSheet({
           aria-label={title}
           aria-invalid={bodyError ? true : undefined}
           aria-describedby={bodyError ? "first-message-body-error" : undefined}
-          className={cn(
-            "min-h-24",
-            // The theme's --ring is visually a red, so the base
-            // focus-visible:border-ring reads as a validation error the
-            // moment the sheet autofocuses. Keep the border neutral on
-            // focus (the soft ring halo still marks it); destructive
-            // treatment is reserved for a REAL server error.
-            bodyError
-              ? "focus-visible:border-destructive focus-visible:ring-destructive/30"
-              : "focus-visible:border-input",
-          )}
+          // Neutral-border focus and aria-invalid error treatment both
+          // come from the Textarea primitive now - no local overrides.
+          className="min-h-24"
           disabled={pending}
         />
         <div className="flex items-start justify-between gap-3">
-          {bodyError && (
-            <p id="first-message-body-error" className="text-xs text-destructive">
-              {bodyError}
-            </p>
-          )}
+          <InlineFieldError id="first-message-body-error" message={bodyError} />
           <p
             className="ml-auto text-right text-[11px] tabular-nums text-muted-foreground"
             aria-live="polite"

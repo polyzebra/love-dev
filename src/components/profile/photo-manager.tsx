@@ -282,7 +282,7 @@ export function PhotoManager({
   }
 
   const controlClass =
-    "glass-chip flex items-center justify-center rounded-full text-white outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50 hover:brightness-110 active:scale-95";
+    "glass-chip flex items-center justify-center rounded-full text-white outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/40 hover:brightness-110 active:scale-95";
 
   return (
     <>

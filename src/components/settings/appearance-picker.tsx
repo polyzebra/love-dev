@@ -66,7 +66,7 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
             value={option}
             disabled={pending}
             aria-label={label}
-            className="glass flex min-h-14 w-full items-center gap-4 rounded-3xl px-5 py-4 text-left outline-none transition-colors hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:border-primary/40 data-[state=checked]:bg-accent data-[disabled]:opacity-70"
+            className="glass flex min-h-14 w-full items-center gap-4 rounded-3xl px-5 py-4 text-left outline-none transition-colors hover:bg-foreground/5 focus-visible:ring-[3px] focus-visible:ring-ring/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-accent data-[disabled]:opacity-70"
           >
             <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
               <Icon className="size-5 text-accent-foreground" aria-hidden="true" />

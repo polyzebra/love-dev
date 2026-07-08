@@ -637,7 +637,7 @@ export function SwipeDeck({
     "pointer-events-auto flex size-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2",
     top
       ? "border border-white/15 bg-white/10 text-white backdrop-blur-xl hover:bg-white/20 focus-visible:ring-white/60"
-      : "glass text-foreground hover:bg-foreground/10 focus-visible:ring-ring",
+      : "glass text-foreground hover:bg-foreground/10 focus-visible:ring-ring/40",
   );
 
   return (
