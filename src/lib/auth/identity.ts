@@ -68,6 +68,13 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
     db.notification.deleteMany({ where: { userId } }),
     db.userSettings.deleteMany({ where: { userId } }),
   ]);
+  // Best-effort storage cleanup: no user session exists here, so remove the
+  // photo objects straight from storage.objects. Never let this break teardown.
+  try {
+    await db.$executeRaw`DELETE FROM storage.objects WHERE bucket_id = 'listing-images' AND name LIKE ${"users/" + userId + "/%"}`;
+  } catch (error) {
+    console.warn(`[identity] storage cleanup failed for ${userId}: ${String(error).slice(0, 120)}`);
+  }
   console.info(`[identity] account ${userId} deleted (${reason}) - email freed`);
 }
 

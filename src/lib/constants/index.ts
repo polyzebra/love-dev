@@ -8,7 +8,7 @@ export const SUPPORTED_COUNTRIES = [
 export const MIN_AGE = 18;
 export const MAX_AGE = 99;
 
-export const PHOTO_LIMITS = { min: 2, max: 9, maxSizeMb: 10 } as const;
+export const PHOTO_LIMITS = { min: 2, max: 10, maxSizeMb: 10 } as const;
 
 export const BIO_MAX_LENGTH = 500;
 export const MESSAGE_MAX_LENGTH = 2000;

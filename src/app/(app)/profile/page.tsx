@@ -5,68 +5,26 @@ import { redirect } from "next/navigation";
 import {
   BadgeCheck,
   Briefcase,
-  Camera,
   ChevronDown,
   CircleDashed,
   GraduationCap,
-  Heart,
   Languages,
-  MapPin,
   MessageSquareQuote,
   PenLine,
-  Settings,
   Ruler,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { promptLabel } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PhotoFrame } from "@/components/shared/photo-frame";
+import { PhotoManager } from "@/components/profile/photo-manager";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
 export const dynamic = "force-dynamic";
 
 const GOAL_LABELS: Record<string, string> = GOAL_LINES;
-
-function coverGradient(seed: string): string {
-  const hues = [346, 12, 262, 200];
-  const h = hues[seed.charCodeAt(0) % hues.length];
-  return `linear-gradient(165deg, hsl(${h} 70% 60%) 0%, hsl(${h} 75% 38%) 50%, hsl(${h} 70% 18%) 100%)`;
-}
-
-/** SVG completion ring with the score in the centre. */
-function CompletionRing({ value }: { value: number }) {
-  const r = 26;
-  const c = 2 * Math.PI * r;
-  return (
-    <div className="relative flex size-16 items-center justify-center" aria-label={`Profile ${value}% complete`}>
-      <svg viewBox="0 0 64 64" className="absolute inset-0 -rotate-90">
-        <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="4" />
-        <circle
-          cx="32"
-          cy="32"
-          r={r}
-          fill="none"
-          stroke="url(#ring-grad)"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - value / 100)}
-        />
-        <defs>
-          <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#fb7185" />
-            <stop offset="100%" stopColor="#e7c9a1" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <span className="text-sm font-semibold tabular-nums text-white">{value}%</span>
-    </div>
-  );
-}
 
 export default async function ProfilePage() {
   const user = await requireUser();
@@ -87,7 +45,6 @@ export default async function ProfilePage() {
 
   const verifiedTypes = new Set(profile.user.verifications.map((v) => v.type));
   const photos = profile.user.photos;
-  const cover = photos[0];
   const age = calculateAge(profile.birthDate);
   const prompts = profile.prompts;
 
@@ -103,123 +60,48 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      {/* ================= COVER - magazine opener ================= */}
-      <Reveal y={16}>
-        <section className="relative overflow-hidden rounded-[36px] border border-border shadow-float">
-          <PhotoFrame
-            photo={cover ?? null}
-            alt="Your cover photo"
-            variant="full"
-            radius="none"
-            className="rounded-[36px] sm:aspect-square md:aspect-4/3"
-            fallback={
-              <div className="absolute inset-0" style={{ background: coverGradient(profile.userId) }} />
-            }
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
-            <div className="absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]" />
-
-            {/* Top rail: completion + edit */}
-            <div className="absolute inset-x-5 top-5 flex items-start justify-between">
-              <CompletionRing value={profile.completionPct} />
-              <Button size="icon" variant="secondary" className="glass-chip size-11 rounded-full border-0" aria-label="Settings" asChild>
-                <Link href="/settings">
-                  <Settings className="size-5" aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-
-            {/* Identity - editorial lockup */}
-            <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 md:p-9">
-              <h1 className="flex flex-wrap items-center gap-3 font-display text-[clamp(2.2rem,6vw,4rem)] font-medium leading-none tracking-tight text-white">
-                {profile.displayName}, {age}
-                {verifiedTypes.has("PHOTO") && (
-                  <span role="img" className="relative flex items-center justify-center" aria-label="Photo verified">
-                    <span className="absolute size-8 animate-ping-soft rounded-full bg-sky-400/25" />
-                    <BadgeCheck className="relative size-8 fill-sky-400 text-white" />
-                  </span>
-                )}
-              </h1>
-              <p className="flex items-center gap-1.5 text-sm text-white/80">
-                <MapPin className="size-4" aria-hidden="true" />
-                {profile.city}
-                {profile.country === "IE" ? ", Ireland" : ", UK"}
-              </p>
-              <Badge className="rounded-full border-0 bg-white/15 px-4 py-1.5 text-white backdrop-blur-md">
-                <Heart className="size-3.5 fill-current" aria-hidden="true" />
-                {GOAL_LABELS[profile.relationshipGoal]}
-              </Badge>
-            </div>
-          </PhotoFrame>
-        </section>
-      </Reveal>
-
-      {/* ================= TRUST ================= */}
-      <RevealGroup className="grid gap-2.5 sm:grid-cols-3">
-        {(
-          [
-            ["EMAIL", "Email verified"],
-            ["PHONE", "Phone verified"],
-            ["PHOTO", "Photo verified"],
-          ] as const
-        ).map(([type, label]) => {
-          const done = verifiedTypes.has(type);
-          return (
-            <RevealItem key={type}>
-              <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
-                {done ? (
-                  <BadgeCheck className="size-5 shrink-0 text-success" aria-hidden="true" />
-                ) : (
-                  <CircleDashed className="size-5 shrink-0 text-muted-foreground/40" aria-hidden="true" />
-                )}
-                <span className={done ? "" : "text-muted-foreground"}>{label}</span>
-                {!done && (
-                  <Button variant="link" size="sm" className="ml-auto h-auto p-0" asChild>
-                    <Link href="/settings/account">Verify</Link>
-                  </Button>
-                )}
-              </div>
-            </RevealItem>
-          );
-        })}
-      </RevealGroup>
-
-      {/* ================= GALLERY ================= */}
-      <Reveal>
-        <section>
-          <div className="mb-3 flex items-baseline justify-between px-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Gallery</p>
-            <p className="text-xs text-muted-foreground">{photos.length}/9 photos</p>
-          </div>
-          <div className="grid grid-cols-3 gap-2.5">
-            {photos.slice(1).map((photo, i) => (
-              <PhotoFrame
-                key={photo.id}
-                photo={photo}
-                alt={`Photo ${i + 2}`}
-                loading="lazy"
-                radius="none"
-                className="rounded-2xl border border-border"
-              />
-            ))}
-            {photos.length < 9 && (
-              <button
-                type="button"
-                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-primary-soft hover:text-primary-soft"
-                aria-label="Add photo"
-              >
-                <Camera className="size-5" aria-hidden="true" />
-                <span className="text-[11px] font-medium">Add photo</span>
-              </button>
-            )}
-          </div>
-          {photos.length < 2 && (
-            <p className="mt-2 px-1 text-xs text-warning">
-              Add at least 2 photos to appear in Discover.
-            </p>
-          )}
-        </section>
-      </Reveal>
+      {/* ============ COVER + GALLERY - client-managed photos ============ */}
+      <PhotoManager
+        initialPhotos={photos}
+        completionPct={profile.completionPct}
+        displayName={profile.displayName}
+        age={age}
+        city={profile.city}
+        country={profile.country}
+        goalLabel={GOAL_LABELS[profile.relationshipGoal]}
+        photoVerified={verifiedTypes.has("PHOTO")}
+        gradientSeed={profile.userId}
+      >
+        {/* ================= TRUST ================= */}
+        <RevealGroup className="grid gap-2.5 sm:grid-cols-3">
+          {(
+            [
+              ["EMAIL", "Email verified"],
+              ["PHONE", "Phone verified"],
+              ["PHOTO", "Photo verified"],
+            ] as const
+          ).map(([type, label]) => {
+            const done = verifiedTypes.has(type);
+            return (
+              <RevealItem key={type}>
+                <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
+                  {done ? (
+                    <BadgeCheck className="size-5 shrink-0 text-success" aria-hidden="true" />
+                  ) : (
+                    <CircleDashed className="size-5 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+                  )}
+                  <span className={done ? "" : "text-muted-foreground"}>{label}</span>
+                  {!done && (
+                    <Button variant="link" size="sm" className="ml-auto h-auto p-0" asChild>
+                      <Link href="/settings/account">Verify</Link>
+                    </Button>
+                  )}
+                </div>
+              </RevealItem>
+            );
+          })}
+        </RevealGroup>
+      </PhotoManager>
 
       {/* ================= IN THEIR WORDS ================= */}
       {profile.bio ? (

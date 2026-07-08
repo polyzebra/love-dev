@@ -3,6 +3,7 @@ import { RATE_LIMITS } from "@/lib/rate-limit";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import {
+  deletePhotoObjects,
   makeBlurDataUrl,
   PhotoStorageNotConfiguredError,
   processProfilePhoto,
@@ -56,14 +57,23 @@ export async function POST(req: Request) {
     return apiError(422, "invalid_image", "We could not read that image. Try a different file.");
   }
 
+  let uploaded: Awaited<ReturnType<typeof uploadProfilePhoto>>;
   try {
-    const uploaded = await uploadProfilePhoto(user.id, processed);
+    uploaded = await uploadProfilePhoto(user.id, processed);
+  } catch (error) {
+    if (error instanceof PhotoStorageNotConfiguredError) {
+      return apiError(503, "storage_unavailable", "Photo storage not configured.");
+    }
+    return apiError(502, "upload_failed", "We could not store that photo. Please try again.");
+  }
 
+  try {
     const last = await db.photo.findFirst({
       where: { userId: user.id },
       orderBy: { position: "desc" },
       select: { position: true },
     });
+    const position = (last?.position ?? -1) + 1;
 
     const photo = await db.photo.create({
       data: {
@@ -74,7 +84,9 @@ export async function POST(req: Request) {
         blurDataUrl,
         width: processed.width,
         height: processed.height,
-        position: (last?.position ?? -1) + 1,
+        position,
+        // The very first photo is automatically the profile cover.
+        isCover: position === 0,
       },
       select: {
         id: true,
@@ -85,16 +97,18 @@ export async function POST(req: Request) {
         width: true,
         height: true,
         position: true,
+        isCover: true,
         moderation: true,
         createdAt: true,
       },
     });
 
     return created(photo);
-  } catch (error) {
-    if (error instanceof PhotoStorageNotConfiguredError) {
-      return apiError(503, "storage_unavailable", "Photo storage not configured.");
-    }
-    return apiError(502, "upload_failed", "We could not store that photo. Please try again.");
+  } catch {
+    // The DB row never landed - remove the orphaned storage objects.
+    await deletePhotoObjects([uploaded.thumbUrl, uploaded.cardUrl, uploaded.fullUrl]).catch(
+      () => undefined,
+    );
+    return apiError(502, "upload_failed", "We could not save that photo. Please try again.");
   }
 }

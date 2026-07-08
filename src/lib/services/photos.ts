@@ -71,7 +71,7 @@ export async function makeBlurDataUrl(input: Buffer): Promise<string> {
   return `data:image/webp;base64,${tiny.toString("base64")}`;
 }
 
-export const PHOTOS_BUCKET = "photos";
+export const PHOTOS_BUCKET = "listing-images";
 
 export class PhotoStorageNotConfiguredError extends Error {
   constructor() {
@@ -89,25 +89,44 @@ function assertStorageConfigured() {
 }
 
 export type UploadedPhoto = {
-  /** Storage id shared by the three objects (`${userId}/${photoId}-*.webp`). */
+  /** Storage id shared by the three objects (`users/{userId}/photos/{photoId}/*.webp`). */
   photoId: string;
   thumbUrl: string;
   cardUrl: string;
   fullUrl: string;
 };
 
+/**
+ * Canonical object paths in the "listing-images" bucket:
+ * `users/{userId}/photos/{photoId}/{thumb|card|full}.webp`.
+ * Storage RLS keys off `(storage.foldername(name))[2] = auth.uid()`, so the
+ * second folder segment MUST be the owner's auth uid.
+ */
 export function photoObjectPaths(userId: string, photoId: string) {
+  const base = `users/${userId}/photos/${photoId}`;
   return {
-    thumb: `${userId}/${photoId}-thumb.webp`,
-    card: `${userId}/${photoId}-card.webp`,
-    full: `${userId}/${photoId}-full.webp`,
+    thumb: `${base}/thumb.webp`,
+    card: `${base}/card.webp`,
+    full: `${base}/full.webp`,
   } as const;
 }
 
 /**
- * Uploads the three variants to the public "photos" bucket under the owner's
- * folder and returns their public URLs. Uses the request-scoped Supabase
- * client so storage RLS sees the authenticated user.
+ * Extracts the bucket-relative object path from a public URL previously
+ * produced by `getPublicUrl` for the listing-images bucket. Returns null for
+ * URLs that do not point at this bucket.
+ */
+export function parsePhotoObjectPath(url: string): string | null {
+  const prefix = `/storage/v1/object/public/${PHOTOS_BUCKET}/`;
+  const idx = url.indexOf(prefix);
+  if (idx === -1) return null;
+  return decodeURIComponent(url.slice(idx + prefix.length).split("?")[0]);
+}
+
+/**
+ * Uploads the three variants to the public "listing-images" bucket under the
+ * owner's folder and returns their public URLs. Uses the request-scoped
+ * Supabase client so storage RLS sees the authenticated user.
  */
 export async function uploadProfilePhoto(
   userId: string,
@@ -156,13 +175,9 @@ export async function deletePhotoObjects(urls: Array<string | null | undefined>)
   assertStorageConfigured();
 
   const supabase = await supabaseServer();
-  const prefix = `/storage/v1/object/public/${PHOTOS_BUCKET}/`;
   const paths = urls
     .filter((u): u is string => Boolean(u))
-    .map((u) => {
-      const idx = u.indexOf(prefix);
-      return idx === -1 ? null : decodeURIComponent(u.slice(idx + prefix.length).split("?")[0]);
-    })
+    .map((u) => parsePhotoObjectPath(u))
     .filter((p): p is string => Boolean(p));
 
   if (paths.length === 0) return;

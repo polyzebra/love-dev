@@ -13,7 +13,7 @@ export async function DELETE(_req: Request, { params }: Params) {
   // Scoped to the session user so nobody can delete someone else's photo.
   const photo = await db.photo.findFirst({
     where: { id, userId: user.id },
-    select: { id: true, url: true, thumbUrl: true, fullUrl: true },
+    select: { id: true, url: true, thumbUrl: true, fullUrl: true, isCover: true },
   });
   if (!photo) return notFound("Photo");
 
@@ -25,5 +25,18 @@ export async function DELETE(_req: Request, { params }: Params) {
   }
 
   await db.photo.delete({ where: { id: photo.id } });
+
+  // If the cover was removed, promote the photo now first in line.
+  if (photo.isCover) {
+    const next = await db.photo.findFirst({
+      where: { userId: user.id },
+      orderBy: { position: "asc" },
+      select: { id: true },
+    });
+    if (next) {
+      await db.photo.update({ where: { id: next.id }, data: { isCover: true } });
+    }
+  }
+
   return ok({ deleted: true });
 }
