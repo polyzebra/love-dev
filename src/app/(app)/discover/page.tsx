@@ -5,30 +5,32 @@ import { db } from "@/lib/db";
 import { getDiscoverFeed } from "@/lib/services/discovery";
 import { SwipeDeck, type ViewerContext } from "@/components/app/swipe-deck";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import { ArrowLeft, Bell, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Discover" };
 export const dynamic = "force-dynamic";
 
+/* Mirrors the SwipeDeck stage geometry so the skeleton is full-stage too */
 function DeckSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-sm">
-      <Skeleton className="aspect-3/4 w-full rounded-[30px]" />
-      <div className="mt-7 flex items-center justify-center gap-4">
-        <Skeleton className="size-12 rounded-full" />
-        <Skeleton className="size-16 rounded-full" />
-        <Skeleton className="size-16 rounded-full" />
-        <Skeleton className="size-12 rounded-full" />
+    <div className="fixed inset-0 z-30 overflow-hidden bg-background">
+      <div className="absolute inset-0 flex justify-center md:py-3 lg:left-72 lg:py-4">
+        <div className="relative h-full w-full md:w-[min(100%,calc((100dvh-1.5rem)*0.78))] lg:w-[min(100%,calc((100dvh-2rem)*0.78))]">
+          <Skeleton className="h-full w-full rounded-none md:rounded-[20px] lg:rounded-[24px]" />
+          <div className="absolute inset-x-0 bottom-[calc(max(1rem,var(--safe-bottom))+4.75rem)] flex items-center justify-center gap-5 sm:gap-6 lg:bottom-[calc(var(--safe-bottom)+2rem)]">
+            <Skeleton className="size-12 rounded-full" />
+            <Skeleton className="size-14 rounded-full" />
+            <Skeleton className="size-[4.5rem] rounded-full" />
+            <Skeleton className="size-12 rounded-full" />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-async function Deck() {
+async function Deck({ backHref }: { backHref: string | null }) {
   const user = await requireUser();
-  if (!user.id) return <SwipeDeck initialProfiles={[]} viewer={null} />;
+  if (!user.id) return <SwipeDeck initialProfiles={[]} viewer={null} backHref={backHref} />;
 
   const [feed, me] = await Promise.all([
     getDiscoverFeed(user.id),
@@ -50,7 +52,7 @@ async function Deck() {
       }
     : null;
 
-  return <SwipeDeck initialProfiles={feed} viewer={viewer} />;
+  return <SwipeDeck initialProfiles={feed} viewer={viewer} backHref={backHref} />;
 }
 
 export default async function DiscoverPage({
@@ -62,30 +64,10 @@ export default async function DiscoverPage({
   const backHref = from?.startsWith("/explore") ? from : null;
   return (
     <>
-      {/* Swipe header: contextual back (from Explore) left, filters right */}
-      <header className="flex items-start justify-between gap-4 pb-6">
-        <div className="flex items-center gap-2">
-          {backHref && (
-            <Button variant="ghost" size="icon" className="rounded-full" aria-label="Back to Explore" asChild>
-              <Link href={backHref}><ArrowLeft className="size-5" /></Link>
-            </Button>
-          )}
-          <div>
-            <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">Swipe</h1>
-            <p className="text-sm text-muted-foreground md:text-base">Profiles picked for you, refreshed daily.</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" className="size-11 rounded-full" aria-label="Notifications" asChild>
-            <Link href="/notifications"><Bell className="size-5" /></Link>
-          </Button>
-          <Button variant="outline" size="icon" className="size-11 rounded-full" aria-label="Discovery preferences" asChild>
-            <Link href="/settings/discovery"><SlidersHorizontal className="size-5" /></Link>
-          </Button>
-        </div>
-      </header>
+      {/* The stage is the page - no header; its controls float over the photo */}
+      <h1 className="sr-only">Swipe</h1>
       <Suspense fallback={<DeckSkeleton />}>
-        <Deck />
+        <Deck backHref={backHref} />
       </Suspense>
     </>
   );
