@@ -1,8 +1,19 @@
 import { z } from "zod";
 import { FIRST_MESSAGE_MAX_LENGTH } from "@/lib/constants";
 
+/**
+ * User ids exist in TWO formats: Prisma `cuid()` defaults (seed data)
+ * and Supabase Auth UUIDs mirrored verbatim at signup
+ * (src/app/auth/callback/route.ts creates users with `id: u.id`).
+ * A bare `.cuid()` check rejects every real signed-up user, so accept
+ * exactly those two shapes - nothing looser.
+ */
+const userIdSchema = z.union([z.string().cuid(), z.string().uuid()], {
+  error: "Invalid user id",
+});
+
 export const sendFirstMessageSchema = z.object({
-  toId: z.string().cuid(),
+  toId: userIdSchema,
   body: z
     .string()
     .trim()

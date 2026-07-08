@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const reportSchema = z.object({
-  reportedId: z.string().cuid(),
-  messageId: z.string().cuid().optional(),
+  reportedId: z.union([z.string().cuid(), z.string().uuid()], { error: "Invalid user id" }),
+  messageId: z.union([z.string().cuid(), z.string().uuid()], { error: "Invalid user id" }).optional(),
   reason: z.enum([
     "FAKE_PROFILE",
     "INAPPROPRIATE_CONTENT",
@@ -17,7 +17,7 @@ export const reportSchema = z.object({
 });
 
 export const blockSchema = z.object({
-  blockedId: z.string().cuid(),
+  blockedId: z.union([z.string().cuid(), z.string().uuid()], { error: "Invalid user id" }),
 });
 
 export type ReportInput = z.infer<typeof reportSchema>;

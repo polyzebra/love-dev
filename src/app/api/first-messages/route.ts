@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, created, guardRate, ok, parseBody, requireSession } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { sendFirstMessageSchema } from "@/lib/validators/first-message";
 import {
@@ -22,7 +22,8 @@ export async function POST(req: Request) {
   try {
     // Sender is ALWAYS the session user - never trusted from the client.
     const result = await sendFirstMessage(user.id, data.toId, data.body);
-    return ok(result);
+    // 201: the sheet treats anything else as a failure.
+    return created(result);
   } catch (error) {
     if (error instanceof FirstMessageError) {
       return apiError(FIRST_MESSAGE_ERROR_STATUS[error.code], error.code, error.message);

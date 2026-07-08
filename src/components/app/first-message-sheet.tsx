@@ -119,6 +119,9 @@ export function FirstMessageSheet({
   const isDesktop = useIsDesktop();
   const [body, setBody] = useState("");
   const [pending, setPending] = useState(false);
+  // Real server-reported problem with the message itself (400/422),
+  // rendered inline under the textarea. Null = no error, no red.
+  const [bodyError, setBodyError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Reset the draft when the recipient changes (render-time reset on
@@ -127,6 +130,7 @@ export function FirstMessageSheet({
   if (profile?.userId !== prevId) {
     setPrevId(profile?.userId);
     setBody("");
+    setBodyError(null);
   }
 
   const openers = useMemo(
@@ -144,6 +148,7 @@ export function FirstMessageSheet({
   async function send() {
     if (!profile || pending || body.trim().length === 0) return;
     setPending(true);
+    setBodyError(null);
     try {
       const res = await fetch("/api/first-messages", {
         method: "POST",
@@ -156,13 +161,32 @@ export function FirstMessageSheet({
         return;
       }
       const payload = await res.json().catch(() => null);
-      const message: string | undefined = payload?.error?.message;
+      const error: { code?: string; message?: string; fields?: Record<string, string[]> } =
+        payload?.error ?? {};
+      // A problem with the message itself belongs under the textarea:
+      // 422 zod field errors for `body`, or the service's own body
+      // rejections (length / content guard). Everything else toasts.
+      const inline =
+        error.fields?.body?.[0] ??
+        (res.status === 400 &&
+        (error.code === "invalid_body" || error.code === "content_rejected")
+          ? error.message
+          : undefined);
+      if (inline) {
+        setBodyError(inline);
+        textareaRef.current?.focus();
+        return; // Keep the sheet open - the draft is still theirs to fix
+      }
       if (res.status === 409) {
         // Already messaged them - nothing to advance, just step aside
-        toast(message ?? "You already sent them a message.");
+        toast(error.message ?? "You already sent them a message.");
         onOpenChange(false);
         return;
       }
+      // Always the REAL server message; a field error beats the shared
+      // 422 envelope copy, and hardcoded text is a last resort only.
+      const message =
+        Object.values(error.fields ?? {}).flat()[0] ?? error.message;
       toast.error(
         message ??
           (res.status === 429
@@ -207,21 +231,43 @@ export function FirstMessageSheet({
         <Textarea
           ref={textareaRef}
           value={body}
-          onChange={(e) => setBody(e.target.value.slice(0, MAX_LENGTH))}
+          onChange={(e) => {
+            setBody(e.target.value.slice(0, MAX_LENGTH));
+            if (bodyError) setBodyError(null);
+          }}
           maxLength={MAX_LENGTH}
           rows={3}
           autoFocus
           placeholder={`Something ${firstName} can actually reply to...`}
           aria-label={title}
-          className="min-h-24"
+          aria-invalid={bodyError ? true : undefined}
+          aria-describedby={bodyError ? "first-message-body-error" : undefined}
+          className={cn(
+            "min-h-24",
+            // The theme's --ring is visually a red, so the base
+            // focus-visible:border-ring reads as a validation error the
+            // moment the sheet autofocuses. Keep the border neutral on
+            // focus (the soft ring halo still marks it); destructive
+            // treatment is reserved for a REAL server error.
+            bodyError
+              ? "focus-visible:border-destructive focus-visible:ring-destructive/30"
+              : "focus-visible:border-input",
+          )}
           disabled={pending}
         />
-        <p
-          className="text-right text-[11px] tabular-nums text-muted-foreground"
-          aria-live="polite"
-        >
-          {body.length}/{MAX_LENGTH}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          {bodyError && (
+            <p id="first-message-body-error" className="text-xs text-destructive">
+              {bodyError}
+            </p>
+          )}
+          <p
+            className="ml-auto text-right text-[11px] tabular-nums text-muted-foreground"
+            aria-live="polite"
+          >
+            {body.length}/{MAX_LENGTH}
+          </p>
+        </div>
       </div>
     </div>
   );
