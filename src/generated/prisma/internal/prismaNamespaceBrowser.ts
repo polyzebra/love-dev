@@ -179,6 +179,7 @@ export const PhotoScalarFieldEnum = {
   userId: 'userId',
   url: 'url',
   thumbUrl: 'thumbUrl',
+  galleryUrl: 'galleryUrl',
   fullUrl: 'fullUrl',
   blurDataUrl: 'blurDataUrl',
   width: 'width',

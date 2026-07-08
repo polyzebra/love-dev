@@ -39,6 +39,7 @@ export type ManagedPhoto = {
   id: string;
   url: string;
   thumbUrl?: string | null;
+  galleryUrl?: string | null;
   fullUrl?: string | null;
   blurDataUrl?: string | null;
   position?: number;
@@ -220,15 +221,14 @@ export function PhotoManager({
 
   return (
     <>
-      {/* ================= COVER - magazine opener ================= */}
+      {/* ================= COVER - canonical 4:5 card ================= */}
       <Reveal y={16}>
-        <section className="relative overflow-hidden rounded-[36px] border border-border shadow-float">
+        <section className="relative mx-auto w-full max-w-[600px]">
           <PhotoFrame
             photo={cover}
             alt="Your cover photo"
-            variant="full"
-            radius="none"
-            className="rounded-[36px] sm:aspect-square md:aspect-4/3"
+            variant="card"
+            className="shadow-float"
             fallback={
               <div className="absolute inset-0" style={{ background: coverGradient(gradientSeed) }} />
             }
@@ -288,7 +288,7 @@ export function PhotoManager({
                 <PhotoFrame
                   photo={photo}
                   alt={i === 0 ? "Cover photo" : `Photo ${i + 1}`}
-                  variant="thumb"
+                  variant="gallery"
                   loading="lazy"
                   radius="none"
                   className="rounded-2xl border border-border"

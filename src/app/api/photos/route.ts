@@ -80,6 +80,7 @@ export async function POST(req: Request) {
         userId: user.id,
         url: uploaded.cardUrl,
         thumbUrl: uploaded.thumbUrl,
+        galleryUrl: uploaded.galleryUrl,
         fullUrl: uploaded.fullUrl,
         blurDataUrl,
         width: processed.width,
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
         id: true,
         url: true,
         thumbUrl: true,
+        galleryUrl: true,
         fullUrl: true,
         blurDataUrl: true,
         width: true,
@@ -106,7 +108,12 @@ export async function POST(req: Request) {
     return created(photo);
   } catch {
     // The DB row never landed - remove the orphaned storage objects.
-    await deletePhotoObjects([uploaded.thumbUrl, uploaded.cardUrl, uploaded.fullUrl]).catch(
+    await deletePhotoObjects([
+      uploaded.thumbUrl,
+      uploaded.galleryUrl,
+      uploaded.cardUrl,
+      uploaded.fullUrl,
+    ]).catch(
       () => undefined,
     );
     return apiError(502, "upload_failed", "We could not save that photo. Please try again.");

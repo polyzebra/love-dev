@@ -12,10 +12,11 @@ export type FramePhoto = {
   url: string;
   blurDataUrl?: string | null;
   thumbUrl?: string | null;
+  galleryUrl?: string | null;
   fullUrl?: string | null;
 };
 
-export type PhotoFrameVariant = "thumb" | "card" | "full";
+export type PhotoFrameVariant = "thumb" | "gallery" | "card" | "full";
 
 type PhotoFrameProps = {
   photo?: FramePhoto | null;
@@ -56,6 +57,7 @@ const RADIUS: Record<NonNullable<PhotoFrameProps["radius"]>, string> = {
 
 function pickUrl(photo: FramePhoto, variant: PhotoFrameVariant): string {
   if (variant === "thumb") return photo.thumbUrl ?? photo.url;
+  if (variant === "gallery") return photo.galleryUrl ?? photo.url;
   if (variant === "full") return photo.fullUrl ?? photo.url;
   return photo.url;
 }

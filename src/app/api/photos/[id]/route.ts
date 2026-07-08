@@ -13,13 +13,13 @@ export async function DELETE(_req: Request, { params }: Params) {
   // Scoped to the session user so nobody can delete someone else's photo.
   const photo = await db.photo.findFirst({
     where: { id, userId: user.id },
-    select: { id: true, url: true, thumbUrl: true, fullUrl: true, isCover: true },
+    select: { id: true, url: true, thumbUrl: true, galleryUrl: true, fullUrl: true, isCover: true },
   });
   if (!photo) return notFound("Photo");
 
   // Best effort: a storage failure should not leave the row behind.
   try {
-    await deletePhotoObjects([photo.url, photo.thumbUrl, photo.fullUrl]);
+    await deletePhotoObjects([photo.url, photo.thumbUrl, photo.galleryUrl, photo.fullUrl]);
   } catch {
     // Storage not configured or transient error - row removal still proceeds.
   }

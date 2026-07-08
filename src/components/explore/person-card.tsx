@@ -13,7 +13,7 @@ export type PersonCardData = {
   isVerified: boolean;
   isOnline: boolean;
   sharedInterests: number;
-  photo: { url: string; blurDataUrl: string | null } | null;
+  photo: { url: string; galleryUrl: string | null; blurDataUrl: string | null } | null;
 };
 
 /** Grid card - opens the immersive viewer as a modal route (?profile=id). */
@@ -43,6 +43,7 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
       <PhotoFrame
         photo={person.photo}
         alt={`${person.displayName}'s photo`}
+        variant="gallery"
         loading="lazy"
         radius="none"
         className="bg-muted"

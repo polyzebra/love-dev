@@ -249,7 +249,7 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
         where: { moderation: { not: "REJECTED" } },
         orderBy: [{ isCover: "desc" }, { position: "asc" }],
         take: 1,
-        select: { url: true, blurDataUrl: true },
+        select: { url: true, galleryUrl: true, blurDataUrl: true },
       },
       verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
       explorePreferences: { where: { categoryId: category.id }, select: { id: true } },

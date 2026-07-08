@@ -28,7 +28,7 @@ export default async function MatchesPage() {
           id: true,
           lastActiveAt: true,
           profile: { select: { displayName: true, birthDate: true, city: true } },
-          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, blurDataUrl: true } },
+          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
         },
       },
       userB: {
@@ -36,7 +36,7 @@ export default async function MatchesPage() {
           id: true,
           lastActiveAt: true,
           profile: { select: { displayName: true, birthDate: true, city: true } },
-          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, blurDataUrl: true } },
+          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
         },
       },
     },
@@ -84,6 +84,7 @@ export default async function MatchesPage() {
                 <PhotoFrame
                   photo={other.photos[0] ?? null}
                   alt={`${name}'s photo`}
+                  variant="gallery"
                   radius="none"
                   className="bg-muted"
                   imgClassName="transition-[opacity,filter,transform] duration-300 group-hover:scale-[1.03]"

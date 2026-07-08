@@ -339,7 +339,8 @@ model Photo {
   id            String           @id @default(cuid())
   userId        String
   url           String // card-size variant (canonical 4:5)
-  thumbUrl      String? // 320x320 square thumbnail variant
+  thumbUrl      String? // 320x400 thumbnail variant (4:5)
+  galleryUrl    String? // 720x900 gallery/grid variant (4:5)
   fullUrl       String? // 1800x2250 full-size variant (4:5)
   blurDataUrl   String? // base64 blur placeholder to avoid layout shift
   width         Int?
