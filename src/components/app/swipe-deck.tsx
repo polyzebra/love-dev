@@ -293,7 +293,10 @@ function TopCard({
         }}
         transition={{ type: "spring", stiffness: 320, damping: 26 }}
         className={cn(
-          "relative flex h-full w-full flex-col justify-end overflow-hidden",
+          // Opaque base fill: while the photo streams in, the card must be
+          // one clean dark surface - transparent here let the ambient
+          // backdrop + pointer light read as a pale inset frame on reload
+          "relative flex h-full w-full flex-col justify-end overflow-hidden bg-[#0f0e11]",
           STAGE_RADIUS,
         )}
       >
