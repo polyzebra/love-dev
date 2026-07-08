@@ -128,6 +128,9 @@ const TRUST_CHIP_VARIANTS = {
   show: { opacity: 1, y: 0, transition: SPRING.snappy },
 };
 
+/* Photo-column geometry: width derives from height (portrait ~3/4) */
+const STAGE_COLUMN_WIDTH =
+  "md:w-[min(100%,calc((100dvh-1.5rem)*0.78))] lg:w-[min(100%,calc((100dvh-2rem)*0.78))]";
 /* Edge-to-edge on mobile; rounded inside the ambient field on md+ */
 const STAGE_RADIUS = "rounded-none md:rounded-[20px] lg:rounded-[24px]";
 /* Action row floats over the photo, clear of the mobile nav capsule */
@@ -137,37 +140,21 @@ const ACTION_ROW_BOTTOM =
 const PHOTO_GLASS_BUTTON =
   "pointer-events-auto flex items-center justify-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-xl transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60";
 
-/**
- * Dignified stand-in when a profile has zero photos: a quiet charcoal
- * gradient with a large monogram and the person's name - never a bright
- * token block. Sits inside the photo area, under the same scrims.
- */
-function NoPhotoFallback({ name }: { name: string }) {
-  const initial = name.trim().charAt(0)?.toUpperCase() || "?";
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[linear-gradient(165deg,#2e2c31_0%,#1c1b20_52%,#0f0e12_100%)] pb-28">
-      <span
-        aria-hidden="true"
-        className="flex size-32 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] font-display text-6xl font-medium text-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-      >
-        {initial}
-      </span>
-      <span className="text-sm font-medium uppercase tracking-[0.22em] text-white/40">
-        {name}
-      </span>
-    </div>
-  );
+function photoGradient(seed: string): string {
+  const hues = [346, 12, 262, 200, 160];
+  const h = hues[seed.charCodeAt(0) % hues.length];
+  return `linear-gradient(160deg, hsl(${h} 80% 72%) 0%, hsl(${h} 72% 48%) 55%, hsl(${h} 70% 26%) 100%)`;
 }
 
 /**
- * Full-viewport stage behind the photo: near-black in BOTH themes (the
- * photo-stage convention, like a video player) so the hairline margins
- * and card throws never flash white in light theme. A blurred duplicate
- * of the current photo glows through it, warmed by the dominant tone.
+ * Full-viewport ambient field behind the photo column: a blurred,
+ * darkened duplicate of the current photo crossfades underneath, tied
+ * to the theme with a background veil and warmed by the dominant tone.
+ * Guarantees the space beside/behind the card never reads as bare page.
  */
 function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#0a0a0c]">
+    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-background">
       <AnimatePresence initial={false}>
         {url && (
           <motion.img
@@ -183,8 +170,8 @@ function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
           />
         )}
       </AnimatePresence>
-      {/* Stage veil - theme-independent near-black, never the page surface */}
-      <div className="absolute inset-0 bg-black/60" />
+      {/* Theme veil - keeps the field cinematic in dark, airy in light */}
+      <div className="absolute inset-0 bg-background/55" />
       {/* Dominant-tone wash sampled from the person's photo */}
       <div
         className="absolute inset-0 transition-[background] duration-[1200ms] ease-out"
@@ -332,7 +319,7 @@ function TopCard({
             draggable={false}
           />
         ) : (
-          <NoPhotoFallback name={profile.displayName} />
+          <div className="absolute inset-0" style={{ background: photoGradient(profile.userId) }} />
         )}
         {/* Cinematic grade: top scrim for controls, deep bottom scrim for info */}
         <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/55 via-black/20 to-transparent" />
@@ -591,11 +578,12 @@ export function SwipeDeck({
     } else toast("Nothing to undo yet.");
   }, []);
 
-  // Stage chrome circles: the stage is near-black in both themes, so the
-  // photo-glass material is always the right one
+  // Stage chrome circles: photo material over a card, house glass otherwise
   const chromeCircle = cn(
     "pointer-events-auto flex size-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2",
-    "border border-white/15 bg-white/10 text-white backdrop-blur-xl hover:bg-white/20 focus-visible:ring-white/60",
+    top
+      ? "border border-white/15 bg-white/10 text-white backdrop-blur-xl hover:bg-white/20 focus-visible:ring-white/60"
+      : "glass text-foreground hover:bg-foreground/10 focus-visible:ring-ring",
   );
 
   return (
@@ -603,11 +591,10 @@ export function SwipeDeck({
       {/* Full-viewport ambient field - never bare page behind the stage */}
       <AmbientBackdrop url={currentPhoto?.url ?? null} tint={ambient} />
 
-      {/* Positioning field: the photo IS the screen - full content area,
-          minus a hairline safe margin on md+ and the desktop rail on lg+ */}
-      <div className="absolute inset-0 md:p-4 lg:left-72 lg:p-5">
+      {/* Positioning field: clears the desktop rail, centers the column */}
+      <div className="absolute inset-0 flex justify-center md:py-3 lg:left-72 lg:py-4">
         <div
-          className="relative h-full w-full"
+          className={cn("relative h-full w-full", STAGE_COLUMN_WIDTH)}
           role="group"
           aria-label="Profile cards"
         >
@@ -625,7 +612,7 @@ export function SwipeDeck({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={next.photos[0].url} alt="" className="h-full w-full object-cover opacity-60" />
               ) : (
-                <NoPhotoFallback name={next.displayName} />
+                <div className="h-full w-full" style={{ background: photoGradient(next.userId) }} />
               )}
               <div className="absolute inset-0 bg-black/55" />
             </motion.div>
@@ -650,7 +637,6 @@ export function SwipeDeck({
           {!top && (
             <div className="flex h-full items-center justify-center pb-24 lg:pb-0">
               <EmptyState
-                className="text-white [&_p]:text-white/60 [&_svg]:text-white/80 [&>div:first-child]:bg-white/10"
                 icon={SearchX}
                 title="You're all caught up"
                 description="No more profiles match your filters right now. Widen your distance or age range, or check back later - new members join every day."
