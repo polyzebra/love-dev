@@ -292,18 +292,20 @@ function TopCard({
         ly.set(((e.clientY - rect.top) / rect.height) * 100);
       }}
       initial={{ scale: 0.96, opacity: 0.7 }}
-      animate={{
-        scale: grabbed ? 1.02 : 1,
-        opacity: 1,
-        boxShadow: grabbed
-          ? "0 40px 90px rgba(0,0,0,0.65), 0 0 40px rgba(225,29,72,0.18)"
-          : "0 24px 60px rgba(0,0,0,0.5)",
-      }}
+      animate={{ scale: grabbed ? 1.02 : 1, opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
       transition={{ type: "spring", stiffness: 320, damping: 26 }}
     >
       <motion.div
         style={{ rotateY: bend }}
+        // Shadow lives on the ROUNDED, 3D-bent card itself - on the square
+        // outer drag wrapper it painted a rotating rectangular rim
+        animate={{
+          boxShadow: grabbed
+            ? "0 40px 90px rgba(0,0,0,0.65), 0 0 40px rgba(225,29,72,0.18)"
+            : "0 24px 60px rgba(0,0,0,0.5)",
+        }}
+        transition={{ type: "spring", stiffness: 320, damping: 26 }}
         className={cn(
           "relative flex h-full w-full flex-col justify-end overflow-hidden md:border md:border-white/10",
           STAGE_RADIUS,
