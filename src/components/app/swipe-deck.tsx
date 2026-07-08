@@ -166,8 +166,9 @@ function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
-            className="absolute inset-0 h-full w-full scale-125 object-cover blur-[64px] saturate-[1.2]"
+            className="absolute inset-0 h-full w-full scale-125 select-none object-cover blur-[64px] saturate-[1.2] [-webkit-touch-callout:none] [-webkit-user-drag:none]"
             draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
           />
         )}
       </AnimatePresence>
@@ -300,10 +301,11 @@ function TopCard({
           STAGE_RADIUS,
         )}
       >
-        {/* Photo - fills the stage; the stage element owns rounding/clipping */}
+        {/* Photo - fills the stage; the stage element owns rounding/clipping.
+            variant="card": full.webp is reserved for the fullscreen viewer. */}
         <PhotoFrame
           mode="fill"
-          variant="full"
+          variant="card"
           photo={photo ?? null}
           draggable={false}
           fallback={
@@ -503,6 +505,16 @@ export function SwipeDeck({
   const dominant = useDominantColor(currentPhoto?.url);
   const ambient: RGB = dominant ?? [225, 29, 72];
 
+  // Warm the NEXT profile's card image whenever the top card changes so the
+  // peek-to-top promotion never streams in cold. `url` IS the card variant
+  // (pickUrl: variant="card" -> photo.url) - full.webp is never touched here.
+  useEffect(() => {
+    const upcoming = next?.photos[0]?.url;
+    if (!upcoming) return;
+    const img = new Image();
+    img.src = upcoming;
+  }, [next]);
+
   const commit = useCallback(
     async (action: SwipeAction) => {
       const current = deck[0];
@@ -597,7 +609,7 @@ export function SwipeDeck({
               className={cn("absolute inset-0 overflow-hidden", STAGE_RADIUS)}
             >
               {next.photos[0] ? (
-                <PhotoFrame mode="fill" photo={next.photos[0]} className="opacity-60" />
+                <PhotoFrame mode="fill" variant="card" photo={next.photos[0]} className="opacity-60" />
               ) : (
                 <div className="h-full w-full" style={{ background: photoGradient(next.userId) }} />
               )}

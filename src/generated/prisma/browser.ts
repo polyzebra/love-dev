@@ -38,6 +38,11 @@ export type Profile = Prisma.ProfileModel
  */
 export type Photo = Prisma.PhotoModel
 /**
+ * Model PhotoModerationEvent
+ * 
+ */
+export type PhotoModerationEvent = Prisma.PhotoModerationEventModel
+/**
  * Model Interest
  * 
  */

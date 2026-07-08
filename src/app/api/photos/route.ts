@@ -2,9 +2,11 @@ import { apiError, created, guardRate, requireSession } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { moderatePhoto } from "@/lib/services/moderation";
 import {
   deletePhotoObjects,
   makeBlurDataUrl,
+  photoProxyPath,
   PhotoStorageNotConfiguredError,
   processProfilePhoto,
   uploadProfilePhoto,
@@ -44,6 +46,9 @@ export async function POST(req: Request) {
     return apiError(409, "photo_limit", `You can have at most ${PHOTO_LIMITS.max} photos.`);
   }
 
+  // The original bytes live ONLY in this buffer: they are re-encoded into
+  // WebP variants below and never persisted anywhere (we keep just the
+  // original's mimeType/sizeBytes as metadata on the row).
   const input = Buffer.from(await file.arrayBuffer());
 
   let processed: Awaited<ReturnType<typeof processProfilePhoto>>;
@@ -77,17 +82,30 @@ export async function POST(req: Request) {
 
     const photo = await db.photo.create({
       data: {
+        // Row id == storage id, so /api/media/{photoId}/{variant} and
+        // users/{uid}/photos/{photoId}/ address the same photo.
+        id: uploaded.photoId,
         userId: user.id,
-        url: uploaded.cardUrl,
-        thumbUrl: uploaded.thumbUrl,
-        galleryUrl: uploaded.galleryUrl,
-        fullUrl: uploaded.fullUrl,
+        // Stored URLs are relative proxy paths - the private bucket is only
+        // reachable through GET /api/media/[photoId]/[variant].
+        url: photoProxyPath(uploaded.photoId, "card"),
+        thumbUrl: photoProxyPath(uploaded.photoId, "thumb"),
+        galleryUrl: photoProxyPath(uploaded.photoId, "gallery"),
+        fullUrl: photoProxyPath(uploaded.photoId, "full"),
+        storagePath: uploaded.storagePath,
         blurDataUrl,
+        blurhash: processed.blurhash,
+        dominantColor: processed.dominantColor,
+        mimeType: file.type,
+        sizeBytes: file.size,
         width: processed.width,
         height: processed.height,
         position,
         // The very first photo is automatically the profile cover.
         isCover: position === 0,
+        // ACTIVE for now: the moderation phase lands next and will own the
+        // PROCESSING -> ACTIVE/REJECTED transition.
+        status: "ACTIVE",
       },
       select: {
         id: true,
@@ -96,26 +114,28 @@ export async function POST(req: Request) {
         galleryUrl: true,
         fullUrl: true,
         blurDataUrl: true,
+        blurhash: true,
+        dominantColor: true,
         width: true,
         height: true,
         position: true,
         isCover: true,
+        status: true,
         moderation: true,
         createdAt: true,
       },
     });
 
+    // Automated moderation: picks a provider by env (external when
+    // MODERATION_API_URL/KEY are set, otherwise the honest null provider),
+    // applies the verdict to Photo.status / Photo.moderation transactionally
+    // and records a PhotoModerationEvent. Never throws for provider failures.
+    await moderatePhoto(photo.id);
+
     return created(photo);
   } catch {
     // The DB row never landed - remove the orphaned storage objects.
-    await deletePhotoObjects([
-      uploaded.thumbUrl,
-      uploaded.galleryUrl,
-      uploaded.cardUrl,
-      uploaded.fullUrl,
-    ]).catch(
-      () => undefined,
-    );
+    await deletePhotoObjects(uploaded.storagePath).catch(() => undefined);
     return apiError(502, "upload_failed", "We could not save that photo. Please try again.");
   }
 }

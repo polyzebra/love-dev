@@ -199,6 +199,16 @@ enum ModerationStatus {
   REJECTED
 }
 
+// Lifecycle of the photo's binary assets (independent of human moderation):
+// PROCESSING while variants are generated, ACTIVE once servable via the
+// media proxy, REJECTED/DELETED keep the row for audit while hiding assets.
+enum PhotoStatus {
+  PROCESSING
+  ACTIVE
+  REJECTED
+  DELETED
+}
+
 // ---------------------------------------------------------------------------
 // Identity & access
 // ---------------------------------------------------------------------------
@@ -338,24 +348,49 @@ model Profile {
 model Photo {
   id            String           @id @default(cuid())
   userId        String
-  url           String // card-size variant (canonical 4:5)
+  url           String // card-size variant (canonical 4:5); proxy path for new uploads
   thumbUrl      String? // 320x400 thumbnail variant (4:5)
   galleryUrl    String? // 720x900 gallery/grid variant (4:5)
-  fullUrl       String? // 1800x2250 full-size variant (4:5)
+  fullUrl       String? // 1800x2700 fullscreen-source variant (2:3, taller than 4:5)
   blurDataUrl   String? // base64 blur placeholder to avoid layout shift
   width         Int?
   height        Int?
   position      Int              @default(0)
   isCover       Boolean          @default(false)
+  status        PhotoStatus      @default(PROCESSING)
+  storagePath   String? // bucket-relative folder: users/{uid}/photos/{photoId}
+  dominantColor String? // #rrggbb dominant colour of the source image
+  faceDetected  Boolean? // reserved for the moderation phase
+  facesCount    Int? // reserved for the moderation phase
+  aiScore       Float? // reserved for the moderation phase
+  mimeType      String? // mime type of the ORIGINAL upload (variants are always webp)
+  sizeBytes     Int? // byte size of the ORIGINAL upload
+  blurhash      String? // blurhash of the source image (4x3 components)
   moderation    ModerationStatus @default(PENDING)
   moderatedById String?
   moderatedAt   DateTime?
   createdAt     DateTime         @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moderationEvents PhotoModerationEvent[]
 
   @@index([userId, position])
   @@index([moderation])
+}
+
+// Append-only audit trail for automated + human photo moderation decisions.
+model PhotoModerationEvent {
+  id        String   @id @default(cuid())
+  photoId   String
+  actorId   String? // null for automated decisions
+  action    String // e.g. "auto-approved", "approved", "rejected"
+  reason    String?
+  aiScore   Float?
+  createdAt DateTime @default(now())
+
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@index([photoId, createdAt])
 }
 
 // Catalogue of selectable interests (seeded)

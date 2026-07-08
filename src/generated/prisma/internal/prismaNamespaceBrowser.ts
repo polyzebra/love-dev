@@ -55,6 +55,7 @@ export const ModelName = {
   Device: 'Device',
   Profile: 'Profile',
   Photo: 'Photo',
+  PhotoModerationEvent: 'PhotoModerationEvent',
   Interest: 'Interest',
   ProfileInterest: 'ProfileInterest',
   Verification: 'Verification',
@@ -186,6 +187,15 @@ export const PhotoScalarFieldEnum = {
   height: 'height',
   position: 'position',
   isCover: 'isCover',
+  status: 'status',
+  storagePath: 'storagePath',
+  dominantColor: 'dominantColor',
+  faceDetected: 'faceDetected',
+  facesCount: 'facesCount',
+  aiScore: 'aiScore',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  blurhash: 'blurhash',
   moderation: 'moderation',
   moderatedById: 'moderatedById',
   moderatedAt: 'moderatedAt',
@@ -193,6 +203,19 @@ export const PhotoScalarFieldEnum = {
 } as const
 
 export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof PhotoScalarFieldEnum]
+
+
+export const PhotoModerationEventScalarFieldEnum = {
+  id: 'id',
+  photoId: 'photoId',
+  actorId: 'actorId',
+  action: 'action',
+  reason: 'reason',
+  aiScore: 'aiScore',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoModerationEventScalarFieldEnum = (typeof PhotoModerationEventScalarFieldEnum)[keyof typeof PhotoModerationEventScalarFieldEnum]
 
 
 export const InterestScalarFieldEnum = {

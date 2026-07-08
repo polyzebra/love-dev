@@ -268,6 +268,16 @@ export const ModerationStatus = {
 export type ModerationStatus = (typeof ModerationStatus)[keyof typeof ModerationStatus]
 
 
+export const PhotoStatus = {
+  PROCESSING: 'PROCESSING',
+  ACTIVE: 'ACTIVE',
+  REJECTED: 'REJECTED',
+  DELETED: 'DELETED'
+} as const
+
+export type PhotoStatus = (typeof PhotoStatus)[keyof typeof PhotoStatus]
+
+
 export const ExploreGroup = {
   LIFESTYLE: 'LIFESTYLE',
   INTERESTS: 'INTERESTS',

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   BadgeCheck,
   CreditCard,
   Flag,
+  Image as ImageIcon,
   LayoutDashboard,
   ScrollText,
   ToggleRight,
@@ -12,7 +12,6 @@ import {
   Compass
 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require-user";
-import { isStaff } from "@/lib/rbac";
 import { Logo } from "@/components/shared/logo";
 import { Badge } from "@/components/ui/badge";
 
@@ -22,6 +21,7 @@ const NAV = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/reports", icon: Flag, label: "Reports" },
+  { href: "/admin/photos", icon: ImageIcon, label: "Photos" },
   { href: "/admin/verification", icon: BadgeCheck, label: "Verification" },
   { href: "/admin/payments", icon: CreditCard, label: "Payments" },
   { href: "/admin/explore", icon: Compass, label: "Explore" },

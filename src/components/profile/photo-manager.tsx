@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, type PanInfo } from "motion/react";
 import { toast } from "sonner";
 import {
   BadgeCheck,
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { PhotoFrame } from "@/components/shared/photo-frame";
 import { Reveal } from "@/components/fx/reveal";
+import { cn } from "@/lib/utils";
 
 /**
  * Serializable photo shape passed from the profile RSC. Position/isCover are
@@ -167,18 +168,12 @@ export function PhotoManager({
     }
   }
 
-  async function movePhoto(index: number, direction: -1 | 1) {
-    const target = index + direction;
-    const a = photos[index];
-    const b = photos[target];
-    if (!a || !b) return;
-
-    const previous = photos;
-    const next = [...photos];
-    next[index] = b;
-    next[target] = a;
-    setPhotos(next);
-
+  /**
+   * The ONE optimistic reorder commit - chevron buttons and drag-drop both
+   * land here: PATCH the new order, revert to `previous` + toast on failure,
+   * router.refresh() on success so RSC-derived state catches up.
+   */
+  async function commitOrder(next: ManagedPhoto[], previous: ManagedPhoto[]) {
     try {
       const res = await fetch("/api/photos/reorder", {
         method: "PATCH",
@@ -195,6 +190,76 @@ export function PhotoManager({
       setPhotos(previous);
       toast.error("We could not reorder your photos. Check your connection and try again.");
     }
+  }
+
+  async function movePhoto(index: number, direction: -1 | 1) {
+    const target = index + direction;
+    const a = photos[index];
+    const b = photos[target];
+    if (!a || !b) return;
+
+    const previous = photos;
+    const next = [...photos];
+    next[index] = b;
+    next[target] = a;
+    setPhotos(next);
+    await commitOrder(next, previous);
+  }
+
+  // ---- Drag to reorder (pointer-based swap; chevrons stay as the
+  // accessible fallback). Grid drag is axis-free, so Reorder.Group (single
+  // axis) is a poor fit - instead each tile is draggable and swaps with the
+  // grid cell under the pointer.
+  const tileRefs = useRef(new Map<string, HTMLDivElement>());
+  const slotRects = useRef<DOMRect[]>([]);
+  const dragStartOrder = useRef<ManagedPhoto[] | null>(null);
+  const suppressClick = useRef(false); // a drag must never fire tile buttons
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  // Drag callbacks close over stale state - mirror the latest order.
+  // (Synced in an effect: refs must not be written during render.)
+  const photosRef = useRef(photos);
+  useEffect(() => {
+    photosRef.current = photos;
+  }, [photos]);
+
+  function beginDrag(photoId: string) {
+    dragStartOrder.current = photosRef.current;
+    suppressClick.current = true;
+    setDraggingId(photoId);
+    // Freeze slot geometry at drag start: pointer targets are the STATIC
+    // grid cells. Measuring live tiles mid-layout-animation would make
+    // swaps jitter back and forth as tiles fly past the pointer.
+    slotRects.current = photosRef.current.map(
+      (p) => tileRefs.current.get(p.id)?.getBoundingClientRect() ?? new DOMRect(0, 0, 0, 0),
+    );
+  }
+
+  function dragOver(photoId: string, info: PanInfo) {
+    // info.point is page-relative; slot rects are viewport-relative.
+    const x = info.point.x - window.scrollX;
+    const y = info.point.y - window.scrollY;
+    const slot = slotRects.current.findIndex(
+      (r) => r.width > 0 && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom,
+    );
+    if (slot === -1) return;
+    setPhotos((current) => {
+      const from = current.findIndex((p) => p.id === photoId);
+      if (from === -1 || from === slot || slot >= current.length) return current;
+      const next = [...current];
+      [next[from], next[slot]] = [next[slot], next[from]];
+      return next;
+    });
+  }
+
+  function endDrag() {
+    setDraggingId(null);
+    window.setTimeout(() => (suppressClick.current = false), 150);
+    const previous = dragStartOrder.current;
+    dragStartOrder.current = null;
+    const next = photosRef.current;
+    if (!previous) return;
+    const changed = next.some((p, i) => p.id !== previous[i]?.id);
+    if (changed) void commitOrder(next, previous);
   }
 
   async function deletePhoto(photo: ManagedPhoto) {
@@ -284,7 +349,32 @@ export function PhotoManager({
           </div>
           <div className="grid grid-cols-3 gap-2.5">
             {photos.map((photo, i) => (
-              <motion.div key={photo.id} layout transition={reduced ? { duration: 0 } : SPRING.standard}>
+              <motion.div
+                key={photo.id}
+                layout
+                transition={reduced ? { duration: 0 } : SPRING.standard}
+                ref={(el) => {
+                  if (el) tileRefs.current.set(photo.id, el);
+                  else tileRefs.current.delete(photo.id);
+                }}
+                drag={photos.length > 1}
+                dragSnapToOrigin
+                dragMomentum={false}
+                onDragStart={() => beginDrag(photo.id)}
+                onDrag={(_, info) => dragOver(photo.id, info)}
+                onDragEnd={endDrag}
+                whileDrag={{
+                  scale: 1.03,
+                  boxShadow: "0 16px 40px rgba(0,0,0,0.35)",
+                  transition: reduced ? { duration: 0 } : SPRING.snappy,
+                }}
+                className={cn(
+                  "relative rounded-2xl",
+                  draggingId === photo.id
+                    ? "z-20 cursor-grabbing"
+                    : photos.length > 1 && "cursor-grab",
+                )}
+              >
                 <PhotoFrame
                   photo={photo}
                   alt={i === 0 ? "Cover photo" : `Photo ${i + 1}`}
@@ -300,7 +390,9 @@ export function PhotoManager({
                   )}
                   <button
                     type="button"
-                    onClick={() => setDeleteTarget(photo)}
+                    onClick={() => {
+                      if (!suppressClick.current) setDeleteTarget(photo);
+                    }}
                     aria-label={i === 0 ? "Delete cover photo" : `Delete photo ${i + 1}`}
                     className={`${controlClass} absolute right-1.5 top-1.5 size-9`}
                   >
@@ -309,7 +401,9 @@ export function PhotoManager({
                   {i > 0 && (
                     <button
                       type="button"
-                      onClick={() => movePhoto(i, -1)}
+                      onClick={() => {
+                        if (!suppressClick.current) void movePhoto(i, -1);
+                      }}
                       aria-label={i === 1 ? `Make photo ${i + 1} the cover` : `Move photo ${i + 1} earlier`}
                       className={`${controlClass} absolute bottom-1.5 left-1.5 size-11`}
                     >
@@ -319,7 +413,9 @@ export function PhotoManager({
                   {i < photos.length - 1 && (
                     <button
                       type="button"
-                      onClick={() => movePhoto(i, 1)}
+                      onClick={() => {
+                        if (!suppressClick.current) void movePhoto(i, 1);
+                      }}
                       aria-label={i === 0 ? "Move cover photo later" : `Move photo ${i + 1} later`}
                       className={`${controlClass} absolute bottom-1.5 right-1.5 size-11`}
                     >

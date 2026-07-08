@@ -388,6 +388,7 @@ export const ModelName = {
   Device: 'Device',
   Profile: 'Profile',
   Photo: 'Photo',
+  PhotoModerationEvent: 'PhotoModerationEvent',
   Interest: 'Interest',
   ProfileInterest: 'ProfileInterest',
   Verification: 'Verification',
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -722,6 +723,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PhotoCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PhotoCountAggregateOutputType> | number
+        }
+      }
+    }
+    PhotoModerationEvent: {
+      payload: Prisma.$PhotoModerationEventPayload<ExtArgs>
+      fields: Prisma.PhotoModerationEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhotoModerationEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhotoModerationEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>
+        }
+        findFirst: {
+          args: Prisma.PhotoModerationEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhotoModerationEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>
+        }
+        findMany: {
+          args: Prisma.PhotoModerationEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>[]
+        }
+        create: {
+          args: Prisma.PhotoModerationEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>
+        }
+        createMany: {
+          args: Prisma.PhotoModerationEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhotoModerationEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>[]
+        }
+        delete: {
+          args: Prisma.PhotoModerationEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>
+        }
+        update: {
+          args: Prisma.PhotoModerationEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.PhotoModerationEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhotoModerationEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhotoModerationEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.PhotoModerationEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationEventPayload>
+        }
+        aggregate: {
+          args: Prisma.PhotoModerationEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhotoModerationEvent>
+        }
+        groupBy: {
+          args: Prisma.PhotoModerationEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotoModerationEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhotoModerationEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotoModerationEventCountAggregateOutputType> | number
         }
       }
     }
@@ -2483,6 +2558,15 @@ export const PhotoScalarFieldEnum = {
   height: 'height',
   position: 'position',
   isCover: 'isCover',
+  status: 'status',
+  storagePath: 'storagePath',
+  dominantColor: 'dominantColor',
+  faceDetected: 'faceDetected',
+  facesCount: 'facesCount',
+  aiScore: 'aiScore',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  blurhash: 'blurhash',
   moderation: 'moderation',
   moderatedById: 'moderatedById',
   moderatedAt: 'moderatedAt',
@@ -2490,6 +2574,19 @@ export const PhotoScalarFieldEnum = {
 } as const
 
 export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof PhotoScalarFieldEnum]
+
+
+export const PhotoModerationEventScalarFieldEnum = {
+  id: 'id',
+  photoId: 'photoId',
+  actorId: 'actorId',
+  action: 'action',
+  reason: 'reason',
+  aiScore: 'aiScore',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoModerationEventScalarFieldEnum = (typeof PhotoModerationEventScalarFieldEnum)[keyof typeof PhotoModerationEventScalarFieldEnum]
 
 
 export const InterestScalarFieldEnum = {
@@ -3038,6 +3135,20 @@ export type ListEnumPetPreferenceFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'PhotoStatus'
+ */
+export type EnumPhotoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhotoStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PhotoStatus[]'
+ */
+export type ListEnumPhotoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhotoStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ModerationStatus'
  */
 export type EnumModerationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationStatus'>
@@ -3416,6 +3527,7 @@ export type GlobalOmitConfig = {
   device?: Prisma.DeviceOmit
   profile?: Prisma.ProfileOmit
   photo?: Prisma.PhotoOmit
+  photoModerationEvent?: Prisma.PhotoModerationEventOmit
   interest?: Prisma.InterestOmit
   profileInterest?: Prisma.ProfileInterestOmit
   verification?: Prisma.VerificationOmit

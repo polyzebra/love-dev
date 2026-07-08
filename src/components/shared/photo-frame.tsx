@@ -68,6 +68,12 @@ function pickUrl(photo: FramePhoto, variant: PhotoFrameVariant): string {
  * (opacity/filter transition + img.complete ref check so the
  * load-before-hydration race never leaves a photo invisible).
  *
+ * Download protection is UX-level (Tinder-style), NOT DRM: no context
+ * menu, no drag-to-save, no long-press callout, no text/image selection.
+ * Screenshots and devtools cannot be stopped and we do not pretend to.
+ * pointer-events stay live (swipe drag physics and pinch-zoom depend on
+ * them) and alt/role semantics are untouched for screen readers.
+ *
  * Tiny circular avatars (chat headers, peek drawer) are NOT photo frames -
  * they stay on Avatar.
  */
@@ -81,7 +87,7 @@ export function PhotoFrame({
   imgClassName,
   fallback,
   children,
-  draggable,
+  draggable = false,
   loading,
 }: PhotoFrameProps) {
   const src = photo ? pickUrl(photo, variant) : null;
@@ -96,6 +102,7 @@ export function PhotoFrame({
 
   return (
     <div
+      onContextMenu={(e) => e.preventDefault()}
       className={cn(
         "overflow-hidden",
         mode === "fill"
@@ -120,13 +127,14 @@ export function PhotoFrame({
             alt={alt}
             loading={loading}
             draggable={draggable}
+            onContextMenu={(e) => e.preventDefault()}
             // Covers the load-before-hydration race: onLoad may never fire
             ref={(el) => {
               if (el?.complete) markLoaded(src);
             }}
             onLoad={() => markLoaded(src)}
             className={cn(
-              "absolute inset-0 h-full w-full object-cover transition-[opacity,filter] duration-700 ease-out",
+              "absolute inset-0 h-full w-full select-none object-cover transition-[opacity,filter] duration-700 ease-out [-webkit-touch-callout:none] [-webkit-user-drag:none]",
               loaded ? "opacity-100 blur-0" : "opacity-0 blur-md",
               imgClassName,
             )}

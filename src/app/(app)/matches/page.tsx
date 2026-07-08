@@ -85,6 +85,7 @@ export default async function MatchesPage() {
                   photo={other.photos[0] ?? null}
                   alt={`${name}'s photo`}
                   variant="gallery"
+                  loading="lazy"
                   radius="none"
                   className="bg-muted"
                   imgClassName="transition-[opacity,filter,transform] duration-300 group-hover:scale-[1.03]"
