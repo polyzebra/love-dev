@@ -305,7 +305,7 @@ export function PhotoManager({
             {/* Top rail: completion + edit */}
             <div className="absolute inset-x-5 top-5 flex items-start justify-between">
               <CompletionRing value={completionPct} />
-              <Button size="icon" variant="secondary" className="glass-chip size-11 rounded-full border-0" aria-label="Settings" asChild>
+              <Button size="icon" variant="secondary" className="glass-chip size-11 rounded-full border-0 lg:hidden" aria-label="Settings" asChild>
                 <Link href="/settings">
                   <Settings className="size-5" aria-hidden="true" />
                 </Link>

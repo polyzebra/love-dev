@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { Compass, Flame, Heart, MessageCircle, UserRound } from "lucide-react";
+import { Compass, Flame, Heart, MessageCircle, Settings, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
 
@@ -13,6 +13,14 @@ const NAV_ITEMS = [
   { href: "/matches", label: "Likes", icon: Heart },
   { href: "/chat", label: "Chat", icon: MessageCircle },
   { href: "/profile", label: "Profile", icon: UserRound },
+] as const;
+
+// Desktop-only: global account settings lives in the rail, below
+// Profile. The mobile capsule stays at five items - settings remains
+// reachable there via the profile card gear.
+const RAIL_ITEMS = [
+  ...NAV_ITEMS,
+  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 /**
@@ -65,7 +73,7 @@ export function AppNav() {
         </div>
         <nav aria-label="Primary" className="flex-1 px-3">
           <ul className="space-y-1">
-            {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            {RAIL_ITEMS.map(({ href, label, icon: Icon }) => {
               const active = pathname.startsWith(href);
               return (
                 <li key={href}>
