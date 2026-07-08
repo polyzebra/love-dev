@@ -16,7 +16,7 @@ import { isStaff } from "@/lib/rbac";
 import { Logo } from "@/components/shared/logo";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata: Metadata = { title: { default: "Admin", template: "%s · Virelsy Admin" } };
+export const metadata: Metadata = { title: { default: "Admin", template: "%s · Tirvea Admin" } };
 
 const NAV = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },

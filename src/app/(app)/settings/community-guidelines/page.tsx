@@ -26,12 +26,12 @@ const GUIDELINES = [
   {
     icon: Sparkles,
     title: "Be honest",
-    body: "No scams, no asking for money, no impersonating anyone - including a fictional better-paid version of yourself. If your intentions on Virelsy aren't genuine, this isn't the place for you.",
+    body: "No scams, no asking for money, no impersonating anyone - including a fictional better-paid version of yourself. If your intentions on Tirvea aren't genuine, this isn't the place for you.",
   },
   {
     icon: ShieldAlert,
     title: "Keep it safe and adult",
-    body: "Virelsy is strictly 18+. No minors, ever - in photos, in conversation, anywhere. No soliciting, no selling, no promotion. Dating only.",
+    body: "Tirvea is strictly 18+. No minors, ever - in photos, in conversation, anywhere. No soliciting, no selling, no promotion. Dating only.",
   },
 ] as const;
 

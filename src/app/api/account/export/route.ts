@@ -54,7 +54,7 @@ export async function GET() {
   return new Response(JSON.stringify(exportDoc, null, 2), {
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="virelsy-data-export.json"`,
+      "Content-Disposition": `attachment; filename="tirvea-data-export.json"`,
     },
   });
 }

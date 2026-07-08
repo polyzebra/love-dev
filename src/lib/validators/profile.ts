@@ -65,7 +65,7 @@ export const petsEnum = z.enum(["DOG", "CAT", "BOTH", "OTHER_PETS", "NONE", "ALL
 const adultBirthDate = z.coerce.date().refine((d) => {
   const age = (Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000);
   return age >= MIN_AGE && age <= 120;
-}, `You must be ${MIN_AGE} or older to use Virelsy`);
+}, `You must be ${MIN_AGE} or older to use Tirvea`);
 
 export const onboardingSchema = z
   .object({

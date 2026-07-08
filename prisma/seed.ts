@@ -46,10 +46,10 @@ async function main() {
 
   // Admin
   await db.user.upsert({
-    where: { email: "admin@virelsy.app" },
+    where: { email: "admin@tirvea.app" },
     create: {
-      email: "admin@virelsy.app",
-      name: "Virelsy Admin",
+      email: "admin@tirvea.app",
+      name: "Tirvea Admin",
       role: "ADMIN",
       emailVerified: new Date(),
       onboardingDone: true,
@@ -57,11 +57,11 @@ async function main() {
     },
     update: { role: "ADMIN" },
   });
-  console.log("✓ admin@virelsy.app app-row (role only; sign-in lives in Supabase Auth)");
+  console.log("✓ admin@tirvea.app app-row (role only; sign-in lives in Supabase Auth)");
 
   // Demo members
   for (const demo of DEMO_PROFILES) {
-    const email = `${demo.name.toLowerCase()}@demo.virelsy.app`;
+    const email = `${demo.name.toLowerCase()}@demo.tirvea.app`;
     const birthDate = new Date(1994 + (demo.name.length % 6), (demo.name.length * 3) % 12, 12);
 
     const user = await db.user.upsert({
@@ -206,7 +206,7 @@ const TAG_SPREADS = [
   { availabilityTags: ["weekend-plans", "coffee-now"], personalityTags: ["introvert"], communityTags: ["irish", "international"] },
 ];
 const demoProfiles = await db.profile.findMany({
-  where: { user: { email: { endsWith: "@demo.virelsy.app" } } },
+  where: { user: { email: { endsWith: "@demo.tirvea.app" } } },
   orderBy: { createdAt: "asc" },
 });
 for (let i = 0; i < demoProfiles.length; i++) {
@@ -214,7 +214,7 @@ for (let i = 0; i < demoProfiles.length; i++) {
 }
 // Freshen activity so TODAY rows have live members
 await db.user.updateMany({
-  where: { email: { endsWith: "@demo.virelsy.app" } },
+  where: { email: { endsWith: "@demo.tirvea.app" } },
   data: { lastActiveAt: new Date(), status: "ACTIVE" },
 });
 console.log(`✓ structured tags on ${demoProfiles.length} demo profiles`);
@@ -229,7 +229,7 @@ const EXTRA = [
 ] as const;
 for (let i = 0; i < EXTRA.length; i++) {
   const e = EXTRA[i];
-  const email = `${e.name.toLowerCase()}@demo.virelsy.app`;
+  const email = `${e.name.toLowerCase()}@demo.tirvea.app`;
   const u = await db.user.upsert({
     where: { email },
     create: { email, name: e.name, emailVerified: new Date(), onboardingDone: true, lastActiveAt: new Date(Date.now() - i * 3 * 3600_000) },
@@ -335,7 +335,7 @@ async function seedPrompts() {
   let total = 0;
   for (const [handle, prompts] of Object.entries(DEMO_PROMPTS)) {
     const profile = await db.profile.findFirst({
-      where: { user: { email: `${handle}@demo.virelsy.app` } },
+      where: { user: { email: `${handle}@demo.tirvea.app` } },
       select: { id: true },
     });
     if (!profile) {

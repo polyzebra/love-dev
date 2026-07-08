@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 const DESCRIPTIONS: Record<string, string> = {
   FREE: "Everything you need to meet someone real. No card, no catch.",
   PLUS: "For when you're ready to move - never run out of likes, never lose a maybe.",
-  PREMIUM: "Be seen first and skip the waiting. Every tool Virelsy has, working for you.",
+  PREMIUM: "Be seen first and skip the waiting. Every tool Tirvea has, working for you.",
 };
 
 function price(cents: number) {

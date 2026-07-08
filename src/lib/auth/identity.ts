@@ -44,7 +44,7 @@ export async function isIdentityBlocked(email: string, provider?: string): Promi
 export async function teardownAccount(userId: string, reason: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
-  const tombstone = `deleted+${userId}@tombstone.virelsy.app`;
+  const tombstone = `deleted+${userId}@tombstone.tirvea.app`;
   await db.$transaction([
     // Anonymized shell - identity gone, email freed for re-registration
     db.user.update({

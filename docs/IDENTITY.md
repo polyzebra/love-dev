@@ -1,4 +1,4 @@
-# Virelsy Identity Architecture
+# Tirvea Identity Architecture
 
 ## Principle
 There is exactly ONE identity source: **Supabase Auth (`auth.users.id`)**.
@@ -59,7 +59,7 @@ path does this automatically.
 
 ## Setup required (Supabase dashboard)
 1. Database → Webhooks: table `auth.users`, events INSERT/UPDATE/DELETE →
-   `https://virelsy.com/api/webhooks/supabase-auth`, header
+   `https://tirvea.com/api/webhooks/supabase-auth`, header
    `x-webhook-secret: $SUPABASE_WEBHOOK_SECRET`.
 2. Optional: disable public sign-ups if deletion should mean banned
    (otherwise use BlockedIdentity).

@@ -35,7 +35,7 @@ export function MarketingNavbar() {
           </Button>
           <Magnetic strength={0.25}>
             <Button size="lg" className="h-11 rounded-full px-6" asChild>
-              <Link href="/register">Join Virelsy</Link>
+              <Link href="/register">Join Tirvea</Link>
             </Button>
           </Magnetic>
         </div>

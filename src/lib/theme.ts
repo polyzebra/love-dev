@@ -1,6 +1,6 @@
 export type AppearanceMode = "SYSTEM" | "LIGHT" | "DARK";
 
-export const THEME_STORAGE_KEY = "virelsy:appearance";
+export const THEME_STORAGE_KEY = "tirvea:appearance";
 
 /**
  * Pre-paint theme bootstrap, inlined into <head> as a plain string so

@@ -7,7 +7,7 @@ export default function CommunityGuidelinesPage() {
     <>
       <h1>Community Guidelines</h1>
       <p>
-        Virelsy works because people feel safe being themselves. These guidelines apply to profiles,
+        Tirvea works because people feel safe being themselves. These guidelines apply to profiles,
         photos, messages and behaviour - on and off the platform.
       </p>
 

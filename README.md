@@ -1,4 +1,4 @@
-# Virelsy - Dating, designed with intention
+# Tirvea - Dating, designed with intention
 
 A production-grade premium dating SaaS platform. Verified profiles, honest
 intentions, premium experience. Built mobile-first with a custom design system.
@@ -39,8 +39,8 @@ npm run dev              # http://localhost:3000
 
 **Seeded accounts** (dev only - change immediately in any shared environment):
 
-- Admin: `admin@virelsy.app` / `admin-virelsy-2026` → `/admin`
-- Demo members: `saoirse@demo.virelsy.app` (and 5 more) / `demo-virelsy-2026`
+- Admin: `admin@tirvea.app` / `admin-tirvea-2026` → `/admin`
+- Demo members: `saoirse@demo.tirvea.app` (and 5 more) / `demo-tirvea-2026`
 
 ## Scripts
 

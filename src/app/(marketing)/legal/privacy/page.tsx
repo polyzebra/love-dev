@@ -44,7 +44,7 @@ export default function PrivacyPage() {
       <ul>
         <li>Access & portability: export your data from Settings at any time.</li>
         <li>Erasure: delete your account from Settings - no emails, no phone calls required.</li>
-        <li>Rectification, restriction and objection: contact privacy@virelsy.app.</li>
+        <li>Rectification, restriction and objection: contact privacy@tirvea.app.</li>
         <li>You may lodge a complaint with the Irish Data Protection Commission or the UK ICO.</li>
       </ul>
 
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
       </p>
 
       <h2>8. Contact</h2>
-      <p>Data Protection Officer: privacy@virelsy.app</p>
+      <p>Data Protection Officer: privacy@tirvea.app</p>
     </>
   );
 }

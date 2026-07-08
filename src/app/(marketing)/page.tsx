@@ -89,7 +89,7 @@ export default function LandingPage() {
             <p className="font-display text-[clamp(1.8rem,4.5vw,3.4rem)] font-medium leading-[1.25] tracking-tight text-balance">
               Swiping was built to be <span className="italic text-muted-foreground">endless</span>.
               <br />
-              We built Virelsy to be <span className="text-luxe italic">the last app you download</span>.
+              We built Tirvea to be <span className="text-luxe italic">the last app you download</span>.
             </p>
           </Reveal>
         </div>
@@ -280,7 +280,7 @@ export default function LandingPage() {
           <Reveal delay={0.28}>
             <Magnetic className="mt-10 inline-block">
               <Button size="lg" className="h-16 rounded-full px-14 text-lg" asChild>
-                <Link href="/register">Join Virelsy - free</Link>
+                <Link href="/register">Join Tirvea - free</Link>
               </Button>
             </Magnetic>
           </Reveal>

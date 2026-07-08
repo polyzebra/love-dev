@@ -8,9 +8,9 @@ export default defineConfig({
     seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL ?? "postgresql://localhost:5432/virelsy",
+    url: process.env.DATABASE_URL ?? "postgresql://localhost:5432/tirvea",
     shadowDatabaseUrl:
       process.env.SHADOW_DATABASE_URL ??
-      "postgresql://amora:amora@localhost:5433/virelsy_shadow",
+      "postgresql://amora:amora@localhost:5433/tirvea_shadow",
   },
 });

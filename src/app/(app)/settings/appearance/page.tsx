@@ -17,7 +17,7 @@ export default async function AppearanceSettingsPage() {
         backHref="/settings"
         backLabel="Back to settings"
         title="Appearance"
-        description="Choose how Virelsy looks."
+        description="Choose how Tirvea looks."
       />
 
       <AppearancePicker initial={settings.appearance} />

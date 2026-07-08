@@ -1,4 +1,4 @@
-export const APP_NAME = "Virelsy";
+export const APP_NAME = "Tirvea";
 export const APP_TAGLINE = "Dating, designed with intention.";
 export const SUPPORTED_COUNTRIES = [
   { code: "IE", label: "Ireland" },
@@ -23,7 +23,7 @@ export const SWIPE_LIMITS = {
 export const PLANS = [
   {
     tier: "FREE",
-    name: "Free",
+    name: "Tirvea",
     priceMonthlyCents: 0,
     tagline: "Start meeting people",
     features: [
@@ -36,7 +36,7 @@ export const PLANS = [
   },
   {
     tier: "PLUS",
-    name: "Plus",
+    name: "Tirvea Plus",
     priceMonthlyCents: 1499,
     tagline: "Date with momentum",
     features: [
@@ -49,7 +49,7 @@ export const PLANS = [
   },
   {
     tier: "PREMIUM",
-    name: "Premium",
+    name: "Tirvea Gold",
     priceMonthlyCents: 2999,
     tagline: "The full experience",
     features: [

@@ -21,7 +21,7 @@ const GROUPS = [
     title: "Company",
     links: [
       { href: "/safety", label: "Trust & Safety" },
-      { href: "mailto:hello@virelsy.app", label: "Contact" },
+      { href: "mailto:hello@tirvea.app", label: "Contact" },
     ],
   },
 ] as const;
@@ -31,7 +31,7 @@ export function MarketingFooter() {
     <footer className="relative overflow-hidden border-t border-border">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-10">
         <div className="space-y-4">
-          <p className="font-display text-3xl font-semibold tracking-tight">Virelsy</p>
+          <p className="font-display text-3xl font-semibold tracking-tight">Tirvea</p>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
             Dating, designed with intention.
             <br />
@@ -73,13 +73,13 @@ export function MarketingFooter() {
           fontSize="150"
           fontWeight="600"
         >
-          Virelsy
+          Tirvea
         </text>
       </svg>
 
       <div className="border-t border-border">
         <p className="mx-auto max-w-6xl px-6 py-6 text-xs text-muted-foreground md:px-10">
-          © {new Date().getFullYear()} Virelsy Ltd. All rights reserved.
+          © {new Date().getFullYear()} Tirvea Ltd. All rights reserved.
         </p>
       </div>
     </footer>

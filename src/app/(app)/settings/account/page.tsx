@@ -101,7 +101,7 @@ export default async function AccountSettingsPage() {
           <CardTitle className="text-base">Verification</CardTitle>
           <CardDescription>
             Verified members get more matches and a badge on their profile. Identity documents are
-            handled by our verification partner and never stored by Virelsy.
+            handled by our verification partner and never stored by Tirvea.
           </CardDescription>
         </CardHeader>
         <CardContent className="divide-y">

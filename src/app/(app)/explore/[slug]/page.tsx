@@ -121,7 +121,7 @@ export default async function ExploreCategoryPage({
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/95 p-6 backdrop-blur-xl" role="alertdialog" aria-label="Profile unavailable">
           <div className="glass max-w-xs space-y-4 rounded-[28px] p-6 text-center">
             <p className="font-display text-xl">This profile isn&apos;t available</p>
-            <p className="text-sm text-muted-foreground">It may have been hidden or is no longer on Virelsy.</p>
+            <p className="text-sm text-muted-foreground">It may have been hidden or is no longer on Tirvea.</p>
             <Button className="rounded-full" asChild>
               <Link href={`/explore/${slug}`}>Back to Explore</Link>
             </Button>

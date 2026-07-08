@@ -23,7 +23,7 @@ const serverSchema = z.object({
   STRIPE_SECRET_KEY: optionalStr,
   STRIPE_WEBHOOK_SECRET: optionalStr,
   RESEND_API_KEY: optionalStr,
-  EMAIL_FROM: z.string().default("Virelsy <hello@virelsy.app>"),
+  EMAIL_FROM: z.string().default("Tirvea <hello@tirvea.app>"),
   UPSTASH_REDIS_REST_URL: optionalStr,
   UPSTASH_REDIS_REST_TOKEN: optionalStr,
 });

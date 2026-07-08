@@ -85,7 +85,7 @@ export default function SafetyCentrePage() {
               </div>
             ))}
             <p className="rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-              Keep conversations on Virelsy until you trust the person, and never send money or
+              Keep conversations on Tirvea until you trust the person, and never send money or
               share financial details - no genuine match will ever ask.
             </p>
           </CardContent>
@@ -93,7 +93,7 @@ export default function SafetyCentrePage() {
 
         <Card className="rounded-3xl">
           <CardHeader>
-            <CardTitle className="text-base">Tools built into Virelsy</CardTitle>
+            <CardTitle className="text-base">Tools built into Tirvea</CardTitle>
             <CardDescription>Everything here works today - two taps at most.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -128,10 +128,10 @@ export default function SafetyCentrePage() {
             <p>
               For anything less urgent, our safety team is at{" "}
               <a
-                href="mailto:safety@virelsy.app"
+                href="mailto:safety@tirvea.app"
                 className="font-medium text-foreground underline underline-offset-2"
               >
-                safety@virelsy.app
+                safety@tirvea.app
               </a>
               . And always: trust your instincts. If something feels off, it probably is.
             </p>

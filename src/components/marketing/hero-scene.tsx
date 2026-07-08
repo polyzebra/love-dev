@@ -76,7 +76,7 @@ export function HeroScene() {
     <div
       onPointerMove={onPointerMove}
       className="perspective-stage relative mx-auto h-[560px] w-full max-w-[420px] sm:h-[600px]"
-      aria-label="A preview of Virelsy: profiles, matching and conversations"
+      aria-label="A preview of Tirvea: profiles, matching and conversations"
     >
       {/* Ambient key light + drifting particles */}
       <div

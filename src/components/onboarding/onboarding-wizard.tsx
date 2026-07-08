@@ -608,7 +608,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                   Let&apos;s start with the basics
                 </h1>
-                <p className="text-muted-foreground">This is how you&apos;ll appear on Virelsy.</p>
+                <p className="text-muted-foreground">This is how you&apos;ll appear on Tirvea.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="displayName">First name</Label>
@@ -633,7 +633,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 />
                 <p id="age-hint" className="text-xs text-muted-foreground">
                   {age !== null && age < 18
-                    ? "You must be 18 or older to use Virelsy."
+                    ? "You must be 18 or older to use Tirvea."
                     : "Your age is shown on your profile - never your birthday."}
                 </p>
               </div>

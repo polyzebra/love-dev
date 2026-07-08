@@ -10,8 +10,8 @@ export default function TermsPage() {
 
       <h2>1. Who we are</h2>
       <p>
-        Virelsy is operated by Virelsy Ltd. These terms govern your use of the
-        Virelsy platform across web and mobile.
+        Tirvea is operated by Tirvea Ltd. These terms govern your use of the
+        Tirvea platform across web and mobile.
       </p>
 
       <h2>2. Eligibility</h2>
@@ -49,13 +49,13 @@ export default function TermsPage() {
 
       <h2>7. Liability</h2>
       <p>
-        Virelsy provides a platform for meeting people; we do not conduct criminal background checks
+        Tirvea provides a platform for meeting people; we do not conduct criminal background checks
         on members. Nothing in these terms excludes liability that cannot be excluded under Irish or
         UK law.
       </p>
 
       <h2>8. Contact</h2>
-      <p>Questions about these terms: legal@virelsy.app</p>
+      <p>Questions about these terms: legal@tirvea.app</p>
     </>
   );
 }

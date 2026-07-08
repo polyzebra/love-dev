@@ -29,7 +29,7 @@ export default async function PrivacySettingsPage() {
           <CardHeader>
             <CardTitle className="text-base">Blocked members</CardTitle>
             <CardDescription>
-              Blocked members can&apos;t see you or contact you anywhere on Virelsy.
+              Blocked members can&apos;t see you or contact you anywhere on Tirvea.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -56,7 +56,7 @@ export default async function PrivacySettingsPage() {
           <CardHeader>
             <CardTitle className="text-base">Export your data</CardTitle>
             <CardDescription>
-              Download a copy of everything Virelsy holds about you - profile, activity, messages and
+              Download a copy of everything Tirvea holds about you - profile, activity, messages and
               payments - as JSON. (GDPR Art. 20)
             </CardDescription>
           </CardHeader>
@@ -82,7 +82,7 @@ export default async function PrivacySettingsPage() {
           <Link href="/legal/privacy" className="underline underline-offset-2">
             Privacy Policy
           </Link>{" "}
-          or email privacy@virelsy.app
+          or email privacy@tirvea.app
         </p>
       </div>
     </>

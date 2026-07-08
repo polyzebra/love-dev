@@ -127,7 +127,7 @@ function LoginForm() {
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        New to Virelsy?{" "}
+        New to Tirvea?{" "}
         <Link href="/register" className="font-medium text-primary-soft underline-offset-2 hover:underline">
           Create an account
         </Link>
