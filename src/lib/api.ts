@@ -28,7 +28,8 @@ export function apiError(
 }
 
 export const unauthorized = () => apiError(401, "unauthorized", "Sign in to continue.");
-export const forbidden = () => apiError(403, "forbidden", "You do not have access to this resource.");
+export const forbidden = () =>
+  apiError(403, "forbidden", "You do not have access to this resource.");
 export const notFound = (what = "Resource") => apiError(404, "not_found", `${what} not found.`);
 
 export function tooManyRequests(rl: RateLimitResult) {
@@ -42,7 +43,12 @@ export function tooManyRequests(rl: RateLimitResult) {
 }
 
 export function validationError(error: ZodError) {
-  return apiError(422, "validation_error", "Some fields need attention.", error.flatten().fieldErrors as Record<string, string[]>);
+  return apiError(
+    422,
+    "validation_error",
+    "Some fields need attention.",
+    error.flatten().fieldErrors as Record<string, string[]>,
+  );
 }
 
 /** Parse + validate a JSON body against a schema. Returns a NextResponse on failure. */
@@ -54,7 +60,10 @@ export async function parseBody<T>(
   try {
     json = await req.json();
   } catch {
-    return { data: null, response: apiError(400, "invalid_json", "Request body must be valid JSON.") };
+    return {
+      data: null,
+      response: apiError(400, "invalid_json", "Request body must be valid JSON."),
+    };
   }
   const parsed = schema.safeParse(json);
   if (!parsed.success) return { data: null, response: validationError(parsed.error) };
@@ -77,10 +86,7 @@ export async function requirePermission(permission: Permission) {
 }
 
 /** Per-user or per-IP rate limit guard. */
-export async function guardRate(
-  key: string,
-  preset: { limit: number; windowMs: number },
-) {
+export async function guardRate(key: string, preset: { limit: number; windowMs: number }) {
   const rl = await rateLimit(key, preset);
   if (!rl.ok) return tooManyRequests(rl);
   return null;
@@ -89,4 +95,25 @@ export async function guardRate(
 export function clientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd?.split(",")[0]?.trim() ?? "unknown";
+}
+
+/**
+ * Wrap an auth-funnel handler so an infrastructure failure (database
+ * unreachable, required env missing) answers a clear 503 with neutral
+ * copy instead of an anonymous 500. The DB-backed limits and locks in
+ * these routes fail CLOSED - nothing proceeds unaudited.
+ */
+export function withUnavailableGuard(
+  label: string,
+  handler: (req: Request) => Promise<Response>,
+  message = "Sign-in is temporarily unavailable. Please try again shortly.",
+): (req: Request) => Promise<Response> {
+  return async (req: Request) => {
+    try {
+      return await handler(req);
+    } catch (error) {
+      console.error(`[${label}] unavailable:`, error);
+      return NextResponse.json({ ok: false, error: message }, { status: 503 });
+    }
+  };
 }

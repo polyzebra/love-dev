@@ -2,6 +2,7 @@ import { EMAIL_OTP_LENGTH } from "@/lib/auth/otp";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
+import { withUnavailableGuard } from "@/lib/api";
 import { emailSchema } from "@/lib/validators/auth";
 import { ensureAppUser } from "@/lib/auth/identity";
 import { authNextStep } from "@/lib/auth/gate";
@@ -32,8 +33,12 @@ const LOCKED = "Too many attempts. Please try again in a few minutes.";
  * identity path as the OAuth callback (ensureAppUser - one email, one
  * account) and answers with the gate's next step. All failures share one
  * neutral message.
+ *
+ * Infrastructure failures (failure-lock/identity queries cannot reach
+ * the database, etc.) answer a clear 503 instead of an anonymous 500 -
+ * the lock fails CLOSED: no verify is ever accepted unaudited.
  */
-export async function POST(req: Request) {
+export const POST = withUnavailableGuard("auth:email/verify", async (req: Request) => {
   let body: unknown;
   try {
     body = await req.json();
@@ -141,4 +146,4 @@ export async function POST(req: Request) {
     metadata: { deviceHash: device?.deviceHash ?? null, riskScore },
   });
   return NextResponse.json({ ok: true, next });
-}
+});

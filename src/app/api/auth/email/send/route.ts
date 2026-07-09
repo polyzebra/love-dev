@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
+import { withUnavailableGuard } from "@/lib/api";
 import { emailSchema } from "@/lib/validators/auth";
 import { isDisposableEmail } from "@/lib/auth/disposable-domains";
 import { checkOtpSendIpLimit, resendCooldown } from "@/lib/auth/rate-limit";
@@ -17,8 +18,12 @@ const bodySchema = z.object({ email: emailSchema });
  * enumeration gets nothing here. `retryAfter` (seconds) is the one thing
  * every caller learns: when the resend unlocks - it is identical whether
  * the code went out or the limiter swallowed the request.
+ *
+ * Infrastructure failures (the DB-backed limiter cannot reach the
+ * database, etc.) answer a clear 503 instead of an anonymous 500 - the
+ * limiter fails CLOSED: no code is ever sent unaudited.
  */
-export async function POST(req: Request) {
+export const POST = withUnavailableGuard("auth:email/send", async (req: Request) => {
   let body: unknown;
   try {
     body = await req.json();
@@ -85,4 +90,4 @@ export async function POST(req: Request) {
 
   await recordAuthEvent({ type: "email_otp_send", email, req });
   return neutral;
-}
+});

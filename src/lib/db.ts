@@ -4,8 +4,18 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 function createClient() {
+  const url = process.env.DATABASE_URL?.trim();
+  if (!url && process.env.NODE_ENV === "production") {
+    // Without this log the failure surfaces as an opaque ECONNREFUSED to
+    // localhost on every query. Name the actual problem where the ops
+    // logs will show it.
+    console.error(
+      "[db] DATABASE_URL is not set - every database query will fail. " +
+        "Set it in the deployment environment (Vercel: Project Settings -> Environment Variables).",
+    );
+  }
   const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL ?? "postgresql://localhost:5432/tirvea",
+    connectionString: url || "postgresql://localhost:5432/tirvea",
   });
   return new PrismaClient({
     adapter,
