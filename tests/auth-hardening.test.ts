@@ -133,7 +133,7 @@ async function main() {
   // ------------------------------------------------- live DB-backed pieces
   const { db } = await import("../src/lib/db");
   const { recordAuthEvent, sha256Hash, ipHashFrom } = await import("../src/lib/auth/audit");
-  const { checkEmailOtpSendLimit, checkPhoneOtpSendLimit, checkOtpVerifyBlocked } = await import(
+  const { resendCooldown, checkOtpSendIpLimit, checkOtpVerifyBlocked } = await import(
     "../src/lib/auth/rate-limit"
   );
   const { ensureAppUser } = await import("../src/lib/auth/identity");
@@ -157,17 +157,25 @@ async function main() {
     });
 
     console.log("rate limits (live sliding windows)");
+    const minutesAgo = (m: number) => new Date(Date.now() - m * 60 * 1000);
     const rlEmail = testEmail("rl");
     cleanupEmails.push(rlEmail);
-    for (let i = 0; i < 4; i++) await recordAuthEvent({ type: "email_otp_send", email: rlEmail, req });
-    await check("email send allowed at 4/5", async () => {
-      assert.equal((await checkEmailOtpSendLimit(rlEmail, null)).ok, true);
+    // 4 sends spread over the hour, ladder cooldowns all elapsed
+    for (const m of [50, 40, 30, 20]) {
+      await db.authVerificationEvent.create({
+        data: { type: "email_otp_send", email: rlEmail, createdAt: minutesAgo(m) },
+      });
+    }
+    await check("email send allowed at 4/5 (ladder elapsed)", async () => {
+      assert.equal((await resendCooldown("email", rlEmail)).allowed, true);
     });
-    await recordAuthEvent({ type: "email_otp_send", email: rlEmail, req });
-    await check("email send blocked at 5/5 per email", async () => {
-      const res = await checkEmailOtpSendLimit(rlEmail, null);
-      assert.equal(res.ok, false);
-      assert.equal(res.reason, "email_hourly");
+    await db.authVerificationEvent.create({
+      data: { type: "email_otp_send", email: rlEmail, createdAt: minutesAgo(9) },
+    });
+    await check("email send blocked at 5/5 per email (hourly cap)", async () => {
+      const res = await resendCooldown("email", rlEmail);
+      assert.equal(res.allowed, false);
+      assert.ok(res.retryAfter > 120); // capped for the window, not just the ladder
     });
     const ipHash = ipHashFrom(fakeReq("198.51.100.7"))!;
     const ipEmailPrefix = testEmail("iprl");
@@ -178,24 +186,29 @@ async function main() {
     }
     cleanupEmails.push(ipEmailPrefix);
     await check("email send blocked at 10/h per IP across emails", async () => {
-      const res = await checkEmailOtpSendLimit(testEmail("fresh"), ipHash);
+      const res = await checkOtpSendIpLimit(ipHash);
       assert.equal(res.ok, false);
       assert.equal(res.reason, "ip_hourly");
     });
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       await db.authVerificationEvent.create({
-        data: { type: "phone_otp_send", phoneE164: TEST_PHONE, email: testEmail("phone-rl") },
+        data: {
+          type: "phone_otp_send",
+          phoneE164: TEST_PHONE,
+          email: testEmail("phone-rl"),
+          createdAt: minutesAgo(30),
+        },
       });
     }
-    await check("phone send blocked at 3/h per number", async () => {
-      assert.equal((await checkPhoneOtpSendLimit(TEST_PHONE)).ok, false);
+    await check("phone send blocked at 5/h per number", async () => {
+      assert.equal((await resendCooldown("phone", TEST_PHONE)).allowed, false);
     });
     const failEmail = testEmail("fails");
     cleanupEmails.push(failEmail);
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 5; i++) {
       await db.authVerificationEvent.create({ data: { type: "otp_verify_fail", email: failEmail } });
     }
-    await check("verification blocked after 8 fails/h", async () => {
+    await check("verification locked after 5 fails/15min", async () => {
       assert.equal((await checkOtpVerifyBlocked({ email: failEmail })).ok, false);
       assert.equal((await checkOtpVerifyBlocked({ email: testEmail("clean") })).ok, true);
     });

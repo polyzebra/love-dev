@@ -3,7 +3,11 @@ import { z } from "zod";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/api";
-import { phoneVerificationProvider, PhoneOtpNotConfiguredError } from "@/lib/auth/phone";
+import {
+  phoneVerificationProvider,
+  PhoneOtpNotConfiguredError,
+  PhoneProviderRejectedError,
+} from "@/lib/auth/phone";
 import { checkOtpVerifyBlocked } from "@/lib/auth/rate-limit";
 import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
 import { authNextStep } from "@/lib/auth/gate";
@@ -15,6 +19,7 @@ const bodySchema = z.object({
 
 const CODE_FAILED = "That code didn't work. Try again.";
 const NUMBER_UNAVAILABLE = "That number can't be used right now.";
+const LOCKED = "Too many attempts. Please try again in a few minutes.";
 
 /**
  * POST /api/auth/phone/verify { phoneE164, code }
@@ -45,17 +50,19 @@ export async function POST(req: Request) {
   }
   const phoneE164 = phone.number;
 
-  // Too many failed attempts -> blocked for the rest of the window
+  // Failure lock: 5 invalid attempts within 15 minutes (per number or per
+  // IP) -> locked for 15 minutes. Audited as its own type so locked
+  // requests never extend the lock.
   const blocked = await checkOtpVerifyBlocked({ phoneE164, ipHash: ipHashFrom(req) });
   if (!blocked.ok) {
     await recordAuthEvent({
-      type: "otp_verify_fail",
+      type: "otp_verify_locked",
       phoneE164,
       userId: user.id,
       req,
-      metadata: { reason: blocked.reason ?? "blocked" },
+      metadata: { reason: blocked.reason ?? "locked" },
     });
-    return NextResponse.json({ ok: false, error: CODE_FAILED }, { status: 429 });
+    return NextResponse.json({ ok: false, error: LOCKED }, { status: 429 });
   }
 
   let verified: boolean;
@@ -66,6 +73,24 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { ok: false, error: "Phone verification is temporarily unavailable.", blocked: true },
         { status: 503 },
+      );
+    }
+    // Vendor-side policy rejection (e.g. Twilio 60202 - Verify's own max
+    // check attempts): OUR neutral copy, real cause in the audit trail.
+    if (error instanceof PhoneProviderRejectedError) {
+      await recordAuthEvent({
+        type:
+          error.auditMetadata.reason === "max_check_attempts"
+            ? "otp_verify_locked"
+            : "otp_verify_fail",
+        phoneE164,
+        userId: user.id,
+        req,
+        metadata: error.auditMetadata,
+      });
+      return NextResponse.json(
+        { ok: false, error: error.neutralMessage },
+        { status: error.httpStatus },
       );
     }
     throw error;

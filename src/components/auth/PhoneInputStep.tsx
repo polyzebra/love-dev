@@ -33,6 +33,8 @@ import {
 
 export const AUTH_PHONE_KEY = "tirvea:auth-phone";
 export const PHONE_COUNTRY_KEY = "tirvea:phone-country";
+/** Server retryAfter (seconds) for the send that opened the code screen. */
+export const AUTH_PHONE_RETRY_KEY = "tirvea:auth-phone-retry";
 
 const defaultCountry = countryByIso(DEFAULT_COUNTRY_ISO)!;
 
@@ -119,6 +121,9 @@ export function PhoneInputStep() {
     }
     try {
       sessionStorage.setItem(AUTH_PHONE_KEY, parsed.number);
+      if (result.retryAfter) {
+        sessionStorage.setItem(AUTH_PHONE_RETRY_KEY, String(result.retryAfter));
+      }
     } catch {}
     router.push(`/auth/phone-code?phone=${encodeURIComponent(parsed.number)}`);
   }

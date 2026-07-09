@@ -1,4 +1,5 @@
 import { needsAgeConfirmation, needsConsent } from "@/lib/auth/consent";
+import { phoneVerificationEnabled } from "@/lib/auth/phone";
 
 /**
  * The auth progression gate - ONE pure function deciding where a user
@@ -9,10 +10,11 @@ import { needsAgeConfirmation, needsConsent } from "@/lib/auth/consent";
  * consent -> onboarding -> app.
  *
  * Phone-unavailable semantics (two DIFFERENT states, do not merge):
- *  - SUPABASE_PHONE_ENABLED off: the feature is NOT LAUNCHED. The gate
- *    hides the step entirely (phoneEnabled=false skips /auth/phone) -
- *    we never demand a phone number the product cannot verify yet.
- *  - SUPABASE_PHONE_ENABLED === "true" but the provider errors at
+ *  - No SMS provider configured (no TWILIO_* envs, SUPABASE_PHONE_ENABLED
+ *    off): the feature is NOT LAUNCHED. The gate hides the step entirely
+ *    (phoneEnabled=false skips /auth/phone) - we never demand a phone
+ *    number the product cannot verify yet.
+ *  - A provider IS configured but errors at
  *    runtime: the step is REQUIRED and NOT skippable. The gate still
  *    routes to /auth/phone; the page shows "Phone verification is
  *    temporarily unavailable." and blocks (no continue path) until the
@@ -32,9 +34,13 @@ export type GateUser = {
   onboardingDone: boolean;
 };
 
-/** Phone verification is only enforceable when an SMS provider is wired up. */
+/**
+ * Phone verification is only enforceable when an SMS provider is wired up.
+ * Thin alias of phone.ts's phoneVerificationEnabled() (Twilio Verify OR
+ * Supabase phone) kept for the gate's callers.
+ */
 export function isPhoneVerificationEnabled(): boolean {
-  return process.env.SUPABASE_PHONE_ENABLED === "true";
+  return phoneVerificationEnabled();
 }
 
 export function authNextStep(

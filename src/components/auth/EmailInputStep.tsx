@@ -20,6 +20,8 @@ import { supabaseBrowser } from "@/lib/supabase/client";
  */
 
 export const AUTH_EMAIL_KEY = "tirvea:auth-email";
+/** Server retryAfter (seconds) for the send that opened the code screen. */
+export const AUTH_EMAIL_RETRY_KEY = "tirvea:auth-email-retry";
 
 /** Good-faith shape check - the emailed code is the real verification. */
 function looksLikeEmail(value: string): boolean {
@@ -63,6 +65,9 @@ export function EmailInputStep() {
     }
     try {
       sessionStorage.setItem(AUTH_EMAIL_KEY, value);
+      if (result.retryAfter) {
+        sessionStorage.setItem(AUTH_EMAIL_RETRY_KEY, String(result.retryAfter));
+      }
     } catch {
       // Query param below is the primary carrier anyway.
     }

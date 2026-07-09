@@ -3,8 +3,12 @@ import { z } from "zod";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/api";
-import { phoneVerificationProvider, PhoneOtpNotConfiguredError } from "@/lib/auth/phone";
-import { checkPhoneOtpSendLimit } from "@/lib/auth/rate-limit";
+import {
+  phoneVerificationProvider,
+  PhoneOtpNotConfiguredError,
+  PhoneProviderRejectedError,
+} from "@/lib/auth/phone";
+import { resendCooldown } from "@/lib/auth/rate-limit";
 import { recordAuthEvent } from "@/lib/auth/audit";
 
 const bodySchema = z.object({
@@ -18,13 +22,15 @@ const PHONE_UNAVAILABLE = "Phone verification is temporarily unavailable.";
 
 /**
  * POST /api/auth/phone/send { phoneE164, countryIso?, dialCode? }
- * -> { ok: true } | { ok: false, error }
+ * -> { ok: true, retryAfter } | { ok: false, error }
  * -> 503 { ok: false, error, blocked: true } when SMS cannot go out
  *    (provider outage or feature flag off) - the step is NOT skippable
  *
  * Requires a signed-in session (phone attaches to the CURRENT account).
  * One phone = one account: a number already verified elsewhere gets the
- * same neutral copy as any other rejection.
+ * same neutral copy as any other rejection. Rate-limited sends return the
+ * SAME neutral 200 as real sends - `retryAfter` (seconds until the resend
+ * unlocks) is the only thing the caller learns either way.
  */
 export async function POST(req: Request) {
   const { user, response } = await requireSession();
@@ -61,18 +67,38 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: NUMBER_UNAVAILABLE }, { status: 409 });
   }
 
-  const limit = await checkPhoneOtpSendLimit(phoneE164);
-  if (!limit.ok) {
-    await recordAuthEvent({ type: "phone_otp_send_limited", phoneE164, userId: user.id, req });
-    return NextResponse.json(
-      { ok: false, error: "Too many codes requested for this number. Try again later." },
-      { status: 429 },
-    );
+  // Escalating resend cooldown (30s -> 60s -> 120s) + 5 sends/hour per
+  // number. Limited requests get the SAME neutral 200 as real sends.
+  const cooldown = await resendCooldown("phone", phoneE164);
+  if (!cooldown.allowed) {
+    await recordAuthEvent({
+      type: "phone_otp_send_limited",
+      phoneE164,
+      userId: user.id,
+      req,
+      metadata: { reason: "resend_cooldown", retryAfter: cooldown.retryAfter },
+    });
+    return NextResponse.json({ ok: true, retryAfter: cooldown.retryAfter });
   }
 
   try {
     await phoneVerificationProvider().sendCode(phoneE164);
   } catch (error) {
+    // Vendor-side policy rejection (invalid number, Verify's own send
+    // cap): OUR neutral copy to the caller, the real cause in the audit.
+    if (error instanceof PhoneProviderRejectedError) {
+      await recordAuthEvent({
+        type: "phone_otp_send_rejected",
+        phoneE164,
+        userId: user.id,
+        req,
+        metadata: error.auditMetadata,
+      });
+      return NextResponse.json(
+        { ok: false, error: error.neutralMessage },
+        { status: error.httpStatus },
+      );
+    }
     // Both failure modes block (503 + blocked:true - the client shows
     // the "temporarily unavailable" notice with NO skip path). When the
     // flag is off entirely the gate never routes here in the first
@@ -103,5 +129,5 @@ export async function POST(req: Request) {
       dialCode: parsed.data.dialCode ?? `+${phone.countryCallingCode}`,
     },
   });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, retryAfter: cooldown.retryAfter });
 }

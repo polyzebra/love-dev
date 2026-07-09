@@ -36,19 +36,29 @@ function errorMessage(json: Json): string | null {
 }
 
 export type SendResult =
-  | { ok: true }
+  | { ok: true; retryAfter?: number }
   | { ok: false; blocked: boolean; message: string };
 
 export type VerifyResult =
   | { ok: true; next: string }
   | { ok: false; message: string };
 
+/**
+ * Server-provided resend unlock (seconds). Present on every neutral send
+ * success - "sent" and "rate limited" are indistinguishable by design; the
+ * countdown is the one honest signal.
+ */
+function retryAfterOf(json: Json): number | undefined {
+  const value = json?.retryAfter;
+  return typeof value === "number" && value > 0 ? Math.ceil(value) : undefined;
+}
+
 /** POST /api/auth/email/send - contractually always a neutral 200. */
 export async function sendEmailCode(email: string): Promise<SendResult> {
   const res = await post("/api/auth/email/send", { email });
   if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
   // Neutral by design: even rate-limits come back as 200 {ok:true}.
-  if (res.status === 200) return { ok: true };
+  if (res.status === 200) return { ok: true, retryAfter: retryAfterOf(res.json) };
   return { ok: false, blocked: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
 }
 
@@ -73,7 +83,7 @@ export async function sendPhoneCode(input: {
 }): Promise<SendResult> {
   const res = await post("/api/auth/phone/send", input);
   if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
-  if (res.json?.ok === true) return { ok: true };
+  if (res.json?.ok === true) return { ok: true, retryAfter: retryAfterOf(res.json) };
   return {
     ok: false,
     blocked: res.json?.blocked === true || res.status === 503,

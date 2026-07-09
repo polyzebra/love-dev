@@ -7,7 +7,11 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
-import { AUTH_PHONE_KEY, PHONE_COUNTRY_KEY } from "@/components/auth/PhoneInputStep";
+import {
+  AUTH_PHONE_KEY,
+  AUTH_PHONE_RETRY_KEY,
+  PHONE_COUNTRY_KEY,
+} from "@/components/auth/PhoneInputStep";
 import { sendPhoneCode, verifyPhoneCode } from "@/components/auth/api";
 import { DEFAULT_COUNTRY_ISO, countryByIso } from "@/lib/auth/countries";
 
@@ -28,6 +32,15 @@ function readStoredPhone(): string | null {
   }
 }
 
+/** The send response's retryAfter, stashed by the phone step. */
+function readStoredRetry(): string | null {
+  try {
+    return sessionStorage.getItem(AUTH_PHONE_RETRY_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export function PhoneCodeStep() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,6 +50,11 @@ export function PhoneCodeStep() {
   // as soon as the client takes over - no setState-in-effect, no tear.
   const storedPhone = useSyncExternalStore(subscribeNever, readStoredPhone, () => null);
   const phone = queryPhone ?? storedPhone;
+
+  // Server-authoritative cooldown for the send that got us here; the
+  // timer falls back to 30s when it is missing.
+  const storedRetry = useSyncExternalStore(subscribeNever, readStoredRetry, () => null);
+  const initialRetry = storedRetry ? Number(storedRetry) : null;
 
   // Nothing in the query AND nothing stored - restart the phone step.
   useEffect(() => {
@@ -64,6 +82,7 @@ export function PhoneCodeStep() {
     if (result.ok) {
       try {
         sessionStorage.removeItem(AUTH_PHONE_KEY);
+        sessionStorage.removeItem(AUTH_PHONE_RETRY_KEY);
       } catch {}
       router.replace(result.next);
       return; // Keep the disabled state while the route changes.
@@ -74,7 +93,7 @@ export function PhoneCodeStep() {
     otpRef.current?.focus();
   }
 
-  async function resend() {
+  async function resend(): Promise<number | void> {
     if (!phone) return;
     setError(null);
     // Reconstruct the country from the remembered choice; fall back to
@@ -87,11 +106,14 @@ export function PhoneCodeStep() {
       countryByIso(iso) ??
       countryByIso(parsePhoneNumberFromString(phone)?.country) ??
       countryByIso(DEFAULT_COUNTRY_ISO)!;
-    await sendPhoneCode({
+    const result = await sendPhoneCode({
       phoneE164: phone,
       countryIso: country.iso,
       dialCode: country.dialCode,
     });
+    // Neutral contract: the server always says when the resend unlocks,
+    // never whether this one actually went out.
+    return result.ok ? result.retryAfter : undefined;
   }
 
   return (
@@ -138,7 +160,11 @@ export function PhoneCodeStep() {
         </div>
 
         <div className="mt-auto pt-8">
-          <ResendTimer disabled={!phone || verifying} onResend={resend} />
+          <ResendTimer
+            disabled={!phone || verifying}
+            initialSeconds={initialRetry}
+            onResend={resend}
+          />
         </div>
       </div>
     </AuthShell>
