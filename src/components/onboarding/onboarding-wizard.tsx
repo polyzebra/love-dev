@@ -565,7 +565,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   }
 
   return (
-    <div className="space-y-8 pt-4">
+    <div className="space-y-4 pt-4">
       {/* Progress + live profile glow */}
       <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
@@ -626,7 +626,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         >
           {/* ------------------------------------------------ 1. Basics */}
           {step === 0 && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                   Let&apos;s start with the basics
@@ -693,7 +693,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
 
           {/* -------------------------------------------- 2. Intentions */}
           {step === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                   What are you here for?
