@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { OTPInput, REGEXP_ONLY_DIGITS, type SlotProps } from "input-otp";
+import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -52,30 +53,41 @@ export function OtpInput({
   /** Reaches the real input - `.focus()` after clearing an error. */
   ref?: React.Ref<HTMLInputElement>;
 }) {
+  // A brief +-4px shake when the code comes back wrong - transform
+  // only, three cycles, and skipped entirely under reduced motion
+  // (the destructive borders already carry the message).
+  const reduceMotion = useReducedMotion();
   return (
-    <OTPInput
-      ref={ref}
-      value={value}
-      onChange={onChange}
-      onComplete={onComplete}
-      maxLength={length}
-      pattern={REGEXP_ONLY_DIGITS}
-      inputMode="numeric"
-      autoComplete="one-time-code"
-      autoFocus={autoFocus}
-      disabled={disabled}
-      aria-label={label}
-      aria-invalid={invalid || undefined}
-      aria-describedby={invalid ? describedById : undefined}
-      containerClassName="flex items-center justify-between gap-2 has-disabled:opacity-60"
-      render={({ slots }) => (
-        <>
-          {slots.map((slot, i) => (
-            <OtpBox key={i} invalid={invalid} {...slot} />
-          ))}
-        </>
-      )}
-    />
+    <motion.div
+      animate={
+        invalid && !reduceMotion ? { x: [0, -4, 4, -4, 4, -4, 4, 0] } : { x: 0 }
+      }
+      transition={{ duration: 0.3 }}
+    >
+      <OTPInput
+        ref={ref}
+        value={value}
+        onChange={onChange}
+        onComplete={onComplete}
+        maxLength={length}
+        pattern={REGEXP_ONLY_DIGITS}
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        autoFocus={autoFocus}
+        disabled={disabled}
+        aria-label={label}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? describedById : undefined}
+        containerClassName="flex items-center justify-between gap-2 has-disabled:opacity-60"
+        render={({ slots }) => (
+          <>
+            {slots.map((slot, i) => (
+              <OtpBox key={i} invalid={invalid} {...slot} />
+            ))}
+          </>
+        )}
+      />
+    </motion.div>
   );
 }
 

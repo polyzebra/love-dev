@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
+import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { sendEmailCode } from "@/components/auth/api";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
@@ -127,15 +128,12 @@ export function EmailInputStep() {
         <AuthErrorBanner message={serverError} className="mt-4" />
 
         <div className="mt-auto space-y-4 pt-8">
-          <Button
-            type="submit"
-            size="lg"
-            className="h-12 w-full rounded-full"
+          <AuthSubmitButton
+            pending={pending === "email"}
             disabled={pending !== null}
           >
-            {pending === "email" && <Loader2 className="size-4 animate-spin" />}
             Continue
-          </Button>
+          </AuthSubmitButton>
 
           <div className="relative" role="separator" aria-label="or">
             <div className="absolute inset-0 flex items-center">

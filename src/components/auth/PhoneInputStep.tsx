@@ -3,13 +3,13 @@
 import { useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
-import { ChevronDown, Loader2, MessageCircleMore } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronDown, MessageCircleMore } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
+import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
 import { sendPhoneCode } from "@/components/auth/api";
 import {
@@ -201,15 +201,9 @@ export function PhoneInputStep() {
           <AuthErrorBanner message={serverError} className="mt-4" />
 
           <div className="mt-auto space-y-4 pt-8">
-            <Button
-              type="submit"
-              size="lg"
-              className="h-12 w-full rounded-full"
-              disabled={pending}
-            >
-              {pending && <Loader2 className="size-4 animate-spin" />}
+            <AuthSubmitButton pending={pending} disabled={pending}>
               Send code
-            </Button>
+            </AuthSubmitButton>
             <p className="text-center text-xs text-muted-foreground">
               Standard SMS rates may apply.
             </p>

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
+import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { acceptConsent } from "@/components/auth/api";
 
 /**
@@ -95,15 +95,9 @@ export function LegalConsentStep() {
         <AuthErrorBanner message={error} className="mt-4" />
 
         <div className="mt-auto pt-8">
-          <Button
-            type="submit"
-            size="lg"
-            className="h-12 w-full rounded-full"
-            disabled={!checked || pending}
-          >
-            {pending && <Loader2 className="size-4 animate-spin" />}
+          <AuthSubmitButton pending={pending} disabled={!checked || pending}>
             Agree and continue
-          </Button>
+          </AuthSubmitButton>
         </div>
       </form>
     </AuthShell>

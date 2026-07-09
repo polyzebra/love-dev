@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
+import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { confirmAge } from "@/components/auth/api";
 
 /**
@@ -67,15 +66,9 @@ export function AgeConfirmStep() {
         <AuthErrorBanner message={error} className="mt-4" />
 
         <div className="mt-auto space-y-4 pt-8">
-          <Button
-            type="submit"
-            size="lg"
-            className="h-12 w-full rounded-full"
-            disabled={!checked || pending}
-          >
-            {pending && <Loader2 className="size-4 animate-spin" />}
+          <AuthSubmitButton pending={pending} disabled={!checked || pending}>
             Continue
-          </Button>
+          </AuthSubmitButton>
           <p className="text-center text-xs text-muted-foreground">
             Lying about your age gets accounts permanently removed.
           </p>
