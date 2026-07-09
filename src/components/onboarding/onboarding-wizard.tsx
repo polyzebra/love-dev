@@ -191,7 +191,7 @@ function ChipToggle({
         "tap-target inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
         selected
           ? "border-transparent bg-linear-160 from-[#fb4a6e] to-[#be123c] text-primary-foreground shadow-[0_4px_18px_rgba(225,29,72,0.35)]"
-          : "glass-chip text-muted-foreground hover:text-foreground",
+          : "glass-chip text-muted-foreground hover:text-foreground light:border-foreground/15 light:bg-white light:shadow-[0_1px_3px_rgba(38,24,30,0.07)]",
       )}
     >
       {selected && (
@@ -244,7 +244,7 @@ function CategoryCard({
         transition={SPRING.snappy}
         className={cn(
           "tap-target flex min-h-[68px] w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-colors",
-          selected ? "border-border bg-accent shadow-card" : "bg-card hover:border-foreground/25",
+          selected ? "border-border bg-accent shadow-card" : "bg-card hover:border-foreground/25 light:border-foreground/15 light:bg-white light:shadow-[0_1px_3px_rgba(38,24,30,0.07)]",
         )}
       >
         <span
@@ -803,7 +803,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                         // rose border.
                         selected
                           ? "border-border bg-accent shadow-card"
-                          : "bg-card",
+                          : "bg-card light:border-foreground/15 light:bg-white light:shadow-[0_1px_3px_rgba(38,24,30,0.07)]",
                         !selected && !atLimit && "hover:border-foreground/25",
                         atLimit && "opacity-45",
                       )}
@@ -921,7 +921,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: EASE_LUXE, delay: 0.08 }}
-                className="space-y-3 rounded-2xl border bg-card p-5"
+                className="space-y-3 rounded-2xl border bg-card p-5 light:border-foreground/15 light:bg-white light:shadow-[0_1px_3px_rgba(38,24,30,0.07)]"
               >
                 <p className="font-medium">After this, two quick wins</p>
                 <div className="flex items-start gap-3">
