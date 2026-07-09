@@ -22,7 +22,7 @@ export default async function OnboardingPage() {
       <header className="safe-top mx-auto w-full max-w-2xl px-5 py-5">
         <Logo />
       </header>
-      <main className="mx-auto max-w-2xl px-5 pb-16">
+      <main className="mx-auto max-w-2xl px-5 pb-24">
         <OnboardingWizard initialName={record?.name ?? ""} />
       </main>
     </div>
