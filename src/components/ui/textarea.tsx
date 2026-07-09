@@ -7,7 +7,7 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
     <textarea
       data-slot="textarea"
       className={cn(
-        "flex field-sizing-content min-h-16 w-full rounded-2xl border border-input bg-foreground/5 light:border-foreground/20 light:bg-white light:shadow-[0_1px_2px_rgba(38,24,30,0.05)] px-3.5 py-2 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-[color,box-shadow,border-color] outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "flex field-sizing-content min-h-16 w-full rounded-2xl border border-input bg-foreground/5 px-3.5 py-2 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-[color,box-shadow,border-color] outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
         // Hover: slightly stronger neutral border - never a color shift.
         "hover:border-foreground/25",
         // Focus: the neutral border simply strengthens - no ring, no rose
