@@ -1,0 +1,87 @@
+/**
+ * Typed client wrappers for the step-auth API routes (built by the
+ * backend against the same contracts). Every wrapper normalizes network
+ * failures and unexpected payloads into calm, renderable results - the
+ * steps never touch `fetch` or juggle response shapes themselves.
+ */
+
+const OFFLINE_MESSAGE = "You appear to be offline. Check your connection and try again.";
+const GENERIC_MESSAGE = "Something went wrong. Please try again.";
+
+type Json = Record<string, unknown> | null;
+
+async function post(path: string, body: unknown): Promise<{ status: number; json: Json } | null> {
+  try {
+    const res = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const json = (await res.json().catch(() => null)) as Json;
+    return { status: res.status, json };
+  } catch {
+    return null; // network failure
+  }
+}
+
+/** Pulls a human message out of `error` whether it's a string or {message}. */
+function errorMessage(json: Json): string | null {
+  const error = json?.error;
+  if (typeof error === "string" && error) return error;
+  if (error && typeof error === "object") {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message) return message;
+  }
+  return null;
+}
+
+export type SendResult =
+  | { ok: true }
+  | { ok: false; notConfigured: boolean; message: string };
+
+export type VerifyResult =
+  | { ok: true; next: string }
+  | { ok: false; message: string };
+
+/** POST /api/auth/email/send - contractually always a neutral 200. */
+export async function sendEmailCode(email: string): Promise<SendResult> {
+  const res = await post("/api/auth/email/send", { email });
+  if (!res) return { ok: false, notConfigured: false, message: OFFLINE_MESSAGE };
+  // Neutral by design: even rate-limits come back as 200 {ok:true}.
+  if (res.status === 200) return { ok: true };
+  return { ok: false, notConfigured: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+}
+
+/** POST /api/auth/email/verify. */
+export async function verifyEmailCode(email: string, code: string): Promise<VerifyResult> {
+  const res = await post("/api/auth/email/verify", { email, code });
+  if (!res) return { ok: false, message: OFFLINE_MESSAGE };
+  const next = res.json?.next;
+  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+}
+
+/** POST /api/auth/phone/send - 503 means the SMS provider isn't configured. */
+export async function sendPhoneCode(input: {
+  phoneE164: string;
+  countryIso: string;
+  dialCode: string;
+}): Promise<SendResult> {
+  const res = await post("/api/auth/phone/send", input);
+  if (!res) return { ok: false, notConfigured: false, message: OFFLINE_MESSAGE };
+  if (res.json?.ok === true) return { ok: true };
+  return {
+    ok: false,
+    notConfigured: res.status === 503,
+    message: errorMessage(res.json) ?? GENERIC_MESSAGE,
+  };
+}
+
+/** POST /api/auth/phone/verify. */
+export async function verifyPhoneCode(phoneE164: string, code: string): Promise<VerifyResult> {
+  const res = await post("/api/auth/phone/verify", { phoneE164, code });
+  if (!res) return { ok: false, message: OFFLINE_MESSAGE };
+  const next = res.json?.next;
+  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+}

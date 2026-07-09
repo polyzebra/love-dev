@@ -1,4 +1,7 @@
+import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
+import { ipHashFrom, userAgentHashFrom } from "@/lib/auth/audit";
+import type { User as AppUser } from "@/generated/prisma/client";
 
 /**
  * Identity rules - Supabase Auth (auth.users.id) is the ONLY identity.
@@ -57,6 +60,11 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
         image: null,
         phone: null,
         phoneVerified: null,
+        phoneE164: null,
+        phoneCountryIso: null,
+        phoneDialCode: null,
+        phoneVerifiedAt: null,
+        authCompleted: false,
       },
     }),
     // Hard-delete everything personal right away
@@ -87,4 +95,109 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
 export async function recycleDeletedRow(userId: string): Promise<void> {
   await db.user.delete({ where: { id: userId } }).catch(() => {});
   console.info(`[identity] deleted shell ${userId} recycled for fresh registration`);
+}
+
+export type EnsureAppUserResult =
+  | { ok: true; user: AppUser; created: boolean; previousLoginIpHash: string | null }
+  | { ok: false; reason: "blocked" | "suspended" | "conflict" };
+
+/**
+ * THE single app-User provisioning path. Both the OAuth/magic-link
+ * callback and the email-OTP verify route funnel through here, so the
+ * identity rules exist exactly once:
+ * - blocked identities never get an app row
+ * - bans stay banned; a DELETED shell is recycled into a fresh account
+ * - DEACTIVATED (grace-window deletion) is cancelled by signing in
+ * - one email = one account; conflicts are rejected, never merged
+ *
+ * The CALLER owns the Supabase session (sign-out on rejection) - this
+ * function only decides and records.
+ */
+export async function ensureAppUser(
+  u: SupabaseAuthUser,
+  opts?: { req?: Request },
+): Promise<EnsureAppUserResult> {
+  const email = u.email!.toLowerCase();
+  const provider = (u.app_metadata?.provider as string | undefined) ?? "email";
+
+  const loginStamps = {
+    lastLoginAt: new Date(),
+    lastLoginIpHash: opts?.req ? ipHashFrom(opts.req) : null,
+    lastUserAgentHash: opts?.req ? userAgentHashFrom(opts.req) : null,
+  };
+
+  // Blocklist gate - a blocked identity never gets (or keeps) an app row
+  if (await isIdentityBlocked(email, provider)) {
+    return { ok: false, reason: "blocked" };
+  }
+
+  const existing = await db.user.findUnique({ where: { id: u.id } });
+  if (existing) {
+    // Bans stay banned - but normal deletion is NOT a ban
+    if (existing.status === "SUSPENDED" || existing.bannedAt) {
+      return { ok: false, reason: "suspended" };
+    }
+    if (existing.status === "DELETED") {
+      // Tinder-style re-registration: drop the anonymized shell and
+      // fall through to a completely fresh account (same auth uid,
+      // zero history - onboarding starts from scratch)
+      await recycleDeletedRow(existing.id);
+    } else {
+      // DEACTIVATED = in-app deletion within the grace window:
+      // signing in cancels it, as promised at deletion time
+      const updated = await db.user.update({
+        where: { id: u.id },
+        data: {
+          email,
+          lastActiveAt: new Date(),
+          ...loginStamps,
+          ...(u.email_confirmed_at && !existing.emailVerified
+            ? { emailVerified: new Date(u.email_confirmed_at) }
+            : {}),
+          ...(existing.status === "DEACTIVATED"
+            ? { status: "ACTIVE", deletionRequested: null }
+            : {}),
+        },
+      });
+      return {
+        ok: true,
+        user: updated,
+        created: false,
+        previousLoginIpHash: existing.lastLoginIpHash,
+      };
+    }
+  }
+
+  // New identity. If a DELETED row still holds this email, tombstone it
+  // first - the new account starts empty. An ACTIVE row holding it under
+  // a different auth id is an integrity conflict: never merge.
+  const emailHolder = await db.user.findUnique({ where: { email } });
+  if (emailHolder) {
+    if (emailHolder.status === "DELETED") {
+      await teardownAccount(emailHolder.id, "email freed for new identity");
+    } else if (!(await isAuthUserAlive(emailHolder.id))) {
+      // The holder's auth user is gone (dashboard deletion without the
+      // webhook) - it's an orphan, not a conflict. Tear it down, free
+      // the email, and let the new identity start from zero.
+      await teardownAccount(emailHolder.id, "orphaned by auth-user deletion");
+    } else {
+      console.error(
+        `[identity] conflict: email held by LIVE account ${emailHolder.id}, new auth uid ${u.id}`,
+      );
+      return { ok: false, reason: "conflict" };
+    }
+  }
+
+  const createdUser = await db.user.create({
+    data: {
+      id: u.id,
+      email,
+      emailVerified: u.email_confirmed_at ? new Date(u.email_confirmed_at) : null,
+      name: (u.user_metadata?.full_name as string | undefined) ?? null,
+      image: (u.user_metadata?.avatar_url as string | undefined) ?? null,
+      ...loginStamps,
+    },
+  });
+  console.info(`[identity] new account auth.uid=${u.id} provider=${provider}`);
+  return { ok: true, user: createdUser, created: true, previousLoginIpHash: null };
 }

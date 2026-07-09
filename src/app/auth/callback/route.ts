@@ -1,15 +1,23 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { db } from "@/lib/db";
-import { isAuthUserAlive, isIdentityBlocked, recycleDeletedRow, teardownAccount } from "@/lib/auth/identity";
+import { ensureAppUser } from "@/lib/auth/identity";
+import { isFlowStateError } from "@/lib/auth/flow-error";
 
 /**
- * OAuth / magic-link callback - the ONLY place an app User row is
- * created. Identity is auth.users.id, never email:
+ * OAuth / magic-link callback. App User rows are created ONLY through
+ * ensureAppUser (shared with the email-OTP verify route). Identity is
+ * auth.users.id, never email:
  * - blocked identities are rejected before a session survives
  * - a new auth uid is ALWAYS a new account; no email-based adoption,
  *   no automatic resurrection of deleted accounts
+ *
+ * Idempotent against double-delivery: browsers/mail scanners can hit
+ * the callback twice with the same one-time code. The second exchange
+ * would fail with flow_state_already_used - so if a session already
+ * exists we never exchange again, and an exchange failure with a live
+ * session still lands the user where they were going.
  */
+
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -34,19 +42,32 @@ export async function GET(request: NextRequest) {
     },
   );
 
+  // Idempotency guard: a second hit with an already-consumed code from a
+  // browser that IS signed in should never exchange again (that's what
+  // throws flow_state_already_used). Just continue to the destination.
+  const {
+    data: { user: existingUser },
+  } = await supabase.auth.getUser();
+  if (existingUser) return redirect;
+
   const { data: exchanged, error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error || !exchanged.user?.email) {
+  if (error || !exchanged?.user?.email) {
     console.error(`[auth:callback] exchange failed: ${error?.message ?? "no user"}`);
-    return fail("OAuthCallbackError");
+    // The exchange is never retried. If a session materialized anyway
+    // (race with another tab), continue; a consumed/stale code without
+    // a session gets friendly "link expired" copy, not a scary error.
+    const {
+      data: { user: sessionUser },
+    } = await supabase.auth.getUser();
+    if (sessionUser) return redirect;
+    return fail(isFlowStateError(error) ? "LinkExpired" : "OAuthCallbackError");
   }
 
-  const u = exchanged.user;
-  const email = u.email!.toLowerCase();
-  const provider = (u.app_metadata?.provider as string | undefined) ?? "email";
-
-  // Blocklist gate - terminate the session before it exists anywhere
-  if (await isIdentityBlocked(email, provider)) {
+  const result = await ensureAppUser(exchanged.user, { req: request });
+  if (!result.ok) {
     await supabase.auth.signOut().catch(() => {});
+    if (result.reason === "conflict") return fail("AccountConflict");
+    // blocked + suspended: terminate the session before it exists anywhere
     const blocked = NextResponse.redirect(new URL("/login?error=AccountBlocked", url.origin));
     request.cookies
       .getAll()
@@ -55,63 +76,5 @@ export async function GET(request: NextRequest) {
     return blocked;
   }
 
-  const existing = await db.user.findUnique({ where: { id: u.id } });
-  if (existing) {
-    // Bans stay banned - but normal deletion is NOT a ban
-    if (existing.status === "SUSPENDED") {
-      await supabase.auth.signOut().catch(() => {});
-      return fail("AccountBlocked");
-    }
-    if (existing.status === "DELETED") {
-      // Tinder-style re-registration: drop the anonymized shell and
-      // fall through to a completely fresh account (same auth uid,
-      // zero history - onboarding starts from scratch)
-      await recycleDeletedRow(existing.id);
-    } else {
-      // DEACTIVATED = in-app deletion within the grace window:
-      // signing in cancels it, as promised at deletion time
-      await db.user.update({
-        where: { id: u.id },
-        data: {
-          email,
-          lastActiveAt: new Date(),
-          ...(existing.status === "DEACTIVATED"
-            ? { status: "ACTIVE", deletionRequested: null }
-            : {}),
-        },
-      });
-      return redirect;
-    }
-  }
-
-  // New identity. If a DELETED row still holds this email, tombstone it
-  // first - the new account starts empty. An ACTIVE row holding it under
-  // a different auth id is an integrity conflict: never merge.
-  const emailHolder = await db.user.findUnique({ where: { email } });
-  if (emailHolder) {
-    if (emailHolder.status === "DELETED") {
-      await teardownAccount(emailHolder.id, "email freed for new identity");
-    } else if (!(await isAuthUserAlive(emailHolder.id))) {
-      // The holder's auth user is gone (dashboard deletion without the
-      // webhook) - it's an orphan, not a conflict. Tear it down, free
-      // the email, and let the new identity start from zero.
-      await teardownAccount(emailHolder.id, "orphaned by auth-user deletion");
-    } else {
-      console.error(`[identity] conflict: email held by LIVE account ${emailHolder.id}, new auth uid ${u.id}`);
-      await supabase.auth.signOut().catch(() => {});
-      return fail("AccountConflict");
-    }
-  }
-
-  await db.user.create({
-    data: {
-      id: u.id,
-      email,
-      emailVerified: u.email_confirmed_at ? new Date(u.email_confirmed_at) : null,
-      name: (u.user_metadata?.full_name as string | undefined) ?? null,
-      image: (u.user_metadata?.avatar_url as string | undefined) ?? null,
-    },
-  });
-  console.info(`[identity] new account auth.uid=${u.id} provider=${provider}`);
   return redirect;
 }

@@ -77,6 +77,7 @@ export const ModelName = {
   UserExplorePreference: 'UserExplorePreference',
   AnalyticsEvent: 'AnalyticsEvent',
   BlockedIdentity: 'BlockedIdentity',
+  AuthVerificationEvent: 'AuthVerificationEvent',
   ProfilePrompt: 'ProfilePrompt',
   UserSettings: 'UserSettings'
 } as const
@@ -107,6 +108,17 @@ export const UserScalarFieldEnum = {
   image: 'image',
   role: 'role',
   status: 'status',
+  phoneE164: 'phoneE164',
+  phoneCountryIso: 'phoneCountryIso',
+  phoneDialCode: 'phoneDialCode',
+  phoneVerifiedAt: 'phoneVerifiedAt',
+  authCompleted: 'authCompleted',
+  riskScore: 'riskScore',
+  bannedAt: 'bannedAt',
+  banReason: 'banReason',
+  lastLoginAt: 'lastLoginAt',
+  lastLoginIpHash: 'lastLoginIpHash',
+  lastUserAgentHash: 'lastUserAgentHash',
   lastActiveAt: 'lastActiveAt',
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
@@ -509,6 +521,21 @@ export const BlockedIdentityScalarFieldEnum = {
 export type BlockedIdentityScalarFieldEnum = (typeof BlockedIdentityScalarFieldEnum)[keyof typeof BlockedIdentityScalarFieldEnum]
 
 
+export const AuthVerificationEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  phoneE164: 'phoneE164',
+  type: 'type',
+  ipHash: 'ipHash',
+  userAgentHash: 'userAgentHash',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type AuthVerificationEventScalarFieldEnum = (typeof AuthVerificationEventScalarFieldEnum)[keyof typeof AuthVerificationEventScalarFieldEnum]
+
+
 export const ProfilePromptScalarFieldEnum = {
   id: 'id',
   profileId: 'profileId',
@@ -557,6 +584,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

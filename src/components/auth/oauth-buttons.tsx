@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { authRedirectUrl } from "@/lib/auth/url";
 
 function GoogleIcon() {
   return (
@@ -47,7 +48,7 @@ export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: stri
     const { error } = await supabaseBrowser().auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+        redirectTo: `${authRedirectUrl("/auth/callback")}?next=${encodeURIComponent(callbackUrl)}`,
         queryParams: provider === "google" ? { prompt: "select_account" } : undefined,
       },
     });

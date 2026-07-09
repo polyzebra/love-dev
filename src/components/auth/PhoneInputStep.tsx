@@ -1,0 +1,225 @@
+"use client";
+
+import { useRef, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
+import { ArrowRight, ChevronDown, Loader2, MessageCircleMore } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { InlineFieldError } from "@/components/ui/field-error";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
+import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
+import { sendPhoneCode } from "@/components/auth/api";
+import {
+  DEFAULT_COUNTRY_ISO,
+  countryByIso,
+  type Country,
+} from "@/lib/auth/countries";
+
+/**
+ * Step 3 of 3 - "What's your number?". Country selector (bottom sheet /
+ * dialog) + tel input formatted as-you-type in the national format;
+ * what we store and send is always E.164. The last-used country is
+ * remembered in localStorage. If the SMS provider isn't wired up yet
+ * (503), we say so plainly and let people continue - no fake codes.
+ */
+
+export const AUTH_PHONE_KEY = "tirvea:auth-phone";
+export const PHONE_COUNTRY_KEY = "tirvea:phone-country";
+
+const defaultCountry = countryByIso(DEFAULT_COUNTRY_ISO)!;
+
+/** localStorage never notifies - subscribe to nothing. */
+const subscribeNever = () => () => {};
+
+function readRememberedIso(): string | null {
+  try {
+    return localStorage.getItem(PHONE_COUNTRY_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function PhoneInputStep() {
+  const router = useRouter();
+  // The remembered country arrives hydration-safely (null on the
+  // server, the stored ISO on the client); an explicit pick this
+  // session wins over it, IE is the default before either exists.
+  const rememberedIso = useSyncExternalStore(subscribeNever, readRememberedIso, () => null);
+  const [pickedCountry, setPickedCountry] = useState<Country | null>(null);
+  const country = pickedCountry ?? countryByIso(rememberedIso) ?? defaultCountry;
+
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [display, setDisplay] = useState("");
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const [notConfigured, setNotConfigured] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function chooseCountry(next: Country) {
+    setPickedCountry(next);
+    try {
+      localStorage.setItem(PHONE_COUNTRY_KEY, next.iso);
+    } catch {}
+    // Reformat whatever is typed under the new country's rules.
+    setDisplay((prev) => formatNational(digitsOf(prev), next));
+    inputRef.current?.focus();
+  }
+
+  function digitsOf(value: string): string {
+    return value.replace(/\D/g, "");
+  }
+
+  function formatNational(digits: string, c: Country): string {
+    return digits ? new AsYouType(c.iso).input(digits) : "";
+  }
+
+  function onPhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value;
+    let digits = digitsOf(raw);
+    // Deleting a formatting character (space, bracket) removes no
+    // digit, so reformatting would snap the char right back and trap
+    // the caret. Treat that delete as "drop the last digit" instead.
+    if (raw.length < display.length && digits === digitsOf(display)) {
+      digits = digits.slice(0, -1);
+    }
+    setDisplay(formatNational(digits, country));
+    if (fieldError) setFieldError(null);
+  }
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (pending) return;
+    const parsed = parsePhoneNumberFromString(digitsOf(display), country.iso);
+    if (!parsed?.isValid()) {
+      setFieldError("Enter a valid phone number.");
+      return;
+    }
+    setFieldError(null);
+    setServerError(null);
+    setPending(true);
+    const result = await sendPhoneCode({
+      phoneE164: parsed.number,
+      countryIso: country.iso,
+      dialCode: country.dialCode,
+    });
+    setPending(false);
+    if (!result.ok) {
+      if (result.notConfigured) setNotConfigured(true);
+      else setServerError(result.message);
+      return;
+    }
+    try {
+      sessionStorage.setItem(AUTH_PHONE_KEY, parsed.number);
+    } catch {}
+    router.push(`/auth/phone-code?phone=${encodeURIComponent(parsed.number)}`);
+  }
+
+  return (
+    <AuthShell
+      step={3}
+      title="What's your number?"
+      subtitle="We'll text you a code to verify it's really you."
+      stepKey={notConfigured ? "not-configured" : "phone"}
+    >
+      {notConfigured ? (
+        // Honest fallback: the provider is off, so say so and move on.
+        <div className="flex flex-1 flex-col">
+          <div className="rounded-2xl border border-border bg-foreground/5 px-5 py-6 text-center">
+            <MessageCircleMore
+              className="mx-auto mb-3 size-6 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <p className="text-sm text-foreground">
+              Phone verification is coming online soon - you can continue for
+              now.
+            </p>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              We&apos;ll ask you to verify your number later.
+            </p>
+          </div>
+          <div className="mt-auto pt-8">
+            <Button
+              type="button"
+              size="lg"
+              className="h-12 w-full rounded-full"
+              onClick={() => router.push("/onboarding")}
+            >
+              Continue
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={onSubmit} className="flex flex-1 flex-col" noValidate>
+          <div className="space-y-2">
+            <Label htmlFor="auth-phone">Phone number</Label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSheetOpen(true)}
+                aria-label={`Country: ${country.name} (${country.dialCode}). Change country`}
+                aria-haspopup="dialog"
+                className="inline-flex h-12 shrink-0 items-center gap-1.5 rounded-2xl border border-input bg-foreground/5 px-3.5 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-colors outline-none hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:opacity-50 md:text-sm"
+                disabled={pending}
+              >
+                <span className="text-lg leading-none" aria-hidden="true">
+                  {country.flag}
+                </span>
+                <span className="tabular-nums">{country.dialCode}</span>
+                <ChevronDown
+                  className="size-3.5 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </button>
+              <Input
+                ref={inputRef}
+                id="auth-phone"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel-national"
+                autoFocus
+                placeholder="87 123 4567"
+                value={display}
+                onChange={onPhoneChange}
+                disabled={pending}
+                aria-invalid={fieldError ? true : undefined}
+                aria-describedby={fieldError ? "auth-phone-error" : undefined}
+                className="h-12"
+              />
+            </div>
+            <InlineFieldError id="auth-phone-error" message={fieldError} />
+          </div>
+
+          <AuthErrorBanner message={serverError} className="mt-4" />
+
+          <div className="mt-auto space-y-4 pt-8">
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 w-full rounded-full"
+              disabled={pending}
+            >
+              {pending && <Loader2 className="size-4 animate-spin" />}
+              Send code
+            </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              Standard SMS rates may apply.
+            </p>
+          </div>
+        </form>
+      )}
+
+      <CountryCodeSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        selectedIso={country.iso}
+        onSelect={chooseCountry}
+      />
+    </AuthShell>
+  );
+}

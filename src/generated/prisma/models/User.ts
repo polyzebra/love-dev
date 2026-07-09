@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  riskScore: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  riskScore: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -34,6 +44,17 @@ export type UserMinAggregateOutputType = {
   image: string | null
   role: $Enums.Role | null
   status: $Enums.AccountStatus | null
+  phoneE164: string | null
+  phoneCountryIso: string | null
+  phoneDialCode: string | null
+  phoneVerifiedAt: Date | null
+  authCompleted: boolean | null
+  riskScore: number | null
+  bannedAt: Date | null
+  banReason: string | null
+  lastLoginAt: Date | null
+  lastLoginIpHash: string | null
+  lastUserAgentHash: string | null
   lastActiveAt: Date | null
   onboardingDone: boolean | null
   marketingOptIn: boolean | null
@@ -52,6 +73,17 @@ export type UserMaxAggregateOutputType = {
   image: string | null
   role: $Enums.Role | null
   status: $Enums.AccountStatus | null
+  phoneE164: string | null
+  phoneCountryIso: string | null
+  phoneDialCode: string | null
+  phoneVerifiedAt: Date | null
+  authCompleted: boolean | null
+  riskScore: number | null
+  bannedAt: Date | null
+  banReason: string | null
+  lastLoginAt: Date | null
+  lastLoginIpHash: string | null
+  lastUserAgentHash: string | null
   lastActiveAt: Date | null
   onboardingDone: boolean | null
   marketingOptIn: boolean | null
@@ -70,6 +102,17 @@ export type UserCountAggregateOutputType = {
   image: number
   role: number
   status: number
+  phoneE164: number
+  phoneCountryIso: number
+  phoneDialCode: number
+  phoneVerifiedAt: number
+  authCompleted: number
+  riskScore: number
+  bannedAt: number
+  banReason: number
+  lastLoginAt: number
+  lastLoginIpHash: number
+  lastUserAgentHash: number
   lastActiveAt: number
   onboardingDone: number
   marketingOptIn: number
@@ -79,6 +122,14 @@ export type UserCountAggregateOutputType = {
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  riskScore?: true
+}
+
+export type UserSumAggregateInputType = {
+  riskScore?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -90,6 +141,17 @@ export type UserMinAggregateInputType = {
   image?: true
   role?: true
   status?: true
+  phoneE164?: true
+  phoneCountryIso?: true
+  phoneDialCode?: true
+  phoneVerifiedAt?: true
+  authCompleted?: true
+  riskScore?: true
+  bannedAt?: true
+  banReason?: true
+  lastLoginAt?: true
+  lastLoginIpHash?: true
+  lastUserAgentHash?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -108,6 +170,17 @@ export type UserMaxAggregateInputType = {
   image?: true
   role?: true
   status?: true
+  phoneE164?: true
+  phoneCountryIso?: true
+  phoneDialCode?: true
+  phoneVerifiedAt?: true
+  authCompleted?: true
+  riskScore?: true
+  bannedAt?: true
+  banReason?: true
+  lastLoginAt?: true
+  lastLoginIpHash?: true
+  lastUserAgentHash?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -126,6 +199,17 @@ export type UserCountAggregateInputType = {
   image?: true
   role?: true
   status?: true
+  phoneE164?: true
+  phoneCountryIso?: true
+  phoneDialCode?: true
+  phoneVerifiedAt?: true
+  authCompleted?: true
+  riskScore?: true
+  bannedAt?: true
+  banReason?: true
+  lastLoginAt?: true
+  lastLoginIpHash?: true
+  lastUserAgentHash?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -173,6 +257,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -203,6 +299,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -217,6 +315,17 @@ export type UserGroupByOutputType = {
   image: string | null
   role: $Enums.Role
   status: $Enums.AccountStatus
+  phoneE164: string | null
+  phoneCountryIso: string | null
+  phoneDialCode: string | null
+  phoneVerifiedAt: Date | null
+  authCompleted: boolean
+  riskScore: number
+  bannedAt: Date | null
+  banReason: string | null
+  lastLoginAt: Date | null
+  lastLoginIpHash: string | null
+  lastUserAgentHash: string | null
   lastActiveAt: Date
   onboardingDone: boolean
   marketingOptIn: boolean
@@ -224,6 +333,8 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -256,6 +367,17 @@ export type UserWhereInput = {
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   status?: Prisma.EnumAccountStatusFilter<"User"> | $Enums.AccountStatus
+  phoneE164?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneCountryIso?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneDialCode?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  authCompleted?: Prisma.BoolFilter<"User"> | boolean
+  riskScore?: Prisma.IntFilter<"User"> | number
+  bannedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  banReason?: Prisma.StringNullableFilter<"User"> | string | null
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastLoginIpHash?: Prisma.StringNullableFilter<"User"> | string | null
+  lastUserAgentHash?: Prisma.StringNullableFilter<"User"> | string | null
   lastActiveAt?: Prisma.DateTimeFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolFilter<"User"> | boolean
@@ -284,6 +406,7 @@ export type UserWhereInput = {
   notifications?: Prisma.NotificationListRelationFilter
   explorePreferences?: Prisma.UserExplorePreferenceListRelationFilter
   adminLogs?: Prisma.AdminLogListRelationFilter
+  authEvents?: Prisma.AuthVerificationEventListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -296,6 +419,17 @@ export type UserOrderByWithRelationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  phoneE164?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneCountryIso?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneDialCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  authCompleted?: Prisma.SortOrder
+  riskScore?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  banReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastLoginIpHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastUserAgentHash?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -324,12 +458,14 @@ export type UserOrderByWithRelationInput = {
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   explorePreferences?: Prisma.UserExplorePreferenceOrderByRelationAggregateInput
   adminLogs?: Prisma.AdminLogOrderByRelationAggregateInput
+  authEvents?: Prisma.AuthVerificationEventOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
   phone?: string
+  phoneE164?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -339,6 +475,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   status?: Prisma.EnumAccountStatusFilter<"User"> | $Enums.AccountStatus
+  phoneCountryIso?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneDialCode?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  authCompleted?: Prisma.BoolFilter<"User"> | boolean
+  riskScore?: Prisma.IntFilter<"User"> | number
+  bannedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  banReason?: Prisma.StringNullableFilter<"User"> | string | null
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastLoginIpHash?: Prisma.StringNullableFilter<"User"> | string | null
+  lastUserAgentHash?: Prisma.StringNullableFilter<"User"> | string | null
   lastActiveAt?: Prisma.DateTimeFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolFilter<"User"> | boolean
@@ -367,7 +513,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   notifications?: Prisma.NotificationListRelationFilter
   explorePreferences?: Prisma.UserExplorePreferenceListRelationFilter
   adminLogs?: Prisma.AdminLogListRelationFilter
-}, "id" | "email" | "phone">
+  authEvents?: Prisma.AuthVerificationEventListRelationFilter
+}, "id" | "email" | "phone" | "phoneE164">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -379,6 +526,17 @@ export type UserOrderByWithAggregationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  phoneE164?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneCountryIso?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneDialCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  authCompleted?: Prisma.SortOrder
+  riskScore?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  banReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastLoginIpHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastUserAgentHash?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -386,8 +544,10 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -403,6 +563,17 @@ export type UserScalarWhereWithAggregatesInput = {
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   status?: Prisma.EnumAccountStatusWithAggregatesFilter<"User"> | $Enums.AccountStatus
+  phoneE164?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneCountryIso?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneDialCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  authCompleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  riskScore?: Prisma.IntWithAggregatesFilter<"User"> | number
+  bannedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  lastLoginIpHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  lastUserAgentHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   lastActiveAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
@@ -421,6 +592,17 @@ export type UserCreateInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -449,6 +631,7 @@ export type UserCreateInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -461,6 +644,17 @@ export type UserUncheckedCreateInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -489,6 +683,7 @@ export type UserUncheckedCreateInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -501,6 +696,17 @@ export type UserUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -529,6 +735,7 @@ export type UserUpdateInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -541,6 +748,17 @@ export type UserUncheckedUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -569,6 +787,7 @@ export type UserUncheckedUpdateInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -581,6 +800,17 @@ export type UserCreateManyInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -599,6 +829,17 @@ export type UserUpdateManyMutationInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -617,6 +858,17 @@ export type UserUncheckedUpdateManyInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -635,12 +887,27 @@ export type UserCountOrderByAggregateInput = {
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  phoneE164?: Prisma.SortOrder
+  phoneCountryIso?: Prisma.SortOrder
+  phoneDialCode?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
+  authCompleted?: Prisma.SortOrder
+  riskScore?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
+  banReason?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
+  lastLoginIpHash?: Prisma.SortOrder
+  lastUserAgentHash?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
   deletionRequested?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  riskScore?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -653,6 +920,17 @@ export type UserMaxOrderByAggregateInput = {
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  phoneE164?: Prisma.SortOrder
+  phoneCountryIso?: Prisma.SortOrder
+  phoneDialCode?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
+  authCompleted?: Prisma.SortOrder
+  riskScore?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
+  banReason?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
+  lastLoginIpHash?: Prisma.SortOrder
+  lastUserAgentHash?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -671,6 +949,17 @@ export type UserMinOrderByAggregateInput = {
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  phoneE164?: Prisma.SortOrder
+  phoneCountryIso?: Prisma.SortOrder
+  phoneDialCode?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
+  authCompleted?: Prisma.SortOrder
+  riskScore?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
+  banReason?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
+  lastLoginIpHash?: Prisma.SortOrder
+  lastUserAgentHash?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -679,9 +968,18 @@ export type UserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type UserSumOrderByAggregateInput = {
+  riskScore?: Prisma.SortOrder
+}
+
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -704,12 +1002,20 @@ export type EnumAccountStatusFieldUpdateOperationsInput = {
   set?: $Enums.AccountStatus
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type UserCreateNestedOneWithoutDevicesInput = {
@@ -1006,6 +1312,22 @@ export type UserUpdateOneRequiredWithoutExplorePreferencesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutExplorePreferencesInput, Prisma.UserUpdateWithoutExplorePreferencesInput>, Prisma.UserUncheckedUpdateWithoutExplorePreferencesInput>
 }
 
+export type UserCreateNestedOneWithoutAuthEventsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthEventsInput, Prisma.UserUncheckedCreateWithoutAuthEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAuthEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthEventsInput, Prisma.UserUncheckedCreateWithoutAuthEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthEventsInput
+  upsert?: Prisma.UserUpsertWithoutAuthEventsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuthEventsInput, Prisma.UserUpdateWithoutAuthEventsInput>, Prisma.UserUncheckedUpdateWithoutAuthEventsInput>
+}
+
 export type UserCreateNestedOneWithoutSettingsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSettingsInput, Prisma.UserUncheckedCreateWithoutSettingsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSettingsInput
@@ -1030,6 +1352,17 @@ export type UserCreateWithoutDevicesInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1057,6 +1390,7 @@ export type UserCreateWithoutDevicesInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDevicesInput = {
@@ -1069,6 +1403,17 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1096,6 +1441,7 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDevicesInput = {
@@ -1124,6 +1470,17 @@ export type UserUpdateWithoutDevicesInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1151,6 +1508,7 @@ export type UserUpdateWithoutDevicesInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDevicesInput = {
@@ -1163,6 +1521,17 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1190,6 +1559,7 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -1202,6 +1572,17 @@ export type UserCreateWithoutProfileInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1229,6 +1610,7 @@ export type UserCreateWithoutProfileInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -1241,6 +1623,17 @@ export type UserUncheckedCreateWithoutProfileInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1268,6 +1661,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -1296,6 +1690,17 @@ export type UserUpdateWithoutProfileInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1323,6 +1728,7 @@ export type UserUpdateWithoutProfileInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -1335,6 +1741,17 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1362,6 +1779,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPhotosInput = {
@@ -1374,6 +1792,17 @@ export type UserCreateWithoutPhotosInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1401,6 +1830,7 @@ export type UserCreateWithoutPhotosInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPhotosInput = {
@@ -1413,6 +1843,17 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1440,6 +1881,7 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPhotosInput = {
@@ -1468,6 +1910,17 @@ export type UserUpdateWithoutPhotosInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1495,6 +1948,7 @@ export type UserUpdateWithoutPhotosInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPhotosInput = {
@@ -1507,6 +1961,17 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1534,6 +1999,7 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVerificationsInput = {
@@ -1546,6 +2012,17 @@ export type UserCreateWithoutVerificationsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1573,6 +2050,7 @@ export type UserCreateWithoutVerificationsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVerificationsInput = {
@@ -1585,6 +2063,17 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1612,6 +2101,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVerificationsInput = {
@@ -1640,6 +2130,17 @@ export type UserUpdateWithoutVerificationsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1667,6 +2168,7 @@ export type UserUpdateWithoutVerificationsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerificationsInput = {
@@ -1679,6 +2181,17 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1706,6 +2219,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLikesSentInput = {
@@ -1718,6 +2232,17 @@ export type UserCreateWithoutLikesSentInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1745,6 +2270,7 @@ export type UserCreateWithoutLikesSentInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesSentInput = {
@@ -1757,6 +2283,17 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1784,6 +2321,7 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesSentInput = {
@@ -1801,6 +2339,17 @@ export type UserCreateWithoutLikesReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1828,6 +2377,7 @@ export type UserCreateWithoutLikesReceivedInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesReceivedInput = {
@@ -1840,6 +2390,17 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1867,6 +2428,7 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesReceivedInput = {
@@ -1895,6 +2457,17 @@ export type UserUpdateWithoutLikesSentInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1922,6 +2495,7 @@ export type UserUpdateWithoutLikesSentInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesSentInput = {
@@ -1934,6 +2508,17 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1961,6 +2546,7 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutLikesReceivedInput = {
@@ -1984,6 +2570,17 @@ export type UserUpdateWithoutLikesReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2011,6 +2608,7 @@ export type UserUpdateWithoutLikesReceivedInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesReceivedInput = {
@@ -2023,6 +2621,17 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2050,6 +2659,7 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMatchesAsAInput = {
@@ -2062,6 +2672,17 @@ export type UserCreateWithoutMatchesAsAInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2089,6 +2710,7 @@ export type UserCreateWithoutMatchesAsAInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMatchesAsAInput = {
@@ -2101,6 +2723,17 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2128,6 +2761,7 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMatchesAsAInput = {
@@ -2145,6 +2779,17 @@ export type UserCreateWithoutMatchesAsBInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2172,6 +2817,7 @@ export type UserCreateWithoutMatchesAsBInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMatchesAsBInput = {
@@ -2184,6 +2830,17 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2211,6 +2868,7 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMatchesAsBInput = {
@@ -2239,6 +2897,17 @@ export type UserUpdateWithoutMatchesAsAInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2266,6 +2935,7 @@ export type UserUpdateWithoutMatchesAsAInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMatchesAsAInput = {
@@ -2278,6 +2948,17 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2305,6 +2986,7 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutMatchesAsBInput = {
@@ -2328,6 +3010,17 @@ export type UserUpdateWithoutMatchesAsBInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2355,6 +3048,7 @@ export type UserUpdateWithoutMatchesAsBInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMatchesAsBInput = {
@@ -2367,6 +3061,17 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2394,6 +3099,7 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFirstMessagesSentInput = {
@@ -2406,6 +3112,17 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2433,6 +3150,7 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
@@ -2445,6 +3163,17 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2472,6 +3201,7 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFirstMessagesSentInput = {
@@ -2489,6 +3219,17 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2516,6 +3257,7 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
@@ -2528,6 +3270,17 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2555,6 +3308,7 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFirstMessagesReceivedInput = {
@@ -2583,6 +3337,17 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2610,6 +3375,7 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
@@ -2622,6 +3388,17 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2649,6 +3426,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutFirstMessagesReceivedInput = {
@@ -2672,6 +3450,17 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2699,6 +3488,7 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
@@ -2711,6 +3501,17 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2738,6 +3539,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutParticipantsInput = {
@@ -2750,6 +3552,17 @@ export type UserCreateWithoutParticipantsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2777,6 +3590,7 @@ export type UserCreateWithoutParticipantsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutParticipantsInput = {
@@ -2789,6 +3603,17 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2816,6 +3641,7 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutParticipantsInput = {
@@ -2844,6 +3670,17 @@ export type UserUpdateWithoutParticipantsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2871,6 +3708,7 @@ export type UserUpdateWithoutParticipantsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutParticipantsInput = {
@@ -2883,6 +3721,17 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2910,6 +3759,7 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -2922,6 +3772,17 @@ export type UserCreateWithoutMessagesInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2949,6 +3810,7 @@ export type UserCreateWithoutMessagesInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
@@ -2961,6 +3823,17 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2988,6 +3861,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -3016,6 +3890,17 @@ export type UserUpdateWithoutMessagesInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3043,6 +3928,7 @@ export type UserUpdateWithoutMessagesInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -3055,6 +3941,17 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3082,6 +3979,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportsMadeInput = {
@@ -3094,6 +3992,17 @@ export type UserCreateWithoutReportsMadeInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3121,6 +4030,7 @@ export type UserCreateWithoutReportsMadeInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsMadeInput = {
@@ -3133,6 +4043,17 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3160,6 +4081,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsMadeInput = {
@@ -3177,6 +4099,17 @@ export type UserCreateWithoutReportsReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3204,6 +4137,7 @@ export type UserCreateWithoutReportsReceivedInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsReceivedInput = {
@@ -3216,6 +4150,17 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3243,6 +4188,7 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsReceivedInput = {
@@ -3271,6 +4217,17 @@ export type UserUpdateWithoutReportsMadeInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3298,6 +4255,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsMadeInput = {
@@ -3310,6 +4268,17 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3337,6 +4306,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportsReceivedInput = {
@@ -3360,6 +4330,17 @@ export type UserUpdateWithoutReportsReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3387,6 +4368,7 @@ export type UserUpdateWithoutReportsReceivedInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsReceivedInput = {
@@ -3399,6 +4381,17 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3426,6 +4419,7 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBlocksMadeInput = {
@@ -3438,6 +4432,17 @@ export type UserCreateWithoutBlocksMadeInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3465,6 +4470,7 @@ export type UserCreateWithoutBlocksMadeInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBlocksMadeInput = {
@@ -3477,6 +4483,17 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3504,6 +4521,7 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBlocksMadeInput = {
@@ -3521,6 +4539,17 @@ export type UserCreateWithoutBlocksReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3548,6 +4577,7 @@ export type UserCreateWithoutBlocksReceivedInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBlocksReceivedInput = {
@@ -3560,6 +4590,17 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3587,6 +4628,7 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBlocksReceivedInput = {
@@ -3615,6 +4657,17 @@ export type UserUpdateWithoutBlocksMadeInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3642,6 +4695,7 @@ export type UserUpdateWithoutBlocksMadeInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlocksMadeInput = {
@@ -3654,6 +4708,17 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3681,6 +4746,7 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutBlocksReceivedInput = {
@@ -3704,6 +4770,17 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3731,6 +4808,7 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
@@ -3743,6 +4821,17 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3770,6 +4859,7 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubscriptionInput = {
@@ -3782,6 +4872,17 @@ export type UserCreateWithoutSubscriptionInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3809,6 +4910,7 @@ export type UserCreateWithoutSubscriptionInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubscriptionInput = {
@@ -3821,6 +4923,17 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3848,6 +4961,7 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubscriptionInput = {
@@ -3876,6 +4990,17 @@ export type UserUpdateWithoutSubscriptionInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3903,6 +5028,7 @@ export type UserUpdateWithoutSubscriptionInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscriptionInput = {
@@ -3915,6 +5041,17 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3942,6 +5079,7 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentsInput = {
@@ -3954,6 +5092,17 @@ export type UserCreateWithoutPaymentsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3981,6 +5130,7 @@ export type UserCreateWithoutPaymentsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentsInput = {
@@ -3993,6 +5143,17 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4020,6 +5181,7 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentsInput = {
@@ -4048,6 +5210,17 @@ export type UserUpdateWithoutPaymentsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4075,6 +5248,7 @@ export type UserUpdateWithoutPaymentsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentsInput = {
@@ -4087,6 +5261,17 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4114,6 +5299,7 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -4126,6 +5312,17 @@ export type UserCreateWithoutNotificationsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4153,6 +5350,7 @@ export type UserCreateWithoutNotificationsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -4165,6 +5363,17 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4192,6 +5401,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -4220,6 +5430,17 @@ export type UserUpdateWithoutNotificationsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4247,6 +5468,7 @@ export type UserUpdateWithoutNotificationsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -4259,6 +5481,17 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4286,6 +5519,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdminLogsInput = {
@@ -4298,6 +5532,17 @@ export type UserCreateWithoutAdminLogsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4325,6 +5570,7 @@ export type UserCreateWithoutAdminLogsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminLogsInput = {
@@ -4337,6 +5583,17 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4364,6 +5621,7 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminLogsInput = {
@@ -4392,6 +5650,17 @@ export type UserUpdateWithoutAdminLogsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4419,6 +5688,7 @@ export type UserUpdateWithoutAdminLogsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminLogsInput = {
@@ -4431,6 +5701,17 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4458,6 +5739,7 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExplorePreferencesInput = {
@@ -4470,6 +5752,17 @@ export type UserCreateWithoutExplorePreferencesInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4497,6 +5790,7 @@ export type UserCreateWithoutExplorePreferencesInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExplorePreferencesInput = {
@@ -4509,6 +5803,17 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4536,6 +5841,7 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExplorePreferencesInput = {
@@ -4564,6 +5870,17 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4591,6 +5908,7 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
@@ -4603,6 +5921,17 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4630,6 +5959,227 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAuthEventsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutAuthEventsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutAuthEventsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthEventsInput, Prisma.UserUncheckedCreateWithoutAuthEventsInput>
+}
+
+export type UserUpsertWithoutAuthEventsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuthEventsInput, Prisma.UserUncheckedUpdateWithoutAuthEventsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthEventsInput, Prisma.UserUncheckedCreateWithoutAuthEventsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuthEventsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuthEventsInput, Prisma.UserUncheckedUpdateWithoutAuthEventsInput>
+}
+
+export type UserUpdateWithoutAuthEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuthEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type UserCreateWithoutSettingsInput = {
@@ -4642,6 +6192,17 @@ export type UserCreateWithoutSettingsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4669,6 +6230,7 @@ export type UserCreateWithoutSettingsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -4681,6 +6243,17 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   image?: string | null
   role?: $Enums.Role
   status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4708,6 +6281,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -4736,6 +6310,17 @@ export type UserUpdateWithoutSettingsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4763,6 +6348,7 @@ export type UserUpdateWithoutSettingsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -4775,6 +6361,17 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4802,6 +6399,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -4829,6 +6427,7 @@ export type UserCountOutputType = {
   notifications: number
   explorePreferences: number
   adminLogs: number
+  authEvents: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4851,6 +6450,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   explorePreferences?: boolean | UserCountOutputTypeCountExplorePreferencesArgs
   adminLogs?: boolean | UserCountOutputTypeCountAdminLogsArgs
+  authEvents?: boolean | UserCountOutputTypeCountAuthEventsArgs
 }
 
 /**
@@ -4996,6 +6596,13 @@ export type UserCountOutputTypeCountAdminLogsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AdminLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuthEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuthVerificationEventWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5007,6 +6614,17 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   image?: boolean
   role?: boolean
   status?: boolean
+  phoneE164?: boolean
+  phoneCountryIso?: boolean
+  phoneDialCode?: boolean
+  phoneVerifiedAt?: boolean
+  authCompleted?: boolean
+  riskScore?: boolean
+  bannedAt?: boolean
+  banReason?: boolean
+  lastLoginAt?: boolean
+  lastLoginIpHash?: boolean
+  lastUserAgentHash?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5035,6 +6653,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   explorePreferences?: boolean | Prisma.User$explorePreferencesArgs<ExtArgs>
   adminLogs?: boolean | Prisma.User$adminLogsArgs<ExtArgs>
+  authEvents?: boolean | Prisma.User$authEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5048,6 +6667,17 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   image?: boolean
   role?: boolean
   status?: boolean
+  phoneE164?: boolean
+  phoneCountryIso?: boolean
+  phoneDialCode?: boolean
+  phoneVerifiedAt?: boolean
+  authCompleted?: boolean
+  riskScore?: boolean
+  bannedAt?: boolean
+  banReason?: boolean
+  lastLoginAt?: boolean
+  lastLoginIpHash?: boolean
+  lastUserAgentHash?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5066,6 +6696,17 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   image?: boolean
   role?: boolean
   status?: boolean
+  phoneE164?: boolean
+  phoneCountryIso?: boolean
+  phoneDialCode?: boolean
+  phoneVerifiedAt?: boolean
+  authCompleted?: boolean
+  riskScore?: boolean
+  bannedAt?: boolean
+  banReason?: boolean
+  lastLoginAt?: boolean
+  lastLoginIpHash?: boolean
+  lastUserAgentHash?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5084,6 +6725,17 @@ export type UserSelectScalar = {
   image?: boolean
   role?: boolean
   status?: boolean
+  phoneE164?: boolean
+  phoneCountryIso?: boolean
+  phoneDialCode?: boolean
+  phoneVerifiedAt?: boolean
+  authCompleted?: boolean
+  riskScore?: boolean
+  bannedAt?: boolean
+  banReason?: boolean
+  lastLoginAt?: boolean
+  lastLoginIpHash?: boolean
+  lastUserAgentHash?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5092,7 +6744,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
@@ -5116,6 +6768,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   explorePreferences?: boolean | Prisma.User$explorePreferencesArgs<ExtArgs>
   adminLogs?: boolean | Prisma.User$adminLogsArgs<ExtArgs>
+  authEvents?: boolean | Prisma.User$authEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -5146,6 +6799,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     explorePreferences: Prisma.$UserExplorePreferencePayload<ExtArgs>[]
     adminLogs: Prisma.$AdminLogPayload<ExtArgs>[]
+    authEvents: Prisma.$AuthVerificationEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5157,6 +6811,17 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     image: string | null
     role: $Enums.Role
     status: $Enums.AccountStatus
+    phoneE164: string | null
+    phoneCountryIso: string | null
+    phoneDialCode: string | null
+    phoneVerifiedAt: Date | null
+    authCompleted: boolean
+    riskScore: number
+    bannedAt: Date | null
+    banReason: string | null
+    lastLoginAt: Date | null
+    lastLoginIpHash: string | null
+    lastUserAgentHash: string | null
     lastActiveAt: Date
     onboardingDone: boolean
     marketingOptIn: boolean
@@ -5579,6 +7244,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   explorePreferences<T extends Prisma.User$explorePreferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$explorePreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserExplorePreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminLogs<T extends Prisma.User$adminLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authEvents<T extends Prisma.User$authEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthVerificationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5617,6 +7283,17 @@ export interface UserFieldRefs {
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly status: Prisma.FieldRef<"User", 'AccountStatus'>
+  readonly phoneE164: Prisma.FieldRef<"User", 'String'>
+  readonly phoneCountryIso: Prisma.FieldRef<"User", 'String'>
+  readonly phoneDialCode: Prisma.FieldRef<"User", 'String'>
+  readonly phoneVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly authCompleted: Prisma.FieldRef<"User", 'Boolean'>
+  readonly riskScore: Prisma.FieldRef<"User", 'Int'>
+  readonly bannedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly banReason: Prisma.FieldRef<"User", 'String'>
+  readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly lastLoginIpHash: Prisma.FieldRef<"User", 'String'>
+  readonly lastUserAgentHash: Prisma.FieldRef<"User", 'String'>
   readonly lastActiveAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly onboardingDone: Prisma.FieldRef<"User", 'Boolean'>
   readonly marketingOptIn: Prisma.FieldRef<"User", 'Boolean'>
@@ -6526,6 +8203,30 @@ export type User$adminLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AdminLogScalarFieldEnum | Prisma.AdminLogScalarFieldEnum[]
+}
+
+/**
+ * User.authEvents
+ */
+export type User$authEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuthVerificationEvent
+   */
+  select?: Prisma.AuthVerificationEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuthVerificationEvent
+   */
+  omit?: Prisma.AuthVerificationEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuthVerificationEventInclude<ExtArgs> | null
+  where?: Prisma.AuthVerificationEventWhereInput
+  orderBy?: Prisma.AuthVerificationEventOrderByWithRelationInput | Prisma.AuthVerificationEventOrderByWithRelationInput[]
+  cursor?: Prisma.AuthVerificationEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuthVerificationEventScalarFieldEnum | Prisma.AuthVerificationEventScalarFieldEnum[]
 }
 
 /**

@@ -410,6 +410,7 @@ export const ModelName = {
   UserExplorePreference: 'UserExplorePreference',
   AnalyticsEvent: 'AnalyticsEvent',
   BlockedIdentity: 'BlockedIdentity',
+  AuthVerificationEvent: 'AuthVerificationEvent',
   ProfilePrompt: 'ProfilePrompt',
   UserSettings: 'UserSettings'
 } as const
@@ -427,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2355,6 +2356,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AuthVerificationEvent: {
+      payload: Prisma.$AuthVerificationEventPayload<ExtArgs>
+      fields: Prisma.AuthVerificationEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AuthVerificationEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AuthVerificationEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>
+        }
+        findFirst: {
+          args: Prisma.AuthVerificationEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AuthVerificationEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>
+        }
+        findMany: {
+          args: Prisma.AuthVerificationEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>[]
+        }
+        create: {
+          args: Prisma.AuthVerificationEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>
+        }
+        createMany: {
+          args: Prisma.AuthVerificationEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AuthVerificationEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>[]
+        }
+        delete: {
+          args: Prisma.AuthVerificationEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>
+        }
+        update: {
+          args: Prisma.AuthVerificationEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.AuthVerificationEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AuthVerificationEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AuthVerificationEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.AuthVerificationEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthVerificationEventPayload>
+        }
+        aggregate: {
+          args: Prisma.AuthVerificationEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuthVerificationEvent>
+        }
+        groupBy: {
+          args: Prisma.AuthVerificationEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuthVerificationEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AuthVerificationEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuthVerificationEventCountAggregateOutputType> | number
+        }
+      }
+    }
     ProfilePrompt: {
       payload: Prisma.$ProfilePromptPayload<ExtArgs>
       fields: Prisma.ProfilePromptFieldRefs
@@ -2552,6 +2627,17 @@ export const UserScalarFieldEnum = {
   image: 'image',
   role: 'role',
   status: 'status',
+  phoneE164: 'phoneE164',
+  phoneCountryIso: 'phoneCountryIso',
+  phoneDialCode: 'phoneDialCode',
+  phoneVerifiedAt: 'phoneVerifiedAt',
+  authCompleted: 'authCompleted',
+  riskScore: 'riskScore',
+  bannedAt: 'bannedAt',
+  banReason: 'banReason',
+  lastLoginAt: 'lastLoginAt',
+  lastLoginIpHash: 'lastLoginIpHash',
+  lastUserAgentHash: 'lastUserAgentHash',
   lastActiveAt: 'lastActiveAt',
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
@@ -2954,6 +3040,21 @@ export const BlockedIdentityScalarFieldEnum = {
 export type BlockedIdentityScalarFieldEnum = (typeof BlockedIdentityScalarFieldEnum)[keyof typeof BlockedIdentityScalarFieldEnum]
 
 
+export const AuthVerificationEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  phoneE164: 'phoneE164',
+  type: 'type',
+  ipHash: 'ipHash',
+  userAgentHash: 'userAgentHash',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type AuthVerificationEventScalarFieldEnum = (typeof AuthVerificationEventScalarFieldEnum)[keyof typeof AuthVerificationEventScalarFieldEnum]
+
+
 export const ProfilePromptScalarFieldEnum = {
   id: 'id',
   profileId: 'profileId',
@@ -3002,6 +3103,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -3099,20 +3207,6 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'Gender'
- */
-export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
-    
-
-
-/**
- * Reference to a field of type 'Gender[]'
- */
-export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -3123,6 +3217,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Gender'
+ */
+export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
+    
+
+
+/**
+ * Reference to a field of type 'Gender[]'
+ */
+export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>
     
 
 
@@ -3653,6 +3761,7 @@ export type GlobalOmitConfig = {
   userExplorePreference?: Prisma.UserExplorePreferenceOmit
   analyticsEvent?: Prisma.AnalyticsEventOmit
   blockedIdentity?: Prisma.BlockedIdentityOmit
+  authVerificationEvent?: Prisma.AuthVerificationEventOmit
   profilePrompt?: Prisma.ProfilePromptOmit
   userSettings?: Prisma.UserSettingsOmit
 }

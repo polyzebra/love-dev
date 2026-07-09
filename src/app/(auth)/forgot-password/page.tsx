@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { authRedirectUrl } from "@/lib/auth/url";
 
 export default function ForgotPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +19,7 @@ export default function ForgotPasswordPage() {
     const form = new FormData(e.currentTarget);
     setSubmitting(true);
     await supabaseBrowser().auth.resetPasswordForEmail(String(form.get("email")), {
-      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      redirectTo: `${authRedirectUrl("/auth/callback")}?next=/reset-password`,
     });
     setSubmitting(false);
     setSent(true);

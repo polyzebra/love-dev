@@ -21,6 +21,12 @@ export type AppSession = {
     image: string | null;
     role: Role;
     onboardingDone: boolean;
+    // Gate inputs (see src/lib/auth/gate.ts)
+    status: string;
+    bannedAt: Date | null;
+    emailVerified: Date | null;
+    phoneVerifiedAt: Date | null;
+    authCompleted: boolean;
   };
 };
 
@@ -58,6 +64,11 @@ export const auth = cache(async (): Promise<AppSession | null> => {
       image: appUser.image,
       role: appUser.role,
       onboardingDone: appUser.onboardingDone,
+      status: appUser.status,
+      bannedAt: appUser.bannedAt,
+      emailVerified: appUser.emailVerified,
+      phoneVerifiedAt: appUser.phoneVerifiedAt,
+      authCompleted: appUser.authCompleted,
     },
   };
 });

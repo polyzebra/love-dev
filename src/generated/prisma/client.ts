@@ -172,6 +172,11 @@ export type AnalyticsEvent = Prisma.AnalyticsEventModel
  */
 export type BlockedIdentity = Prisma.BlockedIdentityModel
 /**
+ * Model AuthVerificationEvent
+ * 
+ */
+export type AuthVerificationEvent = Prisma.AuthVerificationEventModel
+/**
  * Model ProfilePrompt
  * 
  */

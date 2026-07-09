@@ -32,6 +32,7 @@ function LoginForm() {
       OAuthAccountNotLinked:
         "That email is already registered with a different sign-in method. Use your original method.",
       Verification: "That sign-in link is invalid or has expired.",
+      LinkExpired: "That sign-in link has expired or was already used. Request a fresh one.",
       SessionRequired: "Please sign in to continue.",
       AccountBlocked:
         "This account can no longer be used. Contact support if you believe this is a mistake.",

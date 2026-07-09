@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Create your profile" };
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPage() {
-  const user = await requireUser();
+  const user = await requireUser({ allow: "/onboarding" });
 
   const record = await db.user.findUnique({
     where: { id: user.id },

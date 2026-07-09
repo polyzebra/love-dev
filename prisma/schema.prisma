@@ -224,7 +224,10 @@ enum PhotoStatus {
 model User {
   id            String        @id @default(cuid())
   email         String        @unique
+  // emailVerified timestamp doubles as the spec's "email verified" boolean
   emailVerified DateTime?
+  // Legacy phone column - kept for compatibility; new code writes E.164 into
+  // BOTH phone and phoneE164 (phoneE164 is the canonical column)
   phone         String?       @unique
   phoneVerified DateTime?
   name          String?
@@ -232,7 +235,23 @@ model User {
   role          Role          @default(USER)
   status        AccountStatus @default(ACTIVE)
 
+  // Phone verification (canonical) - E.164 format, one phone = one account
+  phoneE164       String?   @unique
+  phoneCountryIso String?
+  phoneDialCode   String?
+  phoneVerifiedAt DateTime?
+
+  // Auth hardening / risk
+  authCompleted     Boolean   @default(false)
+  riskScore         Int       @default(0)
+  bannedAt          DateTime?
+  banReason         String?
+  lastLoginAt       DateTime?
+  lastLoginIpHash   String?
+  lastUserAgentHash String?
+
   lastActiveAt      DateTime  @default(now())
+  // onboardingDone doubles as the spec's "onboarding completed" boolean
   onboardingDone    Boolean   @default(false)
   marketingOptIn    Boolean   @default(false)
   deletionRequested DateTime?
@@ -269,6 +288,7 @@ model User {
   notifications      Notification[]
   explorePreferences UserExplorePreference[]
   adminLogs          AdminLog[]              @relation("AdminActor")
+  authEvents         AuthVerificationEvent[]
 
   @@index([status, lastActiveAt])
   @@index([role])
@@ -779,6 +799,28 @@ model BlockedIdentity {
   createdBy String?
 
   @@index([email])
+}
+
+// Append-only auth audit trail: OTP sends/verifies, failures, risk events.
+// Also the data source for the DB-backed sliding-window rate limiter, so
+// events are recorded even when the request is rejected.
+model AuthVerificationEvent {
+  id            String   @id @default(cuid())
+  userId        String?
+  email         String?
+  phoneE164     String?
+  type          String // email_otp_send | email_otp_verify | otp_verify_fail | phone_otp_send | ...
+  ipHash        String?
+  userAgentHash String?
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, createdAt])
+  @@index([phoneE164, createdAt])
+  @@index([userId, createdAt])
+  @@index([ipHash, createdAt])
 }
 
 // Human voice on profiles - answers to curated prompts. These power
