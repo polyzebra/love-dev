@@ -1,5 +1,6 @@
 "use client";
 
+import { EMAIL_OTP_LENGTH } from "@/lib/auth/otp";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -105,6 +106,7 @@ export function EmailCodeStep() {
     >
       <div className="flex flex-1 flex-col">
         <OtpInput
+          length={EMAIL_OTP_LENGTH}
           ref={otpRef}
           value={code}
           onChange={(value) => {

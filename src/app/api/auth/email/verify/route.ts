@@ -1,3 +1,4 @@
+import { EMAIL_OTP_LENGTH } from "@/lib/auth/otp";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -13,7 +14,10 @@ import { db } from "@/lib/db";
 
 const bodySchema = z.object({
   email: emailSchema,
-  code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code"),
+  code: z
+    .string()
+    .trim()
+    .regex(new RegExp(`^\\d{${EMAIL_OTP_LENGTH}}$`), `Enter the ${EMAIL_OTP_LENGTH}-digit code`),
 });
 
 const CODE_FAILED = "That code didn't work. Try again.";

@@ -138,3 +138,18 @@ identity.
 - `emailVerified DateTime?` = the spec's "email verified" boolean (timestamp set = true)
 - `onboardingDone Boolean` = the spec's onboarding flag (already existed)
 - `phoneE164` is canonical; legacy `phone`/`phoneVerified` are kept mirrored until retired
+
+
+## Email OTP length
+
+Supabase generates the email code at the length configured in
+Authentication -> Email -> "Email OTP Length" (6-10 digits; GoTrue
+`otp_length`). This project's dashboard was found set to 8, which made
+6-box UI + `^\d{6}$` validation reject every real code. The app now
+mirrors the dashboard through ONE setting - `NEXT_PUBLIC_EMAIL_OTP_LENGTH`
+- consumed by the OTP boxes and the server validator alike; codes are
+never generated, stored or truncated by the app. Recommended end
+state: set the dashboard to 6 and drop the env override (6 is the
+default). Until then production must run with
+`NEXT_PUBLIC_EMAIL_OTP_LENGTH=8`. Phone codes stay 6 (Twilio Verify
+service default).

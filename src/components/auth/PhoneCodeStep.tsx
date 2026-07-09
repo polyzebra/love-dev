@@ -1,5 +1,6 @@
 "use client";
 
+import { PHONE_OTP_LENGTH } from "@/lib/auth/otp";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
@@ -136,6 +137,7 @@ export function PhoneCodeStep() {
     >
       <div className="flex flex-1 flex-col">
         <OtpInput
+          length={PHONE_OTP_LENGTH}
           ref={otpRef}
           value={code}
           onChange={(value) => {

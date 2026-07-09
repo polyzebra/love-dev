@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
  * focus), never rose. Destructive tint appears only via `invalid`.
  */
 
+/** Default box count; steps pass channel-specific lengths (email may be 6-10 per Supabase config). */
 export const OTP_LENGTH = 6;
 
 export function OtpInput({
@@ -33,11 +34,12 @@ export function OtpInput({
   autoFocus = false,
   label = "Verification code",
   describedById,
+  length = OTP_LENGTH,
   ref,
 }: {
   value: string;
   onChange: (value: string) => void;
-  /** Fires once the sixth digit lands - the steps auto-submit here. */
+  /** Fires once the final digit lands - the steps auto-submit here. */
   onComplete: (value: string) => void;
   disabled?: boolean;
   invalid?: boolean;
@@ -45,6 +47,8 @@ export function OtpInput({
   label?: string;
   /** id of the error banner/text while invalid. */
   describedById?: string;
+  /** Digit count - mirrors the provider's configured code length. */
+  length?: number;
   /** Reaches the real input - `.focus()` after clearing an error. */
   ref?: React.Ref<HTMLInputElement>;
 }) {
@@ -54,7 +58,7 @@ export function OtpInput({
       value={value}
       onChange={onChange}
       onComplete={onComplete}
-      maxLength={OTP_LENGTH}
+      maxLength={length}
       pattern={REGEXP_ONLY_DIGITS}
       inputMode="numeric"
       autoComplete="one-time-code"
