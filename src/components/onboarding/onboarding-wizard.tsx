@@ -37,7 +37,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { HeartBurst } from "@/components/fx/heart-burst";
-import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,79 +53,6 @@ import { calculateAge, cn } from "@/lib/utils";
 
 const PROMPT_ANSWER_MAX = 280;
 const MAX_PROMPTS = 4;
-
-// --------------------------------------------------- shell rhythm tokens
-
-/**
- * The onboarding shell's vertical rhythm - single source of truth.
- * Every step renders inside StepShell and inherits these; never add
- * ad-hoc mt-/pt-/space-y values in a step body - extend a token instead.
- */
-const STEP_SPACING = {
-  /** Viewport top -> logo row (safe-area aware). */
-  shellTop: "safe-top pt-5",
-  /** Logo row -> progress block: one continuous header surface. */
-  progressGap: "mt-4",
-  /** Progress block (incl. value-note slot) -> step title. */
-  titleGap: "mt-4",
-  /** Step title -> subtitle. */
-  subtitleGap: "mt-1.5",
-  /** Subtitle -> content, and between content sections. */
-  sectionGap: "space-y-6",
-  /** Gap between selectable cards in a grid. */
-  cardGap: "gap-2.5",
-  /** Step content -> fixed CTA bar clearance. */
-  ctaGap: "pb-28",
-} as const;
-
-/** One title voice for every step. */
-const STEP_TITLE = "font-display text-3xl font-semibold tracking-tight";
-
-/** Shared geometry for every selectable card (category + prompt). */
-const CARD_FRAME = "min-h-[68px] rounded-2xl";
-const CARD_PAD = "px-4 py-3.5";
-
-/**
- * The whole onboarding surface: safe-area top, logo row, then whatever
- * the wizard renders (progress + step, or the celebration). Owning this
- * here - not in the page - is what guarantees there is never a stray
- * band between the shell top, the progress header and the content.
- */
-function OnboardingFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-dvh bg-background">
-      <div className={cn("mx-auto w-full max-w-2xl px-5", STEP_SPACING.shellTop)}>
-        <Logo />
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Shared frame for every step: title + subtitle + evenly-rhythmed
- * sections. Keeps the gap between the progress header and the first
- * line of content identical on all six steps.
- */
-function StepShell({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={STEP_SPACING.sectionGap}>
-      <header>
-        <h1 className={STEP_TITLE}>{title}</h1>
-        <p className={cn("text-muted-foreground", STEP_SPACING.subtitleGap)}>{subtitle}</p>
-      </header>
-      {children}
-    </div>
-  );
-}
 
 /** The six prompts surfaced during onboarding - the full catalogue stays in src/config/prompts.ts. */
 const ONBOARDING_PROMPT_KEYS: readonly PromptKey[] = [
@@ -317,9 +243,7 @@ function CategoryCard({
         animate={{ scale: selected ? 1.015 : 1 }}
         transition={SPRING.snappy}
         className={cn(
-          "tap-target flex w-full items-center gap-3.5 border text-left transition-colors",
-          CARD_FRAME,
-          CARD_PAD,
+          "tap-target flex min-h-[68px] w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-colors",
           selected ? "border-border bg-accent shadow-card" : "bg-card hover:border-foreground/25",
         )}
       >
@@ -375,8 +299,7 @@ function CategoryGroup({
           {title}
         </legend>
       )}
-      {/* Explicit minmax(0,1fr) tracks - nowrap card text must never widen the grid */}
-      <div className={cn("grid grid-cols-1 sm:grid-cols-2", STEP_SPACING.cardGap)}>
+      <div className="grid gap-2.5 sm:grid-cols-2">
         {categories.map((cat, i) => (
           <CategoryCard
             key={cat.id}
@@ -611,8 +534,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
 
   if (celebrating) {
     return (
-      <OnboardingFrame>
-        <div className="relative flex min-h-[70dvh] flex-col items-center justify-center gap-5 text-center">
+      <div className="relative flex min-h-[70dvh] flex-col items-center justify-center gap-5 text-center">
         <HeartBurst count={18} />
         <motion.span
           initial={{ scale: 0 }}
@@ -636,17 +558,16 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           transition={{ delay: 0.5, duration: 0.6 }}
           className="max-w-xs text-muted-foreground"
         >
-            Your profile is live. Let&apos;s find someone worth your evening.
-          </motion.p>
-        </div>
-      </OnboardingFrame>
+          Your profile is live. Let&apos;s find someone worth your evening.
+        </motion.p>
+      </div>
     );
   }
 
   return (
-    <OnboardingFrame>
-      {/* Progress + live profile glow - one surface with the logo row above */}
-      <div className={STEP_SPACING.progressGap}>
+    <div className="space-y-8 pt-4">
+      {/* Progress + live profile glow */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
           <AnimatePresence mode="wait">
             <motion.p
@@ -676,29 +597,22 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
             <span className="tabular-nums">{profileScore}%</span>
           </span>
         </div>
-        <Progress
-          className="mt-3"
-          value={progress}
-          aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`}
-        />
-        {/* Fixed-height slot so the note never shifts the step below it */}
-        <div className="mt-2 min-h-4">
-          <AnimatePresence>
-            {valueNote && (
-              <motion.p
-                key={valueNote}
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: EASE_LUXE }}
-                className="text-xs text-gold"
-                aria-live="polite"
-              >
-                {valueNote}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
+        <Progress value={progress} aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`} />
+        <AnimatePresence>
+          {valueNote && (
+            <motion.p
+              key={valueNote}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: EASE_LUXE }}
+              className="text-xs text-gold"
+              aria-live="polite"
+            >
+              {valueNote}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence mode="wait">
@@ -708,14 +622,17 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
           exit={{ opacity: 0, x: -36, scale: 0.985, filter: "blur(6px)" }}
           transition={{ duration: 0.38, ease: EASE_LUXE }}
-          className={cn("min-h-[50dvh]", STEP_SPACING.titleGap, STEP_SPACING.ctaGap)}
+          className="min-h-[50dvh]"
         >
           {/* ------------------------------------------------ 1. Basics */}
           {step === 0 && (
-            <StepShell
-              title="Let's start with the basics"
-              subtitle="This is how you'll appear on Tirvea."
-            >
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  Let&apos;s start with the basics
+                </h1>
+                <p className="text-muted-foreground">This is how you&apos;ll appear on Tirvea.</p>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="displayName">First name</Label>
                 <Input
@@ -771,20 +688,21 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   ))}
                 </div>
               </fieldset>
-            </StepShell>
+            </div>
           )}
 
           {/* -------------------------------------------- 2. Intentions */}
           {step === 1 && (
-            <StepShell
-              title="What are you here for?"
-              subtitle="One honest answer - it leads to better matches."
-            >
-              <div
-                className={cn("grid grid-cols-1", STEP_SPACING.cardGap)}
-                role="radiogroup"
-                aria-label="I'm looking for"
-              >
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  What are you here for?
+                </h1>
+                <p className="text-muted-foreground">
+                  One honest answer - it leads to better matches.
+                </p>
+              </div>
+              <div className="grid gap-2.5" role="radiogroup" aria-label="I'm looking for">
                 {INTENTION_CATS.map((cat, i) => (
                   <CategoryCard
                     key={cat.id}
@@ -795,15 +713,20 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   />
                 ))}
               </div>
-            </StepShell>
+            </div>
           )}
 
           {/* -------------------------------------------- 3. Date style */}
           {step === 2 && (
-            <StepShell
-              title="How do you like to meet?"
-              subtitle="Pick everything that sounds like you - it shapes who we introduce you to."
-            >
+            <div className="space-y-7">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  How do you like to meet?
+                </h1>
+                <p className="text-muted-foreground">
+                  Pick everything that sounds like you - it shapes who we introduce you to.
+                </p>
+              </div>
               <CategoryGroup
                 title={GROUP_LABELS["right-now"]}
                 categories={RIGHT_NOW_CATS}
@@ -817,15 +740,20 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 isSelected={categorySelected}
                 onToggle={toggleCategory}
               />
-            </StepShell>
+            </div>
           )}
 
           {/* ------------------------------- 4. Interests & community */}
           {step === 3 && (
-            <StepShell
-              title="What are you into?"
-              subtitle="Shared ground gives people an easy way to say hello."
-            >
+            <div className="space-y-7">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  What are you into?
+                </h1>
+                <p className="text-muted-foreground">
+                  Shared ground gives people an easy way to say hello.
+                </p>
+              </div>
               <CategoryGroup
                 title={GROUP_LABELS.interests}
                 categories={INTEREST_CATS}
@@ -839,21 +767,27 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 isSelected={categorySelected}
                 onToggle={toggleCategory}
               />
-            </StepShell>
+            </div>
           )}
 
           {/* ------------------------------------------------ 5. Prompts */}
           {step === 4 && (
-            <StepShell
-              title="A few words in your voice"
-              subtitle="Your answers become conversation starters. Three is the sweet spot - but you can always add them later."
-            >
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  A few words in your voice
+                </h1>
+                <p className="text-muted-foreground">
+                  Your answers become conversation starters. Three is the sweet
+                  spot - but you can always add them later.
+                </p>
+              </div>
               <p className="text-sm text-muted-foreground" aria-live="polite">
                 {answeredPrompts === 0
                   ? `Pick up to ${MAX_PROMPTS} prompts that sound like you.`
                   : `${answeredPrompts} answered${answeredPrompts < 3 ? " - a couple more and your profile really talks" : ". Lovely."}`}
               </p>
-              <div className={cn("grid grid-cols-1", STEP_SPACING.cardGap)}>
+              <div className="grid gap-2">
                 {ONBOARDING_PROMPTS.map((prompt) => {
                   const entry = data.prompts.find((p) => p.key === prompt.key);
                   const selected = Boolean(entry);
@@ -863,8 +797,6 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                     <div
                       key={prompt.key}
                       className={cn(
-                        // Same radius as CategoryCard; the trigger button
-                        // below carries CARD_FRAME + CARD_PAD geometry.
                         "rounded-2xl border transition-all",
                         // Calm selected state - accent tint + check on a
                         // neutral border. Selection is the fill, never a
@@ -881,11 +813,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                         aria-expanded={expanded}
                         disabled={atLimit}
                         onClick={() => togglePrompt(prompt.key)}
-                        className={cn(
-                          "tap-target flex w-full items-center justify-between gap-3 text-left",
-                          CARD_FRAME,
-                          CARD_PAD,
-                        )}
+                        className="tap-target flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
                       >
                         <span className="font-medium">{prompt.label}</span>
                         <span
@@ -920,7 +848,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                             transition={{ duration: 0.32, ease: EASE_LUXE }}
                             className="overflow-hidden"
                           >
-                            <div className="space-y-1 px-4 pb-4">
+                            <div className="space-y-1 px-5 pb-4">
                               <Textarea
                                 autoFocus
                                 value={entry.answer}
@@ -942,15 +870,20 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   );
                 })}
               </div>
-            </StepShell>
+            </div>
           )}
 
           {/* ------------------------------------------------- 6. Finish */}
           {step === 5 && (
-            <StepShell
-              title="Last thing - where are you based?"
-              subtitle="We only ever show your city - never your exact location."
-            >
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                  Last thing - where are you based?
+                </h1>
+                <p className="text-muted-foreground">
+                  We only ever show your city - never your exact location.
+                </p>
+              </div>
               <fieldset className="space-y-2">
                 <legend className="text-sm font-medium">Country</legend>
                 <div className="flex gap-2">
@@ -1009,7 +942,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   </p>
                 </div>
               </motion.div>
-            </StepShell>
+            </div>
           )}
         </motion.div>
       </AnimatePresence>
@@ -1056,6 +989,6 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           )}
         </div>
       </div>
-    </OnboardingFrame>
+    </div>
   );
 }
