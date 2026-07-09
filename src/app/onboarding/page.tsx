@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
-import { Logo } from "@/components/shared/logo";
 
 export const metadata: Metadata = { title: "Create your profile" };
 export const dynamic = "force-dynamic";
@@ -17,14 +16,7 @@ export default async function OnboardingPage() {
   });
   if (record?.onboardingDone) redirect("/discover");
 
-  return (
-    <div className="min-h-dvh bg-background">
-      <header className="safe-top mx-auto w-full max-w-2xl px-5 py-5">
-        <Logo />
-      </header>
-      <main className="mx-auto max-w-2xl px-5 pb-24">
-        <OnboardingWizard initialName={record?.name ?? ""} />
-      </main>
-    </div>
-  );
+  // The wizard owns the whole shell (logo, progress, content, CTA) so the
+  // onboarding surface has a single spacing source of truth.
+  return <OnboardingWizard initialName={record?.name ?? ""} />;
 }
