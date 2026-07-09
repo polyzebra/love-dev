@@ -43,9 +43,19 @@ Every OAuth/magic-link redirect the app requests is built from
 
 ## 4. Email OTP template + expiry
 
-Supabase -> Authentication -> Emails -> "Magic Link" template.
-For the code-based flow the template **must contain `{{ .Token }}`** - that is
-the 6-digit code the `/auth/email-code` screen asks for. A template with only
+Supabase -> Authentication -> Emails. TWO templates matter, because
+signInWithOtp picks by account state:
+
+- **"Confirm signup"** - sent to NEW email addresses. If this still
+  contains `{{ .ConfirmationURL }}` ("Confirm your email address"
+  link), new users get a link instead of a code - the exact bug this
+  section prevents.
+- **"Magic Link"** - sent to RETURNING email addresses.
+
+BOTH templates must show `{{ .Token }}` (the 6-digit code the
+/auth/email-code screen asks for) and must NOT use
+`{{ .ConfirmationURL }}` as the primary action. Recommended subject
+for both: "Your Tirvea verification code". A template with only
 `{{ .ConfirmationURL }}` sends a link and no code, and code entry will always
 fail. Recommended body: show `{{ .Token }}` prominently, keep
 `{{ .ConfirmationURL }}` as a fallback link.
