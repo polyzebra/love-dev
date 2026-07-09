@@ -67,12 +67,18 @@ const STEP_SPACING = {
   shellTop: "safe-top pt-5",
   /** Logo row -> progress block: one continuous header surface. */
   progressGap: "mt-4",
-  /** Progress block (incl. value-note slot) -> step title. */
+  /** Progress bar -> transient value note (in flow, no reserved slot). */
+  noteGap: "mt-2",
+  /** Progress block -> step title. */
   titleGap: "mt-4",
   /** Step title -> subtitle. */
-  subtitleGap: "mt-1.5",
-  /** Subtitle -> content, and between content sections. */
+  subtitleGap: "mt-2",
+  /** Subtitle -> first control block of the step body. */
+  controlGap: "mt-5",
+  /** Between content sections (field group -> field group). */
   sectionGap: "space-y-6",
+  /** Field label / legend -> its control (input, chip row, card grid). */
+  fieldLabelGap: "space-y-2",
   /** Gap between selectable cards in a grid. */
   cardGap: "gap-2.5",
   /** Step content -> fixed CTA bar clearance. */
@@ -118,12 +124,15 @@ function StepShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className={STEP_SPACING.sectionGap}>
+    <div>
       <header>
         <h1 className={STEP_TITLE}>{title}</h1>
         <p className={cn("text-muted-foreground", STEP_SPACING.subtitleGap)}>{subtitle}</p>
       </header>
-      {children}
+      {/* controlGap is the single owner of the subtitle -> first-control
+          rung; sectionGap owns every rung between sibling sections. Step
+          bodies must never add their own top margins. */}
+      <div className={cn(STEP_SPACING.controlGap, STEP_SPACING.sectionGap)}>{children}</div>
     </div>
   );
 }
@@ -369,7 +378,7 @@ function CategoryGroup({
   onToggle: (cat: TaxonomyCategory) => void;
 }) {
   return (
-    <fieldset className="space-y-2.5">
+    <fieldset className={STEP_SPACING.fieldLabelGap}>
       {title && (
         <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           {title}
@@ -681,24 +690,23 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           value={progress}
           aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`}
         />
-        {/* Fixed-height slot so the note never shifts the step below it */}
-        <div className="mt-2 min-h-4">
-          <AnimatePresence>
-            {valueNote && (
-              <motion.p
-                key={valueNote}
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: EASE_LUXE }}
-                className="text-xs text-gold"
-                aria-live="polite"
-              >
-                {valueNote}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* No reserved slot - the note only ever changes height at a step
+            boundary, so any shift is masked by the step slide animation. */}
+        <AnimatePresence>
+          {valueNote && (
+            <motion.p
+              key={valueNote}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: EASE_LUXE }}
+              className={cn("text-xs text-gold", STEP_SPACING.noteGap)}
+              aria-live="polite"
+            >
+              {valueNote}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence mode="wait">
@@ -716,7 +724,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               title="Let's start with the basics"
               subtitle="This is how you'll appear on Tirvea."
             >
-              <div className="space-y-2">
+              <div className={STEP_SPACING.fieldLabelGap}>
                 <Label htmlFor="displayName">First name</Label>
                 <Input
                   id="displayName"
@@ -727,7 +735,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   className="h-12 rounded-2xl"
                 />
               </div>
-              <div className="space-y-2">
+              <div className={STEP_SPACING.fieldLabelGap}>
                 <Label htmlFor="birthDate">Date of birth</Label>
                 <Input
                   id="birthDate"
@@ -743,7 +751,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                     : "Your age is shown on your profile - never your birthday."}
                 </p>
               </div>
-              <fieldset className="space-y-2">
+              <fieldset className={STEP_SPACING.fieldLabelGap}>
                 <legend className="text-sm font-medium">I am a…</legend>
                 <div className="flex flex-wrap gap-2">
                   {GENDERS.map((g) => (
@@ -757,7 +765,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   ))}
                 </div>
               </fieldset>
-              <fieldset className="space-y-2">
+              <fieldset className={STEP_SPACING.fieldLabelGap}>
                 <legend className="text-sm font-medium">Show me…</legend>
                 <div className="flex flex-wrap gap-2">
                   {GENDERS.map((g) => (
@@ -951,7 +959,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               title="Last thing - where are you based?"
               subtitle="We only ever show your city - never your exact location."
             >
-              <fieldset className="space-y-2">
+              <fieldset className={STEP_SPACING.fieldLabelGap}>
                 <legend className="text-sm font-medium">Country</legend>
                 <div className="flex gap-2">
                   <ChipToggle selected={data.country === "IE"} onToggle={() => { set("country", "IE"); set("city", ""); }}>
@@ -962,7 +970,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   </ChipToggle>
                 </div>
               </fieldset>
-              <fieldset className="space-y-2">
+              <fieldset className={STEP_SPACING.fieldLabelGap}>
                 <legend className="text-sm font-medium">City</legend>
                 <div className="flex flex-wrap gap-2">
                   {CITIES[data.country].map((city) => (
