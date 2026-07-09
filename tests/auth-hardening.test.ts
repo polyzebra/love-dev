@@ -79,11 +79,16 @@ async function main() {
   // ------------------------------------------------------------ gate matrix
   console.log("gate matrix");
   const { authNextStep } = await import("../src/lib/auth/gate");
+  const { CURRENT_VERSIONS } = await import("../src/lib/auth/consent");
   const base = {
     status: "ACTIVE",
     bannedAt: null as Date | null,
     emailVerified: new Date(),
     phoneVerifiedAt: new Date(),
+    ageConfirmedAt: new Date(),
+    termsVersion: CURRENT_VERSIONS.terms as string,
+    privacyVersion: CURRENT_VERSIONS.privacy as string,
+    communityVersion: CURRENT_VERSIONS.community as string,
     onboardingDone: true,
   };
   await check("banned/suspended -> /account-blocked", () => {

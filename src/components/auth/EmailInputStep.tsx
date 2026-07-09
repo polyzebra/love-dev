@@ -13,7 +13,7 @@ import { sendEmailCode } from "@/components/auth/api";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 /**
- * Step 1 of 3 - "What's your email?". One field, one big CTA; Google
+ * Step 1 of 5 - "What's your email?". One field, one big CTA; Google
  * as the shortcut underneath. Validation runs on submit only. The
  * send endpoint is contractually neutral (200 whatever happens), so
  * success simply moves to the code screen.

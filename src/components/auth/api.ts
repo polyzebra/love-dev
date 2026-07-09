@@ -37,7 +37,7 @@ function errorMessage(json: Json): string | null {
 
 export type SendResult =
   | { ok: true }
-  | { ok: false; notConfigured: boolean; message: string };
+  | { ok: false; blocked: boolean; message: string };
 
 export type VerifyResult =
   | { ok: true; next: string }
@@ -46,10 +46,10 @@ export type VerifyResult =
 /** POST /api/auth/email/send - contractually always a neutral 200. */
 export async function sendEmailCode(email: string): Promise<SendResult> {
   const res = await post("/api/auth/email/send", { email });
-  if (!res) return { ok: false, notConfigured: false, message: OFFLINE_MESSAGE };
+  if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
   // Neutral by design: even rate-limits come back as 200 {ok:true}.
   if (res.status === 200) return { ok: true };
-  return { ok: false, notConfigured: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+  return { ok: false, blocked: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
 }
 
 /** POST /api/auth/email/verify. */
@@ -61,18 +61,22 @@ export async function verifyEmailCode(email: string, code: string): Promise<Veri
   return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
 }
 
-/** POST /api/auth/phone/send - 503 means the SMS provider isn't configured. */
+/**
+ * POST /api/auth/phone/send - a 503 carries { blocked: true }: phone
+ * verification cannot happen right now AND must not be skipped (the
+ * step screen shows the unavailable notice with no continue path).
+ */
 export async function sendPhoneCode(input: {
   phoneE164: string;
   countryIso: string;
   dialCode: string;
 }): Promise<SendResult> {
   const res = await post("/api/auth/phone/send", input);
-  if (!res) return { ok: false, notConfigured: false, message: OFFLINE_MESSAGE };
+  if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
   if (res.json?.ok === true) return { ok: true };
   return {
     ok: false,
-    notConfigured: res.status === 503,
+    blocked: res.json?.blocked === true || res.status === 503,
     message: errorMessage(res.json) ?? GENERIC_MESSAGE,
   };
 }
@@ -80,6 +84,24 @@ export async function sendPhoneCode(input: {
 /** POST /api/auth/phone/verify. */
 export async function verifyPhoneCode(phoneE164: string, code: string): Promise<VerifyResult> {
   const res = await post("/api/auth/phone/verify", { phoneE164, code });
+  if (!res) return { ok: false, message: OFFLINE_MESSAGE };
+  const next = res.json?.next;
+  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+}
+
+/** POST /api/auth/age-confirm - stamps the 18+ confirmation, idempotent. */
+export async function confirmAge(): Promise<VerifyResult> {
+  const res = await post("/api/auth/age-confirm", {});
+  if (!res) return { ok: false, message: OFFLINE_MESSAGE };
+  const next = res.json?.next;
+  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+}
+
+/** POST /api/auth/consent - accepts the current legal versions, idempotent. */
+export async function acceptConsent(): Promise<VerifyResult> {
+  const res = await post("/api/auth/consent", {});
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
   const next = res.json?.next;
   if (res.json?.ok === true && typeof next === "string") return { ok: true, next };

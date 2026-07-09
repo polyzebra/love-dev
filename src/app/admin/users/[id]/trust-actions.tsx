@@ -1,0 +1,262 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Ban, MailOpen, PhoneOff, RotateCcw, ShieldQuestion, Undo2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+
+async function readErrorMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const body = (await res.json()) as { error?: { message?: string } };
+    return body.error?.message ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+type ConfirmAction = {
+  title: string;
+  description: string;
+  endpoint: string;
+  success: string;
+  confirmLabel: string;
+  destructive?: boolean;
+};
+
+/**
+ * Trust panel actions. Each button calls the matching admin API route
+ * (requirePermission server-side, AdminLog + AuthVerificationEvent
+ * recorded there) and refreshes the RSC page on success. Destructive
+ * actions confirm first; a ban requires a written reason.
+ */
+export function TrustActions({
+  userId,
+  banned,
+  hasPhone,
+  phoneVerified,
+  emailBlocked,
+  onboardingDone,
+}: {
+  userId: string;
+  banned: boolean;
+  hasPhone: boolean;
+  phoneVerified: boolean;
+  emailBlocked: boolean;
+  onboardingDone: boolean;
+}) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [banOpen, setBanOpen] = useState(false);
+  const [banReason, setBanReason] = useState("");
+  const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
+
+  function post(endpoint: string, success: string, body?: unknown) {
+    startTransition(async () => {
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          ...(body !== undefined
+            ? { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
+            : {}),
+        });
+        if (!res.ok) {
+          toast.error(await readErrorMessage(res, "Action failed - you may not have permission."));
+          return;
+        }
+        toast.success(success);
+        setBanOpen(false);
+        setBanReason("");
+        setConfirm(null);
+        router.refresh();
+      } catch {
+        toast.error("Network error. Check your connection and try again.");
+      }
+    });
+  }
+
+  const base = `/api/admin/users/${userId}`;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {banned ? (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() =>
+            setConfirm({
+              title: "Restore access",
+              description:
+                "Clears the ban and sets the account back to active. The user can sign in again immediately.",
+              endpoint: `${base}/unban`,
+              success: "Access restored.",
+              confirmLabel: "Restore access",
+            })
+          }
+        >
+          <Undo2 className="size-4" /> Unban
+        </Button>
+      ) : (
+        <Button
+          size="sm"
+          variant="destructive"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() => setBanOpen(true)}
+        >
+          <Ban className="size-4" /> Ban
+        </Button>
+      )}
+
+      {hasPhone && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() =>
+            setConfirm({
+              title: "Release phone number",
+              description:
+                "Removes the phone number from this account so a different account can verify with it. The user will be asked for a phone number again if the phone step is enabled.",
+              endpoint: `${base}/release-phone`,
+              success: "Phone number released.",
+              confirmLabel: "Release phone",
+              destructive: true,
+            })
+          }
+        >
+          <PhoneOff className="size-4" /> Release phone
+        </Button>
+      )}
+
+      {emailBlocked && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() =>
+            setConfirm({
+              title: "Release email",
+              description:
+                "Removes this email from the identity blocklist so it can authenticate again. This does not lift a ban on the account itself.",
+              endpoint: `${base}/release-email`,
+              success: "Email released from the blocklist.",
+              confirmLabel: "Release email",
+            })
+          }
+        >
+          <MailOpen className="size-4" /> Release email
+        </Button>
+      )}
+
+      {phoneVerified && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() =>
+            setConfirm({
+              title: "Require phone re-verification",
+              description:
+                "The user keeps their number but must verify it again on their next visit before using the app.",
+              endpoint: `${base}/require-phone-reverification`,
+              success: "Phone re-verification required.",
+              confirmLabel: "Require re-verification",
+            })
+          }
+        >
+          <ShieldQuestion className="size-4" /> Require phone re-verify
+        </Button>
+      )}
+
+      {onboardingDone && (
+        <Button
+          size="sm"
+          variant="ghost"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() =>
+            setConfirm({
+              title: "Reset onboarding",
+              description:
+                "Sends the user back through onboarding on their next visit. Existing profile data is kept.",
+              endpoint: `${base}/reset-onboarding`,
+              success: "Onboarding reset.",
+              confirmLabel: "Reset onboarding",
+            })
+          }
+        >
+          <RotateCcw className="size-4" /> Reset onboarding
+        </Button>
+      )}
+
+      <Dialog open={banOpen} onOpenChange={setBanOpen}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>Ban this account</DialogTitle>
+            <DialogDescription>
+              A reason is required - it is shown to the user on the restricted-account page and
+              stored in the audit log. The account is signed out and blocked from signing in.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={banReason}
+            onChange={(e) => setBanReason(e.target.value)}
+            placeholder="e.g. Spam - repeated unsolicited commercial messages"
+            rows={3}
+            aria-label="Ban reason"
+          />
+          <DialogFooter>
+            <Button variant="ghost" className="rounded-full" onClick={() => setBanOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="rounded-full"
+              disabled={pending || banReason.trim().length < 3}
+              onClick={() => post(`${base}/ban`, "Account banned.", { reason: banReason.trim() })}
+            >
+              Ban account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirm !== null} onOpenChange={(open) => !open && setConfirm(null)}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>{confirm?.title}</DialogTitle>
+            <DialogDescription>{confirm?.description}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" className="rounded-full" onClick={() => setConfirm(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant={confirm?.destructive ? "destructive" : "default"}
+              className="rounded-full"
+              disabled={pending}
+              onClick={() => confirm && post(confirm.endpoint, confirm.success)}
+            >
+              {confirm?.confirmLabel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -82,7 +83,9 @@ export default async function AdminUsersPage({
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <p className="font-medium">{user.profile?.displayName ?? user.name ?? "-"}</p>
+                  <Link href={`/admin/users/${user.id}`} className="font-medium hover:underline">
+                    {user.profile?.displayName ?? user.name ?? "-"}
+                  </Link>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </TableCell>
                 <TableCell>

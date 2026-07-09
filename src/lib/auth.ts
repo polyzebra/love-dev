@@ -26,6 +26,10 @@ export type AppSession = {
     bannedAt: Date | null;
     emailVerified: Date | null;
     phoneVerifiedAt: Date | null;
+    ageConfirmedAt: Date | null;
+    termsVersion: string | null;
+    privacyVersion: string | null;
+    communityVersion: string | null;
     authCompleted: boolean;
   };
 };
@@ -68,6 +72,10 @@ export const auth = cache(async (): Promise<AppSession | null> => {
       bannedAt: appUser.bannedAt,
       emailVerified: appUser.emailVerified,
       phoneVerifiedAt: appUser.phoneVerifiedAt,
+      ageConfirmedAt: appUser.ageConfirmedAt,
+      termsVersion: appUser.termsVersion,
+      privacyVersion: appUser.privacyVersion,
+      communityVersion: appUser.communityVersion,
       authCompleted: appUser.authCompleted,
     },
   };

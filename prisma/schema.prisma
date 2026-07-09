@@ -249,6 +249,31 @@ model User {
   lastLoginAt       DateTime?
   lastLoginIpHash   String?
   lastUserAgentHash String?
+  previousIpHash    String?
+  lastIpCountry     String?
+  lastIpAsn         String?
+  lastDeviceHash    String?
+  deviceCount       Int       @default(0)
+
+  // Trust & risk (0-100; reasons audited, never fabricated)
+  scamScore     Int       @default(0)
+  riskReason    String?
+  riskUpdatedAt DateTime?
+
+  // Age + legal consent (versioned; hashes, never raw IP/UA)
+  ageConfirmedAt       DateTime?
+  ageConfirmedIpHash   String?
+  termsVersion         String?
+  privacyVersion       String?
+  communityVersion     String?
+  consentAcceptedAt    DateTime?
+  consentIpHash        String?
+  consentUserAgentHash String?
+
+  // Photo verification (provider abstraction; no biometrics stored)
+  photoVerifiedAt           DateTime?
+  photoVerificationProvider String?
+  photoVerificationSession  String?
 
   lastActiveAt      DateTime  @default(now())
   // onboardingDone doubles as the spec's "onboarding completed" boolean

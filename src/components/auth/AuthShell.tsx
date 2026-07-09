@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
  * fields when the keyboard opens.
  */
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 5;
 
 export function AuthShell({
   step,
@@ -29,8 +29,8 @@ export function AuthShell({
   stepKey,
   children,
 }: {
-  /** 1-based position in the 3-step journey (email, code, phone). */
-  step: 1 | 2 | 3;
+  /** 1-based position in the 5-step journey (email, code, phone, 18+, legal). */
+  step: 1 | 2 | 3 | 4 | 5;
   title: string;
   subtitle?: React.ReactNode;
   /** Where the back arrow goes; omit it where backing out makes no sense. */

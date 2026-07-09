@@ -60,6 +60,9 @@ export type AuthEventType =
   | "phone_otp_verify"
   | "otp_verify_fail"
   | "risk_phone_challenge"
+  | "risk_triggered"
+  | "age_confirmed"
+  | "terms_accepted"
   | (string & {});
 
 /**

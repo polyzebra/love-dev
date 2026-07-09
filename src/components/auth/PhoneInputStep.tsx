@@ -3,7 +3,7 @@
 import { useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
-import { ArrowRight, ChevronDown, Loader2, MessageCircleMore } from "lucide-react";
+import { ChevronDown, Loader2, MessageCircleMore } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,11 +19,16 @@ import {
 } from "@/lib/auth/countries";
 
 /**
- * Step 3 of 3 - "What's your number?". Country selector (bottom sheet /
+ * Step 3 of 5 - "What's your number?". Country selector (bottom sheet /
  * dialog) + tel input formatted as-you-type in the national format;
  * what we store and send is always E.164. The last-used country is
- * remembered in localStorage. If the SMS provider isn't wired up yet
- * (503), we say so plainly and let people continue - no fake codes.
+ * remembered in localStorage.
+ *
+ * A 503 from the send route means phone verification can't happen right
+ * now (provider outage while the feature is live) - we say so plainly
+ * and BLOCK: no continue button, no skip. Outages never bypass
+ * verification. When the feature flag is off entirely the gate never
+ * routes here, so this screen only ever blocks, it never skips.
  */
 
 export const AUTH_PHONE_KEY = "tirvea:auth-phone";
@@ -56,7 +61,7 @@ export function PhoneInputStep() {
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [notConfigured, setNotConfigured] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   function chooseCountry(next: Country) {
@@ -108,7 +113,7 @@ export function PhoneInputStep() {
     });
     setPending(false);
     if (!result.ok) {
-      if (result.notConfigured) setNotConfigured(true);
+      if (result.blocked) setBlocked(true);
       else setServerError(result.message);
       return;
     }
@@ -123,34 +128,27 @@ export function PhoneInputStep() {
       step={3}
       title="What's your number?"
       subtitle="We'll text you a code to verify it's really you."
-      stepKey={notConfigured ? "not-configured" : "phone"}
+      stepKey={blocked ? "blocked" : "phone"}
     >
-      {notConfigured ? (
-        // Honest fallback: the provider is off, so say so and move on.
+      {blocked ? (
+        // Provider outage while phone verification is REQUIRED. This is
+        // a hard stop by design - no continue button, no skip path.
         <div className="flex flex-1 flex-col">
-          <div className="rounded-2xl border border-border bg-foreground/5 px-5 py-6 text-center">
+          <div
+            role="status"
+            className="rounded-2xl border border-border bg-foreground/5 px-5 py-6 text-center"
+          >
             <MessageCircleMore
               className="mx-auto mb-3 size-6 text-muted-foreground"
               aria-hidden="true"
             />
             <p className="text-sm text-foreground">
-              Phone verification is coming online soon - you can continue for
-              now.
+              Phone verification is temporarily unavailable.
             </p>
             <p className="mt-1.5 text-xs text-muted-foreground">
-              We&apos;ll ask you to verify your number later.
+              We can&apos;t send codes right now. Please try again in a little
+              while - verifying your number is required to continue.
             </p>
-          </div>
-          <div className="mt-auto pt-8">
-            <Button
-              type="button"
-              size="lg"
-              className="h-12 w-full rounded-full"
-              onClick={() => router.push("/onboarding")}
-            >
-              Continue
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Button>
           </div>
         </div>
       ) : (

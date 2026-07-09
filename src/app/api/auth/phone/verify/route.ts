@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   } catch (error) {
     if (error instanceof PhoneOtpNotConfiguredError) {
       return NextResponse.json(
-        { ok: false, error: "Phone verification is not available yet" },
+        { ok: false, error: "Phone verification is temporarily unavailable.", blocked: true },
         { status: 503 },
       );
     }

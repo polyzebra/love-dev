@@ -7,6 +7,9 @@ import type { Role } from "@/generated/prisma/enums";
 export const PERMISSIONS = {
   "users:read": ["MODERATOR", "ADMIN"],
   "users:suspend": ["MODERATOR", "ADMIN"],
+  // Identity-touching actions: release phone/email, forced re-verification,
+  // onboarding resets. Admin-only - they change what can authenticate.
+  "users:manage": ["ADMIN"],
   "users:delete": ["ADMIN"],
   "reports:read": ["MODERATOR", "ADMIN"],
   "reports:resolve": ["MODERATOR", "ADMIN"],

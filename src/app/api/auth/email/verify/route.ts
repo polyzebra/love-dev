@@ -5,7 +5,10 @@ import { emailSchema } from "@/lib/validators/auth";
 import { ensureAppUser } from "@/lib/auth/identity";
 import { authNextStep, isPhoneVerificationEnabled } from "@/lib/auth/gate";
 import { checkOtpVerifyBlocked } from "@/lib/auth/rate-limit";
-import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
+import { clientIpFrom, ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
+import { registerDevice } from "@/lib/auth/device";
+import { computeRiskScore } from "@/lib/auth/risk";
+import { db } from "@/lib/db";
 
 const bodySchema = z.object({
   email: emailSchema,
@@ -74,27 +77,60 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: ACCOUNT_UNAVAILABLE }, { status: 403 });
   }
 
-  // Returning-user risk hook: a code sign-in from a new network on an
-  // account that HAS a verified phone re-verifies the phone (only when
-  // an SMS provider actually exists).
+  // Device + risk evaluation. ensureAppUser already stamped the new
+  // lastLoginIpHash; keep the one it replaced as previousIpHash so the
+  // engines (and admins) can see the rotation.
+  await db.user
+    .update({
+      where: { id: result.user.id },
+      data: { previousIpHash: result.previousLoginIpHash },
+    })
+    .catch(() => {});
+  const device = await registerDevice(result.user.id, req);
+  let highRisk = false;
+  let riskScore = 0;
+  let riskReasons: string[] = [];
+  try {
+    const risk = await computeRiskScore(result.user, {
+      ipHash,
+      deviceHash: device?.deviceHash ?? null,
+      previousIpHash: result.previousLoginIpHash,
+      newDevice: device?.isNewDevice,
+      rawIp: clientIpFrom(req), // transient - the intel hook only, never stored
+    });
+    highRisk = risk.highRisk;
+    riskScore = risk.score;
+    riskReasons = risk.reasons;
+  } catch (error) {
+    console.error("[auth:verify] risk evaluation failed:", error);
+  }
+
+  // Returning-user step-up: a HIGH-RISK sign-in on an account that HAS a
+  // verified phone re-verifies the phone (only when an SMS provider
+  // actually exists). Low risk follows the normal gate ladder.
   let next = authNextStep(result.user);
-  if (
-    isPhoneVerificationEnabled() &&
-    result.user.phoneVerifiedAt &&
-    result.previousLoginIpHash &&
-    ipHash &&
-    result.previousLoginIpHash !== ipHash
-  ) {
+  if (highRisk && isPhoneVerificationEnabled() && result.user.phoneVerifiedAt) {
     next = "/auth/phone";
     await recordAuthEvent({
-      type: "risk_phone_challenge",
+      type: "risk_triggered",
       email,
       userId: result.user.id,
       req,
-      metadata: { trigger: "ip_change_on_email_login" },
+      metadata: {
+        trigger: "high_risk_email_login",
+        riskScore,
+        riskReasons: riskReasons.join(","),
+        deviceHash: device?.deviceHash ?? null,
+      },
     });
   }
 
-  await recordAuthEvent({ type: "email_otp_verify", email, userId: result.user.id, req });
+  await recordAuthEvent({
+    type: "email_otp_verify",
+    email,
+    userId: result.user.id,
+    req,
+    metadata: { deviceHash: device?.deviceHash ?? null, riskScore },
+  });
   return NextResponse.json({ ok: true, next });
 }

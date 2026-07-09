@@ -19,6 +19,7 @@ import { promptLabel } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PhotoManager } from "@/components/profile/photo-manager";
+import { PhotoVerifyCard } from "@/components/profile/photo-verify-card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -35,6 +36,7 @@ export default async function ProfilePage() {
       prompts: { orderBy: { sortOrder: "asc" } },
       user: {
         select: {
+          photoVerifiedAt: true,
           photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }] },
           verifications: { where: { status: "APPROVED" }, select: { type: true } },
         },
@@ -101,6 +103,14 @@ export default async function ProfilePage() {
             );
           })}
         </RevealGroup>
+
+        {/* Photo verification nudge - only while unverified. Selfie capture
+            happens on the provider's side; no biometrics are ever stored. */}
+        {!profile.user.photoVerifiedAt && (
+          <Reveal>
+            <PhotoVerifyCard />
+          </Reveal>
+        )}
       </PhotoManager>
 
       {/* ================= IN THEIR WORDS ================= */}

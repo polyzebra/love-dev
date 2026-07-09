@@ -14,10 +14,13 @@ const bodySchema = z.object({
 });
 
 const NUMBER_UNAVAILABLE = "That number can't be used right now.";
+const PHONE_UNAVAILABLE = "Phone verification is temporarily unavailable.";
 
 /**
  * POST /api/auth/phone/send { phoneE164, countryIso?, dialCode? }
- * -> { ok: true } | { ok: false, error } | 503 when no SMS provider
+ * -> { ok: true } | { ok: false, error }
+ * -> 503 { ok: false, error, blocked: true } when SMS cannot go out
+ *    (provider outage or feature flag off) - the step is NOT skippable
  *
  * Requires a signed-in session (phone attaches to the CURRENT account).
  * One phone = one account: a number already verified elsewhere gets the
@@ -70,22 +73,23 @@ export async function POST(req: Request) {
   try {
     await phoneVerificationProvider().sendCode(phoneE164);
   } catch (error) {
-    if (error instanceof PhoneOtpNotConfiguredError) {
-      return NextResponse.json(
-        { ok: false, error: "Phone verification is not available yet" },
-        { status: 503 },
-      );
+    // Both failure modes block (503 + blocked:true - the client shows
+    // the "temporarily unavailable" notice with NO skip path). When the
+    // flag is off entirely the gate never routes here in the first
+    // place; a provider outage while the flag is ON must never become
+    // a verification bypass. See the gate comment in lib/auth/gate.ts.
+    if (!(error instanceof PhoneOtpNotConfiguredError)) {
+      console.error(`[auth:phone/send] provider failed:`, error);
+      await recordAuthEvent({
+        type: "phone_otp_send_error",
+        phoneE164,
+        userId: user.id,
+        req,
+      });
     }
-    console.error(`[auth:phone/send] provider failed:`, error);
-    await recordAuthEvent({
-      type: "phone_otp_send_error",
-      phoneE164,
-      userId: user.id,
-      req,
-    });
     return NextResponse.json(
-      { ok: false, error: "We couldn't send a code right now. Try again in a moment." },
-      { status: 502 },
+      { ok: false, error: PHONE_UNAVAILABLE, blocked: true },
+      { status: 503 },
     );
   }
 

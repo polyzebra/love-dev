@@ -11,7 +11,7 @@ import { AUTH_EMAIL_KEY } from "@/components/auth/EmailInputStep";
 import { sendEmailCode, verifyEmailCode } from "@/components/auth/api";
 
 /**
- * Step 2 of 3 - the emailed 6-digit code. The address travels in the
+ * Step 2 of 5 - the emailed 6-digit code. The address travels in the
  * query string with a sessionStorage fallback (opened-from-history,
  * stripped params). Auto-submits at 6 digits; on a bad code the
  * server's own copy lands in the banner, the boxes clear and focus
