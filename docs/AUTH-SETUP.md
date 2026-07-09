@@ -153,3 +153,55 @@ state: set the dashboard to 6 and drop the env override (6 is the
 default). Until then production must run with
 `NEXT_PUBLIC_EMAIL_OTP_LENGTH=8`. Phone codes stay 6 (Twilio Verify
 service default).
+
+## Pending auth users
+
+Requesting an email OTP calls `signInWithOtp` with `shouldCreateUser: true`,
+and Supabase creates the `auth.users` row BEFORE the code is ever entered.
+That is GoTrue behavior and cannot be avoided without building a separate
+pre-registration flow - the row is how Supabase ties the outstanding code
+to an identity.
+
+Tirvea therefore treats any `auth.users` row with **no confirmed email/phone
+and no app `User` row** as a *pending signup attempt*, not an account:
+
+- **Invisible in the product**: app `User` rows are created ONLY by
+  `ensureAppUser()` (`src/lib/auth/identity.ts`), which runs from
+  `/auth/callback` and `/api/auth/email/verify` strictly AFTER `verifyOtp`
+  succeeds. No verified code, no account.
+- **Invisible in the admin**: `src/app/admin/users` reads the Prisma `User`
+  table only (`db.user.findMany`), so pending auth rows can never appear
+  in any user list or count.
+- **Swept after 24h**: `cleanupAbandonedAuthUsers()`
+  (`src/lib/auth/cleanup.ts`) deletes `auth.users` rows where
+  `email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`, older than
+  24 hours, with no `"User"` row and `is_sso_user = false`. All auth child
+  tables (`identities`, `sessions`, `one_time_tokens`, `mfa_factors`, ...)
+  cascade on delete, so one statement is sufficient. Each run is audited
+  as an `auth_cleanup` `AuthVerificationEvent` with the deleted count.
+
+### Why not `shouldCreateUser: false`?
+
+It would break first-time registration outright: Supabase then refuses to
+send a code to any email without an existing auth user, so new users could
+never receive their first OTP. Sign-in and sign-up share one flow by
+design; the ghost rows are the (bounded, swept) cost of that.
+
+### Sweep scheduling
+
+Two schedulers exist; either alone is enough, running both is harmless
+(the DELETE is idempotent):
+
+1. **pg_cron** (currently active on the live project): job
+   `tirvea-auth-cleanup`, schedule `30 4 * * *`, runs the same guarded
+   DELETE inside Postgres. Inspect with
+   `SELECT * FROM cron.job WHERE jobname = 'tirvea-auth-cleanup';`
+   (remove with `SELECT cron.unschedule('tirvea-auth-cleanup');`).
+2. **Vercel Cron** (portable path): `vercel.json` schedules
+   `GET /api/cron/auth-cleanup` daily at 04:30 UTC. The route requires
+   `Authorization: Bearer <CRON_SECRET>` (Vercel sends this automatically
+   when the `CRON_SECRET` env var is set) and fails closed when the env
+   var is missing.
+
+Admins can also trigger the sweep on demand: `POST /api/admin/auth-cleanup`
+(permission `users:delete`, mirrored to `AdminLog` as `auth.cleanup`).
