@@ -12,6 +12,7 @@ import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { sendEmailCode } from "@/components/auth/api";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { authRedirectUrl } from "@/lib/auth/url";
 
 /**
  * Step 1 of 5 - "What's your email?". One field, one big CTA; Google
@@ -85,7 +86,7 @@ export function EmailInputStep() {
     const { error } = await supabaseBrowser().auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/onboarding")}`,
+        redirectTo: `${authRedirectUrl("/auth/callback")}?next=${encodeURIComponent("/onboarding")}`,
         queryParams: { prompt: "select_account" },
       },
     });

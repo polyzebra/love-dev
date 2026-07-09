@@ -5,17 +5,33 @@ auth to work in production. Code-side conventions live at the bottom.
 
 ## 1. Supabase - Authentication -> URL Configuration
 
+**INCIDENT (2026-07): production Google sign-in on mobile Safari landed on
+`localhost:3000/?code=...`.** The fingerprint matters: it is the ROOT path,
+not `/auth/callback`. That means Supabase IGNORED the `redirectTo` the app
+sent (it was not covered by the dashboard allow-list) and fell back to the
+project's configured **Site URL**, which was still `http://localhost:3000`.
+No code change can override that fallback - the dashboard values below are
+mandatory:
+
 | Setting | Value |
 | --- | --- |
-| Site URL | `https://tirvea.com` |
-| Redirect URLs | `https://tirvea.com/**` |
+| Site URL | `https://tirvea.com` - **MUST be this.** It was `http://localhost:3000`; that is exactly why users landed on `localhost:3000/?code=...` |
+| Redirect URLs | `https://tirvea.com/**` (**required** - without it every app `redirectTo` is ignored and Supabase falls back to Site URL) |
 | | `https://tirvea.com/auth/callback` |
 | | `https://tirvea.com/auth/confirm` |
 | | `http://localhost:3000/**` (dev only - REMOVE for launch review) |
 
-Every OAuth/magic-link redirect the app requests is built from
-`NEXT_PUBLIC_SITE_URL` (see `src/lib/auth/url.ts`) - if a login loops back to
-`localhost` in production, that env var is missing, not this list.
+How to read a bad redirect in production:
+
+- Lands on `<wrong-origin>/?code=...` (root path) -> Supabase used its Site
+  URL fallback: the requested redirect was not in the Redirect URLs
+  allow-list, or Site URL itself is wrong. Fix THIS dashboard section.
+- Lands on `localhost:3000/auth/callback?...` -> the app itself built a
+  localhost redirect: `NEXT_PUBLIC_SITE_URL` is missing/wrong in Vercel.
+  Since the 2026-07 hardening, `src/lib/auth/url.ts` blocks localhost
+  origins in production builds (logs `[auth:url] localhost redirect blocked
+  in production` and falls back to `https://tirvea.com`), so this variant
+  should no longer be reachable - but fix the env var regardless.
 
 ## 2. Google Cloud Console (OAuth client)
 
@@ -28,9 +44,15 @@ Every OAuth/magic-link redirect the app requests is built from
 
 ## 3. Vercel environment variables
 
+No `NEXT_PUBLIC_*` variable may carry a localhost value in the Production
+environment, and `NEXT_PUBLIC_*` values are BAKED INTO THE BUNDLE at build
+time - after changing any of them you must REDEPLOY (a plain restart is not
+enough).
+
 | Variable | Notes |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://tirvea.com` - canonical origin for every auth redirect |
+| `NEXT_PUBLIC_SITE_URL` | `https://tirvea.com` - canonical origin for every auth redirect; the source of truth for `src/lib/auth/url.ts` |
+| `NEXT_PUBLIC_APP_URL` | `https://tirvea.com` - metadataBase (`src/app/layout.tsx`); never localhost in production |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon public key (browser-safe) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **server-only** - never expose with `NEXT_PUBLIC_`, never import into client components |
