@@ -30,11 +30,16 @@ export const settingsPatchSchema = z
 export type SettingsPatch = z.infer<typeof settingsPatchSchema>;
 
 export async function getUserSettings(userId: string) {
-  return db.userSettings.upsert({
-    where: { userId },
-    update: {},
-    create: { userId },
-  });
+  const existing = await db.userSettings.findUnique({ where: { userId } });
+  if (existing) return existing;
+  // First visit: create the defaults row ATOMICALLY. `upsert` with an empty
+  // update is NOT atomic under Prisma's driver adapters (SELECT then INSERT),
+  // so concurrent first-visit renders - the page plus the nav's prefetches,
+  // which all run the (app) layout - raced it and the losers threw P2002,
+  // 500ing the page. createMany + skipDuplicates compiles to
+  // INSERT ... ON CONFLICT DO NOTHING, which every racer survives.
+  await db.userSettings.createMany({ data: [{ userId }], skipDuplicates: true });
+  return db.userSettings.findUniqueOrThrow({ where: { userId } });
 }
 
 export async function updateUserSettings(userId: string, patch: SettingsPatch) {
