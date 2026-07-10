@@ -12,7 +12,17 @@ const bodySchema = z.object({
 const INVALID_PHONE = "Enter a valid phone number.";
 const UNSUPPORTED_COUNTRY = "Phone sign-in isn't available for that country yet.";
 const NOT_AVAILABLE = "Phone sign-in isn't available right now.";
-const SMS_UNAVAILABLE = "We couldn't send a code right now. Please try again shortly.";
+// Provider send failure (phone_provider_disabled, sms_send_failed, ...):
+// production stays neutral; dev/staging name the actual fix so the flag
+// being on with the Supabase Phone provider still off is diagnosable
+// from the UI instead of a silent dead end.
+const SMS_UNAVAILABLE_NEUTRAL =
+  "Text sign-in is temporarily unavailable. Use email or Google instead.";
+const SMS_UNAVAILABLE_DETAIL =
+  "Phone sign-in is not configured: enable the Phone provider with Twilio Verify " +
+  "in Supabase Auth settings.";
+const SMS_UNAVAILABLE =
+  process.env.NODE_ENV === "production" ? SMS_UNAVAILABLE_NEUTRAL : SMS_UNAVAILABLE_DETAIL;
 const IDENTITY_CONFLICT =
   "This number is already linked to an account that signs in another way. " +
   "Use your email or Google to sign in, then add phone sign-in from Settings.";

@@ -28,6 +28,11 @@ import { countryByIso, type Country } from "@/lib/auth/countries";
  * - IDENTITY_CONFLICT (409): stays HERE with the server's recovery copy
  *   and a "Sign in another way" link back to /login.
  * - RESEND_TOO_SOON (429): banner with the server's retryAfter.
+ * - SMS_PROVIDER_UNAVAILABLE / PHONE_LOGIN_NOT_AVAILABLE (503): the
+ *   provider (or the feature) is down/misconfigured - an inline
+ *   config-error banner (NEVER a toast; it must survive a glance away)
+ *   with the server's message and a "Use another method" link back to
+ *   /login. The form stays fully usable for a retry.
  * - Offline: toast; everything else: quiet banner.
  */
 
@@ -70,6 +75,7 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [conflict, setConflict] = useState<string | null>(null);
+  const [providerDown, setProviderDown] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -105,6 +111,7 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
     if (fieldError) setFieldError(null);
     if (serverError) setServerError(null);
     if (conflict) setConflict(null);
+    if (providerDown) setProviderDown(null);
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -118,6 +125,7 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
     setFieldError(null);
     setServerError(null);
     setConflict(null);
+    setProviderDown(null);
     setPending(true);
     const result = await sendPhoneLoginCode({
       phoneE164: parsed.number,
@@ -134,6 +142,10 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
           return;
         case "IDENTITY_CONFLICT":
           setConflict(result.message);
+          return;
+        case "SMS_PROVIDER_UNAVAILABLE":
+        case "PHONE_LOGIN_NOT_AVAILABLE":
+          setProviderDown(result.message);
           return;
         case "RESEND_TOO_SOON":
           setServerError(
@@ -205,7 +217,17 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
           <InlineFieldError id="login-phone-error" message={fieldError} />
         </div>
 
-        <AuthErrorBanner message={serverError ?? conflict} className="mt-4" />
+        <AuthErrorBanner message={serverError ?? conflict ?? providerDown} className="mt-4" />
+        {providerDown && (
+          <p className="mt-3 text-center text-sm">
+            <Link
+              href="/login"
+              className="rounded-sm font-medium text-primary-soft underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-foreground/20"
+            >
+              Use another method
+            </Link>
+          </p>
+        )}
         {conflict && (
           <p className="mt-3 text-center text-sm">
             <Link

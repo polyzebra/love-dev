@@ -22,7 +22,13 @@ export default async function LoginPage({
   searchParams: Promise<{ callbackUrl?: string | string[]; error?: string | string[] }>;
 }) {
   const session = await auth();
-  if (session) redirect(authNextStep(session.user));
+  if (session) {
+    // A session that still owes its first verified channel belongs HERE
+    // (the gate answers "/login") - redirecting would loop. Everyone
+    // else goes wherever the gate says they belong.
+    const next = authNextStep(session.user);
+    if (next !== "/login") redirect(next);
+  }
 
   const params = await searchParams;
   const rawCallback = typeof params.callbackUrl === "string" ? params.callbackUrl : undefined;

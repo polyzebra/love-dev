@@ -89,7 +89,7 @@ async function main() {
       onboardingDone: false,
     };
     assert.equal(authNextStep({ ...raw, bannedAt: new Date() }, true), "/account-blocked");
-    assert.equal(authNextStep(raw, true), "/auth");
+    assert.equal(authNextStep(raw, true), "/login");
     assert.equal(authNextStep({ ...raw, emailVerified: new Date() }, true), "/auth/phone");
     assert.equal(
       authNextStep({ ...raw, emailVerified: new Date(), phoneVerifiedAt: new Date() }, true),

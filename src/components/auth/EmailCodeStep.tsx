@@ -56,7 +56,7 @@ export function EmailCodeStep() {
 
   // Nothing in the query AND nothing stored - restart the flow.
   useEffect(() => {
-    if (!queryEmail && !readStoredEmail()) router.replace("/auth");
+    if (!queryEmail && !readStoredEmail()) router.replace("/login/email");
   }, [queryEmail, router]);
 
   const [code, setCode] = useState("");
@@ -92,7 +92,7 @@ export function EmailCodeStep() {
           <>
             Sent to <span className="font-medium text-foreground">{email}</span>{" "}
             <Link
-              href="/auth"
+              href="/login/email"
               className="whitespace-nowrap text-primary-soft underline-offset-2 hover:underline"
             >
               Change email
@@ -102,7 +102,7 @@ export function EmailCodeStep() {
           "One moment..."
         )
       }
-      backHref="/auth"
+      backHref="/login/email"
     >
       <div className="flex flex-1 flex-col">
         <OtpInput

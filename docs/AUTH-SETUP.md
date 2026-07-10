@@ -102,7 +102,7 @@ signInWithOtp picks by account state:
 - **"Magic Link"** - sent to RETURNING email addresses.
 
 BOTH templates must show `{{ .Token }}` (the 6-digit code the
-/auth/email-code screen asks for) and must NOT use
+/login/email/verify screen asks for) and must NOT use
 `{{ .ConfirmationURL }}` as the primary action. Recommended subject
 for both: "Your Tirvea verification code". A template with only
 `{{ .ConfirmationURL }}` sends a link and no code, and code entry will always
@@ -227,6 +227,33 @@ vs `phone_otp_*`).
 4. Set `PHONE_LOGIN_ENABLED="true"` (+ optionally
    `PHONE_LOGIN_COUNTRIES`).
 
+**Full settings table (server env + dashboard):**
+
+| Setting | Where | Value | Purpose |
+| --- | --- | --- | --- |
+| `PHONE_LOGIN_ENABLED` | server env | `"true"` | THE phone-login switch: shows the `/login` button, opens `/login/phone(/verify)`, arms the auth.users.phone backfill |
+| `PHONE_LOGIN_COUNTRIES` | server env | `"IE,GB"` (default) | ISO allowlist for anonymous phone login |
+| `TWILIO_ACCOUNT_SID` | server env | `AC...` | Twilio Verify (backend phone-change flow) |
+| `TWILIO_AUTH_TOKEN` | server env | secret | Twilio Verify auth |
+| `TWILIO_VERIFY_SERVICE_SID` | server env | `VA...` | The Verify service; use the SAME SID in the Supabase SMS provider so codes come from one pool |
+| Phone provider | Supabase dashboard (Auth -> Sign In / Up) | ON | Without it `POST /auth/v1/otp {phone}` answers `400 phone_provider_disabled` |
+| SMS provider | Supabase dashboard | Twilio Verify + same Verify SID | GoTrue sends the login OTPs through it |
+| Confirm phone change | Supabase dashboard | OFF | The backfill's `updateUser({ phone })` must write silently, not text a second code |
+
+**Live E2E status (2026-07-09, provider still OFF in the dashboard):**
+`POST /api/auth/phone-login/send` with a valid IE number through the dev
+server (flag on) returns the graceful
+`503 SMS_PROVIDER_UNAVAILABLE` - GoTrue answered
+`phone_provider_disabled` before creating anything, and SQL confirms NO
+`auth.users` row and NO app `User` row was minted by the attempt.
+Non-production builds return the actionable message ("Phone sign-in is
+not configured: enable the Phone provider with Twilio Verify in Supabase
+Auth settings."); production keeps the neutral "Text sign-in is
+temporarily unavailable. Use email or Google instead.". The final
+SMS-in-hand test unlocks the moment the two dashboard flips above are
+made - no code change needed; the existing-owner invariant is already
+proven by `tests/phone-login.test.ts` (spy-client suite, 12/12).
+
 ## 5d. Apple sign-in (feature-flagged, default OFF)
 
 "Continue with Apple" (login entry `/login` + `oauth-buttons.tsx`) renders
@@ -250,6 +277,18 @@ The button then uses the exact same `signInWithOAuth` -> `/auth/callback`
 -> `ensureAppUser()` path as Google.
 
 ## 6. Auth flow map (code reference)
+
+**Route map (since 2026-07-09): `/login` is THE canonical entry.**
+
+- `/login` - entry (Apple flag / Google / Email / Phone flag rows)
+- `/login/email` -> `/login/email/verify` - email OTP journey (moved from
+  `/auth` and `/auth/email-code`)
+- `/login/phone` -> `/login/phone/verify` - phone OTP login (flag-gated)
+- `/auth` -> 308 `/login` (`src/app/auth/route.ts`; carries `?next` /
+  `?callbackUrl` only when same-origin relative) and `/auth/email-code`
+  -> 308 `/login/email/verify` (carries `?email`)
+- `/auth/age`, `/auth/legal`, `/auth/recovery`, `/auth/callback` -
+  UNCHANGED (authenticated steps + OAuth callback)
 
 - `src/lib/auth/url.ts` - `siteUrl()` / `authRedirectUrl()`; the only way redirect URLs are built
 - `src/app/auth/callback/route.ts` - OAuth/magic-link callback; idempotent against re-used codes

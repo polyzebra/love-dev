@@ -15,7 +15,7 @@ import { authRedirectUrl } from "@/lib/auth/url";
 /**
  * /login - the front door. One calm column of full-width providers:
  * Apple (feature-flagged), Google (prompt=select_account so switching
- * accounts is always explicit), Email (-> the /auth OTP flow) and phone
+ * accounts is always explicit), Email (-> the /login/email OTP flow) and phone
  * (server-rendered availability - the page omits it when
  * PHONE_LOGIN_ENABLED is off; never a dead button).
  *
@@ -201,7 +201,7 @@ export function LoginEntry({
         >
           Continue with Google
         </ProviderActionButton>
-        <ProviderLink href="/auth" icon={<Mail className="size-4.5" aria-hidden="true" />}>
+        <ProviderLink href="/login/email" icon={<Mail className="size-4.5" aria-hidden="true" />}>
           Continue with Email
         </ProviderLink>
         {phoneEnabled && (

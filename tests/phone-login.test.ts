@@ -324,7 +324,7 @@ async function main() {
       assert.equal(row.email, `phone+${uid}@placeholder.tirvea.app`);
       // Gate: both identity rungs satisfied - continues to age/legal/onboarding
       const next = authNextStep(row);
-      assert.notEqual(next, "/auth");
+      assert.notEqual(next, "/login");
       assert.notEqual(next, "/auth/phone");
       assert.equal(next, "/auth/age");
     });

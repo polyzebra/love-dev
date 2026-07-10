@@ -73,7 +73,7 @@ export function EmailInputStep() {
     } catch {
       // Query param below is the primary carrier anyway.
     }
-    router.push(`/auth/email-code?email=${encodeURIComponent(value)}`);
+    router.push(`/login/email/verify?email=${encodeURIComponent(value)}`);
   }
 
   // The existing login OAuth flow, verbatim (see oauth-buttons.tsx):

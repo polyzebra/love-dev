@@ -26,7 +26,7 @@ import { authRedirectUrl } from "@/lib/auth/url";
  * (Supabase linkIdentity/unlinkIdentity) needs the dashboard's "Allow
  * manual linking" toggle, which is OFF today, so the link/unlink actions
  * sit behind NEXT_PUBLIC_MANUAL_LINKING_ENABLED (default off) and the UI
- * shows an honest "coming soon" footnote instead of dead buttons.
+ * names that dependency in a footnote instead of showing dead buttons.
  * Guard: unlinking is disabled whenever only one identity remains - an
  * account must never end up with zero ways to sign in.
  */
@@ -281,7 +281,7 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
 
       {!MANUAL_LINKING_ENABLED && (
         <SettingsNote>
-          Adding another sign-in method to an existing account is coming soon.
+          Linking another provider requires manual-linking to be enabled for this project.
         </SettingsNote>
       )}
 

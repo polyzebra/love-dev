@@ -91,7 +91,7 @@ export function RecoveryOptions({ phoneEnabled }: { phoneEnabled: boolean }) {
     >
       <div className="flex flex-1 flex-col">
         <div className="grid gap-3">
-          <Link href="/auth" className={ROW_CLASS}>
+          <Link href="/login/email" className={ROW_CLASS}>
             <RowBody
               icon={<Mail className="size-4.5" />}
               title="Sign in with email code"

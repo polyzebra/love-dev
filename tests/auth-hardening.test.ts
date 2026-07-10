@@ -95,10 +95,10 @@ async function main() {
     assert.equal(authNextStep({ ...base, bannedAt: new Date() }, true), "/account-blocked");
     assert.equal(authNextStep({ ...base, status: "SUSPENDED" }, false), "/account-blocked");
   });
-  await check("unverified email -> /auth (before phone/onboarding)", () => {
+  await check("unverified email -> /login (before phone/onboarding)", () => {
     assert.equal(
       authNextStep({ ...base, emailVerified: null, phoneVerifiedAt: null, onboardingDone: false }, true),
-      "/auth",
+      "/login",
     );
   });
   await check("phone required only when enabled", () => {

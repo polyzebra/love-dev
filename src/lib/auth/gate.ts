@@ -49,11 +49,12 @@ export function authNextStep(
 ): string {
   if (user.bannedAt || user.status === "SUSPENDED") return "/account-blocked";
   // First rung = ONE verified sign-in channel. Email/OAuth identities
-  // verify email here as always; a phone-LOGIN account (verified phone,
-  // placeholder email) already proved its channel and must not be sent
-  // to email capture. No existing account weakens: the legacy funnel
-  // never stamps phoneVerifiedAt before emailVerified.
-  if (!user.emailVerified && !user.phoneVerifiedAt) return "/auth";
+  // verify email here as always (the /login entry leads into
+  // /login/email); a phone-LOGIN account (verified phone, placeholder
+  // email) already proved its channel and must not be sent to email
+  // capture. No existing account weakens: the legacy funnel never
+  // stamps phoneVerifiedAt before emailVerified.
+  if (!user.emailVerified && !user.phoneVerifiedAt) return "/login";
   if (phoneEnabled && !user.phoneVerifiedAt) return "/auth/phone";
   if (needsAgeConfirmation(user)) return "/auth/age";
   if (needsConsent(user)) return "/auth/legal";
