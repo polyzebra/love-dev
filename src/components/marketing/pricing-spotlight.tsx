@@ -100,7 +100,7 @@ export function PricingSpotlight() {
             </div>
             <Magnetic className="inline-block">
               <Button size="lg" className="h-14 rounded-full px-10 text-base" asChild>
-                <Link href="/register">
+                <Link href="/login">
                   {plan.tier === "FREE" ? "Join free" : `Get ${plan.name}`}
                 </Link>
               </Button>

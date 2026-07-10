@@ -6,7 +6,7 @@ const GROUPS = [
     links: [
       { href: "/pricing", label: "Pricing" },
       { href: "/safety", label: "Safety Centre" },
-      { href: "/register", label: "Create account" },
+      { href: "/login", label: "Create account" },
     ],
   },
   {

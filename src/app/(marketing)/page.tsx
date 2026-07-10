@@ -54,7 +54,7 @@ export default function LandingPage() {
         subtitle="Every profile verified. Every intention stated. Every conversation given room to breathe."
         actions={
           <>
-            <HeroCta href="/register">
+            <HeroCta href="/login">
               Start meeting people
               <ArrowRight className="size-4" aria-hidden="true" />
             </HeroCta>
@@ -139,7 +139,7 @@ export default function LandingPage() {
             </Reveal>
             <Reveal delay={0.24}>
               <Link
-                href="/register"
+                href="/login"
                 className="group inline-flex items-center gap-2 text-sm font-semibold text-primary-soft"
               >
                 Create your profile
@@ -280,7 +280,7 @@ export default function LandingPage() {
           <Reveal delay={0.28}>
             <Magnetic className="mt-10 inline-block">
               <Button size="lg" className="h-16 rounded-full px-14 text-lg" asChild>
-                <Link href="/register">Join Tirvea - free</Link>
+                <Link href="/login">Start meeting people</Link>
               </Button>
             </Magnetic>
           </Reveal>

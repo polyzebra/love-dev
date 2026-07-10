@@ -29,16 +29,13 @@ export function MarketingNavbar() {
         )}
       >
         <Logo size={condensed ? "sm" : "md"} className="transition-all duration-300" />
-        <div className="flex items-center gap-1.5">
-          <Button variant="ghost" className="rounded-full max-sm:hidden" asChild>
-            <Link href="/login">Sign in</Link>
+        {/* One auth entry: Sign in carries the primary treatment on every
+            viewport - /login handles both new and returning people. */}
+        <Magnetic strength={0.25}>
+          <Button size="lg" className="h-11 rounded-full px-6" asChild>
+            <Link href="/login" aria-label="Sign in to Tirvea">Sign in</Link>
           </Button>
-          <Magnetic strength={0.25}>
-            <Button size="lg" className="h-11 rounded-full px-6" asChild>
-              <Link href="/register">Join Tirvea</Link>
-            </Button>
-          </Magnetic>
-        </div>
+        </Magnetic>
       </motion.nav>
     </header>
   );
