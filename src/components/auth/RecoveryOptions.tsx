@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ChevronRight, Loader2, Mail, MessageCircleMore } from "lucide-react";
+import { ChevronRight, Loader2, Mail, Smartphone } from "lucide-react";
 import { LoginStepShell } from "@/components/auth/LoginStepShell";
 import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -19,7 +19,7 @@ import { authRedirectUrl } from "@/lib/auth/url";
 
 function GoogleIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="size-4.5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z"
@@ -105,7 +105,7 @@ export function RecoveryOptions({ phoneEnabled }: { phoneEnabled: boolean }) {
             <div className="grid gap-3">
               <Link href="/login/email" className={ROW_CLASS}>
                 <RowBody
-                  icon={<Mail className="size-4.5" />}
+                  icon={<Mail className="size-5" />}
                   title="Sign in with email code"
                   detail="We'll email you a one-time code - no password needed."
                 />
@@ -135,7 +135,7 @@ export function RecoveryOptions({ phoneEnabled }: { phoneEnabled: boolean }) {
               {phoneEnabled && (
                 <Link href="/login/phone" className={ROW_CLASS}>
                   <RowBody
-                    icon={<MessageCircleMore className="size-4.5" />}
+                    icon={<Smartphone className="size-5" />}
                     title="Sign in with phone"
                     detail="We'll text a six-digit code to your number."
                   />
