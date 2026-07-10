@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { BackButton } from "./BackButton";
 import { AnimatePresence, motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
 
@@ -40,16 +39,9 @@ export function LoginStepShell({
     <div>
       <div className="mb-8 flex items-center">
         {backHref ? (
-          <Link
-            href={backHref}
-            className="tap-target text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:ring-foreground/20 -m-2 inline-flex min-h-9 items-center gap-1.5 rounded-full p-2 text-sm transition-colors outline-none focus-visible:ring-2"
-          >
-            <ArrowLeft className="size-5" aria-hidden="true" />
-            {backLabel !== "Back" && <span>{backLabel}</span>}
-            {backLabel === "Back" && <span className="sr-only">Back</span>}
-          </Link>
+          <BackButton href={backHref} label={backLabel} />
         ) : (
-          <span aria-hidden="true" className="min-h-9" />
+          <span aria-hidden="true" className="min-h-11" />
         )}
       </div>
 

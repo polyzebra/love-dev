@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { BackButton } from "./BackButton";
 import { AnimatePresence, motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -47,15 +46,9 @@ export function AuthShell({
 }) {
   return (
     <div>
-      <div className="mb-8 grid grid-cols-[2.25rem_1fr_2.25rem] items-center">
+      <div className="mb-8 grid grid-cols-[2.75rem_1fr_2.75rem] items-center">
         {backHref ? (
-          <Link
-            href={backHref}
-            aria-label="Back"
-            className="tap-target text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:ring-foreground/20 -m-2 inline-flex size-9 items-center justify-center rounded-full p-2 transition-colors outline-none focus-visible:ring-2"
-          >
-            <ArrowLeft className="size-5" aria-hidden="true" />
-          </Link>
+          <BackButton href={backHref} />
         ) : (
           <span aria-hidden="true" />
         )}
