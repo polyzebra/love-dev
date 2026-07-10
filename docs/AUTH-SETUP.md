@@ -42,6 +42,33 @@ How to read a bad redirect in production:
 - The app always sends `prompt=select_account`, so account switching after
   sign-out is explicit.
 
+### Linking Google to an existing account
+
+Identity is `auth.users.id`; one email = one account (docs/IDENTITY.md).
+Two ways a Google identity can end up on an existing account:
+
+- **Automatic (same email only).** Supabase auto-links a Google sign-in to
+  an existing `auth.users` row when the Google account's email equals that
+  row's confirmed email. A user who registered with email-OTP
+  `me@gmail.com` and later picks `me@gmail.com` in the Google chooser
+  lands on the SAME account (a second row appears in `auth.identities`,
+  same `user_id`). No app code involved.
+- **Manual (different email).** Supabase supports
+  `supabase.auth.linkIdentity({ provider: "google" })` called from the
+  browser WHILE SIGNED IN to the account that should gain the identity;
+  it runs the OAuth dance and attaches the new identity to the current
+  uid. Requires **Authentication -> Providers -> "Allow manual linking"**
+  to be enabled in the Supabase dashboard (off by default; off for
+  Tirvea today). Tirvea intentionally ships no linking UI - the
+  duplicate-phone 409 is answered with guidance instead, and accounts
+  are never merged server-side.
+
+Corollary: a user whose Google email differs from their OTP email holds
+two separate accounts, and a phone number verified on one 409s on the
+other - working as designed. Tell them to sign in with the method/email
+that owns the number (the phone/send + phone/verify routes log
+`phoneOwner=<id>` to the console on every 409).
+
 ## 3. Vercel environment variables
 
 No `NEXT_PUBLIC_*` variable may carry a localhost value in the Production

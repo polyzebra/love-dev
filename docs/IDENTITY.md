@@ -69,3 +69,30 @@ Identity lookups by email are forbidden. Remaining email usages, all allowed:
 password reset + email verification (Supabase-owned), notification
 delivery, seed fixtures, and the callback's email-conflict INTEGRITY
 check (which never merges).
+
+## Two emails = two accounts (identity linking)
+One email = one account, by design. A person who signs in with Google
+account `alice.a@gmail.com` and separately email-OTPs `alice.b@gmail.com`
+holds TWO canonical accounts - two `auth.users` rows, two app `User` rows.
+That is correct behavior, not a bug, and it is the usual real cause behind
+"my phone number is already verified on another account" (the 409
+`duplicate_phone`): the number was verified on the OTHER account. The
+routes log a console-only diagnostic on every 409
+(`authUserId=appUserId=... phoneOwner=... provider=...`) so support can
+see both ids instantly; the UI copy stays neutral.
+
+How identities relate on ONE account:
+- Supabase links a NEW provider sign-in to an EXISTING `auth.users` row
+  automatically only when the incoming identity's email matches that
+  row's confirmed email. Example: email-OTP `alice.b@gmail.com` first,
+  then Google sign-in with the same `alice.b@gmail.com` - one uid, two
+  rows in `auth.identities`.
+- Different emails NEVER auto-link. Manual linking is possible with
+  `supabase.auth.linkIdentity()` while signed in - see
+  docs/AUTH-SETUP.md "Linking Google to an existing account". Tirvea
+  ships no linking UI today; phone conflicts are resolved by signing in
+  to the account that owns the number (or using a different number).
+- Accounts are never merged server-side. `ensureAppUser` rejects an
+  email held by a live foreign account (`AccountConflict`) and its
+  update path never touches phone columns - a verified phone can only
+  move accounts by admin release (`releasePhone`) + re-verification.

@@ -21,6 +21,8 @@ export type AppSession = {
     image: string | null;
     role: Role;
     onboardingDone: boolean;
+    /** Supabase sign-in provider for THIS session ("email", "google", ...) - diagnostics only. */
+    provider: string | null;
     // Gate inputs (see src/lib/auth/gate.ts)
     status: string;
     bannedAt: Date | null;
@@ -68,6 +70,7 @@ export const auth = cache(async (): Promise<AppSession | null> => {
       image: appUser.image,
       role: appUser.role,
       onboardingDone: appUser.onboardingDone,
+      provider: (user.app_metadata?.provider as string | undefined) ?? null,
       status: appUser.status,
       bannedAt: appUser.bannedAt,
       emailVerified: appUser.emailVerified,

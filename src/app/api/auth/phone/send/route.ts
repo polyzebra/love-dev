@@ -78,6 +78,15 @@ export const POST = withUnavailableGuard(
       case "account_blocked":
         return NextResponse.json({ ok: false, error: NUMBER_UNAVAILABLE }, { status: 403 });
       case "duplicate_phone":
+        // Dev diagnostic - console only, never UI. A 409 here means the
+        // number is verified on a DIFFERENT canonical account (identity =
+        // auth.users.id = User.id; one email -> one account). See
+        // docs/IDENTITY.md "Two emails = two accounts".
+        console.warn(
+          `[auth:phone/send] duplicate_phone: authUserId=appUserId=${user.id} ` +
+            `phoneOwner=${outcome.holderId} provider=${user.provider ?? "?"} ` +
+            `onboardingDone=${user.onboardingDone} authCompleted=${user.authCompleted}`,
+        );
         return NextResponse.json(
           { ok: false, code: "duplicate_phone", error: DUPLICATE_PHONE },
           { status: 409 },

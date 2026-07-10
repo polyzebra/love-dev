@@ -1,7 +1,7 @@
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
 import { ipHashFrom, userAgentHashFrom } from "@/lib/auth/audit";
-import type { User as AppUser } from "@/generated/prisma/client";
+import { Prisma, type User as AppUser } from "@/generated/prisma/client";
 
 /**
  * Identity rules - Supabase Auth (auth.users.id) is the ONLY identity.
@@ -188,16 +188,34 @@ export async function ensureAppUser(
     }
   }
 
-  const createdUser = await db.user.create({
-    data: {
-      id: u.id,
-      email,
-      emailVerified: u.email_confirmed_at ? new Date(u.email_confirmed_at) : null,
-      name: (u.user_metadata?.full_name as string | undefined) ?? null,
-      image: (u.user_metadata?.avatar_url as string | undefined) ?? null,
-      ...loginStamps,
-    },
-  });
+  let createdUser: AppUser;
+  try {
+    createdUser = await db.user.create({
+      data: {
+        id: u.id,
+        email,
+        emailVerified: u.email_confirmed_at ? new Date(u.email_confirmed_at) : null,
+        name: (u.user_metadata?.full_name as string | undefined) ?? null,
+        image: (u.user_metadata?.avatar_url as string | undefined) ?? null,
+        ...loginStamps,
+      },
+    });
+  } catch (error) {
+    // Concurrent FIRST logins for one uid (double-delivered callback,
+    // OTP verify racing the callback): the PK settles it - exactly one
+    // row. The loser adopts the winner's row instead of erroring.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      const winner = await db.user.findUnique({ where: { id: u.id } });
+      if (winner) {
+        console.info(`[identity] first-login race for auth.uid=${u.id} - adopting winner row`);
+        return { ok: true, user: winner, created: false, previousLoginIpHash: null };
+      }
+    }
+    throw error;
+  }
   console.info(`[identity] new account auth.uid=${u.id} provider=${provider}`);
   return { ok: true, user: createdUser, created: true, previousLoginIpHash: null };
 }

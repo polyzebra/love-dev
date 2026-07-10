@@ -72,6 +72,13 @@ export const POST = withUnavailableGuard(
           { status: 429 },
         );
       case "duplicate_phone":
+        // Dev diagnostic - console only, never UI. See docs/IDENTITY.md
+        // "Two emails = two accounts".
+        console.warn(
+          `[auth:phone/verify] duplicate_phone: authUserId=appUserId=${user.id} ` +
+            `phoneOwner=${outcome.holderId} provider=${user.provider ?? "?"} ` +
+            `onboardingDone=${user.onboardingDone} authCompleted=${user.authCompleted}`,
+        );
         return NextResponse.json(
           { ok: false, code: "duplicate_phone", error: DUPLICATE_PHONE },
           { status: 409 },

@@ -82,7 +82,8 @@ export type PhoneSendOutcome =
   | { kind: "invalid_phone" }
   | { kind: "unsupported_country" }
   | { kind: "account_blocked" }
-  | { kind: "duplicate_phone" }
+  /** `holderId` = the OTHER account that owns the number (diagnostics only, never UI). */
+  | { kind: "duplicate_phone"; holderId: string }
   | { kind: "already_verified"; user: User }
   /** Sent OR rate-limited - deliberately indistinguishable (neutral contract). */
   | { kind: "sent"; retryAfter: number; limited: boolean }
@@ -119,7 +120,7 @@ export async function sendPhoneVerification(opts: {
   const holder = await db.user.findUnique({ where: { phoneE164 } });
   if (holder && holder.id !== user.id) {
     await recordAuthEvent({ type: "phone_otp_send_conflict", phoneE164, userId: user.id, req });
-    return { kind: "duplicate_phone" };
+    return { kind: "duplicate_phone", holderId: holder.id };
   }
   // Same number already verified on THIS account - success, no SMS.
   if (holder && holder.id === user.id && holder.phoneVerifiedAt) {
@@ -185,7 +186,8 @@ export async function sendPhoneVerification(opts: {
 export type PhoneVerifyOutcome =
   | { kind: "invalid_phone" }
   | { kind: "locked" }
-  | { kind: "duplicate_phone" }
+  /** `holderId` = the OTHER account that owns the number (diagnostics only, never UI). */
+  | { kind: "duplicate_phone"; holderId: string }
   | { kind: "already_verified"; user: User }
   | { kind: "expired" }
   | { kind: "incorrect" }
@@ -224,7 +226,7 @@ export async function confirmPhoneVerification(opts: {
   const holder = await db.user.findUnique({ where: { phoneE164 } });
   if (holder && holder.id !== user.id) {
     await recordAuthEvent({ type: "phone_otp_verify_conflict", phoneE164, userId: user.id, req });
-    return { kind: "duplicate_phone" };
+    return { kind: "duplicate_phone", holderId: holder.id };
   }
 
   // Failure lock: 5 invalid attempts within 15 minutes (per number or per
@@ -317,7 +319,9 @@ export async function confirmPhoneVerification(opts: {
   }
   if (!updated) {
     await recordAuthEvent({ type: "phone_otp_verify_conflict", phoneE164, userId: user.id, req });
-    return { kind: "duplicate_phone" };
+    // Race loser - refetch the winner purely for the diagnostic outcome.
+    const winner = await db.user.findUnique({ where: { phoneE164 }, select: { id: true } });
+    return { kind: "duplicate_phone", holderId: winner?.id ?? "unknown" };
   }
 
   await recordAuthEvent({ type: "phone_otp_verify", phoneE164, userId: user.id, req });
