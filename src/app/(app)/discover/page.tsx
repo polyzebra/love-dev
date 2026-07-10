@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { getDiscoverFeed } from "@/lib/services/discovery";
 import { SwipeDeck, type ViewerContext } from "@/components/app/swipe-deck";
-import { PageLoader } from "@/components/shared/page-loader";
 
 export const metadata: Metadata = { title: "Discover" };
 
@@ -47,10 +45,11 @@ export default async function DiscoverPage({
     <>
       {/* The stage is the page - no header; its controls float over the photo */}
       <h1 className="sr-only">Swipe</h1>
-      {/* Full-stage fallback: same fixed stage geometry as SwipeDeck, no placeholder shapes */}
-      <Suspense fallback={<PageLoader fullStage />}>
-        <Deck backHref={backHref} />
-      </Suspense>
+      {/* Deliberately NO Suspense boundary: the page is not 'ready' until
+          the deck data resolves, so soft navigation keeps the PREVIOUS page
+          visible (with the top progress bar) instead of landing on a
+          full-screen loader or a blank stage. */}
+      <Deck backHref={backHref} />
     </>
   );
 }
