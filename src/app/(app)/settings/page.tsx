@@ -21,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { RestorePurchasesRow, SignOutRow } from "@/components/settings/restore-purchases";
 
 export const metadata: Metadata = { title: "Settings" };
-export const dynamic = "force-dynamic";
 
 const GROUPS = [
   {

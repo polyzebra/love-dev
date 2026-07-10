@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DeleteAccountButton, ExportDataButton } from "@/components/app/privacy-actions";
 
 export const metadata: Metadata = { title: "Privacy Centre" };
-export const dynamic = "force-dynamic";
 
 export default async function PrivacySettingsPage() {
   const user = await requireUser();

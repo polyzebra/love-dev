@@ -8,7 +8,6 @@ import { Reveal } from "@/components/fx/reveal";
 import { PromptsForm } from "./prompts-form";
 
 export const metadata: Metadata = { title: "Your prompts" };
-export const dynamic = "force-dynamic";
 
 export default async function ProfilePromptsPage() {
   const user = await requireUser();

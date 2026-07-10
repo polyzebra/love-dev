@@ -7,7 +7,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { formatRelativeTime, cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Notifications" };
-export const dynamic = "force-dynamic";
 
 const ICONS = {
   NEW_MATCH: Heart, NEW_MESSAGE: MessageCircle, NEW_LIKE: Heart,
@@ -19,15 +18,21 @@ const ICONS = {
  *  subscription and system events in one push-ready stream. */
 export default async function NotificationsPage() {
   const user = await requireUser();
-  const notifications = await db.notification.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-  await db.notification.updateMany({
-    where: { userId: user.id, readAt: null },
-    data: { readAt: new Date() },
-  });
+  // One batched transaction instead of two awaits. Order still matters
+  // (the list must show pre-read state so unread styling survives this
+  // very render), so this is NOT a Promise.all candidate - the batch
+  // keeps SELECT-before-UPDATE while collapsing the two roundtrips.
+  const [notifications] = await db.$transaction([
+    db.notification.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
+    db.notification.updateMany({
+      where: { userId: user.id, readAt: null },
+      data: { readAt: new Date() },
+    }),
+  ]);
 
   return (
     <>

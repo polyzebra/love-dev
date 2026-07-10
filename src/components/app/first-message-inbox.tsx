@@ -80,10 +80,12 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
           data: { matched: boolean; conversationId?: string };
         };
         toast.success("It's a match");
+        // A fresh server render of the destination - no refresh() needed
+        // on top (dynamic routes carry no client cache to invalidate).
         router.push(data.conversationId ? `/chat/${data.conversationId}` : "/chat");
       }
-      // Decline succeeds silently - either way, unread counts elsewhere update.
-      router.refresh();
+      // Decline: local state already removed the card, and every other
+      // page re-renders server-side on its next navigation anyway.
     } catch {
       restore(card, index);
       toast.error("You appear to be offline.");

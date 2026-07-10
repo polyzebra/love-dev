@@ -5,7 +5,6 @@ import { AppearancePicker } from "@/components/settings/appearance-picker";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 
 export const metadata: Metadata = { title: "Appearance" };
-export const dynamic = "force-dynamic";
 
 export default async function AppearanceSettingsPage() {
   const user = await requireUser();

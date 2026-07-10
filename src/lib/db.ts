@@ -17,6 +17,16 @@ function createClient() {
   const adapter = new PrismaPg({
     connectionString: url || "postgresql://localhost:5432/tirvea",
   });
+  if (process.env.PERF_TRACE) {
+    const client = new PrismaClient({
+      adapter,
+      log: [{ level: "query", emit: "event" }, "error"],
+    });
+    client.$on("query", (e) => {
+      console.info(`[trace:db] ${e.duration}ms at=${Date.now()} q=${e.query.slice(0, 80)}`);
+    });
+    return client;
+  }
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],

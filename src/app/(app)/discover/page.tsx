@@ -7,7 +7,6 @@ import { SwipeDeck, type ViewerContext } from "@/components/app/swipe-deck";
 import { PageLoader } from "@/components/shared/page-loader";
 
 export const metadata: Metadata = { title: "Discover" };
-export const dynamic = "force-dynamic";
 
 async function Deck({ backHref }: { backHref: string | null }) {
   const user = await requireUser();

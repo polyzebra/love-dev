@@ -5,7 +5,6 @@ import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { SettingsToggleList } from "@/components/settings/settings-toggle-list";
 
 export const metadata: Metadata = { title: "Email notifications" };
-export const dynamic = "force-dynamic";
 
 export default async function EmailNotificationsPage() {
   const user = await requireUser();

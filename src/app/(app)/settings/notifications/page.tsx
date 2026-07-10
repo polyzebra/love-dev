@@ -7,7 +7,6 @@ import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { SettingsToggleList } from "@/components/settings/settings-toggle-list";
 
 export const metadata: Metadata = { title: "Notifications" };
-export const dynamic = "force-dynamic";
 
 const CHANNELS = [
   {

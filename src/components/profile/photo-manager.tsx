@@ -113,8 +113,9 @@ async function readErrorMessage(res: Response, fallback: string): Promise<string
 /**
  * Owns the cover hero AND the gallery grid so every mutation (add, reorder,
  * delete) updates both optimistically - index 0 of local state is always the
- * hero. `router.refresh()` follows successful mutations so RSC-derived state
- * (completion %, other pages) catches up behind the already-correct UI.
+ * hero. `router.refresh()` follows successful upload/delete so RSC-derived
+ * state (completion %, verify nudge) catches up behind the already-correct
+ * UI; reorder skips it - no server-derived UI depends on order.
  */
 export function PhotoManager({
   initialPhotos,
@@ -170,8 +171,7 @@ export function PhotoManager({
 
   /**
    * The ONE optimistic reorder commit - chevron buttons and drag-drop both
-   * land here: PATCH the new order, revert to `previous` + toast on failure,
-   * router.refresh() on success so RSC-derived state catches up.
+   * land here: PATCH the new order, revert to `previous` + toast on failure.
    */
   async function commitOrder(next: ManagedPhoto[], previous: ManagedPhoto[]) {
     try {
@@ -185,7 +185,8 @@ export function PhotoManager({
         toast.error(await readErrorMessage(res, "We could not reorder your photos. Please try again."));
         return;
       }
-      router.refresh();
+      // No refresh(): unlike upload/delete, reorder changes no server-derived
+      // UI (completionPct, verify nudge) - local order IS the server order now.
     } catch {
       setPhotos(previous);
       toast.error("We could not reorder your photos. Check your connection and try again.");

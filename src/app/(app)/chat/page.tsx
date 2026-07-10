@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { cn, formatRelativeTime, initialsOf } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Chat" };
-export const dynamic = "force-dynamic";
 
 export default async function ChatListPage() {
   const user = await requireUser();

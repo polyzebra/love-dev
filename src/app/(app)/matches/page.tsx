@@ -24,7 +24,6 @@ import { Button } from "@/components/ui/button";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
 
 export const metadata: Metadata = { title: "Matches" };
-export const dynamic = "force-dynamic";
 
 /**
  * Contract with src/lib/services/first-messages.ts:
@@ -92,7 +91,8 @@ export default async function MatchesPage() {
   const user = await requireUser();
   const userId = user.id;
 
-  const [pendingRaw, viewerProfile] = await Promise.all([
+  // Three independent reads - one parallel batch, no waterfall.
+  const [pendingRaw, viewerProfile, matches] = await Promise.all([
     listFirstMessagesFor(userId),
     db.profile.findUnique({
       where: { userId },
@@ -102,6 +102,29 @@ export default async function MatchesPage() {
         communityTags: true,
         interests: { select: { interest: { select: { slug: true } } } },
       },
+    }),
+    db.match.findMany({
+      where: { status: "ACTIVE", OR: [{ userAId: userId }, { userBId: userId }] },
+      include: {
+        conversation: { select: { id: true, lastMessageAt: true } },
+        userA: {
+          select: {
+            id: true,
+            lastActiveAt: true,
+            profile: { select: { displayName: true, birthDate: true, city: true } },
+            photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
+          },
+        },
+        userB: {
+          select: {
+            id: true,
+            lastActiveAt: true,
+            profile: { select: { displayName: true, birthDate: true, city: true } },
+            photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
     }),
   ]);
 
@@ -128,30 +151,6 @@ export default async function MatchesPage() {
   }));
   // Only mounted when there is at least one - never an empty section.
   const inbox = inboxCards.length > 0 ? <FirstMessageInbox initialItems={inboxCards} /> : null;
-
-  const matches = await db.match.findMany({
-    where: { status: "ACTIVE", OR: [{ userAId: userId }, { userBId: userId }] },
-    include: {
-      conversation: { select: { id: true, lastMessageAt: true } },
-      userA: {
-        select: {
-          id: true,
-          lastActiveAt: true,
-          profile: { select: { displayName: true, birthDate: true, city: true } },
-          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
-        },
-      },
-      userB: {
-        select: {
-          id: true,
-          lastActiveAt: true,
-          profile: { select: { displayName: true, birthDate: true, city: true } },
-          photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
 
   if (matches.length === 0) {
     return (

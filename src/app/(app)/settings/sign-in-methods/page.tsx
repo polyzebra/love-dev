@@ -6,7 +6,6 @@ import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { SignInMethods } from "@/components/settings/sign-in-methods";
 
 export const metadata: Metadata = { title: "Sign-in methods" };
-export const dynamic = "force-dynamic";
 
 /**
  * Mask a verified number for display: keep the dial code and the last

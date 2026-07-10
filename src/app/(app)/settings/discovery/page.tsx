@@ -6,7 +6,6 @@ import { PageHeader } from "@/components/shared/page-header";
 import { DiscoveryPreferencesForm } from "@/components/app/discovery-preferences-form";
 
 export const metadata: Metadata = { title: "Discovery preferences" };
-export const dynamic = "force-dynamic";
 
 export default async function DiscoverySettingsPage() {
   const user = await requireUser();

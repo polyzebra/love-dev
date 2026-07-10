@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { formatRelativeTime } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Devices & sessions" };
-export const dynamic = "force-dynamic";
 
 export default async function DevicesSettingsPage() {
   const user = await requireUser();

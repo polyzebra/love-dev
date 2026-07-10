@@ -71,8 +71,10 @@ export function ChatActions({ otherUserId, otherName }: { otherUserId: string; o
     }
     setBlockOpen(false);
     toast.success(`${otherName} is blocked.`);
+    // push() to a dynamic route IS a fresh server render (the router keeps
+    // no client cache for dynamic data) - a refresh() on top re-rendered
+    // the whole tree a second time for nothing.
     router.push("/chat");
-    router.refresh();
   }
 
   return (

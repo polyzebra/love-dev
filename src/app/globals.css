@@ -231,6 +231,8 @@
   --animate-float-slower: float-slow 11s ease-in-out infinite reverse;
   --animate-ping-soft: ping-soft 2.2s var(--ease-luxe) infinite;
   --animate-sheen: sheen 3.5s var(--ease-luxe) infinite;
+  /* Route-transition bar: delayed start hides it on fast (<150ms) navs */
+  --animate-nav-progress: nav-progress 3.2s var(--ease-luxe) 0.15s both;
 
   @keyframes pulse-dot {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -269,6 +271,13 @@
   @keyframes rise {
     from { opacity: 0; transform: translate3d(0, 28px, 0); }
     to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+  /* Indeterminate top progress: sprint to ~80%, crawl until the route lands */
+  @keyframes nav-progress {
+    0% { transform: scaleX(0); opacity: 0; }
+    5% { opacity: 1; }
+    45% { transform: scaleX(0.72); }
+    100% { transform: scaleX(0.94); opacity: 1; }
   }
 }
 

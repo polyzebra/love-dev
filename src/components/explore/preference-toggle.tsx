@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { emitInteraction } from "@/lib/interaction-events";
 
 /** Join/leave a category - saved preferences boost your ranking inside it. */
 export function ExplorePreferenceToggle({ categoryId, initialSaved }: { categoryId: string; initialSaved: boolean }) {
-  const router = useRouter();
   const [saved, setSaved] = useState(initialSaved);
   const [busy, setBusy] = useState(false);
 
@@ -27,7 +25,9 @@ export function ExplorePreferenceToggle({ categoryId, initialSaved }: { category
     if (!res.ok) { setSaved(!next); toast.error("Couldn't update. Try again."); return; }
     emitInteraction("step-complete");
     toast.success(next ? "Added to your Explore interests." : "Removed from your interests.");
-    router.refresh();
+    // No refresh(): the button state is the feedback, re-ranking the list
+    // mid-view is jarring, and dynamic routes re-render server-side on the
+    // next navigation regardless (no client cache).
   }
 
   return (

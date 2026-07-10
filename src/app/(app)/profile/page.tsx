@@ -23,7 +23,6 @@ import { PhotoVerifyCard } from "@/components/profile/photo-verify-card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
-export const dynamic = "force-dynamic";
 
 const GOAL_LABELS: Record<string, string> = GOAL_LINES;
 

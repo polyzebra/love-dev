@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { Compass, Flame, Heart, MessageCircle, Settings, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
+import { NavLinkStatus, NavTransitionProvider } from "@/components/app/nav-progress";
 
 const NAV_ITEMS = [
   { href: "/discover", label: "Swipe", icon: Flame },
@@ -26,12 +27,14 @@ const RAIL_ITEMS = [
 /**
  * Floating glass navigation. Mobile: a levitating capsule tab bar with
  * a spring-animated active halo. Desktop (lg+): a frosted side rail.
+ * Route transitions keep the old page visible (no (app)/loading.tsx);
+ * the NavTransitionProvider's 2px top bar is the only pending signal.
  */
 export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <>
+    <NavTransitionProvider>
       {/* Mobile floating capsule */}
       <nav
         aria-label="Primary"
@@ -59,6 +62,7 @@ export function AppNav() {
                   )}
                   <Icon className={cn("relative size-5", active && "fill-primary/30")} aria-hidden="true" />
                   <span className="relative">{label}</span>
+                  <NavLinkStatus />
                 </Link>
               </li>
             );
@@ -99,6 +103,7 @@ export function AppNav() {
                     )}
                     <Icon className="relative size-5" aria-hidden="true" />
                     <span className="relative">{label}</span>
+                    <NavLinkStatus />
                   </Link>
                 </li>
               );
@@ -107,6 +112,6 @@ export function AppNav() {
         </nav>
         <p className="px-6 py-6 text-xs text-muted-foreground">Made with care</p>
       </aside>
-    </>
+    </NavTransitionProvider>
   );
 }

@@ -17,7 +17,6 @@ import { promptLabel } from "@/config/prompts";
 import { categoriesForProfile } from "@/lib/discovery/taxonomy";
 
 export const metadata: Metadata = { title: "Conversation" };
-export const dynamic = "force-dynamic";
 
 export default async function ConversationPage({
   params,
@@ -30,10 +29,12 @@ export default async function ConversationPage({
   const user = await requireUser();
   const userId = user.id;
 
-  const participant = await assertParticipant(conversationId, userId);
-  if (!participant) notFound();
-
-  const [other, myProfile, messages] = await Promise.all([
+  // The participation check and the three reads are independent - run
+  // them as one parallel batch and gate on the check before using any of
+  // it. markRead stays AFTER the gate: its participant.update throws for
+  // non-participants and its SEEN sweep must never run for outsiders.
+  const [participant, other, myProfile, messages] = await Promise.all([
+    assertParticipant(conversationId, userId),
     db.participant.findFirst({
       where: { conversationId, userId: { not: userId } },
       include: {
@@ -84,6 +85,7 @@ export default async function ConversationPage({
       select: { id: true, senderId: true, body: true, status: true, createdAt: true },
     }),
   ]);
+  if (!participant) notFound();
 
   await markRead(conversationId, userId);
 

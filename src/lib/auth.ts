@@ -48,9 +48,13 @@ export type AppSession = {
 export const auth = cache(async (): Promise<AppSession | null> => {
   const supabase = await supabaseServer();
   // getUser() validates the JWT against Supabase Auth - source of truth
+  const t0 = Date.now();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (process.env.PERF_TRACE) {
+    console.info(`[trace:auth] getUser ${Date.now() - t0}ms at=${Date.now()}`);
+  }
   // Phone-keyed auth users (native phone OTP login) have NO email - only
   // require the uid. Email-keyed sessions still carry one.
   if (!user?.id) return null;

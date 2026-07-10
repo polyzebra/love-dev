@@ -15,7 +15,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Explore" };
-export const dynamic = "force-dynamic";
 
 export default async function ExploreCategoryPage({
   params, searchParams,
@@ -27,14 +26,19 @@ export default async function ExploreCategoryPage({
   const userId = session!.user.id;
   const { profile: profileParam, ...filterParams } = rawFilters;
   const filters = exploreFiltersSchema.safeParse(filterParams);
-  const viewerProfile = profileParam ? await getExploreProfile(userId, profileParam) : null;
-  const result = await getExploreMatches(userId, slug, filters.success ? filters.data : {});
+  // Independent reads (saved-state resolves the category via its slug
+  // relation) - one parallel batch instead of a three-step waterfall.
+  const [viewerProfile, result, savedRow] = await Promise.all([
+    profileParam ? getExploreProfile(userId, profileParam) : null,
+    getExploreMatches(userId, slug, filters.success ? filters.data : {}),
+    db.userExplorePreference.findFirst({
+      where: { userId, category: { is: { slug } } },
+      select: { id: true },
+    }),
+  ]);
   if (!result) notFound();
   const { category, users, total, page, pageSize } = result;
-
-  const saved = !!(await db.userExplorePreference.findUnique({
-    where: { userId_categoryId: { userId, categoryId: category.id } },
-  }));
+  const saved = !!savedRow;
   track("explore_category_viewed", userId, { slug });
 
   const hasFilters = Object.keys(filterParams).length > 0;

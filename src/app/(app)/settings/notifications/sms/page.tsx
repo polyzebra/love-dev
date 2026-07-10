@@ -6,7 +6,6 @@ import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { SettingsToggleList } from "@/components/settings/settings-toggle-list";
 
 export const metadata: Metadata = { title: "SMS notifications" };
-export const dynamic = "force-dynamic";
 
 export default async function SmsNotificationsPage() {
   const user = await requireUser();

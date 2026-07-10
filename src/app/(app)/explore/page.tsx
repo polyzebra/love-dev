@@ -7,7 +7,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Compass } from "lucide-react";
 
 export const metadata: Metadata = { title: "Explore" };
-export const dynamic = "force-dynamic";
 
 export default async function ExplorePage() {
   const user = await requireUser();
