@@ -141,8 +141,8 @@ export function LoginEntry({
     toast.error(CALLBACK_ERROR_MESSAGES[errorCode] ?? "Sign-in failed. Please try again.");
   }, [errorCode]);
 
-  // The existing Google flow, verbatim (oauth-buttons.tsx): Supabase
-  // browser client; prompt=select_account forces the account chooser.
+  // Supabase browser client OAuth; prompt=select_account forces the
+  // account chooser so switching accounts is always explicit.
   async function startOAuth(provider: "google" | "apple") {
     if (pending) return;
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {

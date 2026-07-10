@@ -286,7 +286,9 @@ The button then uses the exact same `signInWithOAuth` -> `/auth/callback`
 - `/login/phone` -> `/login/phone/verify` - phone OTP login (flag-gated)
 - `/auth` -> 308 `/login` (`src/app/auth/route.ts`; carries `?next` /
   `?callbackUrl` only when same-origin relative) and `/auth/email-code`
-  -> 308 `/login/email/verify` (carries `?email`)
+  -> 308 `/login/email/verify` (carries `?email`). The same
+  normalization also runs in the edge middleware (`src/proxy.ts`,
+  `legacyAuthRedirect`) as defense-in-depth for cached/PWA clients.
 - `/auth/age`, `/auth/legal`, `/auth/recovery`, `/auth/callback` -
   UNCHANGED (authenticated steps + OAuth callback)
 

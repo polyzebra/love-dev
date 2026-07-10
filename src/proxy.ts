@@ -17,11 +17,44 @@ const PROTECTED = [
 ];
 
 /**
+ * /auth and /auth/email-code moved permanently to /login and
+ * /login/email/verify. The route handlers under src/app/auth/ already
+ * 308; this edge-level normalization is defense-in-depth so cached/PWA
+ * clients and any stray server code get corrected before the app even
+ * renders. Param carry mirrors the route handlers exactly: only
+ * same-origin relative values ("/..." but never "//...") survive for
+ * ?next / ?callbackUrl, and only ?email survives onto the verify step.
+ */
+function legacyAuthRedirect(request: NextRequest): NextResponse | null {
+  const { pathname, searchParams } = request.nextUrl;
+  if (pathname === "/auth") {
+    const target = new URL("/login", request.url);
+    for (const key of ["next", "callbackUrl"] as const) {
+      const value = searchParams.get(key);
+      if (value && value.startsWith("/") && !value.startsWith("//")) {
+        target.searchParams.set(key, value);
+      }
+    }
+    return NextResponse.redirect(target, 308);
+  }
+  if (pathname === "/auth/email-code") {
+    const target = new URL("/login/email/verify", request.url);
+    const email = searchParams.get("email");
+    if (email) target.searchParams.set("email", email);
+    return NextResponse.redirect(target, 308);
+  }
+  return null;
+}
+
+/**
  * Edge middleware: refreshes the Supabase session cookie and gates
  * protected routes. Role-level checks (admin) run server-side in the
  * admin layout against the app database.
  */
 export default async function proxy(request: NextRequest) {
+  const legacy = legacyAuthRedirect(request);
+  if (legacy) return legacy;
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
