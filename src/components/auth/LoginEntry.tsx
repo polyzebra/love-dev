@@ -25,7 +25,7 @@ import { authRedirectUrl } from "@/lib/auth/url";
  * an OAuth redirect is in flight.
  */
 
-function GoogleIcon() {
+export function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
       <path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z" />
@@ -36,7 +36,7 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
+export function AppleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5 fill-current" aria-hidden="true">
       <path d="M17.05 20.28c-.98.95-2.05.86-3.08.38-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.38C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08ZM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25Z" />

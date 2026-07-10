@@ -1,6 +1,7 @@
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
 import { ipHashFrom, userAgentHashFrom } from "@/lib/auth/audit";
+import { PLACEHOLDER_EMAIL_SUFFIX } from "@/lib/auth/gate";
 import { Prisma, type User as AppUser } from "@/generated/prisma/client";
 
 /**
@@ -224,9 +225,13 @@ export async function ensureAppUser(
 // Phone-keyed provisioning (anonymous phone LOGIN)
 // ---------------------------------------------------------------------------
 
-/** Placeholder email for a phone-keyed auth user until they add a real one. */
+/**
+ * Placeholder email for a phone-keyed auth user until they add a real one.
+ * The suffix is what the gate's needsEmailAttach() rung keys on - the
+ * /auth/email attach step replaces this with a real, verified address.
+ */
 export function phonePlaceholderEmail(authUid: string): string {
-  return `phone+${authUid}@placeholder.tirvea.app`;
+  return `phone+${authUid}${PLACEHOLDER_EMAIL_SUFFIX}`;
 }
 
 export type ProvisionPhoneLoginResult =

@@ -280,6 +280,43 @@ flag before BOTH prerequisites exist, or users get a dead provider:
 The button then uses the exact same `signInWithOAuth` -> `/auth/callback`
 -> `ensureAppUser()` path as Google.
 
+## 5e. Authenticated email attach (/auth/email) - "Secure email change" must be OFF
+
+Every completed account must hold BOTH a verified phone AND a verified
+email. Phone-first accounts are born with a placeholder address
+(`phone+<uid>@placeholder.tirvea.app`), so the gate sends them to
+`/auth/email` (the rung between phone and age; `needsEmailAttach()` in
+`src/lib/auth/gate.ts`) to attach a real one. The flow
+(`src/lib/auth/email-attach-flow.ts`) is the email mirror of the
+authenticated phone-change flow - NOT the anonymous email login:
+
+- send   = `supabase.auth.updateUser({ email })` on the live session -
+  GoTrue's `email_change` flow emails a code to the NEW address.
+- verify = `supabase.auth.verifyOtp({ email, token, type: "email_change" })`
+  - stamps `auth.users.email` + `email_confirmed_at`; the app then
+  rewrites `User.email` + `emailVerified` in one race-safe transaction.
+
+**DASHBOARD REQUIREMENT**: Supabase -> Authentication -> Providers ->
+Email -> **"Secure email change" MUST be OFF** for this single-OTP
+attach. When it is ON, GoTrue sends confirmations to BOTH the current
+and the new address and requires both - and a phone-first account's
+current address is the unroutable placeholder, so the flow could never
+complete. Turning it off makes `updateUser({ email })` email only the
+new address (template: **"Change Email Address"** - it must show
+`{{ .Token }}`, same rule as section 4's templates).
+
+**Why CASE 3 is explicit here (vs. the anonymous flows' neutrality)**:
+anonymous send endpoints answer neutrally so account existence is never
+enumerable by strangers. On `/auth/email` the caller is AUTHENTICATED
+(they just proved a phone), and a fake "code sent" for an address they
+cannot attach would be a dead end. So an address owned by another LIVE
+account answers an explicit `409 EMAIL_IN_USE` ("This email is already
+associated with another Tirvea account. Please sign in using Email,
+Google or Apple to access that account.") - no OTP is sent, nothing is
+written, the owner is untouched, and the message names no account
+details. Disposable/blocklisted addresses still get ONE indistinguishable
+neutral rejection (`email_not_allowed`).
+
 ## 6. Auth flow map (code reference)
 
 **Route map (since 2026-07-09): `/login` is THE canonical entry.**
@@ -295,15 +332,19 @@ The button then uses the exact same `signInWithOAuth` -> `/auth/callback`
   `legacyAuthRedirect`) as defense-in-depth for cached/PWA clients.
 - `/auth/age`, `/auth/legal`, `/auth/recovery`, `/auth/callback` -
   UNCHANGED (authenticated steps + OAuth callback)
+- `/auth/email` - AUTHENTICATED email attach (gate rung for phone-first
+  accounts; section 5e). Not to be confused with `/login/email`.
 
 - `src/lib/auth/url.ts` - `siteUrl()` / `authRedirectUrl()`; the only way redirect URLs are built
 - `src/app/auth/callback/route.ts` - OAuth/magic-link callback; idempotent against re-used codes
 - `src/lib/auth/identity.ts` - `ensureAppUser()`: the single app-User provisioning path (callback + email verify)
-- `src/lib/auth/gate.ts` - `authNextStep()`: blocked -> email -> phone (if enabled) -> onboarding -> app
+- `src/lib/auth/gate.ts` - `authNextStep()`: blocked -> first channel (/login) -> phone (if enabled) -> email attach (/auth/email) -> age -> legal -> onboarding -> app
 - `POST /api/auth/email/send` `{email}` -> always `{ok:true, retryAfter}` (neutral; disposable/limited differ only in audit - `retryAfter` = seconds until the resend unlocks)
 - `POST /api/auth/email/verify` `{email, code}` -> `{ok:true, next}` or neutral failure
 - `POST /api/auth/phone/send` `{phoneE164, countryIso?, dialCode?}` (session required) -> `{ok:true, retryAfter}` (limited sends are indistinguishable from real ones)
 - `POST /api/auth/phone/verify` `{phoneE164, code}` -> `{ok:true, next}` (+ guarded auth.users.phone sync, section 5c)
+- `POST /api/auth/email-attach/send` `{email}` (session required) -> `{ok:true, retryAfter}` (limited sends indistinguishable) | `{ok:true, alreadyVerified:true, next}` | 409 `email_in_use` | 400 `invalid_email`/`email_not_allowed` | 503
+- `POST /api/auth/email-attach/verify` `{email, code}` (session required) -> `{ok:true, next}` | 400 `incorrect_code`/`code_expired` | 409 `email_in_use` (commit race - nothing transferred) | 429 `too_many_attempts`
 - `POST /api/auth/phone-login/send` `{phoneE164, countryIso}` (ANONYMOUS, flag-gated) -> `{data:{sent,retryAfter}}` | `{error:{code,message}}` with `INVALID_PHONE` / `UNSUPPORTED_COUNTRY` / `IDENTITY_CONFLICT` / `ACCOUNT_BLOCKED` / `RESEND_TOO_SOON` / `SMS_PROVIDER_UNAVAILABLE` / `PHONE_LOGIN_NOT_AVAILABLE`
 - `POST /api/auth/phone-login/verify` `{phoneE164, code, countryIso?}` (ANONYMOUS) -> `{data:{next,created}}` | `{error:{code,message}}` with `INVALID_CODE` / `EXPIRED_CODE` / `TOO_MANY_ATTEMPTS` / `IDENTITY_CONFLICT` / `ACCOUNT_BLOCKED` / `SESSION_CREATION_FAILED` / `PHONE_LOGIN_NOT_AVAILABLE`
 - `AuthVerificationEvent` (Prisma) - audit trail AND the data behind the DB-backed rate limits

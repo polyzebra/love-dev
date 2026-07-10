@@ -327,11 +327,13 @@ async function main() {
       assert.equal(row.phoneCountryIso, "IE");
       assert.equal(row.authCompleted, true);
       assert.equal(row.email, `phone+${uid}@placeholder.tirvea.app`);
-      // Gate: both identity rungs satisfied - continues to age/legal/onboarding
+      // Gate: the first channel is proven (never bounced back to /login
+      // or /auth/phone), but the account lives on a placeholder email -
+      // the email-attach rung comes next, before age/legal/onboarding.
       const next = authNextStep(row);
       assert.notEqual(next, "/login");
       assert.notEqual(next, "/auth/phone");
-      assert.equal(next, "/auth/age");
+      assert.equal(next, "/auth/email");
     });
 
     // ------------------------------------------------------------ case 8

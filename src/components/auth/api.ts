@@ -122,6 +122,49 @@ export async function verifyPhoneCode(phoneE164: string, code: string): Promise<
 }
 
 // ---------------------------------------------------------------------------
+// Email ATTACH (authenticated) - /api/auth/email-attach/*. The mirror of the
+// phone-change endpoints above for the email channel (phone-first accounts
+// replacing their placeholder address) - NOT the anonymous email login.
+// ---------------------------------------------------------------------------
+
+/**
+ * POST /api/auth/email-attach/send { email }. A 409 carries
+ * code "email_in_use" - the UI renders the full-card conflict state with
+ * the server's copy (sign in with Email/Google/Apple instead).
+ */
+export async function sendEmailAttachCode(email: string): Promise<SendResult> {
+  const res = await post("/api/auth/email-attach/send", { email });
+  if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
+  if (res.json?.ok === true) {
+    // Already verified on this account: a success state - the flow
+    // simply continues to `next` without an OTP screen.
+    if (res.json.alreadyVerified === true && typeof res.json.next === "string") {
+      return { ok: true, alreadyVerified: true, next: res.json.next };
+    }
+    return { ok: true, retryAfter: retryAfterOf(res.json) };
+  }
+  return {
+    ok: false,
+    blocked: false,
+    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    message: errorMessage(res.json) ?? GENERIC_MESSAGE,
+  };
+}
+
+/** POST /api/auth/email-attach/verify { email, code }. */
+export async function verifyEmailAttachCode(email: string, code: string): Promise<VerifyResult> {
+  const res = await post("/api/auth/email-attach/verify", { email, code });
+  if (!res) return { ok: false, message: OFFLINE_MESSAGE };
+  const next = res.json?.next;
+  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  return {
+    ok: false,
+    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    message: errorMessage(res.json) ?? GENERIC_MESSAGE,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Phone LOGIN (anonymous) - /api/auth/phone-login/*. A SEPARATE flow from
 // the authenticated phone-change endpoints above; structured errors are
 // { error: { code, message, retryAfter? } } and success is { data: ... }.

@@ -78,11 +78,12 @@ async function main() {
 
   // ------------------------------------------------------------ gate matrix
   console.log("gate matrix");
-  const { authNextStep } = await import("../src/lib/auth/gate");
+  const { authNextStep, needsEmailAttach } = await import("../src/lib/auth/gate");
   const { CURRENT_VERSIONS } = await import("../src/lib/auth/consent");
   const base = {
     status: "ACTIVE",
     bannedAt: null as Date | null,
+    email: "hardening-gate@example.com",
     emailVerified: new Date(),
     phoneVerifiedAt: new Date(),
     ageConfirmedAt: new Date(),
@@ -104,6 +105,34 @@ async function main() {
   await check("phone required only when enabled", () => {
     assert.equal(authNextStep({ ...base, phoneVerifiedAt: null }, true), "/auth/phone");
     assert.equal(authNextStep({ ...base, phoneVerifiedAt: null }, false), "/discover");
+  });
+  await check("email attach rung: placeholder/unverified email -> /auth/email after phone", () => {
+    const phoneFirst = {
+      ...base,
+      email: "phone+some-uid@placeholder.tirvea.app",
+      emailVerified: null as Date | null,
+    };
+    assert.equal(needsEmailAttach(phoneFirst), true);
+    // Placeholder email + verified phone: the attach step comes right
+    // after the phone rung, before age - with the flag on OR off.
+    assert.equal(authNextStep(phoneFirst, true), "/auth/email");
+    assert.equal(authNextStep(phoneFirst, false), "/auth/email");
+    // Real-but-unverified email (e.g. admin-released) also owes the rung.
+    assert.equal(
+      authNextStep({ ...base, emailVerified: null as Date | null }, true),
+      "/auth/email",
+    );
+    // A verified placeholder can't happen, but the rung still catches it.
+    assert.equal(needsEmailAttach({ ...phoneFirst, emailVerified: new Date() }), true);
+    // Email-first users never see it - nobody re-verifies what's verified.
+    assert.equal(needsEmailAttach(base), false);
+    assert.equal(authNextStep(base, true), "/discover");
+    // Google-created user: verified email, no phone, flag on -> the gate
+    // demands the PHONE first and never /auth/email.
+    assert.equal(
+      authNextStep({ ...base, phoneVerifiedAt: null, onboardingDone: false }, true),
+      "/auth/phone",
+    );
   });
   await check("onboarding then discover", () => {
     assert.equal(authNextStep({ ...base, onboardingDone: false }, true), "/onboarding");

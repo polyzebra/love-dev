@@ -69,6 +69,7 @@ async function main() {
   const base = {
     status: "ACTIVE",
     bannedAt: null as Date | null,
+    email: "age-consent-gate@example.com",
     emailVerified: new Date(),
     phoneVerifiedAt: new Date(),
     ageConfirmedAt: new Date() as Date | null,

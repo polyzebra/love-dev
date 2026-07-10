@@ -6,8 +6,13 @@ import { phoneVerificationEnabled } from "@/lib/auth/phone";
  * belongs next. Every guard (requireUser, OTP verify responses, login
  * redirects) asks this instead of re-implementing the ladder.
  *
- * Ladder: blocked -> email -> phone -> 18+ confirmation -> legal
- * consent -> onboarding -> app.
+ * Ladder: blocked -> first channel -> phone -> email attach -> 18+
+ * confirmation -> legal consent -> onboarding -> app.
+ *
+ * MILESTONE INVARIANT: every COMPLETED account holds BOTH a verified
+ * phone (when the feature is launched) AND a verified email. Nobody
+ * re-verifies a channel that is already verified, and accounts are
+ * never merged or transferred to satisfy a rung.
  *
  * Phone-unavailable semantics (two DIFFERENT states, do not merge):
  *  - No SMS provider configured (no TWILIO_* envs, SUPABASE_PHONE_ENABLED
@@ -25,6 +30,8 @@ import { phoneVerificationEnabled } from "@/lib/auth/phone";
 export type GateUser = {
   status: string;
   bannedAt: Date | null;
+  /** Always set on the app row - phone-first accounts carry a placeholder until they attach one. */
+  email: string;
   emailVerified: Date | null;
   phoneVerifiedAt: Date | null;
   ageConfirmedAt: Date | null;
@@ -43,6 +50,20 @@ export function isPhoneVerificationEnabled(): boolean {
   return phoneVerificationEnabled();
 }
 
+/** Domain of the synthetic email a phone-LOGIN account is born with. */
+export const PLACEHOLDER_EMAIL_SUFFIX = "@placeholder.tirvea.app";
+
+/**
+ * Does this account still owe a REAL, verified email address? True for a
+ * phone-first account living on its placeholder email AND for any account
+ * whose email was never verified (e.g. admin-released). Email-first and
+ * OAuth users verified their address at sign-in, so the rung is invisible
+ * to them - nobody re-verifies what is already verified.
+ */
+export function needsEmailAttach(user: Pick<GateUser, "email" | "emailVerified">): boolean {
+  return user.email.endsWith(PLACEHOLDER_EMAIL_SUFFIX) || !user.emailVerified;
+}
+
 export function authNextStep(
   user: GateUser,
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
@@ -56,6 +77,10 @@ export function authNextStep(
   // stamps phoneVerifiedAt before emailVerified.
   if (!user.emailVerified && !user.phoneVerifiedAt) return "/login";
   if (phoneEnabled && !user.phoneVerifiedAt) return "/auth/phone";
+  // Second channel = a REAL verified email on every account. Phone-first
+  // accounts (placeholder email) attach one right after their phone rung;
+  // email-first users already verified theirs, so this rung never shows.
+  if (needsEmailAttach(user)) return "/auth/email";
   if (needsAgeConfirmation(user)) return "/auth/age";
   if (needsConsent(user)) return "/auth/legal";
   if (!user.onboardingDone) return "/onboarding";

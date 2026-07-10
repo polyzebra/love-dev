@@ -73,6 +73,16 @@ export type AuthEventType =
   // Backfill of auth.users.phone after an app-side phone-change verify
   | "phone_auth_sync"
   | "phone_auth_sync_failed"
+  // Authenticated email ATTACH (/auth/email - separate from anonymous
+  // email login; send events double as the flow's rate-limit data)
+  | "email_attach_send"
+  | "email_attach_send_limited"
+  | "email_attach_send_blocked"
+  | "email_attach_send_error"
+  | "email_attach_conflict"
+  | "email_attach_verify_fail"
+  | "email_attach_verify_locked"
+  | "email_attach_verified"
   | "risk_phone_challenge"
   | "risk_triggered"
   | "age_confirmed"

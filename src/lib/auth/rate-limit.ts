@@ -67,6 +67,9 @@ const SEND_EVENT_TYPE = {
   // Anonymous phone LOGIN - counted separately from phone-change sends so
   // the two flows never consume each other's budget.
   phone_login: "auth_phone_code_sent",
+  // Authenticated email ATTACH (/auth/email) - counted separately from
+  // anonymous email-login sends for the same reason.
+  email_attach: "email_attach_send",
 } as const;
 
 /**
@@ -83,7 +86,9 @@ export async function resendCooldown(
   const sends = await db.authVerificationEvent.findMany({
     where: {
       type: SEND_EVENT_TYPE[kind],
-      ...(kind === "email" ? { email: identifier.toLowerCase() } : { phoneE164: identifier }),
+      ...(kind === "email" || kind === "email_attach"
+        ? { email: identifier.toLowerCase() }
+        : { phoneE164: identifier }),
       createdAt: { gte: new Date(now - HOUR_MS) },
     },
     orderBy: { createdAt: "desc" },
@@ -116,6 +121,40 @@ export async function checkOtpSendIpLimit(ipHash: string | null): Promise<OtpLim
   if (!ipHash) return { ok: true };
   const byIp = await countEvents({ type: "email_otp_send", ipHash }, HOUR_MS);
   if (byIp >= 10) return { ok: false, reason: "ip_hourly" };
+  return { ok: true };
+}
+
+/** Authenticated email-attach sends: max 10/hour per IP hash (across addresses). */
+export async function checkEmailAttachSendIpLimit(ipHash: string | null): Promise<OtpLimitResult> {
+  if (!ipHash) return { ok: true };
+  const byIp = await countEvents({ type: "email_attach_send", ipHash }, HOUR_MS);
+  if (byIp >= 10) return { ok: false, reason: "ip_hourly" };
+  return { ok: true };
+}
+
+/**
+ * Email-ATTACH failure lock: same policy as checkOtpVerifyBlocked (5
+ * invalid attempts per address or per IP within 15 minutes -> locked 15
+ * minutes) but counted over email_attach_verify_fail events, so attach
+ * failures and anonymous email-login failures never extend each other's
+ * locks. Locked attempts audit as email_attach_verify_locked (not counted).
+ */
+export async function checkEmailAttachVerifyBlocked(target: {
+  email: string;
+  ipHash?: string | null;
+}): Promise<OtpLimitResult> {
+  const byEmail = await countEvents(
+    { type: "email_attach_verify_fail", email: target.email.toLowerCase() },
+    VERIFY_LOCK_WINDOW_MS,
+  );
+  if (byEmail >= VERIFY_LOCK_MAX_FAILS) return { ok: false, reason: "verify_locked_email" };
+  if (target.ipHash) {
+    const byIp = await countEvents(
+      { type: "email_attach_verify_fail", ipHash: target.ipHash },
+      VERIFY_LOCK_WINDOW_MS,
+    );
+    if (byIp >= VERIFY_LOCK_MAX_FAILS) return { ok: false, reason: "verify_locked_ip" };
+  }
   return { ok: true };
 }
 
