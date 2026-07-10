@@ -14,6 +14,8 @@ import { db } from "@/lib/db";
 import { Prisma, type User } from "@/generated/prisma/client";
 import {
   phoneVerificationProvider,
+  phoneVerificationProviderKind,
+  phoneLoginEnabled,
   PhoneOtpNotConfiguredError,
   PhoneProviderRejectedError,
   type PhoneVerificationProvider,
@@ -200,12 +202,87 @@ function isUniqueViolation(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
 
+// ---------------------------------------------------------------------------
+// auth.users.phone backfill (the exit ramp from the phone-login bridge)
+// ---------------------------------------------------------------------------
+
+/** Structural subset of supabase.auth the backfill needs - injectable in tests. */
+export type AuthPhoneSyncClient = {
+  updateUser(attributes: {
+    phone: string;
+  }): Promise<{ error: { code?: string; message: string } | null }>;
+};
+
+/**
+ * Best-effort sync of a JUST-VERIFIED number into auth.users.phone via
+ * supabase.auth.updateUser({ phone }) on the caller's live session. This
+ * is the honest fix for existing owners: their number lives only in app
+ * columns (User.phoneE164), so native phone LOGIN would hit the
+ * IDENTITY_CONFLICT bridge; once auth.users.phone is populated, the
+ * uid-match branch signs them straight into their canonical account.
+ *
+ * Guards (never fail the app-side claim because of the sync):
+ *  - PHONE_LOGIN_ENABLED must be "true". With the Supabase phone provider
+ *    OFF, GoTrue rejects any phone write outright - proven live
+ *    2026-07-09: POST /auth/v1/otp {phone} -> 400 phone_provider_disabled
+ *    - so attempting it would only add noise. The flag asserts the
+ *    dashboard is configured (provider on + Twilio-in-Supabase).
+ *  - provider kind must be "twilio". Under kind "supabase" the
+ *    phone_change flow ITSELF wrote auth.users.phone (verifyOtp type
+ *    "phone_change"), and updateUser({ phone }) is that flow's SEND - it
+ *    would text a fresh code.
+ *  - errors are audited (phone_auth_sync_failed) and swallowed. NOTE:
+ *    when Supabase's "confirm phone change" is on, updateUser sends its
+ *    own confirmation SMS instead of writing the column directly - keep
+ *    phone-change confirmations OFF in the dashboard for a silent sync.
+ *
+ * Returns the disposition purely for tests/telemetry.
+ */
+export async function syncPhoneToSupabaseAuth(opts: {
+  userId: string;
+  phoneE164: string;
+  client?: AuthPhoneSyncClient;
+  req?: Request;
+}): Promise<"skipped" | "synced" | "failed"> {
+  if (!phoneLoginEnabled() || phoneVerificationProviderKind() !== "twilio") return "skipped";
+  const { userId, phoneE164, req } = opts;
+  try {
+    const client =
+      opts.client ?? (await (await import("@/lib/supabase/server")).supabaseServer()).auth;
+    const { error } = await client.updateUser({ phone: phoneE164 });
+    if (error) {
+      await recordAuthEvent({
+        type: "phone_auth_sync_failed",
+        phoneE164,
+        userId,
+        req,
+        metadata: { code: error.code ?? error.message },
+      });
+      return "failed";
+    }
+    await recordAuthEvent({ type: "phone_auth_sync", phoneE164, userId, req });
+    return "synced";
+  } catch (error) {
+    console.warn(`[auth:phone] auth.users.phone sync failed: ${String(error).slice(0, 120)}`);
+    await recordAuthEvent({
+      type: "phone_auth_sync_failed",
+      phoneE164,
+      userId,
+      req,
+      metadata: { code: "exception" },
+    });
+    return "failed";
+  }
+}
+
 export async function confirmPhoneVerification(opts: {
   user: { id: string };
   phone: string;
   code: string;
   countryIso?: string;
   provider?: PhoneVerificationProvider;
+  /** Overrides the SSR supabase client for the auth.users.phone sync (tests). */
+  authSync?: AuthPhoneSyncClient;
   req?: Request;
 }): Promise<PhoneVerifyOutcome> {
   const { user, req } = opts;
@@ -325,5 +402,11 @@ export async function confirmPhoneVerification(opts: {
   }
 
   await recordAuthEvent({ type: "phone_otp_verify", phoneE164, userId: user.id, req });
+
+  // BACKFILL (guarded, best-effort, AFTER the claim committed): mirror the
+  // verified number into auth.users.phone so native phone LOGIN can key
+  // this member by uid instead of hitting the identity-conflict bridge.
+  await syncPhoneToSupabaseAuth({ userId: user.id, phoneE164, client: opts.authSync, req });
+
   return { kind: "verified", user: updated };
 }

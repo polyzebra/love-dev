@@ -164,6 +164,69 @@ via the `phone_change` flow (`auth.updateUser({ phone })` +
 `verifyOtp(type: "phone_change")`) - it never creates a second, phone-keyed
 identity.
 
+### 5c. Phone LOGIN (anonymous, feature-flagged - separate from 5a/5b)
+
+Phone LOGIN signs users IN with native Supabase phone auth
+(`signInWithOtp({ phone })` + `verifyOtp(type: "sms")`), which keys
+identity by **`auth.users.phone`**. It is a separate feature from the
+authenticated phone-change flow above, at route (`/api/auth/phone-login/*`
+vs `/api/auth/phone/*`), service (`phone-login-flow.ts` vs
+`phone-flow.ts`) and audit level (`auth_phone_code_*`, `auth_login_*`
+vs `phone_otp_*`).
+
+**Architecture truth (proven live 2026-07-09):**
+
+- `GET /auth/v1/settings` -> `external.phone: false` (provider OFF;
+  `sms_provider: "twilio"` is merely the configured vendor name).
+- `POST /auth/v1/otp {phone}` -> `400 phone_provider_disabled`.
+- `auth.users`: 2 rows, **0** with `phone`, **0** with
+  `phone_confirmed_at` - every verified number lives ONLY app-side
+  (`User.phoneE164`; 1 verified owner at audit time), because Twilio
+  Verify runs through OUR backend and writes app columns only.
+- Therefore native phone OTP **cannot** sign an existing owner into their
+  canonical account: GoTrue would mint a NEW phone-keyed auth user
+  (uid != owner's `User.id`) - a duplicate canonical account, forbidden.
+  Without a service-role key we can neither backfill `auth.users.phone`
+  server-side nor fabricate sessions.
+
+**Shipped policy (`src/lib/auth/phone-login-flow.ts`):**
+
+- `PHONE_LOGIN_ENABLED` (default off) -> routes answer
+  `503 PHONE_LOGIN_NOT_AVAILABLE`; the UI hides the button (never a dead
+  one). `PHONE_LOGIN_COUNTRIES` (default `IE,GB`) allowlists regions -
+  narrower than phone-change, which accepts any resolvable region.
+- **Existing-owner bridge**: at send, an app-owned number whose
+  `auth.users` mapping is missing/mismatched is refused with
+  `409 IDENTITY_CONFLICT` before any SMS. At verify (defense in depth),
+  a successful OTP whose session uid differs from the app owner is
+  SIGNED OUT and answered `409 IDENTITY_CONFLICT`: "This number is
+  already linked to an account that signs in another way. Use your email
+  or Google to sign in, then add phone sign-in from Settings." No second
+  app account is ever created; the owner's row is untouched.
+- uid matches the owner -> normal login into the canonical account.
+- Unowned number -> app account provisioned ONLY after the OTP approves
+  (`provisionPhoneLoginUser`), phone stamped in the same write; the gate
+  then continues age -> legal -> onboarding (the first gate rung accepts
+  either verified channel).
+- **Backfill (the exit ramp)**: with the flag on, every successful
+  authenticated phone-change verify also calls
+  `supabase.auth.updateUser({ phone })` on the live session
+  (`syncPhoneToSupabaseAuth`, audited `phone_auth_sync[_failed]`, never
+  blocks the app-side claim). Once `auth.users.phone` is populated,
+  owners re-verifying (or newly verifying) unlock uid-match phone login.
+
+**Dashboard config required to flip the flag:**
+
+1. Supabase -> Authentication -> Sign In / Up -> **Phone: enable**.
+2. Supabase -> SMS provider: **Twilio Verify**, with the SAME Verify
+   service the backend uses (Account SID, Auth Token,
+   `TWILIO_VERIFY_SERVICE_SID`).
+3. Keep "confirm phone change" OFF so the backfill's
+   `updateUser({ phone })` writes the column silently instead of texting
+   a second code.
+4. Set `PHONE_LOGIN_ENABLED="true"` (+ optionally
+   `PHONE_LOGIN_COUNTRIES`).
+
 ## 6. Auth flow map (code reference)
 
 - `src/lib/auth/url.ts` - `siteUrl()` / `authRedirectUrl()`; the only way redirect URLs are built
@@ -173,7 +236,9 @@ identity.
 - `POST /api/auth/email/send` `{email}` -> always `{ok:true, retryAfter}` (neutral; disposable/limited differ only in audit - `retryAfter` = seconds until the resend unlocks)
 - `POST /api/auth/email/verify` `{email, code}` -> `{ok:true, next}` or neutral failure
 - `POST /api/auth/phone/send` `{phoneE164, countryIso?, dialCode?}` (session required) -> `{ok:true, retryAfter}` (limited sends are indistinguishable from real ones)
-- `POST /api/auth/phone/verify` `{phoneE164, code}` -> `{ok:true, next}`
+- `POST /api/auth/phone/verify` `{phoneE164, code}` -> `{ok:true, next}` (+ guarded auth.users.phone sync, section 5c)
+- `POST /api/auth/phone-login/send` `{phoneE164, countryIso}` (ANONYMOUS, flag-gated) -> `{data:{sent,retryAfter}}` | `{error:{code,message}}` with `INVALID_PHONE` / `UNSUPPORTED_COUNTRY` / `IDENTITY_CONFLICT` / `ACCOUNT_BLOCKED` / `RESEND_TOO_SOON` / `SMS_PROVIDER_UNAVAILABLE` / `PHONE_LOGIN_NOT_AVAILABLE`
+- `POST /api/auth/phone-login/verify` `{phoneE164, code, countryIso?}` (ANONYMOUS) -> `{data:{next,created}}` | `{error:{code,message}}` with `INVALID_CODE` / `EXPIRED_CODE` / `TOO_MANY_ATTEMPTS` / `IDENTITY_CONFLICT` / `ACCOUNT_BLOCKED` / `SESSION_CREATION_FAILED` / `PHONE_LOGIN_NOT_AVAILABLE`
 - `AuthVerificationEvent` (Prisma) - audit trail AND the data behind the DB-backed rate limits
   (`src/lib/auth/rate-limit.ts`):
   - sends (email + phone): escalating resend cooldown 30s -> 60s -> 120s (then 120s),

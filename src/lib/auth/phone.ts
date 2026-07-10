@@ -238,3 +238,43 @@ export function phoneVerificationProvider(): PhoneVerificationProvider {
       return notConfiguredProvider;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Phone LOGIN (anonymous) - a SEPARATE feature from the authenticated
+// phone-change flow above. Native Supabase phone auth (signInWithOtp
+// { phone } + verifyOtp type "sms") keys identity by auth.users.phone, so
+// it only works when the Supabase Dashboard has BOTH:
+//   1. Authentication -> Sign In / Up -> Phone provider ENABLED
+//      (live audit 2026-07-09: GET /auth/v1/settings -> external.phone=false,
+//      and POST /auth/v1/otp {phone} -> 400 phone_provider_disabled), and
+//   2. Twilio Verify configured as Supabase's SMS provider (Account SID,
+//      Auth Token, Verify Service SID - the same Verify service the
+//      backend uses is fine; codes then come from one pool).
+// Flip PHONE_LOGIN_ENABLED="true" ONLY once both are done. The flag also
+// arms the auth.users.phone backfill in phone-flow.ts.
+// ---------------------------------------------------------------------------
+
+/**
+ * THE phone-login switch. Off (default) means the login routes answer
+ * 503 PHONE_LOGIN_NOT_AVAILABLE and the UI must hide the button - never
+ * render a dead one.
+ */
+export function phoneLoginEnabled(): boolean {
+  return process.env.PHONE_LOGIN_ENABLED === "true";
+}
+
+/**
+ * ISO country allowlist for anonymous phone LOGIN (env
+ * PHONE_LOGIN_COUNTRIES, comma-separated, default "IE,GB"). Deliberately
+ * narrower than the authenticated phone-change flow, which accepts any
+ * region libphonenumber can resolve.
+ */
+export function phoneLoginCountries(): ReadonlySet<string> {
+  const raw = process.env.PHONE_LOGIN_COUNTRIES?.trim() || "IE,GB";
+  return new Set(
+    raw
+      .split(",")
+      .map((iso) => iso.trim().toUpperCase())
+      .filter((iso) => /^[A-Z]{2}$/.test(iso)),
+  );
+}

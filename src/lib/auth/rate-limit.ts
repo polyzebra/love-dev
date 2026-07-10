@@ -60,6 +60,15 @@ export type ResendCooldownResult = {
   retryAfter: number;
 };
 
+/** Audit event type that counts as a "real send" for each flow. */
+const SEND_EVENT_TYPE = {
+  email: "email_otp_send",
+  phone: "phone_otp_send",
+  // Anonymous phone LOGIN - counted separately from phone-change sends so
+  // the two flows never consume each other's budget.
+  phone_login: "auth_phone_code_sent",
+} as const;
+
 /**
  * Server-authoritative escalating resend policy for one identifier.
  * Looks at real send events in the last hour: after the nth send the
@@ -67,13 +76,13 @@ export type ResendCooldownResult = {
  * 6th send inside an hour is blocked outright (MAX_SENDS_PER_HOUR).
  */
 export async function resendCooldown(
-  kind: "email" | "phone",
+  kind: keyof typeof SEND_EVENT_TYPE,
   identifier: string,
 ): Promise<ResendCooldownResult> {
   const now = Date.now();
   const sends = await db.authVerificationEvent.findMany({
     where: {
-      type: kind === "email" ? "email_otp_send" : "phone_otp_send",
+      type: SEND_EVENT_TYPE[kind],
       ...(kind === "email" ? { email: identifier.toLowerCase() } : { phoneE164: identifier }),
       createdAt: { gte: new Date(now - HOUR_MS) },
     },
@@ -107,6 +116,40 @@ export async function checkOtpSendIpLimit(ipHash: string | null): Promise<OtpLim
   if (!ipHash) return { ok: true };
   const byIp = await countEvents({ type: "email_otp_send", ipHash }, HOUR_MS);
   if (byIp >= 10) return { ok: false, reason: "ip_hourly" };
+  return { ok: true };
+}
+
+/** Anonymous phone-login sends: max 10/hour per IP hash (across numbers). */
+export async function checkPhoneLoginSendIpLimit(ipHash: string | null): Promise<OtpLimitResult> {
+  if (!ipHash) return { ok: true };
+  const byIp = await countEvents({ type: "auth_phone_code_sent", ipHash }, HOUR_MS);
+  if (byIp >= 10) return { ok: false, reason: "ip_hourly" };
+  return { ok: true };
+}
+
+/**
+ * Phone-LOGIN failure lock: same policy as checkOtpVerifyBlocked (5
+ * invalid attempts per number or per IP within 15 minutes -> locked 15
+ * minutes) but counted over auth_phone_code_failed events, so login
+ * failures and phone-change failures never extend each other's locks.
+ * Locked attempts are audited as auth_phone_code_locked (not counted).
+ */
+export async function checkPhoneLoginVerifyBlocked(target: {
+  phoneE164: string;
+  ipHash?: string | null;
+}): Promise<OtpLimitResult> {
+  const byPhone = await countEvents(
+    { type: "auth_phone_code_failed", phoneE164: target.phoneE164 },
+    VERIFY_LOCK_WINDOW_MS,
+  );
+  if (byPhone >= VERIFY_LOCK_MAX_FAILS) return { ok: false, reason: "verify_locked_phone" };
+  if (target.ipHash) {
+    const byIp = await countEvents(
+      { type: "auth_phone_code_failed", ipHash: target.ipHash },
+      VERIFY_LOCK_WINDOW_MS,
+    );
+    if (byIp >= VERIFY_LOCK_MAX_FAILS) return { ok: false, reason: "verify_locked_ip" };
+  }
   return { ok: true };
 }
 

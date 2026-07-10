@@ -219,3 +219,135 @@ export async function ensureAppUser(
   console.info(`[identity] new account auth.uid=${u.id} provider=${provider}`);
   return { ok: true, user: createdUser, created: true, previousLoginIpHash: null };
 }
+
+// ---------------------------------------------------------------------------
+// Phone-keyed provisioning (anonymous phone LOGIN)
+// ---------------------------------------------------------------------------
+
+/** Placeholder email for a phone-keyed auth user until they add a real one. */
+export function phonePlaceholderEmail(authUid: string): string {
+  return `phone+${authUid}@placeholder.tirvea.app`;
+}
+
+export type ProvisionPhoneLoginResult =
+  | { ok: true; user: AppUser; created: boolean }
+  | { ok: false; reason: "blocked" | "suspended" | "conflict" };
+
+/**
+ * Provision/load the app User for a PHONE-KEYED auth identity (native
+ * Supabase phone OTP, verifyOtp type "sms"). The companion of
+ * ensureAppUser with the same identity rules - auth.users.id IS User.id,
+ * DELETED shells recycle, bans stay banned, conflicts never merge - plus
+ * the phone-login invariant: the verified number is stamped on the row
+ * IN THE SAME WRITE that creates/claims it (phoneE164's unique index is
+ * the referee). The caller has ALREADY proven, pre-provider and again
+ * post-verify, that no OTHER app account owns the number (the
+ * existing-owner bridge in phone-login-flow.ts) - a rival appearing
+ * between that check and this write loses on P2002 and gets `conflict`.
+ *
+ * The CALLER owns the Supabase session (sign-out on any rejection).
+ */
+export async function provisionPhoneLoginUser(opts: {
+  authUid: string;
+  /** Email on the auth user, if any (phone-keyed users usually have none). */
+  email?: string | null;
+  phoneE164: string;
+  phoneCountryIso: string;
+  phoneDialCode: string;
+  req?: Request;
+}): Promise<ProvisionPhoneLoginResult> {
+  const { authUid, phoneE164 } = opts;
+  const now = new Date();
+  const loginStamps = {
+    lastLoginAt: now,
+    lastLoginIpHash: opts.req ? ipHashFrom(opts.req) : null,
+    lastUserAgentHash: opts.req ? userAgentHashFrom(opts.req) : null,
+  };
+  const phoneStamps = {
+    phoneE164,
+    phoneCountryIso: opts.phoneCountryIso,
+    phoneDialCode: opts.phoneDialCode,
+    phoneVerifiedAt: now,
+    // Legacy mirror columns - kept in sync until fully retired
+    phone: phoneE164,
+    phoneVerified: now,
+    authCompleted: true,
+  };
+
+  // Identity blocklist is email-keyed; a phone-keyed auth user without an
+  // email cannot be matched against it (documented limitation).
+  if (opts.email && (await isIdentityBlocked(opts.email.toLowerCase(), "phone"))) {
+    return { ok: false, reason: "blocked" };
+  }
+
+  const existing = await db.user.findUnique({ where: { id: authUid } });
+  if (existing) {
+    if (existing.status === "SUSPENDED" || existing.bannedAt) {
+      return { ok: false, reason: "suspended" };
+    }
+    if (existing.status === "DELETED") {
+      // Same re-registration model as ensureAppUser: drop the anonymized
+      // shell, fall through to a fresh row under the same auth uid.
+      await recycleDeletedRow(existing.id);
+    } else {
+      // Existing row under this auth uid (e.g. auth.users.phone was
+      // backfilled for an email-first account whose app-side claim was
+      // later admin-released). Adopt it and re-claim the number
+      // atomically; the unique index settles any race.
+      try {
+        const updated = await db.$transaction(async (tx) => {
+          const rival = await tx.user.findUnique({ where: { phoneE164 } });
+          if (rival && rival.id !== authUid) return null;
+          return tx.user.update({
+            where: { id: authUid },
+            data: {
+              ...loginStamps,
+              ...phoneStamps,
+              lastActiveAt: now,
+              ...(existing.status === "DEACTIVATED"
+                ? { status: "ACTIVE", deletionRequested: null }
+                : {}),
+            },
+          });
+        });
+        if (!updated) return { ok: false, reason: "conflict" };
+        return { ok: true, user: updated, created: false };
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+          return { ok: false, reason: "conflict" };
+        }
+        throw error;
+      }
+    }
+  }
+
+  // Fresh phone-keyed account. The single INSERT is the transaction the
+  // spec requires: the row is born with phoneE164 + phoneVerifiedAt set,
+  // so no window exists where the account lacks its phone claim.
+  try {
+    const created = await db.user.create({
+      data: {
+        id: authUid,
+        email: opts.email?.toLowerCase() ?? phonePlaceholderEmail(authUid),
+        ...phoneStamps,
+        ...loginStamps,
+      },
+    });
+    console.info(`[identity] new account auth.uid=${authUid} provider=phone`);
+    return { ok: true, user: created, created: true };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      // Two concurrent FIRST phone logins for one uid: the PK settles it -
+      // the loser adopts the winner's row (which already carries the phone
+      // stamps). No row by this uid means the collision was phoneE164
+      // itself: a rival claimed the number - conflict, never merge.
+      const winner = await db.user.findUnique({ where: { id: authUid } });
+      if (winner && winner.phoneE164 === phoneE164) {
+        console.info(`[identity] first-login race for auth.uid=${authUid} - adopting winner row`);
+        return { ok: true, user: winner, created: false };
+      }
+      return { ok: false, reason: "conflict" };
+    }
+    throw error;
+  }
+}

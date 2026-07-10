@@ -61,6 +61,18 @@ export type AuthEventType =
   | "phone_otp_verify"
   | "otp_verify_fail"
   | "otp_verify_locked"
+  // Anonymous phone LOGIN (separate from the authenticated phone-change
+  // flow) - metadata always carries provider: "phone".
+  | "auth_phone_code_sent"
+  | "auth_phone_code_send_limited"
+  | "auth_phone_code_verified"
+  | "auth_phone_code_failed"
+  | "auth_phone_code_locked"
+  | "auth_login_succeeded"
+  | "auth_login_failed"
+  // Backfill of auth.users.phone after an app-side phone-change verify
+  | "phone_auth_sync"
+  | "phone_auth_sync_failed"
   | "risk_phone_challenge"
   | "risk_triggered"
   | "age_confirmed"

@@ -48,7 +48,12 @@ export function authNextStep(
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
 ): string {
   if (user.bannedAt || user.status === "SUSPENDED") return "/account-blocked";
-  if (!user.emailVerified) return "/auth";
+  // First rung = ONE verified sign-in channel. Email/OAuth identities
+  // verify email here as always; a phone-LOGIN account (verified phone,
+  // placeholder email) already proved its channel and must not be sent
+  // to email capture. No existing account weakens: the legacy funnel
+  // never stamps phoneVerifiedAt before emailVerified.
+  if (!user.emailVerified && !user.phoneVerifiedAt) return "/auth";
   if (phoneEnabled && !user.phoneVerifiedAt) return "/auth/phone";
   if (needsAgeConfirmation(user)) return "/auth/age";
   if (needsConsent(user)) return "/auth/legal";
