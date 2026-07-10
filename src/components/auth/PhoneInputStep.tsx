@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
@@ -160,77 +161,69 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
       {blocked ? (
         // Provider outage while phone verification is REQUIRED. This is
         // a hard stop by design - no continue button, no skip path.
-        <div className="flex flex-1 flex-col">
-          <div
-            role="status"
-            className="rounded-2xl border border-border bg-foreground/5 px-5 py-6 text-center"
-          >
-            <MessageCircleMore
-              className="mx-auto mb-3 size-6 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <p className="text-sm text-foreground">
-              Phone verification is temporarily unavailable.
-            </p>
-            <p className="mt-1.5 text-xs text-muted-foreground">
-              We can&apos;t send codes right now. Please try again in a little
-              while - verifying your number is required to continue.
-            </p>
-          </div>
+        <div
+          role="status"
+          className="border-border bg-foreground/5 rounded-2xl border px-5 py-6 text-center"
+        >
+          <MessageCircleMore
+            className="text-muted-foreground mx-auto mb-3 size-6"
+            aria-hidden="true"
+          />
+          <p className="text-foreground text-sm">Phone verification is temporarily unavailable.</p>
+          <p className="text-muted-foreground mt-1.5 text-xs">
+            We can&apos;t send codes right now. Please try again in a little while - verifying your
+            number is required to continue.
+          </p>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="flex flex-1 flex-col" noValidate>
-          <div className="space-y-2">
-            <Label htmlFor="auth-phone">Phone number</Label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setSheetOpen(true)}
-                aria-label={`Country: ${country.name} (${country.dialCode}). Change country`}
-                aria-haspopup="dialog"
-                className="inline-flex h-12 shrink-0 items-center gap-1.5 rounded-2xl border border-input bg-foreground/5 px-3.5 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-colors outline-none hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:opacity-50 md:text-sm"
-                disabled={pending}
-              >
-                <span className="text-lg leading-none" aria-hidden="true">
-                  {country.flag}
-                </span>
-                <span className="tabular-nums">{country.dialCode}</span>
-                <ChevronDown
-                  className="size-3.5 text-muted-foreground"
-                  aria-hidden="true"
+        <AuthFormStack
+          onSubmit={onSubmit}
+          field={
+            <>
+              <Label htmlFor="auth-phone">Phone number</Label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSheetOpen(true)}
+                  aria-label={`Country: ${country.name} (${country.dialCode}). Change country`}
+                  aria-haspopup="dialog"
+                  className="border-input bg-foreground/5 hover:border-foreground/25 focus-visible:ring-foreground/20 inline-flex h-12 shrink-0 items-center gap-1.5 rounded-2xl border px-3.5 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-colors outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm"
+                  disabled={pending}
+                >
+                  <span className="text-lg leading-none" aria-hidden="true">
+                    {country.flag}
+                  </span>
+                  <span className="tabular-nums">{country.dialCode}</span>
+                  <ChevronDown className="text-muted-foreground size-3.5" aria-hidden="true" />
+                </button>
+                <Input
+                  ref={inputRef}
+                  id="auth-phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel-national"
+                  autoFocus
+                  placeholder="87 123 4567"
+                  value={display}
+                  onChange={onPhoneChange}
+                  disabled={pending}
+                  aria-invalid={fieldError ? true : undefined}
+                  aria-describedby={fieldError ? "auth-phone-error" : undefined}
+                  className="h-12"
                 />
-              </button>
-              <Input
-                ref={inputRef}
-                id="auth-phone"
-                name="phone"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel-national"
-                autoFocus
-                placeholder="87 123 4567"
-                value={display}
-                onChange={onPhoneChange}
-                disabled={pending}
-                aria-invalid={fieldError ? true : undefined}
-                aria-describedby={fieldError ? "auth-phone-error" : undefined}
-                className="h-12"
-              />
-            </div>
-            <InlineFieldError id="auth-phone-error" message={fieldError} />
-          </div>
-
-          <AuthErrorBanner message={serverError} className="mt-4" />
-
-          <div className="mt-auto space-y-4 pt-8">
+              </div>
+              <InlineFieldError id="auth-phone-error" message={fieldError} />
+            </>
+          }
+          status={<AuthErrorBanner message={serverError} />}
+          cta={
             <AuthSubmitButton pending={pending} disabled={pending}>
               Send code
             </AuthSubmitButton>
-            <p className="text-center text-xs text-muted-foreground">
-              Standard SMS rates may apply.
-            </p>
-          </div>
-        </form>
+          }
+          footnote="Standard SMS rates may apply."
+        />
       )}
 
       <CountryCodeSheet

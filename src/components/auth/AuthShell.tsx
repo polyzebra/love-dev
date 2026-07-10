@@ -14,9 +14,15 @@ import { cn } from "@/lib/utils";
  * glass card (max-w-md centered) and the legal line in the footer. This
  * shell owns everything inside the card: back button, progress dots,
  * the big display title + one-line subtitle, and the slide transition
- * between steps. On mobile it stretches so the CTA (whatever the step
- * renders last / with mt-auto) sits near the thumb and stays with the
- * fields when the keyboard opens.
+ * between steps.
+ *
+ * The card is CONTENT-DRIVEN. An earlier iteration stretched this shell
+ * to min-h-[62dvh] so each step could push its CTA to the bottom with
+ * mt-auto ("near the thumb"); that design is deliberately REVERSED -
+ * it opened a viewport-dependent gulf between the input and its button.
+ * Steps now lay out on AuthFormStack's fixed rhythm and the card simply
+ * grows with its content; only the page shell around it may size to the
+ * viewport.
  */
 
 const TOTAL_STEPS = 5;
@@ -40,13 +46,13 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-[62dvh] flex-col sm:min-h-105">
+    <div>
       <div className="mb-8 grid grid-cols-[2.25rem_1fr_2.25rem] items-center">
         {backHref ? (
           <Link
             href={backHref}
             aria-label="Back"
-            className="tap-target -m-2 inline-flex size-9 items-center justify-center rounded-full p-2 text-muted-foreground transition-colors outline-none hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="tap-target text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:ring-foreground/20 -m-2 inline-flex size-9 items-center justify-center rounded-full p-2 transition-colors outline-none focus-visible:ring-2"
           >
             <ArrowLeft className="size-5" aria-hidden="true" />
           </Link>
@@ -63,9 +69,7 @@ export function AuthShell({
               key={i}
               className={cn(
                 "h-1.5 rounded-full transition-all duration-500",
-                i + 1 === step
-                  ? "w-6 bg-foreground"
-                  : "w-1.5 bg-foreground/20",
+                i + 1 === step ? "bg-foreground w-6" : "bg-foreground/20 w-1.5",
               )}
             />
           ))}
@@ -79,15 +83,12 @@ export function AuthShell({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -28 }}
           transition={{ duration: 0.5, ease: EASE_LUXE }}
-          className="flex min-h-0 flex-1 flex-col"
         >
           <div className="mb-8 space-y-2">
             <h1 className="font-display text-3xl font-semibold tracking-tight text-balance">
               {title}
             </h1>
-            {subtitle != null && (
-              <div className="text-sm text-muted-foreground">{subtitle}</div>
-            )}
+            {subtitle != null && <div className="text-muted-foreground text-sm">{subtitle}</div>}
           </div>
           {children}
         </motion.div>

@@ -59,9 +59,7 @@ export function OtpInput({
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
-      animate={
-        invalid && !reduceMotion ? { x: [0, -4, 4, -4, 4, -4, 4, 0] } : { x: 0 }
-      }
+      animate={invalid && !reduceMotion ? { x: [0, -4, 4, -4, 4, -4, 4, 0] } : { x: 0 }}
       transition={{ duration: 0.3 }}
     >
       <OTPInput
@@ -78,7 +76,7 @@ export function OtpInput({
         aria-label={label}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? describedById : undefined}
-        containerClassName="flex items-center justify-between gap-2 has-disabled:opacity-60"
+        containerClassName="flex items-center justify-center gap-2 has-disabled:opacity-60"
         render={({ slots }) => (
           <>
             {slots.map((slot, i) => (
@@ -96,15 +94,17 @@ function OtpBox({ char, hasFakeCaret, isActive, invalid }: SlotProps & { invalid
     <div
       aria-hidden="true"
       className={cn(
-        "relative flex h-14 w-11 items-center justify-center rounded-2xl border border-input bg-foreground/5 text-xl font-medium tabular-nums shadow-[inset_0_1px_0_var(--glass-highlight)] transition-all",
-        isActive && "z-10 border-foreground/30 ring-2 ring-foreground/20",
+        // Fluid width capped at 3.5rem so the row spans the card (the old
+        // justify-between spread) without stretch utilities.
+        "border-input bg-foreground/5 relative flex h-14 w-full max-w-14 items-center justify-center rounded-2xl border text-xl font-medium tabular-nums shadow-[inset_0_1px_0_var(--glass-highlight)] transition-all",
+        isActive && "border-foreground/30 ring-foreground/20 z-10 ring-2",
         invalid && "border-destructive ring-0",
       )}
     >
       {char}
       {hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-6 w-px animate-caret-blink bg-foreground duration-1000" />
+          <div className="animate-caret-blink bg-foreground h-6 w-px duration-1000" />
         </div>
       )}
     </div>

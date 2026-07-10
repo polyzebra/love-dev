@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { useRouter, useSearchParams } from "next/navigation";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
@@ -68,10 +69,7 @@ export function PhoneCodeStep() {
   const otpRef = useRef<HTMLInputElement>(null);
 
   const prettyPhone = useMemo(
-    () =>
-      phone
-        ? (parsePhoneNumberFromString(phone)?.formatInternational() ?? phone)
-        : null,
+    () => (phone ? (parsePhoneNumberFromString(phone)?.formatInternational() ?? phone) : null),
     [phone],
   );
 
@@ -141,9 +139,7 @@ export function PhoneCodeStep() {
         prettyPhone ? (
           <>
             Sent to{" "}
-            <span className="font-medium whitespace-nowrap text-foreground">
-              {prettyPhone}
-            </span>
+            <span className="text-foreground font-medium whitespace-nowrap">{prettyPhone}</span>
           </>
         ) : (
           "One moment..."
@@ -151,40 +147,41 @@ export function PhoneCodeStep() {
       }
       backHref="/auth/phone"
     >
-      <div className="flex flex-1 flex-col">
-        <OtpInput
-          length={PHONE_OTP_LENGTH}
-          ref={otpRef}
-          value={code}
-          onChange={(value) => {
-            setCode(value);
-            if (error) setError(null);
-          }}
-          onComplete={verify}
-          disabled={verifying || !phone}
-          invalid={!!error}
-          autoFocus
-          label="6-digit text message code"
-          describedById="phone-code-error"
-        />
-
-        <div className="mt-4 space-y-4" aria-live="polite">
-          {verifying && (
-            <p className="text-center text-sm text-muted-foreground">
-              Checking your code...
-            </p>
-          )}
-          <AuthErrorBanner id="phone-code-error" message={error} />
-        </div>
-
-        <div className="mt-auto pt-8">
+      <AuthFormStack
+        field={
+          <OtpInput
+            length={PHONE_OTP_LENGTH}
+            ref={otpRef}
+            value={code}
+            onChange={(value) => {
+              setCode(value);
+              if (error) setError(null);
+            }}
+            onComplete={verify}
+            disabled={verifying || !phone}
+            invalid={!!error}
+            autoFocus
+            label="6-digit text message code"
+            describedById="phone-code-error"
+          />
+        }
+        statusLive
+        status={
+          <>
+            {verifying && (
+              <p className="text-muted-foreground text-center text-sm">Checking your code...</p>
+            )}
+            <AuthErrorBanner id="phone-code-error" message={error} />
+          </>
+        }
+        cta={
           <ResendTimer
             disabled={!phone || verifying}
             initialSeconds={initialRetry}
             onResend={resend}
           />
-        </div>
-      </div>
+        }
+      />
     </AuthShell>
   );
 }

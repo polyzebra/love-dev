@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { sendEmailCode } from "@/components/auth/api";
@@ -70,42 +71,40 @@ export function EmailInputStep() {
       subtitle="We'll email you a 6-digit code. No passwords to remember."
       backHref="/login"
     >
-      <form onSubmit={onSubmit} className="flex flex-1 flex-col" noValidate>
-        <div className="space-y-2">
-          <Label htmlFor="auth-email">Email</Label>
-          <Input
-            id="auth-email"
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            autoFocus
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (fieldError) setFieldError(null);
-            }}
-            disabled={pending}
-            aria-invalid={fieldError ? true : undefined}
-            aria-describedby={fieldError ? "auth-email-error" : undefined}
-            className="h-12"
-          />
-          <InlineFieldError id="auth-email-error" message={fieldError} />
-        </div>
-
-        <AuthErrorBanner message={serverError} className="mt-4" />
-
-        <div className="mt-auto space-y-4 pt-8">
+      <AuthFormStack
+        onSubmit={onSubmit}
+        field={
+          <>
+            <Label htmlFor="auth-email">Email</Label>
+            <Input
+              id="auth-email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoFocus
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldError) setFieldError(null);
+              }}
+              disabled={pending}
+              aria-invalid={fieldError ? true : undefined}
+              aria-describedby={fieldError ? "auth-email-error" : undefined}
+              className="h-12"
+            />
+            <InlineFieldError id="auth-email-error" message={fieldError} />
+          </>
+        }
+        status={<AuthErrorBanner message={serverError} />}
+        cta={
           <AuthSubmitButton pending={pending} disabled={pending}>
             Continue
           </AuthSubmitButton>
-
-          <p className="text-center text-xs text-muted-foreground">
-            We only use your email to sign you in - never to spam you.
-          </p>
-        </div>
-      </form>
+        }
+        footnote="We only use your email to sign you in - never to spam you."
+      />
     </AuthShell>
   );
 }

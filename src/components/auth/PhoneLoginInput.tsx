@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { LoginStepShell } from "@/components/auth/LoginStepShell";
+import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
@@ -181,75 +182,78 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
       subtitle="We'll text you a six-digit code."
       backHref="/login"
     >
-      <form onSubmit={onSubmit} className="flex flex-1 flex-col" noValidate>
-        <div className="space-y-2">
-          <Label htmlFor="login-phone">Phone number</Label>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setSheetOpen(true)}
-              aria-label={`Country: ${country.name} (${country.dialCode}). Change country`}
-              aria-haspopup="dialog"
-              className="inline-flex h-12 shrink-0 items-center gap-1.5 rounded-2xl border border-input bg-foreground/5 px-3.5 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-colors outline-none hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:opacity-50 md:text-sm"
-              disabled={pending}
-            >
-              <span className="text-lg leading-none" aria-hidden="true">
-                {country.flag}
-              </span>
-              <span className="tabular-nums">{country.dialCode}</span>
-              <ChevronDown className="size-3.5 text-muted-foreground" aria-hidden="true" />
-            </button>
-            <Input
-              ref={inputRef}
-              id="login-phone"
-              name="phone"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel-national"
-              autoFocus
-              placeholder="87 123 4567"
-              value={display}
-              onChange={onPhoneChange}
-              disabled={pending}
-              aria-invalid={fieldError ? true : undefined}
-              aria-describedby={fieldError ? "login-phone-error" : undefined}
-              className="h-12"
-            />
-          </div>
-          <InlineFieldError id="login-phone-error" message={fieldError} />
-        </div>
-
-        <AuthErrorBanner message={serverError ?? conflict ?? providerDown} className="mt-4" />
-        {providerDown && (
-          <p className="mt-3 text-center text-sm">
-            <Link
-              href="/login"
-              className="rounded-sm font-medium text-primary-soft underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-foreground/20"
-            >
-              Use another method
-            </Link>
-          </p>
-        )}
-        {conflict && (
-          <p className="mt-3 text-center text-sm">
-            <Link
-              href="/login"
-              className="rounded-sm font-medium text-primary-soft underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-foreground/20"
-            >
-              Sign in another way
-            </Link>
-          </p>
-        )}
-
-        <div className="mt-auto space-y-4 pt-8">
+      <AuthFormStack
+        onSubmit={onSubmit}
+        field={
+          <>
+            <Label htmlFor="login-phone">Phone number</Label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSheetOpen(true)}
+                aria-label={`Country: ${country.name} (${country.dialCode}). Change country`}
+                aria-haspopup="dialog"
+                className="border-input bg-foreground/5 hover:border-foreground/25 focus-visible:ring-foreground/20 inline-flex h-12 shrink-0 items-center gap-1.5 rounded-2xl border px-3.5 text-base shadow-[inset_0_1px_0_var(--glass-highlight)] transition-colors outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm"
+                disabled={pending}
+              >
+                <span className="text-lg leading-none" aria-hidden="true">
+                  {country.flag}
+                </span>
+                <span className="tabular-nums">{country.dialCode}</span>
+                <ChevronDown className="text-muted-foreground size-3.5" aria-hidden="true" />
+              </button>
+              <Input
+                ref={inputRef}
+                id="login-phone"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel-national"
+                autoFocus
+                placeholder="87 123 4567"
+                value={display}
+                onChange={onPhoneChange}
+                disabled={pending}
+                aria-invalid={fieldError ? true : undefined}
+                aria-describedby={fieldError ? "login-phone-error" : undefined}
+                className="h-12"
+              />
+            </div>
+            <InlineFieldError id="login-phone-error" message={fieldError} />
+          </>
+        }
+        status={
+          <>
+            <AuthErrorBanner message={serverError ?? conflict ?? providerDown} />
+            {providerDown && (
+              <p className="text-center text-sm">
+                <Link
+                  href="/login"
+                  className="text-primary-soft focus-visible:ring-foreground/20 rounded-sm font-medium underline-offset-2 outline-none hover:underline focus-visible:ring-2"
+                >
+                  Use another method
+                </Link>
+              </p>
+            )}
+            {conflict && (
+              <p className="text-center text-sm">
+                <Link
+                  href="/login"
+                  className="text-primary-soft focus-visible:ring-foreground/20 rounded-sm font-medium underline-offset-2 outline-none hover:underline focus-visible:ring-2"
+                >
+                  Sign in another way
+                </Link>
+              </p>
+            )}
+          </>
+        }
+        cta={
           <AuthSubmitButton pending={pending} disabled={pending}>
             Send code
           </AuthSubmitButton>
-          <p className="text-center text-xs text-muted-foreground">
-            Standard SMS rates may apply.
-          </p>
-        </div>
-      </form>
+        }
+        footnote="Standard SMS rates may apply."
+      />
 
       <CountryCodeSheet
         open={sheetOpen}

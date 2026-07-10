@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
@@ -90,10 +91,10 @@ export function EmailCodeStep() {
       subtitle={
         email ? (
           <>
-            Sent to <span className="font-medium text-foreground">{email}</span>{" "}
+            Sent to <span className="text-foreground font-medium">{email}</span>{" "}
             <Link
               href="/login/email"
-              className="whitespace-nowrap text-primary-soft underline-offset-2 hover:underline"
+              className="text-primary-soft whitespace-nowrap underline-offset-2 hover:underline"
             >
               Change email
             </Link>
@@ -104,33 +105,34 @@ export function EmailCodeStep() {
       }
       backHref="/login/email"
     >
-      <div className="flex flex-1 flex-col">
-        <OtpInput
-          length={EMAIL_OTP_LENGTH}
-          ref={otpRef}
-          value={code}
-          onChange={(value) => {
-            setCode(value);
-            if (error) setError(null);
-          }}
-          onComplete={verify}
-          disabled={verifying || !email}
-          invalid={!!error}
-          autoFocus
-          label="6-digit email code"
-          describedById="email-code-error"
-        />
-
-        <div className="mt-4 space-y-4" aria-live="polite">
-          {verifying && (
-            <p className="text-center text-sm text-muted-foreground">
-              Checking your code...
-            </p>
-          )}
-          <AuthErrorBanner id="email-code-error" message={error} />
-        </div>
-
-        <div className="mt-auto pt-8">
+      <AuthFormStack
+        field={
+          <OtpInput
+            length={EMAIL_OTP_LENGTH}
+            ref={otpRef}
+            value={code}
+            onChange={(value) => {
+              setCode(value);
+              if (error) setError(null);
+            }}
+            onComplete={verify}
+            disabled={verifying || !email}
+            invalid={!!error}
+            autoFocus
+            label="6-digit email code"
+            describedById="email-code-error"
+          />
+        }
+        statusLive
+        status={
+          <>
+            {verifying && (
+              <p className="text-muted-foreground text-center text-sm">Checking your code...</p>
+            )}
+            <AuthErrorBanner id="email-code-error" message={error} />
+          </>
+        }
+        cta={
           <ResendTimer
             disabled={!email || verifying}
             initialSeconds={initialRetry}
@@ -143,8 +145,8 @@ export function EmailCodeStep() {
               return result.ok ? result.retryAfter : undefined;
             }}
           />
-        </div>
-      </div>
+        }
+      />
     </AuthShell>
   );
 }

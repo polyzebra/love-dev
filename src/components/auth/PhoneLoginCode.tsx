@@ -8,18 +8,12 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoginStepShell } from "@/components/auth/LoginStepShell";
+import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
-import {
-  LOGIN_PHONE_KEY,
-  LOGIN_PHONE_RETRY_KEY,
-} from "@/components/auth/PhoneLoginInput";
-import {
-  OFFLINE_CODE,
-  sendPhoneLoginCode,
-  verifyPhoneLoginCode,
-} from "@/components/auth/api";
+import { LOGIN_PHONE_KEY, LOGIN_PHONE_RETRY_KEY } from "@/components/auth/PhoneLoginInput";
+import { OFFLINE_CODE, sendPhoneLoginCode, verifyPhoneLoginCode } from "@/components/auth/api";
 
 /**
  * /login/phone/verify - the SMS six-digit gate for phone LOGIN. The
@@ -196,8 +190,7 @@ export function PhoneLoginCode() {
       subtitle={
         conflict ? null : masked ? (
           <>
-            Sent to{" "}
-            <span className="font-medium whitespace-nowrap text-foreground">{masked}</span>
+            Sent to <span className="text-foreground font-medium whitespace-nowrap">{masked}</span>
           </>
         ) : (
           "One moment..."
@@ -211,84 +204,89 @@ export function PhoneLoginCode() {
         // Full-card recovery: the OTP was right, but this number belongs
         // to an account that signs in another way - the server already
         // refused the session. Calm exit, no identity details.
-        <div className="flex flex-1 flex-col">
-          <div
-            role="alert"
-            className="rounded-2xl border border-border bg-foreground/5 px-5 py-6 text-center"
-          >
-            <ShieldAlert
-              className="mx-auto mb-3 size-6 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <p className="text-sm text-foreground">{conflict}</p>
-          </div>
-          <div className="mt-auto space-y-4 pt-8">
+        <AuthFormStack
+          field={
+            <div
+              role="alert"
+              className="border-border bg-foreground/5 rounded-2xl border px-5 py-6 text-center"
+            >
+              <ShieldAlert
+                className="text-muted-foreground mx-auto mb-3 size-6"
+                aria-hidden="true"
+              />
+              <p className="text-foreground text-sm">{conflict}</p>
+            </div>
+          }
+          cta={
             <Button asChild size="lg" className="min-h-12 w-full rounded-full">
               <Link href="/login">Use email or Google</Link>
             </Button>
-            <p className="text-center text-xs text-muted-foreground">
+          }
+          footnote={
+            <>
               Need a hand?{" "}
               <a
                 href="mailto:support@tirvea.app"
-                className="underline underline-offset-2 hover:text-foreground"
+                className="hover:text-foreground underline underline-offset-2"
               >
                 Contact support
               </a>
-            </p>
-          </div>
-        </div>
+            </>
+          }
+        />
       ) : (
-        <div className="flex flex-1 flex-col">
-          <OtpInput
-            length={6}
-            ref={otpRef}
-            value={code}
-            onChange={(value) => {
-              setCode(value);
-              if (error && !locked) {
-                setError(null);
-                setExpired(false);
-              }
-            }}
-            onComplete={verify}
-            disabled={verifying || locked || !phone}
-            invalid={!!error && !locked}
-            autoFocus
-            label="6-digit text message code"
-            describedById="phone-login-code-error"
-          />
-
-          <div className="mt-4 space-y-4" aria-live="polite">
-            {verifying && (
-              <p className="text-center text-sm text-muted-foreground">
-                Checking your code...
-              </p>
-            )}
-            <AuthErrorBanner id="phone-login-code-error" message={error} />
-            {locked && (
-              <p className="text-center text-sm text-muted-foreground">
-                You can try again in{" "}
-                <span className="tabular-nums">
-                  {Math.floor(lockSeconds / 60)}:{String(lockSeconds % 60).padStart(2, "0")}
-                </span>
-                .
-              </p>
-            )}
-            {expired && !locked && (
-              <p className="text-center text-sm text-muted-foreground">
-                Codes only live for a few minutes - request a fresh one below.
-              </p>
-            )}
-          </div>
-
-          <div className="mt-auto pt-8">
+        <AuthFormStack
+          field={
+            <OtpInput
+              length={6}
+              ref={otpRef}
+              value={code}
+              onChange={(value) => {
+                setCode(value);
+                if (error && !locked) {
+                  setError(null);
+                  setExpired(false);
+                }
+              }}
+              onComplete={verify}
+              disabled={verifying || locked || !phone}
+              invalid={!!error && !locked}
+              autoFocus
+              label="6-digit text message code"
+              describedById="phone-login-code-error"
+            />
+          }
+          statusLive
+          status={
+            <>
+              {verifying && (
+                <p className="text-muted-foreground text-center text-sm">Checking your code...</p>
+              )}
+              <AuthErrorBanner id="phone-login-code-error" message={error} />
+              {locked && (
+                <p className="text-muted-foreground text-center text-sm">
+                  You can try again in{" "}
+                  <span className="tabular-nums">
+                    {Math.floor(lockSeconds / 60)}:{String(lockSeconds % 60).padStart(2, "0")}
+                  </span>
+                  .
+                </p>
+              )}
+              {expired && !locked && (
+                <p className="text-muted-foreground text-center text-sm">
+                  Codes only live for a few minutes - request a fresh one below.
+                </p>
+              )}
+            </>
+          }
+          cta={
             <ResendTimer
               disabled={!phone || verifying || locked}
               initialSeconds={initialRetry}
               onResend={resend}
             />
-          </div>
-        </div>
+          }
+        />
       )}
     </LoginStepShell>
   );

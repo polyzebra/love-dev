@@ -10,8 +10,13 @@ import { EASE_LUXE } from "@/lib/motion";
  * /auth/recovery) - AuthShell's geometry and slide transition without
  * the 5-step progress dots, which belong to the signup ladder only.
  * The (auth) layout still provides the chrome (dvh, safe areas, aurora,
- * glass card); steps put their CTA last with mt-auto so it stays near
- * the thumb and above the keyboard.
+ * glass card).
+ *
+ * The card is CONTENT-DRIVEN. An earlier iteration stretched this shell
+ * to min-h-[62dvh] so steps could push their CTA down with mt-auto
+ * ("near the thumb"); that design is deliberately REVERSED - it opened
+ * a viewport-dependent gulf between the input and its button. Steps lay
+ * out on AuthFormStack's fixed rhythm and the card grows with content.
  */
 export function LoginStepShell({
   title,
@@ -32,12 +37,12 @@ export function LoginStepShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-[62dvh] flex-col sm:min-h-105">
+    <div>
       <div className="mb-8 flex items-center">
         {backHref ? (
           <Link
             href={backHref}
-            className="tap-target -m-2 inline-flex min-h-9 items-center gap-1.5 rounded-full p-2 text-sm text-muted-foreground transition-colors outline-none hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="tap-target text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:ring-foreground/20 -m-2 inline-flex min-h-9 items-center gap-1.5 rounded-full p-2 text-sm transition-colors outline-none focus-visible:ring-2"
           >
             <ArrowLeft className="size-5" aria-hidden="true" />
             {backLabel !== "Back" && <span>{backLabel}</span>}
@@ -55,15 +60,12 @@ export function LoginStepShell({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -28 }}
           transition={{ duration: 0.5, ease: EASE_LUXE }}
-          className="flex min-h-0 flex-1 flex-col"
         >
           <div className="mb-8 space-y-2">
             <h1 className="font-display text-3xl font-semibold tracking-tight text-balance">
               {title}
             </h1>
-            {subtitle != null && (
-              <div className="text-sm text-muted-foreground">{subtitle}</div>
-            )}
+            {subtitle != null && <div className="text-muted-foreground text-sm">{subtitle}</div>}
           </div>
           {children}
         </motion.div>
