@@ -70,18 +70,21 @@ async function main() {
       "+15005550006",
       "123456",
     );
-    await check("verifyCode: VerificationCheck URL/body, approved -> true", () => {
+    await check("verifyCode: VerificationCheck URL/body, approved -> approved", () => {
       assert.equal(calls[0].url, "https://verify.twilio.com/v2/Services/VAtest/VerificationCheck");
       assert.equal(calls[0].init.body, "To=%2B15005550006&Code=123456");
-      assert.equal(ok, true);
+      assert.equal(ok, "approved");
     });
   }
 
-  await check("verifyCode: non-approved status -> false (denied)", async () => {
-    assert.equal(await providerWith(200, { status: "pending" }).verifyCode("+1", "000000"), false);
+  await check("verifyCode: non-approved status -> incorrect (denied)", async () => {
+    assert.equal(
+      await providerWith(200, { status: "pending" }).verifyCode("+1", "000000"),
+      "incorrect",
+    );
   });
-  await check("verifyCode: 404 (expired / no pending verification) -> false", async () => {
-    assert.equal(await providerWith(404, { code: 20404 }).verifyCode("+1", "123456"), false);
+  await check("verifyCode: 404 (expired / no pending verification) -> expired", async () => {
+    assert.equal(await providerWith(404, { code: 20404 }).verifyCode("+1", "123456"), "expired");
   });
 
   await check("60200 invalid number -> neutral copy + audit metadata", async () => {

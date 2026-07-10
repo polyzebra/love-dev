@@ -36,12 +36,21 @@ function errorMessage(json: Json): string | null {
 }
 
 export type SendResult =
-  | { ok: true; retryAfter?: number }
-  | { ok: false; blocked: boolean; message: string };
+  /**
+   * `alreadyVerified` = this number is already verified on THIS account;
+   * `next` is where the flow continues (skip the OTP screen entirely).
+   */
+  | { ok: true; retryAfter?: number; alreadyVerified?: boolean; next?: string }
+  /**
+   * `code` is the machine-readable error state when the server provides
+   * one - "duplicate_phone", "invalid_phone", "unsupported_country", ...
+   */
+  | { ok: false; blocked: boolean; code?: string; message: string };
 
 export type VerifyResult =
   | { ok: true; next: string }
-  | { ok: false; message: string };
+  /** `code`: "incorrect_code" | "code_expired" | "duplicate_phone" | "too_many_attempts" ... */
+  | { ok: false; code?: string; message: string };
 
 /**
  * Server-provided resend unlock (seconds). Present on every neutral send
@@ -83,10 +92,18 @@ export async function sendPhoneCode(input: {
 }): Promise<SendResult> {
   const res = await post("/api/auth/phone/send", input);
   if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
-  if (res.json?.ok === true) return { ok: true, retryAfter: retryAfterOf(res.json) };
+  if (res.json?.ok === true) {
+    // Already verified on this account: a success state - the flow
+    // simply continues to `next` without an OTP screen.
+    if (res.json.alreadyVerified === true && typeof res.json.next === "string") {
+      return { ok: true, alreadyVerified: true, next: res.json.next };
+    }
+    return { ok: true, retryAfter: retryAfterOf(res.json) };
+  }
   return {
     ok: false,
     blocked: res.json?.blocked === true || res.status === 503,
+    code: typeof res.json?.code === "string" ? res.json.code : undefined,
     message: errorMessage(res.json) ?? GENERIC_MESSAGE,
   };
 }
@@ -97,7 +114,11 @@ export async function verifyPhoneCode(phoneE164: string, code: string): Promise<
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
   const next = res.json?.next;
   if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
-  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+  return {
+    ok: false,
+    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    message: errorMessage(res.json) ?? GENERIC_MESSAGE,
+  };
 }
 
 /** POST /api/auth/age-confirm - stamps the 18+ confirmation, idempotent. */

@@ -112,6 +112,22 @@ export function PhoneCodeStep() {
       countryIso: country.iso,
       dialCode: country.dialCode,
     });
+    // Verified in the meantime (another tab, a race we lost track of):
+    // that's a success state - continue the flow instead of resending.
+    if (result.ok && result.alreadyVerified && result.next) {
+      try {
+        sessionStorage.removeItem(AUTH_PHONE_KEY);
+        sessionStorage.removeItem(AUTH_PHONE_RETRY_KEY);
+      } catch {}
+      router.replace(result.next);
+      return;
+    }
+    // Surface a duplicate claim (the number got verified on ANOTHER
+    // account since the first send) instead of silently swallowing it.
+    if (!result.ok && result.code === "duplicate_phone") {
+      setError(result.message);
+      return;
+    }
     // Neutral contract: the server always says when the resend unlocks,
     // never whether this one actually went out.
     return result.ok ? result.retryAfter : undefined;

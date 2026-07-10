@@ -1,6 +1,6 @@
 import { ok, requirePermission } from "@/lib/api";
 import { audit } from "@/lib/audit";
-import { cleanupAbandonedAuthUsers } from "@/lib/auth/cleanup";
+import { cleanupAbandonedAuthUsers, cleanupStalePhoneClaims } from "@/lib/auth/cleanup";
 
 /**
  * POST /api/admin/auth-cleanup - manually sweep abandoned (ghost)
@@ -13,10 +13,11 @@ export async function POST() {
   if (response) return response;
 
   const deleted = await cleanupAbandonedAuthUsers();
+  const phoneClaimsCleared = await cleanupStalePhoneClaims();
   await audit({
     actorId: actor.id,
     action: "auth.cleanup",
-    metadata: { deleted },
+    metadata: { deleted, phoneClaimsCleared },
   });
-  return ok({ deleted });
+  return ok({ deleted, phoneClaimsCleared });
 }

@@ -53,11 +53,18 @@ export class PhoneProviderRejectedError extends Error {
   }
 }
 
+/**
+ * Outcome of a code check. "expired" = the provider no longer holds a
+ * pending verification for this number (expired or never sent) - the UI
+ * tells the user to request a fresh code instead of retyping this one.
+ */
+export type PhoneVerifyCheck = "approved" | "incorrect" | "expired";
+
 export interface PhoneVerificationProvider {
   /** Text a one-time code to the number (E.164). */
   sendCode(phoneE164: string): Promise<void>;
-  /** Verify the code; true = the number is confirmed for the current user. */
-  verifyCode(phoneE164: string, code: string): Promise<boolean>;
+  /** Verify the code; "approved" = the number is confirmed for the current user. */
+  verifyCode(phoneE164: string, code: string): Promise<PhoneVerifyCheck>;
 }
 
 // ---------------------------------------------------------------------------
@@ -154,11 +161,12 @@ export function twilioVerifyProvider(
       });
       if (!ok) {
         // 404 = no pending verification for this number (expired or never
-        // sent) - to the user that is simply a code that didn't work.
-        if (status === 404) return false;
+        // sent) - surfaced as its own state so the UI can say "request a
+        // new code" instead of "wrong code".
+        if (status === 404) return "expired";
         throwMappedTwilioError(json?.code, status);
       }
-      return json?.status === "approved";
+      return json?.status === "approved" ? "approved" : "incorrect";
     },
   };
 }
@@ -183,8 +191,8 @@ const supabaseProvider: PhoneVerificationProvider = {
       token: code,
       type: "phone_change",
     });
-    if (error || !data.user) return false;
-    return true;
+    if (error) return error.code === "otp_expired" ? "expired" : "incorrect";
+    return data.user ? "approved" : "incorrect";
   },
 };
 

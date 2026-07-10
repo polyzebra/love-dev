@@ -94,7 +94,10 @@ export function PhoneInputStep() {
       digits = digits.slice(0, -1);
     }
     setDisplay(formatNational(digits, country));
+    // Editing the number clears BOTH error layers - after a duplicate
+    // (409) the form stays right here and must feel immediately usable.
     if (fieldError) setFieldError(null);
+    if (serverError) setServerError(null);
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -113,10 +116,18 @@ export function PhoneInputStep() {
       countryIso: country.iso,
       dialCode: country.dialCode,
     });
+    // Loading ALWAYS resets before any branch - a failure (duplicate,
+    // invalid, rate-limited...) leaves the form editable on this screen.
     setPending(false);
     if (!result.ok) {
       if (result.blocked) setBlocked(true);
       else setServerError(result.message);
+      return;
+    }
+    // This number is already verified on this account - success, no OTP
+    // screen; continue straight to the next step of the flow.
+    if (result.alreadyVerified && result.next) {
+      router.replace(result.next);
       return;
     }
     try {

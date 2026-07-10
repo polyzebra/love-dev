@@ -235,7 +235,14 @@ model User {
   role          Role          @default(USER)
   status        AccountStatus @default(ACTIVE)
 
-  // Phone verification (canonical) - E.164 format, one phone = one account
+  // Phone verification (canonical) - E.164 format, one phone = one account.
+  // The plain @unique is deliberately equivalent to a partial
+  // "unique only when verified" index: phoneE164 is written in exactly ONE
+  // place - the final-success transaction in src/lib/auth/phone-flow.ts,
+  // atomically with phoneVerifiedAt. No code path writes it
+  // pre-verification (the only other writers NULL it: identity teardown,
+  // admin releasePhone), so an unverified row can never hold a claim and
+  // block the number for someone else. Keep it that way.
   phoneE164       String?   @unique
   phoneCountryIso String?
   phoneDialCode   String?

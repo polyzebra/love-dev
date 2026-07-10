@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cleanupAbandonedAuthUsers } from "@/lib/auth/cleanup";
+import { cleanupAbandonedAuthUsers, cleanupStalePhoneClaims } from "@/lib/auth/cleanup";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,10 @@ export async function GET(req: Request) {
   }
 
   const deleted = await cleanupAbandonedAuthUsers();
-  console.info(`[cron:auth-cleanup] swept ${deleted} abandoned auth user(s)`);
-  return NextResponse.json({ data: { deleted } });
+  const phoneClaimsCleared = await cleanupStalePhoneClaims();
+  console.info(
+    `[cron:auth-cleanup] swept ${deleted} abandoned auth user(s), ` +
+      `cleared ${phoneClaimsCleared} stale phone claim(s)`,
+  );
+  return NextResponse.json({ data: { deleted, phoneClaimsCleared } });
 }
