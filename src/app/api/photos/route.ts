@@ -7,7 +7,9 @@ import {
   deletePhotoObjects,
   makeBlurDataUrl,
   photoProxyPath,
+  PhotoProcessingError,
   PhotoStorageNotConfiguredError,
+  PhotoUploadIntegrityError,
   processProfilePhoto,
   uploadProfilePhoto,
 } from "@/lib/services/photos";
@@ -48,8 +50,13 @@ export async function POST(req: Request) {
 
   // The original bytes live ONLY in this buffer: they are re-encoded into
   // WebP variants below and never persisted anywhere (we keep just the
-  // original's mimeType/sizeBytes as metadata on the row).
+  // original's mimeType/sizeBytes as metadata on the row). If processing or
+  // validation fails, NOTHING has been written - the user still has their
+  // original and simply retries with another file.
   const input = Buffer.from(await file.arrayBuffer());
+  console.info(
+    `[photos:upload] user=${user.id} received bytes=${input.length} declaredType=${file.type} name=${JSON.stringify(file.name)}`,
+  );
 
   let processed: Awaited<ReturnType<typeof processProfilePhoto>>;
   let blurDataUrl: string;
@@ -58,7 +65,21 @@ export async function POST(req: Request) {
       processProfilePhoto(input),
       makeBlurDataUrl(input),
     ]);
-  } catch {
+  } catch (error) {
+    if (error instanceof PhotoProcessingError) {
+      // A generated variant failed decode-back validation. Abort before any
+      // write and log the full diagnostics for the audit trail.
+      console.error(
+        `[photos:upload] user=${user.id} image_processing_failed:`,
+        JSON.stringify(error.diagnostics),
+      );
+      return apiError(
+        422,
+        "image_processing_failed",
+        "We could not process that photo safely, so nothing was saved. " +
+          "Your original stays with you - we never store it. Please try a different photo.",
+      );
+    }
     return apiError(422, "invalid_image", "We could not read that image. Try a different file.");
   }
 
@@ -68,6 +89,19 @@ export async function POST(req: Request) {
   } catch (error) {
     if (error instanceof PhotoStorageNotConfiguredError) {
       return apiError(503, "storage_unavailable", "Photo storage not configured.");
+    }
+    if (error instanceof PhotoUploadIntegrityError) {
+      // Storage returned different bytes than we sent (platform-level
+      // corruption). Everything was removed; nothing is recorded.
+      console.error(
+        `[photos:upload] user=${user.id} upload_integrity_failed:`,
+        JSON.stringify(error.diagnostics),
+      );
+      return apiError(
+        502,
+        "upload_integrity_failed",
+        "Storing that photo did not complete safely, so nothing was saved. Please try again.",
+      );
     }
     return apiError(502, "upload_failed", "We could not store that photo. Please try again.");
   }

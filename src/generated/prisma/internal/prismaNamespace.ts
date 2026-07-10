@@ -2750,6 +2750,7 @@ export const PhotoScalarFieldEnum = {
   moderation: 'moderation',
   moderatedById: 'moderatedById',
   moderatedAt: 'moderatedAt',
+  mediaVersion: 'mediaVersion',
   createdAt: 'createdAt'
 } as const
 

@@ -432,6 +432,10 @@ model Photo {
   moderation    ModerationStatus @default(PENDING)
   moderatedById String?
   moderatedAt   DateTime?
+  // Bumped whenever the storage objects behind this photoId are rewritten
+  // in place (e.g. a repair/reprocess). Part of the /api/media ETag so
+  // clients holding the old immutable response refetch the new bytes.
+  mediaVersion  Int              @default(0)
   createdAt     DateTime         @default(now())
 
   user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
