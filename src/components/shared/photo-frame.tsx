@@ -95,10 +95,30 @@ export function PhotoFrame({
   // Blur-up: a new src starts hidden and fades/sharpens in. Cached images
   // mark loaded via the ref's `complete` check before first paint.
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  // Eternal-blur guard: a one-time fetch failure (expired session tab,
+  // flaky network, stale cached error) previously left the blur forever.
+  // First error retries once with a cache-busting param; a second error
+  // surrenders to the fallback slot instead of an empty blur.
+  const [retrySrc, setRetrySrc] = useState<string | null>(null);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const loaded = src != null && loadedSrc === src;
+  const failed = src != null && failedSrc === src;
   const markLoaded = useCallback((url: string) => {
     setLoadedSrc((current) => (current === url ? current : url));
   }, []);
+  const handleError = useCallback((url: string) => {
+    setRetrySrc((prev) => {
+      if (prev === url) {
+        setFailedSrc(url);
+        return prev;
+      }
+      return url;
+    });
+  }, []);
+  const effectiveSrc =
+    src != null && retrySrc === src && !failed
+      ? `${src}${src.includes("?") ? "&" : "?"}r=1`
+      : src;
 
   return (
     <div
@@ -111,7 +131,7 @@ export function PhotoFrame({
         className,
       )}
     >
-      {src && photo ? (
+      {src && photo && !failed ? (
         <>
           {photo.blurDataUrl && (
             <div
@@ -122,8 +142,8 @@ export function PhotoFrame({
           )}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            key={src}
-            src={src}
+            key={effectiveSrc ?? src}
+            src={effectiveSrc ?? src}
             alt={alt}
             loading={loading}
             draggable={draggable}
@@ -133,6 +153,7 @@ export function PhotoFrame({
               if (el?.complete) markLoaded(src);
             }}
             onLoad={() => markLoaded(src)}
+            onError={() => handleError(src)}
             className={cn(
               "absolute inset-0 h-full w-full select-none object-cover transition-[opacity,filter] duration-700 ease-out [-webkit-touch-callout:none] [-webkit-user-drag:none]",
               loaded ? "opacity-100 blur-0" : "opacity-0 blur-md",
