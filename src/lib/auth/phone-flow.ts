@@ -21,6 +21,7 @@ import {
   type PhoneVerificationProvider,
 } from "@/lib/auth/phone";
 import { resendCooldown, checkOtpVerifyBlocked } from "@/lib/auth/rate-limit";
+import { workflowCountrySet } from "@/lib/auth/phone-countries";
 import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
 
 /**
@@ -76,6 +77,23 @@ export function normalizePhone(raw: string, defaultCountry?: string): Normalized
   };
 }
 
+/**
+ * Normalize + enforce THIS flow's country allowlist
+ * (workflowCountries("change") - the /auth/phone onboarding verification
+ * and the settings-driven change share this one flow, see
+ * phone-countries.ts for the mapping). Used by BOTH send and verify, so
+ * a number outside the allowlist is rejected as unsupported_country
+ * BEFORE any rate-limit read, DB lookup or provider call.
+ */
+function normalizeForChange(raw: string, defaultCountry?: string): NormalizedPhone {
+  const normalized = normalizePhone(raw, defaultCountry);
+  if (!normalized.ok) return normalized;
+  if (!workflowCountrySet("change").has(normalized.countryIso)) {
+    return { ok: false, reason: "unsupported_country" };
+  }
+  return normalized;
+}
+
 // ---------------------------------------------------------------------------
 // Send
 // ---------------------------------------------------------------------------
@@ -101,9 +119,10 @@ export async function sendPhoneVerification(opts: {
 }): Promise<PhoneSendOutcome> {
   const { user, req } = opts;
 
-  // (1) Normalize FIRST - bad input never consumes a rate limit, never
-  // reaches a provider, never writes state.
-  const normalized = normalizePhone(opts.phone, opts.countryIso);
+  // (1) Normalize + country allowlist FIRST - bad or out-of-allowlist
+  // input never consumes a rate limit, never reaches a provider, never
+  // writes state.
+  const normalized = normalizeForChange(opts.phone, opts.countryIso);
   if (!normalized.ok) return { kind: normalized.reason };
   const { phoneE164 } = normalized;
 
@@ -187,6 +206,7 @@ export async function sendPhoneVerification(opts: {
 
 export type PhoneVerifyOutcome =
   | { kind: "invalid_phone" }
+  | { kind: "unsupported_country" }
   | { kind: "locked" }
   /** `holderId` = the OTHER account that owns the number (diagnostics only, never UI). */
   | { kind: "duplicate_phone"; holderId: string }
@@ -287,8 +307,12 @@ export async function confirmPhoneVerification(opts: {
 }): Promise<PhoneVerifyOutcome> {
   const { user, req } = opts;
 
-  const normalized = normalizePhone(opts.phone, opts.countryIso);
-  if (!normalized.ok) return { kind: "invalid_phone" };
+  // Same normalize + allowlist gate as send (defense in depth - a code
+  // for an out-of-allowlist number can never complete a claim).
+  const normalized = normalizeForChange(opts.phone, opts.countryIso);
+  if (!normalized.ok) {
+    return { kind: normalized.reason === "invalid_phone" ? "invalid_phone" : "unsupported_country" };
+  }
   const { phoneE164 } = normalized;
 
   // Idempotent success: this exact number is already verified on THIS

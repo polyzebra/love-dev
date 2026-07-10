@@ -14,6 +14,8 @@ const bodySchema = z.object({
 });
 
 const CODE_FAILED = "That code didn't work. Try again.";
+const UNSUPPORTED_COUNTRY =
+  "We can't verify numbers from that country yet. Please use a different number.";
 const CODE_EXPIRED = "That code has expired. Request a new one.";
 const LOCKED = "Too many attempts. Please try again in a few minutes.";
 const DUPLICATE_PHONE =
@@ -64,6 +66,11 @@ export const POST = withUnavailableGuard(
       case "invalid_phone":
         return NextResponse.json(
           { ok: false, code: "invalid_phone", error: CODE_FAILED },
+          { status: 400 },
+        );
+      case "unsupported_country":
+        return NextResponse.json(
+          { ok: false, code: "unsupported_country", error: UNSUPPORTED_COUNTRY },
           { status: 400 },
         );
       case "locked":

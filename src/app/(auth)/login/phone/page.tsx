@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { phoneLoginEnabled, phoneLoginCountries } from "@/lib/auth/phone";
+import { phoneLoginEnabled } from "@/lib/auth/phone";
+import { workflowCountries } from "@/lib/auth/phone-countries";
 import { PhoneLoginInput } from "@/components/auth/PhoneLoginInput";
 
 export const metadata: Metadata = {
@@ -12,11 +13,11 @@ export const dynamic = "force-dynamic";
 
 /**
  * Phone LOGIN, step 1: the number. Server component so the flag and the
- * PHONE_LOGIN_COUNTRIES allowlist are read HERE (server env only) - with
- * the flag off the page doesn't exist for visitors, matching the hidden
- * entry button (the API would only answer 503 anyway).
+ * workflowCountries("login") allowlist are read HERE (server env only) -
+ * with the flag off the page doesn't exist for visitors, matching the
+ * hidden entry button (the API would only answer 503 anyway).
  */
 export default function PhoneLoginPage() {
   if (!phoneLoginEnabled()) redirect("/login");
-  return <PhoneLoginInput allowedIsos={[...phoneLoginCountries()]} />;
+  return <PhoneLoginInput allowedIsos={workflowCountries("login")} />;
 }

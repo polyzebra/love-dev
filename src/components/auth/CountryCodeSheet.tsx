@@ -30,7 +30,12 @@ import { cn } from "@/lib/utils";
  * md+: centered dialog - the house pattern (see first-message-sheet).
  * Popular countries pinned first, then every country alphabetically;
  * search matches name, ISO code and dial code with or without "+"
- * (Ireland | IE | 353 | +353). Rows are 44px touch targets.
+ * (Ireland | IE | 353 | +353). Rows are 44px touch targets with a
+ * roving tabindex: Tab reaches the list once (the selected row when
+ * visible), ArrowUp/ArrowDown/Home/End move between rows, ArrowDown
+ * from the search box drops into the results. Focus trap, Esc/backdrop
+ * close and background-scroll locking come from the Dialog/Drawer
+ * primitives.
  */
 
 /** md breakpoint - drawer below, dialog at and above. */
@@ -110,6 +115,47 @@ export function CountryCodeSheet({
     if (isDesktop) searchRef.current?.focus();
   };
 
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Roving focus: ONE row is tabbable (the current selection when
+  // visible, else the first row) - Tab lands on the list once, arrows
+  // move within it. The Popular group can repeat a country from the
+  // main list, so the roving target is a flat INDEX, not an ISO.
+  const flatRows = useMemo(() => [...popular, ...all], [popular, all]);
+  const selectedFlatIndex = flatRows.findIndex((c) => c.iso === selectedIso);
+  const rovingIndex = selectedFlatIndex === -1 ? 0 : selectedFlatIndex;
+
+  const rowsOf = (root: HTMLElement) =>
+    Array.from(root.querySelectorAll<HTMLButtonElement>("[data-country-row]"));
+
+  function onListKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) return;
+    const rows = rowsOf(e.currentTarget);
+    if (rows.length === 0) return;
+    e.preventDefault();
+    const current = rows.indexOf(document.activeElement as HTMLButtonElement);
+    const next =
+      e.key === "Home"
+        ? 0
+        : e.key === "End"
+          ? rows.length - 1
+          : e.key === "ArrowDown"
+            ? Math.min(current + 1, rows.length - 1)
+            : Math.max(current - 1, 0);
+    rows[next]?.focus();
+    rows[next]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function onSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    // ArrowDown from the search box drops straight into the results.
+    if (e.key !== "ArrowDown" || !listRef.current) return;
+    const rows = rowsOf(listRef.current);
+    if (rows.length === 0) return;
+    e.preventDefault();
+    rows[0].focus();
+    rows[0].scrollIntoView({ block: "nearest" });
+  }
+
   const search = (
     <div className="relative">
       <Search
@@ -122,6 +168,7 @@ export function CountryCodeSheet({
         inputMode="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={onSearchKeyDown}
         placeholder="Search country or code"
         aria-label="Search countries"
         className="h-11 pl-10"
@@ -130,13 +177,19 @@ export function CountryCodeSheet({
   );
 
   const list = (
-    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pt-3 pb-4">
+    <div
+      ref={listRef}
+      onKeyDown={onListKeyDown}
+      className="min-h-0 flex-1 space-y-4 overflow-y-auto pt-3 pb-4"
+    >
       {popular.length > 0 && (
         <CountryGroup
           label="Popular"
           countries={popular}
           selectedIso={selectedIso}
           onPick={pick}
+          startIndex={0}
+          rovingIndex={rovingIndex}
         />
       )}
       {all.length > 0 && (
@@ -145,6 +198,8 @@ export function CountryCodeSheet({
           countries={all}
           selectedIso={selectedIso}
           onPick={pick}
+          startIndex={popular.length}
+          rovingIndex={rovingIndex}
         />
       )}
       {popular.length === 0 && all.length === 0 && (
@@ -201,11 +256,17 @@ function CountryGroup({
   countries,
   selectedIso,
   onPick,
+  startIndex,
+  rovingIndex,
 }: {
   label: string;
   countries: Country[];
   selectedIso: string;
   onPick: (country: Country) => void;
+  /** Flat index of this group's first row across all groups. */
+  startIndex: number;
+  /** The single tabbable row's flat index (roving tabindex). */
+  rovingIndex: number;
 }) {
   return (
     <div role="group" aria-label={label}>
@@ -213,12 +274,14 @@ function CountryGroup({
         {label}
       </p>
       <ul className="space-y-0.5">
-        {countries.map((country) => {
+        {countries.map((country, i) => {
           const selected = country.iso === selectedIso;
           return (
             <li key={`${label}-${country.iso}`}>
               <button
                 type="button"
+                data-country-row
+                tabIndex={startIndex + i === rovingIndex ? 0 : -1}
                 onClick={() => onPick(country)}
                 aria-pressed={selected}
                 className={cn(

@@ -1,4 +1,18 @@
-import { getCountries, getCountryCallingCode, type CountryCode } from "libphonenumber-js";
+// The "core" build with explicit metadata - same reasoning as
+// phone-flow.ts: the bundled builds (min/max) resolve their metadata
+// through an ESM/CJS interop shim that breaks under tsx (tests) while
+// working under Next. core + an explicit JSON import behaves identically
+// everywhere, which is what lets this dataset be THE one source of truth
+// for server allowlists (phone-countries.ts) and the UI alike.
+import {
+  getCountries,
+  getCountryCallingCode,
+  type CountryCode,
+  type MetadataJson,
+} from "libphonenumber-js/core";
+import metadataJson from "libphonenumber-js/metadata.min.json";
+
+const phoneMetadata = metadataJson as unknown as MetadataJson;
 
 /**
  * Country metadata for the phone step - derived entirely from
@@ -46,11 +60,18 @@ function nameOf(iso: string): string | null {
 }
 
 /** Every nameable country, alphabetical by English name. */
-export const COUNTRIES: Country[] = getCountries()
+export const COUNTRIES: Country[] = getCountries(phoneMetadata)
   .flatMap((iso): Country[] => {
     const name = nameOf(iso);
     return name
-      ? [{ iso, name, dialCode: `+${getCountryCallingCode(iso)}`, flag: flagEmoji(iso) }]
+      ? [
+          {
+            iso,
+            name,
+            dialCode: `+${getCountryCallingCode(iso, phoneMetadata)}`,
+            flag: flagEmoji(iso),
+          },
+        ]
       : [];
   })
   .sort((a, b) => a.name.localeCompare(b.name));

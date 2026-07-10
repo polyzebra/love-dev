@@ -263,18 +263,7 @@ export function phoneLoginEnabled(): boolean {
   return process.env.PHONE_LOGIN_ENABLED === "true";
 }
 
-/**
- * ISO country allowlist for anonymous phone LOGIN (env
- * PHONE_LOGIN_COUNTRIES, comma-separated, default "IE,GB"). Deliberately
- * narrower than the authenticated phone-change flow, which accepts any
- * region libphonenumber can resolve.
- */
-export function phoneLoginCountries(): ReadonlySet<string> {
-  const raw = process.env.PHONE_LOGIN_COUNTRIES?.trim() || "IE,GB";
-  return new Set(
-    raw
-      .split(",")
-      .map((iso) => iso.trim().toUpperCase())
-      .filter((iso) => /^[A-Z]{2}$/.test(iso)),
-  );
-}
+// Country allowlists live in ONE module: src/lib/auth/phone-countries.ts
+// (workflowCountries) - the old phoneLoginCountries() env parse moved
+// there so login/verification/change each get a named, strictly
+// defaulted list.

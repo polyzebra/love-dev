@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
 import { ChevronDown, MessageCircleMore } from "lucide-react";
@@ -12,17 +12,15 @@ import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
 import { sendPhoneCode } from "@/components/auth/api";
-import {
-  DEFAULT_COUNTRY_ISO,
-  countryByIso,
-  type Country,
-} from "@/lib/auth/countries";
+import { countryByIso, type Country } from "@/lib/auth/countries";
 
 /**
  * Step 3 of 5 - "What's your number?". Country selector (bottom sheet /
- * dialog) + tel input formatted as-you-type in the national format;
- * what we store and send is always E.164. The last-used country is
- * remembered in localStorage.
+ * dialog) restricted to the server's allowlist (workflowCountries -
+ * a server prop from the page, the env never reaches the bundle) + tel
+ * input formatted as-you-type in the national format; what we store and
+ * send is always E.164. The last-used country is remembered in
+ * localStorage (only honored while it stays on the allowlist).
  *
  * A 503 from the send route means phone verification can't happen right
  * now (provider outage while the feature is live) - we say so plainly
@@ -36,8 +34,6 @@ export const PHONE_COUNTRY_KEY = "tirvea:phone-country";
 /** Server retryAfter (seconds) for the send that opened the code screen. */
 export const AUTH_PHONE_RETRY_KEY = "tirvea:auth-phone-retry";
 
-const defaultCountry = countryByIso(DEFAULT_COUNTRY_ISO)!;
-
 /** localStorage never notifies - subscribe to nothing. */
 const subscribeNever = () => () => {};
 
@@ -49,14 +45,27 @@ function readRememberedIso(): string | null {
   }
 }
 
-export function PhoneInputStep() {
+export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
   const router = useRouter();
-  // The remembered country arrives hydration-safely (null on the
-  // server, the stored ISO on the client); an explicit pick this
-  // session wins over it, IE is the default before either exists.
+
+  const allowedCountries = useMemo(
+    () => allowedIsos.map((iso) => countryByIso(iso)).filter((c): c is Country => c !== null),
+    [allowedIsos],
+  );
+  // The allowlist's first entry is the default country (IE with the
+  // stock "IE,GB" list). The server page never renders this with an
+  // empty list - workflowCountries always yields at least the hard
+  // default.
+  const fallbackCountry = allowedCountries[0];
+
+  // The remembered country (shared with phone login) arrives
+  // hydration-safely (null on the server, the stored ISO on the
+  // client) and only counts while it is on the allowlist; an explicit
+  // pick this session wins over it.
   const rememberedIso = useSyncExternalStore(subscribeNever, readRememberedIso, () => null);
   const [pickedCountry, setPickedCountry] = useState<Country | null>(null);
-  const country = pickedCountry ?? countryByIso(rememberedIso) ?? defaultCountry;
+  const remembered = allowedCountries.find((c) => c.iso === countryByIso(rememberedIso)?.iso);
+  const country = pickedCountry ?? remembered ?? fallbackCountry;
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [display, setDisplay] = useState("");
@@ -227,6 +236,7 @@ export function PhoneInputStep() {
         onOpenChange={setSheetOpen}
         selectedIso={country.iso}
         onSelect={chooseCountry}
+        isos={allowedIsos}
       />
     </AuthShell>
   );
