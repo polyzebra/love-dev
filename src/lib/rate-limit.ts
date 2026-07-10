@@ -65,4 +65,7 @@ export const RATE_LIMITS = {
   message: { limit: 60, windowMs: 60_000 },
   report: { limit: 10, windowMs: 60 * 60_000 },
   api: { limit: 300, windowMs: 60_000 },
+  pushSubscribe: { limit: 10, windowMs: 60_000 },
+  pushTest: { limit: 3, windowMs: 60 * 60_000 },
+  presenceHeartbeat: { limit: 1, windowMs: 10_000 },
 } as const;

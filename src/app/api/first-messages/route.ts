@@ -7,6 +7,7 @@ import {
   listFirstMessagesFor,
   sendFirstMessage,
 } from "@/lib/services/first-messages";
+import { schedulePushDispatch } from "@/lib/services/notify";
 
 /** POST /api/first-messages - send a message before matching (with a Like). */
 export async function POST(req: Request) {
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
   try {
     // Sender is ALWAYS the session user - never trusted from the client.
     const result = await sendFirstMessage(user.id, data.toId, data.body);
+    // Push (first-message or instant-match) goes out after the response.
+    schedulePushDispatch();
     // 201: the sheet treats anything else as a failure.
     return created(result);
   } catch (error) {

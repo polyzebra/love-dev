@@ -3,8 +3,8 @@ import Link from "next/link";
 import { BellRing, ChevronRight, Mail, MessageSquareText } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { getUserSettings } from "@/lib/services/settings";
+import { InAppFeedbackSettings } from "@/components/settings/in-app-feedback";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
-import { SettingsToggleList } from "@/components/settings/settings-toggle-list";
 
 export const metadata: Metadata = { title: "Notifications" };
 
@@ -67,20 +67,11 @@ export default async function NotificationSettingsPage() {
         <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           In-app
         </h2>
-        <SettingsToggleList
-          initial={settings}
-          items={[
-            {
-              field: "inAppVibrations",
-              label: "Vibrations",
-              hint: "Subtle haptics on key moments.",
-            },
-            {
-              field: "inAppSounds",
-              label: "Sounds",
-              hint: "Soft sounds for matches and messages.",
-            },
-          ]}
+        <InAppFeedbackSettings
+          initial={{
+            inAppVibrations: settings.inAppVibrations,
+            inAppSounds: settings.inAppSounds,
+          }}
         />
       </section>
     </>

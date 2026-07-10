@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { SWIPE_LIMITS } from "@/lib/constants";
+import { notifyUser } from "@/lib/services/notify";
 import type { PlanTier, SwipeAction } from "@/generated/prisma/enums";
 
 /** Canonical ordering so a user pair maps to exactly one Match row. */
@@ -80,15 +81,28 @@ export async function recordSwipe(
     include: { conversation: { select: { id: true } } },
   });
 
-  await db.notification.createMany({
-    data: [fromId, toId].map((userId) => ({
+  // Same in-app copy as before, but routed through the outbox so the match
+  // also lands as a push (per prefs). The other user is the actor, so
+  // block-suppression applies; the matchId-scoped dedupe key means a
+  // re-swipe on an existing match never re-notifies.
+  for (const [userId, actorUserId] of [
+    [fromId, toId],
+    [toId, fromId],
+  ] as const) {
+    await notifyUser({
       userId,
-      type: "NEW_MATCH" as const,
+      type: "NEW_MATCH",
       title: "It's a match!",
       body: "You liked each other. Say hello 👋",
-      data: { matchId: match.id },
-    })),
-  });
+      url: match.conversation ? `/chat/${match.conversation.id}` : "/matches",
+      actorUserId,
+      dedupeKey: `match:${match.id}:user:${userId}`,
+      data: {
+        matchId: match.id,
+        ...(match.conversation ? { conversationId: match.conversation.id } : {}),
+      },
+    });
+  }
 
   return {
     matched: true,

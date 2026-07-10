@@ -9,8 +9,11 @@ import { saveSettings } from "@/app/(app)/settings/actions";
 import type { SettingsPatch } from "@/lib/services/settings";
 import { SPRING } from "@/lib/motion";
 
-/** Every boolean preference the server accepts. */
-export type SettingsToggleField = Exclude<keyof SettingsPatch, "appearance">;
+/** Every boolean preference the server accepts (drops appearance, quiet
+ * hours bounds, timezone - anything a Switch can't represent). */
+export type SettingsToggleField = {
+  [K in keyof SettingsPatch]-?: NonNullable<SettingsPatch[K]> extends boolean ? K : never;
+}[keyof SettingsPatch];
 
 export type SettingsToggleItem = {
   field: SettingsToggleField;

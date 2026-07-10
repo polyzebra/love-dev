@@ -26,6 +26,16 @@ export const metadata: Metadata = {
   description:
     "Tirvea is a premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
   keywords: ["dating", "relationships", "verified dating", "premium dating"],
+  // Home-screen icon for iOS - required alongside the manifest for a
+  // proper "Add to Home Screen" install (and therefore iOS Web Push).
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Tirvea",
+  },
   openGraph: {
     title: "Tirvea - Dating, designed with intention",
     description:

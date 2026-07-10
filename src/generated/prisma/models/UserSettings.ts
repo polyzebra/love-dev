@@ -20,8 +20,20 @@ export type UserSettingsModel = runtime.Types.Result.DefaultSelection<Prisma.$Us
 
 export type AggregateUserSettings = {
   _count: UserSettingsCountAggregateOutputType | null
+  _avg: UserSettingsAvgAggregateOutputType | null
+  _sum: UserSettingsSumAggregateOutputType | null
   _min: UserSettingsMinAggregateOutputType | null
   _max: UserSettingsMaxAggregateOutputType | null
+}
+
+export type UserSettingsAvgAggregateOutputType = {
+  quietHoursStart: number | null
+  quietHoursEnd: number | null
+}
+
+export type UserSettingsSumAggregateOutputType = {
+  quietHoursStart: number | null
+  quietHoursEnd: number | null
 }
 
 export type UserSettingsMinAggregateOutputType = {
@@ -39,6 +51,16 @@ export type UserSettingsMinAggregateOutputType = {
   smsEnabled: boolean | null
   inAppVibrations: boolean | null
   inAppSounds: boolean | null
+  safetyPush: boolean | null
+  accountPush: boolean | null
+  safetyEmail: boolean | null
+  accountEmail: boolean | null
+  safetySms: boolean | null
+  accountSms: boolean | null
+  quietHoursEnabled: boolean | null
+  quietHoursStart: number | null
+  quietHoursEnd: number | null
+  timezone: string | null
   appearance: $Enums.AppearanceMode | null
   updatedAt: Date | null
 }
@@ -58,6 +80,16 @@ export type UserSettingsMaxAggregateOutputType = {
   smsEnabled: boolean | null
   inAppVibrations: boolean | null
   inAppSounds: boolean | null
+  safetyPush: boolean | null
+  accountPush: boolean | null
+  safetyEmail: boolean | null
+  accountEmail: boolean | null
+  safetySms: boolean | null
+  accountSms: boolean | null
+  quietHoursEnabled: boolean | null
+  quietHoursStart: number | null
+  quietHoursEnd: number | null
+  timezone: string | null
   appearance: $Enums.AppearanceMode | null
   updatedAt: Date | null
 }
@@ -77,11 +109,31 @@ export type UserSettingsCountAggregateOutputType = {
   smsEnabled: number
   inAppVibrations: number
   inAppSounds: number
+  safetyPush: number
+  accountPush: number
+  safetyEmail: number
+  accountEmail: number
+  safetySms: number
+  accountSms: number
+  quietHoursEnabled: number
+  quietHoursStart: number
+  quietHoursEnd: number
+  timezone: number
   appearance: number
   updatedAt: number
   _all: number
 }
 
+
+export type UserSettingsAvgAggregateInputType = {
+  quietHoursStart?: true
+  quietHoursEnd?: true
+}
+
+export type UserSettingsSumAggregateInputType = {
+  quietHoursStart?: true
+  quietHoursEnd?: true
+}
 
 export type UserSettingsMinAggregateInputType = {
   id?: true
@@ -98,6 +150,16 @@ export type UserSettingsMinAggregateInputType = {
   smsEnabled?: true
   inAppVibrations?: true
   inAppSounds?: true
+  safetyPush?: true
+  accountPush?: true
+  safetyEmail?: true
+  accountEmail?: true
+  safetySms?: true
+  accountSms?: true
+  quietHoursEnabled?: true
+  quietHoursStart?: true
+  quietHoursEnd?: true
+  timezone?: true
   appearance?: true
   updatedAt?: true
 }
@@ -117,6 +179,16 @@ export type UserSettingsMaxAggregateInputType = {
   smsEnabled?: true
   inAppVibrations?: true
   inAppSounds?: true
+  safetyPush?: true
+  accountPush?: true
+  safetyEmail?: true
+  accountEmail?: true
+  safetySms?: true
+  accountSms?: true
+  quietHoursEnabled?: true
+  quietHoursStart?: true
+  quietHoursEnd?: true
+  timezone?: true
   appearance?: true
   updatedAt?: true
 }
@@ -136,6 +208,16 @@ export type UserSettingsCountAggregateInputType = {
   smsEnabled?: true
   inAppVibrations?: true
   inAppSounds?: true
+  safetyPush?: true
+  accountPush?: true
+  safetyEmail?: true
+  accountEmail?: true
+  safetySms?: true
+  accountSms?: true
+  quietHoursEnabled?: true
+  quietHoursStart?: true
+  quietHoursEnd?: true
+  timezone?: true
   appearance?: true
   updatedAt?: true
   _all?: true
@@ -179,6 +261,18 @@ export type UserSettingsAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserSettingsAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSettingsSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserSettingsMinAggregateInputType
@@ -209,6 +303,8 @@ export type UserSettingsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   _count?: UserSettingsCountAggregateInputType | true
+  _avg?: UserSettingsAvgAggregateInputType
+  _sum?: UserSettingsSumAggregateInputType
   _min?: UserSettingsMinAggregateInputType
   _max?: UserSettingsMaxAggregateInputType
 }
@@ -228,9 +324,21 @@ export type UserSettingsGroupByOutputType = {
   smsEnabled: boolean
   inAppVibrations: boolean
   inAppSounds: boolean
+  safetyPush: boolean
+  accountPush: boolean
+  safetyEmail: boolean
+  accountEmail: boolean
+  safetySms: boolean
+  accountSms: boolean
+  quietHoursEnabled: boolean
+  quietHoursStart: number | null
+  quietHoursEnd: number | null
+  timezone: string | null
   appearance: $Enums.AppearanceMode
   updatedAt: Date
   _count: UserSettingsCountAggregateOutputType | null
+  _avg: UserSettingsAvgAggregateOutputType | null
+  _sum: UserSettingsSumAggregateOutputType | null
   _min: UserSettingsMinAggregateOutputType | null
   _max: UserSettingsMaxAggregateOutputType | null
 }
@@ -268,6 +376,16 @@ export type UserSettingsWhereInput = {
   smsEnabled?: Prisma.BoolFilter<"UserSettings"> | boolean
   inAppVibrations?: Prisma.BoolFilter<"UserSettings"> | boolean
   inAppSounds?: Prisma.BoolFilter<"UserSettings"> | boolean
+  safetyPush?: Prisma.BoolFilter<"UserSettings"> | boolean
+  accountPush?: Prisma.BoolFilter<"UserSettings"> | boolean
+  safetyEmail?: Prisma.BoolFilter<"UserSettings"> | boolean
+  accountEmail?: Prisma.BoolFilter<"UserSettings"> | boolean
+  safetySms?: Prisma.BoolFilter<"UserSettings"> | boolean
+  accountSms?: Prisma.BoolFilter<"UserSettings"> | boolean
+  quietHoursEnabled?: Prisma.BoolFilter<"UserSettings"> | boolean
+  quietHoursStart?: Prisma.IntNullableFilter<"UserSettings"> | number | null
+  quietHoursEnd?: Prisma.IntNullableFilter<"UserSettings"> | number | null
+  timezone?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   appearance?: Prisma.EnumAppearanceModeFilter<"UserSettings"> | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -288,6 +406,16 @@ export type UserSettingsOrderByWithRelationInput = {
   smsEnabled?: Prisma.SortOrder
   inAppVibrations?: Prisma.SortOrder
   inAppSounds?: Prisma.SortOrder
+  safetyPush?: Prisma.SortOrder
+  accountPush?: Prisma.SortOrder
+  safetyEmail?: Prisma.SortOrder
+  accountEmail?: Prisma.SortOrder
+  safetySms?: Prisma.SortOrder
+  accountSms?: Prisma.SortOrder
+  quietHoursEnabled?: Prisma.SortOrder
+  quietHoursStart?: Prisma.SortOrderInput | Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  timezone?: Prisma.SortOrderInput | Prisma.SortOrder
   appearance?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -311,6 +439,16 @@ export type UserSettingsWhereUniqueInput = Prisma.AtLeast<{
   smsEnabled?: Prisma.BoolFilter<"UserSettings"> | boolean
   inAppVibrations?: Prisma.BoolFilter<"UserSettings"> | boolean
   inAppSounds?: Prisma.BoolFilter<"UserSettings"> | boolean
+  safetyPush?: Prisma.BoolFilter<"UserSettings"> | boolean
+  accountPush?: Prisma.BoolFilter<"UserSettings"> | boolean
+  safetyEmail?: Prisma.BoolFilter<"UserSettings"> | boolean
+  accountEmail?: Prisma.BoolFilter<"UserSettings"> | boolean
+  safetySms?: Prisma.BoolFilter<"UserSettings"> | boolean
+  accountSms?: Prisma.BoolFilter<"UserSettings"> | boolean
+  quietHoursEnabled?: Prisma.BoolFilter<"UserSettings"> | boolean
+  quietHoursStart?: Prisma.IntNullableFilter<"UserSettings"> | number | null
+  quietHoursEnd?: Prisma.IntNullableFilter<"UserSettings"> | number | null
+  timezone?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   appearance?: Prisma.EnumAppearanceModeFilter<"UserSettings"> | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -331,11 +469,23 @@ export type UserSettingsOrderByWithAggregationInput = {
   smsEnabled?: Prisma.SortOrder
   inAppVibrations?: Prisma.SortOrder
   inAppSounds?: Prisma.SortOrder
+  safetyPush?: Prisma.SortOrder
+  accountPush?: Prisma.SortOrder
+  safetyEmail?: Prisma.SortOrder
+  accountEmail?: Prisma.SortOrder
+  safetySms?: Prisma.SortOrder
+  accountSms?: Prisma.SortOrder
+  quietHoursEnabled?: Prisma.SortOrder
+  quietHoursStart?: Prisma.SortOrderInput | Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  timezone?: Prisma.SortOrderInput | Prisma.SortOrder
   appearance?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserSettingsCountOrderByAggregateInput
+  _avg?: Prisma.UserSettingsAvgOrderByAggregateInput
   _max?: Prisma.UserSettingsMaxOrderByAggregateInput
   _min?: Prisma.UserSettingsMinOrderByAggregateInput
+  _sum?: Prisma.UserSettingsSumOrderByAggregateInput
 }
 
 export type UserSettingsScalarWhereWithAggregatesInput = {
@@ -356,6 +506,16 @@ export type UserSettingsScalarWhereWithAggregatesInput = {
   smsEnabled?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
   inAppVibrations?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
   inAppSounds?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  safetyPush?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  accountPush?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  safetyEmail?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  accountEmail?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  safetySms?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  accountSms?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  quietHoursEnabled?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  quietHoursStart?: Prisma.IntNullableWithAggregatesFilter<"UserSettings"> | number | null
+  quietHoursEnd?: Prisma.IntNullableWithAggregatesFilter<"UserSettings"> | number | null
+  timezone?: Prisma.StringNullableWithAggregatesFilter<"UserSettings"> | string | null
   appearance?: Prisma.EnumAppearanceModeWithAggregatesFilter<"UserSettings"> | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
 }
@@ -374,6 +534,16 @@ export type UserSettingsCreateInput = {
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: number | null
+  quietHoursEnd?: number | null
+  timezone?: string | null
   appearance?: $Enums.AppearanceMode
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSettingsInput
@@ -394,6 +564,16 @@ export type UserSettingsUncheckedCreateInput = {
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: number | null
+  quietHoursEnd?: number | null
+  timezone?: string | null
   appearance?: $Enums.AppearanceMode
   updatedAt?: Date | string
 }
@@ -412,6 +592,16 @@ export type UserSettingsUpdateInput = {
   smsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppVibrations?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppSounds?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetySms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountSms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quietHoursEnd?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appearance?: Prisma.EnumAppearanceModeFieldUpdateOperationsInput | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSettingsNestedInput
@@ -432,6 +622,16 @@ export type UserSettingsUncheckedUpdateInput = {
   smsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppVibrations?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppSounds?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetySms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountSms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quietHoursEnd?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appearance?: Prisma.EnumAppearanceModeFieldUpdateOperationsInput | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -451,6 +651,16 @@ export type UserSettingsCreateManyInput = {
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: number | null
+  quietHoursEnd?: number | null
+  timezone?: string | null
   appearance?: $Enums.AppearanceMode
   updatedAt?: Date | string
 }
@@ -469,6 +679,16 @@ export type UserSettingsUpdateManyMutationInput = {
   smsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppVibrations?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppSounds?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetySms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountSms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quietHoursEnd?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appearance?: Prisma.EnumAppearanceModeFieldUpdateOperationsInput | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -488,6 +708,16 @@ export type UserSettingsUncheckedUpdateManyInput = {
   smsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppVibrations?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppSounds?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetySms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountSms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quietHoursEnd?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appearance?: Prisma.EnumAppearanceModeFieldUpdateOperationsInput | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -512,8 +742,23 @@ export type UserSettingsCountOrderByAggregateInput = {
   smsEnabled?: Prisma.SortOrder
   inAppVibrations?: Prisma.SortOrder
   inAppSounds?: Prisma.SortOrder
+  safetyPush?: Prisma.SortOrder
+  accountPush?: Prisma.SortOrder
+  safetyEmail?: Prisma.SortOrder
+  accountEmail?: Prisma.SortOrder
+  safetySms?: Prisma.SortOrder
+  accountSms?: Prisma.SortOrder
+  quietHoursEnabled?: Prisma.SortOrder
+  quietHoursStart?: Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   appearance?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSettingsAvgOrderByAggregateInput = {
+  quietHoursStart?: Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrder
 }
 
 export type UserSettingsMaxOrderByAggregateInput = {
@@ -531,6 +776,16 @@ export type UserSettingsMaxOrderByAggregateInput = {
   smsEnabled?: Prisma.SortOrder
   inAppVibrations?: Prisma.SortOrder
   inAppSounds?: Prisma.SortOrder
+  safetyPush?: Prisma.SortOrder
+  accountPush?: Prisma.SortOrder
+  safetyEmail?: Prisma.SortOrder
+  accountEmail?: Prisma.SortOrder
+  safetySms?: Prisma.SortOrder
+  accountSms?: Prisma.SortOrder
+  quietHoursEnabled?: Prisma.SortOrder
+  quietHoursStart?: Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   appearance?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -550,8 +805,23 @@ export type UserSettingsMinOrderByAggregateInput = {
   smsEnabled?: Prisma.SortOrder
   inAppVibrations?: Prisma.SortOrder
   inAppSounds?: Prisma.SortOrder
+  safetyPush?: Prisma.SortOrder
+  accountPush?: Prisma.SortOrder
+  safetyEmail?: Prisma.SortOrder
+  accountEmail?: Prisma.SortOrder
+  safetySms?: Prisma.SortOrder
+  accountSms?: Prisma.SortOrder
+  quietHoursEnabled?: Prisma.SortOrder
+  quietHoursStart?: Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   appearance?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSettingsSumOrderByAggregateInput = {
+  quietHoursStart?: Prisma.SortOrder
+  quietHoursEnd?: Prisma.SortOrder
 }
 
 export type UserSettingsCreateNestedOneWithoutUserInput = {
@@ -604,6 +874,16 @@ export type UserSettingsCreateWithoutUserInput = {
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: number | null
+  quietHoursEnd?: number | null
+  timezone?: string | null
   appearance?: $Enums.AppearanceMode
   updatedAt?: Date | string
 }
@@ -622,6 +902,16 @@ export type UserSettingsUncheckedCreateWithoutUserInput = {
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: number | null
+  quietHoursEnd?: number | null
+  timezone?: string | null
   appearance?: $Enums.AppearanceMode
   updatedAt?: Date | string
 }
@@ -656,6 +946,16 @@ export type UserSettingsUpdateWithoutUserInput = {
   smsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppVibrations?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppSounds?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetySms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountSms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quietHoursEnd?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appearance?: Prisma.EnumAppearanceModeFieldUpdateOperationsInput | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -674,6 +974,16 @@ export type UserSettingsUncheckedUpdateWithoutUserInput = {
   smsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppVibrations?: Prisma.BoolFieldUpdateOperationsInput | boolean
   inAppSounds?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountPush?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetyEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountEmail?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  safetySms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  accountSms?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quietHoursStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quietHoursEnd?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   appearance?: Prisma.EnumAppearanceModeFieldUpdateOperationsInput | $Enums.AppearanceMode
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -695,6 +1005,16 @@ export type UserSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: boolean
+  quietHoursEnd?: boolean
+  timezone?: boolean
   appearance?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -715,6 +1035,16 @@ export type UserSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: boolean
+  quietHoursEnd?: boolean
+  timezone?: boolean
   appearance?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -735,6 +1065,16 @@ export type UserSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: boolean
+  quietHoursEnd?: boolean
+  timezone?: boolean
   appearance?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -755,11 +1095,21 @@ export type UserSettingsSelectScalar = {
   smsEnabled?: boolean
   inAppVibrations?: boolean
   inAppSounds?: boolean
+  safetyPush?: boolean
+  accountPush?: boolean
+  safetyEmail?: boolean
+  accountEmail?: boolean
+  safetySms?: boolean
+  accountSms?: boolean
+  quietHoursEnabled?: boolean
+  quietHoursStart?: boolean
+  quietHoursEnd?: boolean
+  timezone?: boolean
   appearance?: boolean
   updatedAt?: boolean
 }
 
-export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "emailNewMatches" | "emailMessages" | "emailPromotions" | "pushNewMatches" | "pushMessages" | "pushMessageLikes" | "pushSuperLikes" | "pushDailyPicks" | "pushOffers" | "smsEnabled" | "inAppVibrations" | "inAppSounds" | "appearance" | "updatedAt", ExtArgs["result"]["userSettings"]>
+export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "emailNewMatches" | "emailMessages" | "emailPromotions" | "pushNewMatches" | "pushMessages" | "pushMessageLikes" | "pushSuperLikes" | "pushDailyPicks" | "pushOffers" | "smsEnabled" | "inAppVibrations" | "inAppSounds" | "safetyPush" | "accountPush" | "safetyEmail" | "accountEmail" | "safetySms" | "accountSms" | "quietHoursEnabled" | "quietHoursStart" | "quietHoursEnd" | "timezone" | "appearance" | "updatedAt", ExtArgs["result"]["userSettings"]>
 export type UserSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -790,6 +1140,16 @@ export type $UserSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     smsEnabled: boolean
     inAppVibrations: boolean
     inAppSounds: boolean
+    safetyPush: boolean
+    accountPush: boolean
+    safetyEmail: boolean
+    accountEmail: boolean
+    safetySms: boolean
+    accountSms: boolean
+    quietHoursEnabled: boolean
+    quietHoursStart: number | null
+    quietHoursEnd: number | null
+    timezone: string | null
     appearance: $Enums.AppearanceMode
     updatedAt: Date
   }, ExtArgs["result"]["userSettings"]>
@@ -1230,6 +1590,16 @@ export interface UserSettingsFieldRefs {
   readonly smsEnabled: Prisma.FieldRef<"UserSettings", 'Boolean'>
   readonly inAppVibrations: Prisma.FieldRef<"UserSettings", 'Boolean'>
   readonly inAppSounds: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly safetyPush: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly accountPush: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly safetyEmail: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly accountEmail: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly safetySms: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly accountSms: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly quietHoursEnabled: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly quietHoursStart: Prisma.FieldRef<"UserSettings", 'Int'>
+  readonly quietHoursEnd: Prisma.FieldRef<"UserSettings", 'Int'>
+  readonly timezone: Prisma.FieldRef<"UserSettings", 'String'>
   readonly appearance: Prisma.FieldRef<"UserSettings", 'AppearanceMode'>
   readonly updatedAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
 }

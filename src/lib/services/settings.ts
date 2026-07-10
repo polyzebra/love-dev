@@ -22,6 +22,18 @@ export const settingsPatchSchema = z
     smsEnabled: z.boolean(),
     inAppVibrations: z.boolean(),
     inAppSounds: z.boolean(),
+    safetyPush: z.boolean(),
+    accountPush: z.boolean(),
+    safetyEmail: z.boolean(),
+    accountEmail: z.boolean(),
+    safetySms: z.boolean(),
+    accountSms: z.boolean(),
+    quietHoursEnabled: z.boolean(),
+    // Minutes since local midnight (0-1439); null clears the bound.
+    quietHoursStart: z.number().int().min(0).max(1439).nullable(),
+    quietHoursEnd: z.number().int().min(0).max(1439).nullable(),
+    // IANA timezone name; unknown names are evaluated as UTC server-side.
+    timezone: z.string().min(1).max(64).nullable(),
     appearance: z.enum(["SYSTEM", "LIGHT", "DARK"]),
   })
   .partial()

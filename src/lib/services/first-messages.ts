@@ -5,6 +5,7 @@ import {
   FIRST_MESSAGE_TTL_DAYS,
 } from "@/lib/constants";
 import { orderPair, planTierOf } from "@/lib/services/matching";
+import { notifyUser } from "@/lib/services/notify";
 import { calculateAge } from "@/lib/utils";
 
 /**
@@ -233,15 +234,21 @@ export async function sendFirstMessage(
         data: { senderId, receiverId, body, expiresAt },
         select: { id: true },
       });
-      await tx.notification.create({
-        data: {
+      // Same in-app payload as before (preview included in-app only - push
+      // copy for NEW_LIKE is always generic), now via the outbox.
+      await notifyUser(
+        {
           userId: receiverId,
           type: "NEW_LIKE",
           title: `${senderName} sent you a message`,
           body: preview,
+          url: "/matches",
+          actorUserId: senderId,
+          dedupeKey: `first-message:${firstMessage.id}:receiver:${receiverId}`,
           data: { firstMessageId: firstMessage.id, senderId, preview },
         },
-      });
+        { client: tx },
+      );
       return { id: firstMessage.id, matched: false as const };
     }
 
@@ -287,15 +294,24 @@ export async function sendFirstMessage(
       data: { lastMessageAt: message.createdAt },
     });
 
-    await tx.notification.createMany({
-      data: [senderId, receiverId].map((userId) => ({
-        userId,
-        type: "NEW_MATCH" as const,
-        title: "It's a match!",
-        body: "You liked each other. Say hello 👋",
-        data: { matchId: match.id, conversationId },
-      })),
-    });
+    for (const [userId, actorUserId] of [
+      [senderId, receiverId],
+      [receiverId, senderId],
+    ] as const) {
+      await notifyUser(
+        {
+          userId,
+          type: "NEW_MATCH",
+          title: "It's a match!",
+          body: "You liked each other. Say hello 👋",
+          url: `/chat/${conversationId}`,
+          actorUserId,
+          dedupeKey: `match:${match.id}:user:${userId}`,
+          data: { matchId: match.id, conversationId },
+        },
+        { client: tx },
+      );
+    }
 
     return { id: firstMessage.id, matched: true as const, conversationId };
   });
@@ -396,24 +412,32 @@ export async function respondToFirstMessage(
       data: { status: "ACCEPTED", acceptedAt: new Date() },
     });
 
-    await tx.notification.createMany({
-      data: [
-        {
-          userId: senderId,
-          type: "NEW_MATCH" as const,
-          title: "It's a match!",
-          body: "Your message landed. The conversation is open 👋",
-          data: { matchId: match.id, conversationId },
-        },
-        {
-          userId: receiverId,
-          type: "NEW_MATCH" as const,
-          title: "It's a match!",
-          body: `You matched with ${senderName}. Say hello 👋`,
-          data: { matchId: match.id, conversationId },
-        },
-      ],
-    });
+    await notifyUser(
+      {
+        userId: senderId,
+        type: "NEW_MATCH",
+        title: "It's a match!",
+        body: "Your message landed. The conversation is open 👋",
+        url: `/chat/${conversationId}`,
+        actorUserId: receiverId,
+        dedupeKey: `match:${match.id}:user:${senderId}`,
+        data: { matchId: match.id, conversationId },
+      },
+      { client: tx },
+    );
+    await notifyUser(
+      {
+        userId: receiverId,
+        type: "NEW_MATCH",
+        title: "It's a match!",
+        body: `You matched with ${senderName}. Say hello 👋`,
+        url: `/chat/${conversationId}`,
+        actorUserId: senderId,
+        dedupeKey: `match:${match.id}:user:${receiverId}`,
+        data: { matchId: match.id, conversationId },
+      },
+      { client: tx },
+    );
 
     return { status: "ACCEPTED" as const, conversationId };
   });

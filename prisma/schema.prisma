@@ -193,6 +193,28 @@ enum NotificationType {
   SYSTEM
 }
 
+// Transport a NotificationDelivery row targets. IN_APP is the Notification
+// row itself (always written); the others are outbox work items.
+enum DeliveryChannel {
+  PUSH
+  EMAIL
+  SMS
+  IN_APP
+}
+
+// Outbox lifecycle. SUPPRESSED = deliberately not sent (quiet hours would
+// have deferred it, or the recipient was actively viewing the conversation);
+// DEAD = gave up after max attempts. Honest states only - a row is never
+// marked SENT unless the provider accepted it.
+enum DeliveryStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  DEAD
+  SUPPRESSED
+}
+
 enum FirstMessageStatus {
   PENDING
   ACCEPTED
@@ -318,6 +340,8 @@ model User {
   settings           UserSettings?
   payments           Payment[]
   notifications      Notification[]
+  pushSubscriptions  PushSubscription[]
+  conversationPresence ConversationPresence[]
   explorePreferences UserExplorePreference[]
   adminLogs          AdminLog[]              @relation("AdminActor")
   authEvents         AuthVerificationEvent[]
@@ -730,9 +754,83 @@ model Notification {
   readAt    DateTime?
   createdAt DateTime         @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
 
   @@index([userId, readAt, createdAt])
+}
+
+// One browser/device push endpoint per row. Only the PUBLIC subscription
+// material lives here (endpoint + p256dh + auth from PushSubscription.toJSON)
+// - the VAPID PRIVATE key is env-only and must never be stored in the DB.
+// Rows are revoked (revokedAt + enabled=false), never deleted, so device
+// history stays auditable.
+model PushSubscription {
+  id             String    @id @default(cuid())
+  userId         String
+  endpoint       String    @unique @db.Text
+  p256dh         String
+  auth           String
+  userAgent      String?
+  platform       String?
+  browser        String?
+  deviceLabel    String?
+  installationId String?
+  enabled        Boolean   @default(true)
+  lastSeenAt     DateTime  @default(now())
+  lastSuccessAt  DateTime?
+  lastFailureAt  DateTime?
+  failureCount   Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  revokedAt      DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, enabled])
+}
+
+// Per-channel outbox for a Notification. IN_APP rows are written SENT
+// immediately (the Notification row IS the in-app delivery); PUSH rows are
+// claimed by processPendingPush with exponential backoff via nextAttemptAt;
+// EMAIL/SMS rows exist for safety/account notices and go DEAD with
+// errorCode "not_configured" until a provider ships - no fake sends.
+model NotificationDelivery {
+  id                String          @id @default(cuid())
+  notificationId    String
+  channel           DeliveryChannel
+  status            DeliveryStatus  @default(PENDING)
+  provider          String?
+  providerMessageId String?
+  attempt           Int             @default(0)
+  nextAttemptAt     DateTime?
+  errorCode         String?
+  errorMessage      String?
+  idempotencyKey    String          @unique
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  createdAt         DateTime        @default(now())
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId, channel])
+  @@index([status, createdAt])
+}
+
+// Heartbeat of "user X is looking at conversation Y right now" - used to
+// suppress push for messages the recipient is already reading. Client pings
+// POST /api/presence/heartbeat every ~10s; a row younger than 30s counts
+// as present.
+model ConversationPresence {
+  id             String   @id @default(cuid())
+  userId         String
+  conversationId String
+  lastSeenAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conversationId])
+  @@index([conversationId, lastSeenAt])
 }
 
 model AdminLog {
@@ -881,8 +979,14 @@ enum AppearanceMode {
   DARK
 }
 
-// Per-user notification + appearance preferences. Push/SMS values are
-// stored preferences; delivery activates when those transports ship.
+// Per-user notification + appearance preferences. This model IS the spec's
+// "NotificationPreference" - one row per user, per-type toggles per channel:
+//   push:  pushNewMatches/pushMessages/pushMessageLikes/pushSuperLikes/
+//          pushDailyPicks/pushOffers/safetyPush/accountPush
+//   email: emailNewMatches/emailMessages/emailPromotions/safetyEmail/accountEmail
+//   sms:   smsEnabled (master) + safetySms/accountSms
+// Quiet hours are minutes-since-midnight in the user's own timezone
+// (IANA name in `timezone`); an overnight range (start > end) wraps.
 model UserSettings {
   id     String @id @default(cuid())
   userId String @unique
@@ -899,6 +1003,22 @@ model UserSettings {
   smsEnabled       Boolean @default(false)
   inAppVibrations  Boolean @default(true)
   inAppSounds      Boolean @default(false)
+
+  // Safety (SAFETY) + account (PROFILE_VERIFIED/SUBSCRIPTION/SYSTEM)
+  // notices per channel. These default ON - they are not marketing.
+  safetyPush   Boolean @default(true)
+  accountPush  Boolean @default(true)
+  safetyEmail  Boolean @default(true)
+  accountEmail Boolean @default(true)
+  safetySms    Boolean @default(true)
+  accountSms   Boolean @default(true)
+
+  // Quiet hours: minutes since local midnight, 0-1439. Push is deferred
+  // (not dropped) while inside the window; safety notices ignore it.
+  quietHoursEnabled Boolean @default(false)
+  quietHoursStart   Int?
+  quietHoursEnd     Int?
+  timezone          String?
 
   appearance AppearanceMode @default(SYSTEM)
   updatedAt  DateTime       @updatedAt

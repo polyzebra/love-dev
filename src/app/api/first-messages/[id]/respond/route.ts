@@ -6,6 +6,7 @@ import {
   FirstMessageError,
   respondToFirstMessage,
 } from "@/lib/services/first-messages";
+import { schedulePushDispatch } from "@/lib/services/notify";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -24,6 +25,8 @@ export async function POST(req: Request, { params }: Params) {
   try {
     // Ownership (session user must be the receiver) is enforced in the service.
     const result = await respondToFirstMessage(user.id, id, data.action);
+    // Accepting creates match notifications - dispatch push post-response.
+    if (result.status === "ACCEPTED") schedulePushDispatch();
     return ok(result);
   } catch (error) {
     if (error instanceof FirstMessageError) {

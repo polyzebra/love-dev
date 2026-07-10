@@ -2,6 +2,7 @@ import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { swipeSchema } from "@/lib/validators/swipe";
 import { planTierOf, recordSwipe, swipesRemainingToday, undoLastSwipe } from "@/lib/services/matching";
+import { schedulePushDispatch } from "@/lib/services/notify";
 import { SWIPE_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
 
@@ -37,6 +38,8 @@ export async function POST(req: Request) {
   }
 
   const outcome = await recordSwipe(user.id, data.toId, data.action);
+  // Match push (if any) goes out after the response - never blocks the swipe.
+  if (outcome.matched) schedulePushDispatch();
   return ok(outcome);
 }
 

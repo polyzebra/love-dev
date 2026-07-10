@@ -259,6 +259,28 @@ export const NotificationType = {
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
 
 
+export const DeliveryChannel = {
+  PUSH: 'PUSH',
+  EMAIL: 'EMAIL',
+  SMS: 'SMS',
+  IN_APP: 'IN_APP'
+} as const
+
+export type DeliveryChannel = (typeof DeliveryChannel)[keyof typeof DeliveryChannel]
+
+
+export const DeliveryStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  FAILED: 'FAILED',
+  DEAD: 'DEAD',
+  SUPPRESSED: 'SUPPRESSED'
+} as const
+
+export type DeliveryStatus = (typeof DeliveryStatus)[keyof typeof DeliveryStatus]
+
+
 export const FirstMessageStatus = {
   PENDING: 'PENDING',
   ACCEPTED: 'ACCEPTED',

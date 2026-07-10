@@ -71,6 +71,9 @@ export const ModelName = {
   Subscription: 'Subscription',
   Payment: 'Payment',
   Notification: 'Notification',
+  PushSubscription: 'PushSubscription',
+  NotificationDelivery: 'NotificationDelivery',
+  ConversationPresence: 'ConversationPresence',
   AdminLog: 'AdminLog',
   FeatureFlag: 'FeatureFlag',
   ExploreCategory: 'ExploreCategory',
@@ -458,6 +461,60 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
+  platform: 'platform',
+  browser: 'browser',
+  deviceLabel: 'deviceLabel',
+  installationId: 'installationId',
+  enabled: 'enabled',
+  lastSeenAt: 'lastSeenAt',
+  lastSuccessAt: 'lastSuccessAt',
+  lastFailureAt: 'lastFailureAt',
+  failureCount: 'failureCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  revokedAt: 'revokedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const NotificationDeliveryScalarFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  channel: 'channel',
+  status: 'status',
+  provider: 'provider',
+  providerMessageId: 'providerMessageId',
+  attempt: 'attempt',
+  nextAttemptAt: 'nextAttemptAt',
+  errorCode: 'errorCode',
+  errorMessage: 'errorMessage',
+  idempotencyKey: 'idempotencyKey',
+  sentAt: 'sentAt',
+  deliveredAt: 'deliveredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
+
+
+export const ConversationPresenceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  conversationId: 'conversationId',
+  lastSeenAt: 'lastSeenAt'
+} as const
+
+export type ConversationPresenceScalarFieldEnum = (typeof ConversationPresenceScalarFieldEnum)[keyof typeof ConversationPresenceScalarFieldEnum]
+
+
 export const AdminLogScalarFieldEnum = {
   id: 'id',
   actorId: 'actorId',
@@ -583,6 +640,16 @@ export const UserSettingsScalarFieldEnum = {
   smsEnabled: 'smsEnabled',
   inAppVibrations: 'inAppVibrations',
   inAppSounds: 'inAppSounds',
+  safetyPush: 'safetyPush',
+  accountPush: 'accountPush',
+  safetyEmail: 'safetyEmail',
+  accountEmail: 'accountEmail',
+  safetySms: 'safetySms',
+  accountSms: 'accountSms',
+  quietHoursEnabled: 'quietHoursEnabled',
+  quietHoursStart: 'quietHoursStart',
+  quietHoursEnd: 'quietHoursEnd',
+  timezone: 'timezone',
   appearance: 'appearance',
   updatedAt: 'updatedAt'
 } as const

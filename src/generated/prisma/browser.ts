@@ -118,6 +118,21 @@ export type Payment = Prisma.PaymentModel
  */
 export type Notification = Prisma.NotificationModel
 /**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
+/**
+ * Model NotificationDelivery
+ * 
+ */
+export type NotificationDelivery = Prisma.NotificationDeliveryModel
+/**
+ * Model ConversationPresence
+ * 
+ */
+export type ConversationPresence = Prisma.ConversationPresenceModel
+/**
  * Model AdminLog
  * 
  */

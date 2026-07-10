@@ -3,6 +3,7 @@ import { parseBody } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { sendMessageSchema } from "@/lib/validators/chat";
 import { assertParticipant, markRead, sendMessage } from "@/lib/services/chat";
+import { schedulePushDispatch } from "@/lib/services/notify";
 import { db } from "@/lib/db";
 
 type Params = { params: Promise<{ conversationId: string }> };
@@ -64,6 +65,9 @@ export async function POST(req: Request, { params }: Params) {
     body: data.body,
     replyToId: data.replyToId,
   });
+
+  // Drain the push outbox after the response is sent - never blocks the send.
+  schedulePushDispatch();
 
   return created(message);
 }

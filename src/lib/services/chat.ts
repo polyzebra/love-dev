@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { notifyUser } from "@/lib/services/notify";
 
 /**
  * Chat service. Realtime transport (WebSocket/SSE, e.g. Supabase Realtime
@@ -103,6 +104,37 @@ export async function sendMessage(params: {
     });
     return created;
   });
+
+  // Notify every other participant through the outbox. notifyUser itself
+  // skips the sender (actorUserId), suppresses blocked pairs, respects the
+  // pushMessages preference/quiet hours, and suppresses push while the
+  // recipient is actively viewing this conversation. The per-message
+  // dedupe key makes retried requests safe. Push copy never includes the
+  // message body (see pushCopyFor) - the in-app row stays generic too.
+  const [others, senderProfile] = await Promise.all([
+    db.participant.findMany({
+      where: { conversationId: params.conversationId, userId: { not: params.senderId } },
+      select: { userId: true },
+    }),
+    db.profile.findUnique({
+      where: { userId: params.senderId },
+      select: { displayName: true },
+    }),
+  ]);
+  const senderName = senderProfile?.displayName ?? "Someone";
+  for (const other of others) {
+    await notifyUser({
+      userId: other.userId,
+      type: "NEW_MESSAGE",
+      title: "New message",
+      body: `${senderName} sent you a message.`,
+      url: `/chat/${params.conversationId}`,
+      actorUserId: params.senderId,
+      conversationId: params.conversationId,
+      dedupeKey: `message:${message.id}:recipient:${other.userId}`,
+      data: { messageId: message.id },
+    });
+  }
 
   return message;
 }
