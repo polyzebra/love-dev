@@ -7,7 +7,7 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
-import { OtpInput } from "@/components/auth/OtpInput";
+import { OtpInput, refocusOtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
 import {
   AUTH_PHONE_KEY,
@@ -89,7 +89,7 @@ export function PhoneCodeStep() {
     setVerifying(false);
     setError(result.message);
     setCode("");
-    otpRef.current?.focus();
+    refocusOtpInput(otpRef);
   }
 
   async function resend(): Promise<number | void> {

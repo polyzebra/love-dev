@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
-import { OtpInput } from "@/components/auth/OtpInput";
+import { OtpInput, refocusOtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
 import { AUTH_EMAIL_KEY, AUTH_EMAIL_RETRY_KEY } from "@/components/auth/EmailInputStep";
 import { sendEmailCode, verifyEmailCode } from "@/components/auth/api";
@@ -81,7 +81,7 @@ export function EmailCodeStep() {
     setVerifying(false);
     setError(result.message);
     setCode("");
-    otpRef.current?.focus();
+    refocusOtpInput(otpRef);
   }
 
   return (

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { LoginStepShell } from "@/components/auth/LoginStepShell";
 import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
-import { OtpInput } from "@/components/auth/OtpInput";
+import { OtpInput, refocusOtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
 import { LOGIN_PHONE_KEY, LOGIN_PHONE_RETRY_KEY } from "@/components/auth/PhoneLoginInput";
 import { OFFLINE_CODE, sendPhoneLoginCode, verifyPhoneLoginCode } from "@/components/auth/api";
@@ -145,13 +145,13 @@ export function PhoneLoginCode() {
         setExpired(true);
         setError(result.message);
         setCode("");
-        otpRef.current?.focus();
+        refocusOtpInput(otpRef);
         return;
       default:
         // INVALID_CODE and anything unexpected: clear + shake + refocus.
         setError(result.message);
         setCode("");
-        otpRef.current?.focus();
+        refocusOtpInput(otpRef);
         return;
     }
   }
