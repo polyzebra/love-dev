@@ -51,11 +51,18 @@ export function CountryCodeSheet({
   onOpenChange,
   selectedIso,
   onSelect,
+  isos,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedIso: string;
   onSelect: (country: Country) => void;
+  /**
+   * Optional ISO allowlist (e.g. phone LOGIN's PHONE_LOGIN_COUNTRIES).
+   * When set the sheet shows ONE popular-first group of just those
+   * countries; omitted = every dialable country (the default flow).
+   */
+  isos?: readonly string[];
 }) {
   const isDesktop = useIsDesktop();
   const [query, setQuery] = useState("");
@@ -68,13 +75,27 @@ export function CountryCodeSheet({
     if (open) setQuery("");
   }
 
+  // Restricted mode: one popular-first list (popular allowlisted
+  // countries, then the rest alphabetically) - no "Popular" group,
+  // duplicating a two-item list would be noise.
+  const restricted = useMemo(() => {
+    if (!isos) return null;
+    const allowed = new Set(isos.map((iso) => iso.toUpperCase()));
+    const pinned = POPULAR_COUNTRIES.filter((c) => allowed.has(c.iso));
+    const pinnedIsos = new Set(pinned.map((c) => c.iso as string));
+    return [
+      ...pinned,
+      ...COUNTRIES.filter((c) => allowed.has(c.iso) && !pinnedIsos.has(c.iso)),
+    ];
+  }, [isos]);
+
   const popular = useMemo(
-    () => POPULAR_COUNTRIES.filter((c) => matchesCountry(c, query)),
-    [query],
+    () => (restricted ? [] : POPULAR_COUNTRIES.filter((c) => matchesCountry(c, query))),
+    [query, restricted],
   );
   const all = useMemo(
-    () => COUNTRIES.filter((c) => matchesCountry(c, query)),
-    [query],
+    () => (restricted ?? COUNTRIES).filter((c) => matchesCountry(c, query)),
+    [query, restricted],
   );
 
   function pick(country: Country) {
@@ -120,7 +141,7 @@ export function CountryCodeSheet({
       )}
       {all.length > 0 && (
         <CountryGroup
-          label="All countries"
+          label={restricted ? "Available countries" : "All countries"}
           countries={all}
           selectedIso={selectedIso}
           onPick={pick}

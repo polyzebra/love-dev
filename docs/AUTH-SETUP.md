@@ -227,6 +227,28 @@ vs `phone_otp_*`).
 4. Set `PHONE_LOGIN_ENABLED="true"` (+ optionally
    `PHONE_LOGIN_COUNTRIES`).
 
+## 5d. Apple sign-in (feature-flagged, default OFF)
+
+"Continue with Apple" (login entry `/login` + `oauth-buttons.tsx`) renders
+ONLY when `NEXT_PUBLIC_APPLE_LOGIN_ENABLED="true"` (single source:
+`appleLoginEnabled()` in `src/lib/auth/apple.ts`; the legacy
+`NEXT_PUBLIC_APPLE_OAUTH=1` spelling is still honored). Never flip the
+flag before BOTH prerequisites exist, or users get a dead provider:
+
+1. **Apple Developer** (Certificates, Identifiers & Profiles):
+   - an App ID, plus a **Services ID** (this is the OAuth client id) with
+     *Sign in with Apple* enabled;
+   - the Supabase callback registered as a Return URL:
+     `https://<project-ref>.supabase.co/auth/v1/callback`;
+   - a *Sign in with Apple* private key (`.p8`) + its Key ID and the
+     10-char Team ID (used to mint the client-secret JWT, which Apple
+     expires at most 6 months out - rotate it).
+2. **Supabase Dashboard** -> Authentication -> Providers -> **Apple**:
+   enabled with the Services ID as client id + the client-secret JWT.
+
+The button then uses the exact same `signInWithOAuth` -> `/auth/callback`
+-> `ensureAppUser()` path as Google.
+
 ## 6. Auth flow map (code reference)
 
 - `src/lib/auth/url.ts` - `siteUrl()` / `authRedirectUrl()`; the only way redirect URLs are built

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { authRedirectUrl } from "@/lib/auth/url";
+import { appleLoginEnabled } from "@/lib/auth/apple";
 
 function GoogleIcon() {
   return (
@@ -35,7 +36,10 @@ function AppleIcon() {
 export function OAuthButtons({ callbackUrl = "/discover" }: { callbackUrl?: string }) {
   const [pending, setPending] = useState<"google" | "apple" | null>(null);
   const configured = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const appleEnabled = process.env.NEXT_PUBLIC_APPLE_OAUTH === "1";
+  // Apple is feature-flagged (NEXT_PUBLIC_APPLE_LOGIN_ENABLED, default
+  // off) - see src/lib/auth/apple.ts for the Apple Developer + Supabase
+  // prerequisites. Off = the button is not rendered, never a dead one.
+  const appleEnabled = appleLoginEnabled();
 
   async function start(provider: "google" | "apple") {
     if (!configured) {
