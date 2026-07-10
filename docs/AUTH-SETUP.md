@@ -193,8 +193,11 @@ vs `phone_otp_*`).
 
 - `PHONE_LOGIN_ENABLED` (default off) -> routes answer
   `503 PHONE_LOGIN_NOT_AVAILABLE`; the UI hides the button (never a dead
-  one). `PHONE_LOGIN_COUNTRIES` (default `IE,GB`) allowlists regions -
-  narrower than phone-change, which accepts any resolvable region.
+  one). Supported regions come from the shared
+  `SUPPORTED_PHONE_COUNTRIES` base (default: every country in the
+  dataset - Twilio Verify delivers worldwide), IDENTICAL to phone
+  verification/change; `PHONE_LOGIN_COUNTRIES` may only NARROW that base
+  (intersection), and only with a documented legal/provider reason.
 - **Existing-owner bridge**: at send, an app-owned number whose
   `auth.users` mapping is missing/mismatched is refused with
   `409 IDENTITY_CONFLICT` before any SMS. At verify (defense in depth),
@@ -225,14 +228,15 @@ vs `phone_otp_*`).
    `updateUser({ phone })` writes the column silently instead of texting
    a second code.
 4. Set `PHONE_LOGIN_ENABLED="true"` (+ optionally
-   `PHONE_LOGIN_COUNTRIES`).
+   `SUPPORTED_PHONE_COUNTRIES` / `PHONE_LOGIN_COUNTRIES` to narrow).
 
 **Full settings table (server env + dashboard):**
 
 | Setting | Where | Value | Purpose |
 | --- | --- | --- | --- |
 | `PHONE_LOGIN_ENABLED` | server env | `"true"` | THE phone-login switch: shows the `/login` button, opens `/login/phone(/verify)`, arms the auth.users.phone backfill |
-| `PHONE_LOGIN_COUNTRIES` | server env | `"IE,GB"` (default) | ISO allowlist for anonymous phone login |
+| `SUPPORTED_PHONE_COUNTRIES` | server env | unset (default: all countries) | THE shared ISO base for every phone workflow (login, verification, change) |
+| `PHONE_LOGIN_COUNTRIES` | server env | unset (default: the shared base) | Narrow-only login override - intersection with the base; set only with a documented legal/provider reason |
 | `TWILIO_ACCOUNT_SID` | server env | `AC...` | Twilio Verify (backend phone-change flow) |
 | `TWILIO_AUTH_TOKEN` | server env | secret | Twilio Verify auth |
 | `TWILIO_VERIFY_SERVICE_SID` | server env | `VA...` | The Verify service; use the SAME SID in the Supabase SMS provider so codes come from one pool |

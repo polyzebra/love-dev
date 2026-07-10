@@ -21,7 +21,7 @@ import {
   type PhoneVerificationProvider,
 } from "@/lib/auth/phone";
 import { resendCooldown, checkOtpVerifyBlocked } from "@/lib/auth/rate-limit";
-import { workflowCountrySet } from "@/lib/auth/phone-countries";
+import { getSupportedPhoneCountrySet } from "@/lib/auth/phone-countries";
 import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
 
 /**
@@ -78,17 +78,17 @@ export function normalizePhone(raw: string, defaultCountry?: string): Normalized
 }
 
 /**
- * Normalize + enforce THIS flow's country allowlist
- * (workflowCountries("change") - the /auth/phone onboarding verification
- * and the settings-driven change share this one flow, see
+ * Normalize + enforce THIS flow's supported-country list
+ * (getSupportedPhoneCountries("change") - the /auth/phone onboarding
+ * verification and the settings-driven change share this one flow, see
  * phone-countries.ts for the mapping). Used by BOTH send and verify, so
- * a number outside the allowlist is rejected as unsupported_country
+ * a number outside the supported list is rejected as unsupported_country
  * BEFORE any rate-limit read, DB lookup or provider call.
  */
 function normalizeForChange(raw: string, defaultCountry?: string): NormalizedPhone {
   const normalized = normalizePhone(raw, defaultCountry);
   if (!normalized.ok) return normalized;
-  if (!workflowCountrySet("change").has(normalized.countryIso)) {
+  if (!getSupportedPhoneCountrySet("change").has(normalized.countryIso)) {
     return { ok: false, reason: "unsupported_country" };
   }
   return normalized;

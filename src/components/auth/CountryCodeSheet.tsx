@@ -63,9 +63,12 @@ export function CountryCodeSheet({
   selectedIso: string;
   onSelect: (country: Country) => void;
   /**
-   * Optional ISO allowlist (e.g. phone LOGIN's PHONE_LOGIN_COUNTRIES).
-   * When set the sheet shows ONE popular-first group of just those
-   * countries; omitted = every dialable country (the default flow).
+   * Optional ISO restriction - the server-resolved supported list
+   * (getSupportedPhoneCountries) the pages pass down. When set the
+   * sheet renders the allowed popular countries as the pinned "Popular"
+   * group, then the remaining allowed countries alphabetically (deduped
+   * - a pinned country is not repeated below); omitted = every dialable
+   * country (the default flow).
    */
   isos?: readonly string[];
 }) {
@@ -80,26 +83,33 @@ export function CountryCodeSheet({
     if (open) setQuery("");
   }
 
-  // Restricted mode: one popular-first list (popular allowlisted
-  // countries, then the rest alphabetically) - no "Popular" group,
-  // duplicating a two-item list would be noise.
+  // Restricted mode: the allowed popular countries stay pinned as the
+  // "Popular" group, the remaining allowed countries follow
+  // alphabetically (deduped - unlike the unrestricted default, a pinned
+  // country is not repeated below). A plain list is deliberate: at the
+  // full dataset's 245 rows of flat 44px buttons, rendering and
+  // scrolling are well within budget - virtualization would only add
+  // complexity and break find-in-page/accessibility.
   const restricted = useMemo(() => {
     if (!isos) return null;
     const allowed = new Set(isos.map((iso) => iso.toUpperCase()));
     const pinned = POPULAR_COUNTRIES.filter((c) => allowed.has(c.iso));
     const pinnedIsos = new Set(pinned.map((c) => c.iso as string));
-    return [
-      ...pinned,
-      ...COUNTRIES.filter((c) => allowed.has(c.iso) && !pinnedIsos.has(c.iso)),
-    ];
+    return {
+      pinned,
+      rest: COUNTRIES.filter((c) => allowed.has(c.iso) && !pinnedIsos.has(c.iso)),
+    };
   }, [isos]);
 
   const popular = useMemo(
-    () => (restricted ? [] : POPULAR_COUNTRIES.filter((c) => matchesCountry(c, query))),
+    () =>
+      (restricted ? restricted.pinned : POPULAR_COUNTRIES).filter((c) =>
+        matchesCountry(c, query),
+      ),
     [query, restricted],
   );
   const all = useMemo(
-    () => (restricted ?? COUNTRIES).filter((c) => matchesCountry(c, query)),
+    () => (restricted ? restricted.rest : COUNTRIES).filter((c) => matchesCountry(c, query)),
     [query, restricted],
   );
 

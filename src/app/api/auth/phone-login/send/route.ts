@@ -35,7 +35,7 @@ const RESEND_TOO_SOON = "Please wait before requesting another code.";
  * separate from the authenticated /api/auth/phone/send (phone-change).
  *
  * -> 200 { data: { sent: true, retryAfter } }
- * -> 400 INVALID_PHONE | UNSUPPORTED_COUNTRY (PHONE_LOGIN_COUNTRIES allowlist)
+ * -> 400 INVALID_PHONE | UNSUPPORTED_COUNTRY (getSupportedPhoneCountries("login"))
  * -> 403 ACCOUNT_BLOCKED
  * -> 409 IDENTITY_CONFLICT   number owned by an account this flow cannot
  *                            sign into (see phone-login-flow.ts bridge)

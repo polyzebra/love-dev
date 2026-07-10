@@ -15,13 +15,14 @@ import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
 import { PHONE_COUNTRY_KEY } from "@/components/auth/PhoneInputStep";
 import { OFFLINE_CODE, sendPhoneLoginCode } from "@/components/auth/api";
-import { countryByIso, type Country } from "@/lib/auth/countries";
+import { DEFAULT_COUNTRY_ISO, countryByIso, type Country } from "@/lib/auth/countries";
 
 /**
  * /login/phone - "Continue with your phone". Country selector restricted
- * to the server's PHONE_LOGIN_COUNTRIES allowlist (a server prop - the
- * env never reaches the bundle) + national as-you-type formatting; the
- * E.164 we send is built client-side and the backend revalidates it.
+ * to the server's supported list (getSupportedPhoneCountries("login"),
+ * a server prop - the env never reaches the bundle) + national
+ * as-you-type formatting; the E.164 we send is built client-side and the
+ * backend revalidates it.
  *
  * Error language, per contract code:
  * - INVALID_PHONE / UNSUPPORTED_COUNTRY: inline field error.
@@ -58,10 +59,11 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
     () => allowedIsos.map((iso) => countryByIso(iso)).filter((c): c is Country => c !== null),
     [allowedIsos],
   );
-  // IE leads the allowlist by default; an unknown env falls to the first
-  // allowed country. (The server page never renders this with an empty list.)
+  // IE leads when the supported list contains it (the default full list
+  // always does); a narrowed list without IE falls to its first entry.
+  // (The server page never renders this with an empty list.)
   const fallbackCountry =
-    allowedCountries.find((c) => c.iso === "IE") ?? allowedCountries[0];
+    allowedCountries.find((c) => c.iso === DEFAULT_COUNTRY_ISO) ?? allowedCountries[0];
 
   // Remembered country (shared with the signup phone step), but only
   // when the allowlist contains it; hydration-safe (null on the server).

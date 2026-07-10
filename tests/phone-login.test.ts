@@ -11,7 +11,8 @@
  * The matrix:
  *   1.  Flag off -> send AND verify answer not_available (route: 503
  *       PHONE_LOGIN_NOT_AVAILABLE), zero client calls
- *   2.  Country allowlist (PHONE_LOGIN_COUNTRIES): US number rejected;
+ *   2.  Country narrowing (PHONE_LOGIN_COUNTRIES=IE,GB set explicitly -
+ *       the default is now the FULL dataset): US number rejected;
  *       invalid input rejected - all pre-client
  *   3.  Send happy path (client called once, audit auth_phone_code_sent)
  *       + immediate resend -> resend_too_soon
@@ -136,7 +137,11 @@ async function main() {
     return id;
   }
 
+  // Explicit narrowing for case 2's US rejection - with every country
+  // env unset the default is now the FULL dataset (US would be accepted;
+  // tests/phone-countries.test.ts covers that side).
   process.env.PHONE_LOGIN_COUNTRIES = "IE,GB";
+  delete process.env.SUPPORTED_PHONE_COUNTRIES;
 
   try {
     // ------------------------------------------------------------ case 1

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import type { User } from "@/generated/prisma/client";
 import { normalizePhone } from "@/lib/auth/phone-flow";
 import { phoneLoginEnabled } from "@/lib/auth/phone";
-import { workflowCountrySet } from "@/lib/auth/phone-countries";
+import { getSupportedPhoneCountrySet } from "@/lib/auth/phone-countries";
 import { provisionPhoneLoginUser } from "@/lib/auth/identity";
 import {
   resendCooldown,
@@ -94,9 +94,9 @@ function normalizeForLogin(
   | { ok: false; kind: "invalid_phone" | "unsupported_country" } {
   const normalized = normalizePhone(phone, countryIso);
   if (!normalized.ok) return { ok: false, kind: normalized.reason };
-  // The LOGIN allowlist (workflowCountries("login")) - deliberately its
-  // own list, isolated from the authenticated change/verification one.
-  if (!workflowCountrySet("login").has(normalized.countryIso)) {
+  // The LOGIN list (getSupportedPhoneCountries("login")) - the shared
+  // base, unless a documented PHONE_LOGIN_COUNTRIES override narrows it.
+  if (!getSupportedPhoneCountrySet("login").has(normalized.countryIso)) {
     return { ok: false, kind: "unsupported_country" };
   }
   return { ok: true, value: normalized };

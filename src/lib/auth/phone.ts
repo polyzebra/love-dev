@@ -263,7 +263,7 @@ export function phoneLoginEnabled(): boolean {
   return process.env.PHONE_LOGIN_ENABLED === "true";
 }
 
-// Country allowlists live in ONE module: src/lib/auth/phone-countries.ts
-// (workflowCountries) - the old phoneLoginCountries() env parse moved
-// there so login/verification/change each get a named, strictly
-// defaulted list.
+// Country support lives in ONE module: src/lib/auth/phone-countries.ts
+// (getSupportedPhoneCountries) - the old phoneLoginCountries() env parse
+// moved there so login/verification/change all share one base list that
+// per-workflow envs may only narrow.

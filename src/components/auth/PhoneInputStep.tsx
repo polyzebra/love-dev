@@ -12,15 +12,16 @@ import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
 import { CountryCodeSheet } from "@/components/auth/CountryCodeSheet";
 import { sendPhoneCode } from "@/components/auth/api";
-import { countryByIso, type Country } from "@/lib/auth/countries";
+import { DEFAULT_COUNTRY_ISO, countryByIso, type Country } from "@/lib/auth/countries";
 
 /**
  * Step 3 of 5 - "What's your number?". Country selector (bottom sheet /
- * dialog) restricted to the server's allowlist (workflowCountries -
- * a server prop from the page, the env never reaches the bundle) + tel
- * input formatted as-you-type in the national format; what we store and
- * send is always E.164. The last-used country is remembered in
- * localStorage (only honored while it stays on the allowlist).
+ * dialog) restricted to the server's supported list
+ * (getSupportedPhoneCountries - a server prop from the page, the env
+ * never reaches the bundle) + tel input formatted as-you-type in the
+ * national format; what we store and send is always E.164. The last-used
+ * country is remembered in localStorage (only honored while it stays on
+ * the supported list).
  *
  * A 503 from the send route means phone verification can't happen right
  * now (provider outage while the feature is live) - we say so plainly
@@ -52,11 +53,12 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
     () => allowedIsos.map((iso) => countryByIso(iso)).filter((c): c is Country => c !== null),
     [allowedIsos],
   );
-  // The allowlist's first entry is the default country (IE with the
-  // stock "IE,GB" list). The server page never renders this with an
-  // empty list - workflowCountries always yields at least the hard
-  // default.
-  const fallbackCountry = allowedCountries[0];
+  // IE leads when the supported list contains it (the default full list
+  // always does); a narrowed list without IE falls to its first entry.
+  // The server page never renders this with an empty list -
+  // getSupportedPhoneCountries never resolves to nothing.
+  const fallbackCountry =
+    allowedCountries.find((c) => c.iso === DEFAULT_COUNTRY_ISO) ?? allowedCountries[0];
 
   // The remembered country (shared with phone login) arrives
   // hydration-safely (null on the server, the stored ISO on the
