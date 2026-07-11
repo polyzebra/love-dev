@@ -2,6 +2,7 @@ import { getUserSettings } from "@/lib/services/settings";
 import { ThemeSync } from "@/components/theme/theme-sync";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
+import { isStaff } from "@/lib/rbac";
 import { db } from "@/lib/db";
 import { AppNav } from "@/components/app/app-nav";
 import { Aurora } from "@/components/fx/aurora";
@@ -17,7 +18,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="noise relative min-h-dvh overflow-x-clip bg-background">
       <Aurora fixed intensity="faint" />
       <ServiceWorkerMount />
-      <AppNav />
+      {/* Staff flag rides the session user already loaded by requireUser()
+          (auth() selects role) - no extra DB query. Server decides; the
+          boolean prop is stable so there is no hydration mismatch. */}
+      <AppNav showAdmin={isStaff(user.role)} />
       <main className="relative mx-auto max-w-2xl px-4 pb-32 pt-6 md:px-6 lg:ml-72 lg:max-w-4xl lg:pb-12 lg:pt-10">
         <ThemeSync appearance={settings.appearance} />
         {children}

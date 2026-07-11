@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
+  ArrowLeft,
   BadgeCheck,
   CreditCard,
   Flag,
@@ -76,6 +77,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             ))}
           </ul>
         </nav>
+        {/* Back to the member app - same session, same tab, plain Link. */}
+        <div className="border-t px-3 py-2">
+          <Link
+            href="/discover"
+            className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
+            <ArrowLeft className="size-4.5" aria-hidden="true" />
+            Back to Tirvea
+          </Link>
+        </div>
         <div className="border-t px-5 py-4 text-xs text-muted-foreground">
           Signed in as {adminUser.email}
           <br />
@@ -95,6 +106,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             {label}
           </Link>
         ))}
+        <span aria-hidden="true" className="my-2.5 w-px shrink-0 self-stretch bg-border/50" />
+        <Link
+          href="/discover"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Back to Tirvea
+        </Link>
       </nav>
 
       <main className="px-4 py-6 md:ml-60 md:px-8 md:py-8">{children}</main>

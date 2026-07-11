@@ -1,9 +1,10 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { Compass, Flame, Heart, MessageCircle, Settings, UserRound } from "lucide-react";
+import { Compass, Flame, Heart, MessageCircle, Settings, Shield, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
 import { NavLinkStatus, NavTransitionProvider } from "@/components/app/nav-progress";
@@ -24,14 +25,27 @@ const RAIL_ITEMS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
+// Staff-only rail entry (MODERATOR/ADMIN/SUPER_ADMIN). Rendering is decided
+// by the server layout (isStaff on the session role) and flows in as a
+// stable RSC prop - never a client fetch, so no hydration mismatch and the
+// item is absent from a normal user's HTML entirely. Navigation only: the
+// /admin layout enforces its own role gate on every request.
+const ADMIN_ITEM = { href: "/admin", label: "Admin", icon: Shield } as const;
+
 /**
  * Floating glass navigation. Mobile: a levitating capsule tab bar with
  * a spring-animated active halo. Desktop (lg+): a frosted side rail.
  * Route transitions keep the old page visible (no (app)/loading.tsx);
  * the NavTransitionProvider's 2px top bar is the only pending signal.
+ *
+ * `showAdmin` adds the staff Admin entry to the desktop rail (after a
+ * subtle divider below Settings). The mobile capsule keeps its five fixed
+ * slots - staff reach /admin on mobile via the Staff row on the settings
+ * hub, which stays the mobile surface for this entry.
  */
-export function AppNav() {
+export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
   const pathname = usePathname();
+  const railItems = showAdmin ? ([...RAIL_ITEMS, ADMIN_ITEM] as const) : RAIL_ITEMS;
 
   return (
     <NavTransitionProvider>
@@ -77,35 +91,40 @@ export function AppNav() {
         </div>
         <nav aria-label="Primary" className="flex-1 px-3">
           <ul className="space-y-1">
-            {RAIL_ITEMS.map(({ href, label, icon: Icon }) => {
+            {railItems.map(({ href, label, icon: Icon }) => {
               const active = pathname.startsWith(href);
               return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
-                      active
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
-                    )}
-                  >
-                    {active && (
-                      <motion.span
-                        layoutId="app-rail-halo"
-                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                        // Calm active tint - the old inset glass-highlight
-                        // painted a near-white 1px seam across the pill top
-                        // in light mode, and the outer glow is decoration.
-                        className="absolute inset-0 rounded-2xl bg-primary/15"
-                      />
-                    )}
-                    <Icon className="relative size-5" aria-hidden="true" />
-                    <span className="relative">{label}</span>
-                    <NavLinkStatus />
-                  </Link>
-                </li>
+                <Fragment key={href}>
+                  {href === ADMIN_ITEM.href && (
+                    <li aria-hidden="true" className="mx-4 my-2 border-t border-border/50" />
+                  )}
+                  <li>
+                    <Link
+                      href={href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
+                        active
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+                      )}
+                    >
+                      {active && (
+                        <motion.span
+                          layoutId="app-rail-halo"
+                          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                          // Calm active tint - the old inset glass-highlight
+                          // painted a near-white 1px seam across the pill top
+                          // in light mode, and the outer glow is decoration.
+                          className="absolute inset-0 rounded-2xl bg-primary/15"
+                        />
+                      )}
+                      <Icon className="relative size-5" aria-hidden="true" />
+                      <span className="relative">{label}</span>
+                      <NavLinkStatus />
+                    </Link>
+                  </li>
+                </Fragment>
               );
             })}
           </ul>
