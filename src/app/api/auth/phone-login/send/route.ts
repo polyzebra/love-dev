@@ -80,7 +80,16 @@ export const POST = withUnavailableGuard(
           { status: 429, headers: { "Retry-After": String(outcome.retryAfter) } },
         );
       case "sms_provider_unavailable":
-        return apiError(503, "SMS_PROVIDER_UNAVAILABLE", SMS_UNAVAILABLE);
+        // outcome.errorClass (SMS_PROVIDER_CONFIG_ERROR / _AUTH_ERROR /
+        // _REGION_BLOCKED / _RATE_LIMITED / SMS_DELIVERY_FAILED, ...) is
+        // already in the structured server log + audit trail - the caller
+        // gets only the neutral outage, with 429 for provider-side rate
+        // limits and 503 for everything else.
+        return apiError(
+          outcome.errorClass === "SMS_PROVIDER_RATE_LIMITED" ? 429 : 503,
+          "SMS_PROVIDER_UNAVAILABLE",
+          SMS_UNAVAILABLE,
+        );
       case "sent":
         return ok({ sent: true, retryAfter: outcome.retryAfter });
     }

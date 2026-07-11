@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
 import type { User } from "@/generated/prisma/client";
 import { normalizePhone } from "@/lib/auth/phone-flow";
@@ -85,6 +86,117 @@ export interface PhoneLoginAuthClient {
 }
 
 // ---------------------------------------------------------------------------
+// Failure classification + structured logging
+//
+// Every failure in this flow is classified into ONE of these classes for
+// the server log (and, where the outcome carries it, for the route's HTTP
+// status). The classes are for OPERATORS: user-facing copy stays neutral
+// and never leaks registration status or vendor detail.
+// ---------------------------------------------------------------------------
+
+export type PhoneLoginErrorClass =
+  | "PHONE_LOGIN_DISABLED"
+  | "PHONE_NOT_REGISTERED"
+  | "PHONE_NOT_VERIFIED"
+  | "PHONE_ACCOUNT_CONFLICT"
+  | "INVALID_PHONE"
+  | "SMS_PROVIDER_CONFIG_ERROR"
+  | "SMS_PROVIDER_AUTH_ERROR"
+  | "SMS_PROVIDER_REGION_BLOCKED"
+  | "SMS_PROVIDER_RATE_LIMITED"
+  | "SMS_DELIVERY_FAILED"
+  | "OTP_INVALID"
+  | "OTP_EXPIRED"
+  | "AUTH_USER_LINK_MISSING"
+  | "SESSION_CREATION_FAILED"
+  | "INTERNAL_ERROR";
+
+/**
+ * Map a GoTrue signInWithOtp({ phone }) error onto our taxonomy. GoTrue
+ * wraps SMS-vendor (Twilio) failures under `sms_send_failed` with the
+ * vendor detail only in the message, so the message is sniffed for the
+ * well-known Twilio auth/region codes before the generic delivery bucket.
+ * Live-proven mapping (2026-07-11): the dashboard Phone provider being
+ * OFF answers 400 `phone_provider_disabled` "Unsupported phone provider".
+ */
+export function classifyPhoneLoginProviderError(error: {
+  code?: string;
+  message: string;
+  status?: number;
+}): PhoneLoginErrorClass {
+  const code = error.code ?? "";
+  const msg = (error.message ?? "").toLowerCase();
+  if (
+    code === "phone_provider_disabled" ||
+    code === "otp_disabled" ||
+    code === "signup_disabled" ||
+    code === "sms_template_error" ||
+    msg.includes("unsupported phone provider")
+  ) {
+    return "SMS_PROVIDER_CONFIG_ERROR";
+  }
+  if (
+    code === "over_sms_send_rate_limit" ||
+    code === "over_request_rate_limit" ||
+    error.status === 429
+  ) {
+    return "SMS_PROVIDER_RATE_LIMITED";
+  }
+  if (code === "validation_failed" || msg.includes("invalid phone")) return "INVALID_PHONE";
+  if (
+    error.status === 401 ||
+    msg.includes("authenticate") ||
+    msg.includes("20003") // Twilio: authentication failure
+  ) {
+    return "SMS_PROVIDER_AUTH_ERROR";
+  }
+  if (
+    msg.includes("region") ||
+    msg.includes("geo") ||
+    msg.includes("21408") || // Twilio: permission not enabled for region
+    msg.includes("60605") // Twilio Verify: destination country blocked
+  ) {
+    return "SMS_PROVIDER_REGION_BLOCKED";
+  }
+  return "SMS_DELIVERY_FAILED";
+}
+
+/** Last-3-digits masking for logs - never a full number. */
+function maskPhoneForLog(phone?: string | null): string | null {
+  if (!phone) return null;
+  return `${phone.slice(0, 5)}*****${phone.slice(-3)}`;
+}
+
+/**
+ * One sanitized structured line per failure: stage, class, provider
+ * code/status, masked suffix, correlation id. NEVER the OTP code, never a
+ * full phone number, never vendor copy verbatim beyond the machine code.
+ */
+function logPhoneLoginFailure(entry: {
+  correlationId: string;
+  stage: "send" | "verify";
+  errorClass: PhoneLoginErrorClass;
+  phoneE164?: string | null;
+  providerCode?: string | null;
+  providerStatus?: number | null;
+  detail?: string | null;
+}): void {
+  console.error(
+    "[auth:phone-login] " +
+      JSON.stringify({
+        evt: "phone_login_failure",
+        cid: entry.correlationId,
+        stage: entry.stage,
+        class: entry.errorClass,
+        phone: maskPhoneForLog(entry.phoneE164),
+        providerCode: entry.providerCode ?? null,
+        providerStatus: entry.providerStatus ?? null,
+        detail: entry.detail ?? null,
+      }),
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Shared guards
 // ---------------------------------------------------------------------------
 
@@ -168,7 +280,11 @@ export type PhoneLoginSendOutcome =
   | { kind: "identity_conflict" }
   | { kind: "account_blocked" }
   | { kind: "resend_too_soon"; retryAfter: number }
-  | { kind: "sms_provider_unavailable" }
+  | {
+      kind: "sms_provider_unavailable";
+      /** For the route's status choice and the log - never for user copy. */
+      errorClass: PhoneLoginErrorClass;
+    }
   | { kind: "sent"; retryAfter: number };
 
 export async function sendPhoneLoginCode(opts: {
@@ -178,12 +294,24 @@ export async function sendPhoneLoginCode(opts: {
   req?: Request;
 }): Promise<PhoneLoginSendOutcome> {
   const { req } = opts;
-  if (!phoneLoginEnabled()) return { kind: "not_available" };
+  const cid = randomUUID().slice(0, 8);
+  if (!phoneLoginEnabled()) {
+    logPhoneLoginFailure({ correlationId: cid, stage: "send", errorClass: "PHONE_LOGIN_DISABLED" });
+    return { kind: "not_available" };
+  }
 
   // Normalize + allowlist FIRST - bad input never consumes a rate limit,
   // never reaches GoTrue, never writes state.
   const normalized = normalizeForLogin(opts.phone, opts.countryIso);
-  if (!normalized.ok) return { kind: normalized.kind };
+  if (!normalized.ok) {
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "send",
+      errorClass: "INVALID_PHONE",
+      detail: normalized.kind,
+    });
+    return { kind: normalized.kind };
+  }
   const { phoneE164, countryIso, dialCode } = normalized.value;
 
   // EXISTING-OWNER BRIDGE, part 1 (pre-provider): when the app owner's
@@ -205,6 +333,13 @@ export async function sendPhoneLoginCode(opts: {
         req,
         metadata: { provider: "phone", stage: "send", reason: "account_blocked" },
       });
+      logPhoneLoginFailure({
+        correlationId: cid,
+        stage: "send",
+        errorClass: "PHONE_ACCOUNT_CONFLICT",
+        phoneE164,
+        detail: "account_blocked",
+      });
       return { kind: "account_blocked" };
     }
     const authUid = await authUidHoldingPhone(phoneE164);
@@ -220,6 +355,16 @@ export async function sendPhoneLoginCode(opts: {
           reason: "identity_conflict",
           authUidForPhone: authUid ?? "none",
         },
+      });
+      // No auth.users mapping at all = the number was verified through
+      // our Twilio backend but never mirrored/re-verified into GoTrue for
+      // this account - native OTP cannot log it in yet. A DIFFERENT uid
+      // holding it is a genuine account conflict.
+      logPhoneLoginFailure({
+        correlationId: cid,
+        stage: "send",
+        errorClass: authUid === null ? "AUTH_USER_LINK_MISSING" : "PHONE_ACCOUNT_CONFLICT",
+        phoneE164,
       });
       return { kind: "identity_conflict" };
     }
@@ -251,15 +396,30 @@ export async function sendPhoneLoginCode(opts: {
     options: { shouldCreateUser: true },
   });
   if (error) {
+    const errorClass = classifyPhoneLoginProviderError(error);
     await recordAuthEvent({
       type: "auth_phone_code_failed",
       phoneE164,
       req,
-      metadata: { provider: "phone", stage: "send", code: error.code ?? error.message },
+      metadata: {
+        provider: "phone",
+        stage: "send",
+        code: error.code ?? error.message,
+        errorClass,
+      },
     });
     // phone_provider_disabled, sms_send_failed, misconfigured Twilio-in-
-    // Supabase, ... - all one neutral outage to the caller.
-    return { kind: "sms_provider_unavailable" };
+    // Supabase, ... - one neutral outage to the CALLER; the class carries
+    // the real cause to the log and the route's status choice.
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "send",
+      errorClass,
+      phoneE164,
+      providerCode: error.code ?? null,
+      providerStatus: error.status ?? null,
+    });
+    return { kind: "sms_provider_unavailable", errorClass };
   }
 
   await recordAuthEvent({
@@ -296,10 +456,26 @@ export async function verifyPhoneLoginCode(opts: {
   req?: Request;
 }): Promise<PhoneLoginVerifyOutcome> {
   const { req, client } = opts;
-  if (!phoneLoginEnabled()) return { kind: "not_available" };
+  const cid = randomUUID().slice(0, 8);
+  if (!phoneLoginEnabled()) {
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "verify",
+      errorClass: "PHONE_LOGIN_DISABLED",
+    });
+    return { kind: "not_available" };
+  }
 
   const normalized = normalizeForLogin(opts.phone, opts.countryIso);
-  if (!normalized.ok) return { kind: normalized.kind };
+  if (!normalized.ok) {
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "verify",
+      errorClass: "INVALID_PHONE",
+      detail: normalized.kind,
+    });
+    return { kind: normalized.kind };
+  }
   const { phoneE164, countryIso, dialCode } = normalized.value;
 
   // Failure lock BEFORE the provider: 5 invalid attempts per number or
@@ -325,13 +501,22 @@ export async function verifyPhoneLoginCode(opts: {
     type: "sms",
   });
   if (error) {
+    const expired = error.code === "otp_expired";
     await recordAuthEvent({
       type: "auth_phone_code_failed",
       phoneE164,
       req,
       metadata: { provider: "phone", stage: "verify", code: error.code ?? error.message },
     });
-    return { kind: error.code === "otp_expired" ? "expired_code" : "invalid_code" };
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "verify",
+      errorClass: expired ? "OTP_EXPIRED" : "OTP_INVALID",
+      phoneE164,
+      providerCode: error.code ?? null,
+      providerStatus: error.status ?? null,
+    });
+    return { kind: expired ? "expired_code" : "invalid_code" };
   }
   if (!data.user || !data.session) {
     // Approved code but no session materialized - nothing to sign out,
@@ -341,6 +526,12 @@ export async function verifyPhoneLoginCode(opts: {
       phoneE164,
       req,
       metadata: { provider: "phone", reason: "session_creation_failed" },
+    });
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "verify",
+      errorClass: "SESSION_CREATION_FAILED",
+      phoneE164,
     });
     return { kind: "session_creation_failed" };
   }
@@ -377,6 +568,13 @@ export async function verifyPhoneLoginCode(opts: {
         authUid,
         ...(ownerId ? { ownerId } : {}),
       },
+    });
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "verify",
+      errorClass: "PHONE_ACCOUNT_CONFLICT",
+      phoneE164,
+      detail: outcome,
     });
     return { kind: outcome };
   };

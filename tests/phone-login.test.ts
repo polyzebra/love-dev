@@ -54,6 +54,8 @@ const NUMBERS = {
   codes: "+353861234606",
   race: "+353861234607",
   sync: "+353861234608",
+  local: "+353861234609", // submitted as 08x local format
+  providerErr: "+353861234610",
   us: "+12025550123",
 } as const;
 
@@ -484,6 +486,96 @@ async function main() {
         where: { type: "phone_auth_sync_failed", phoneE164: NUMBERS.sync, userId: syncUserId },
       });
       assert.ok(audit, "phone_auth_sync_failed audited");
+    });
+
+    // ----------------------------------------------------------- case 11
+    console.log("11. local Irish format normalizes to E.164 before the client");
+    await check("086... + countryIso IE reaches the client as +35386...", async () => {
+      const spy = spyClient();
+      const outcome = await sendPhoneLoginCode({
+        phone: "086 123 4609",
+        countryIso: "IE",
+        client: spy.client,
+      });
+      assert.equal(outcome.kind, "sent");
+      assert.deepEqual(spy.calls, [{ method: "signInWithOtp", phone: NUMBERS.local }]);
+    });
+
+    // ----------------------------------------------------------- case 12
+    console.log("12. provider send errors -> classified sms_provider_unavailable");
+    await check("phone_provider_disabled -> SMS_PROVIDER_CONFIG_ERROR (neutral outcome)", async () => {
+      const spy = spyClient({ sendError: "phone_provider_disabled" });
+      const outcome = await sendPhoneLoginCode({
+        phone: NUMBERS.providerErr,
+        client: spy.client,
+      });
+      assert.equal(outcome.kind, "sms_provider_unavailable");
+      assert.ok(outcome.kind === "sms_provider_unavailable");
+      assert.equal(outcome.errorClass, "SMS_PROVIDER_CONFIG_ERROR");
+      const audit = await db.authVerificationEvent.findFirst({
+        where: { type: "auth_phone_code_failed", phoneE164: NUMBERS.providerErr },
+        orderBy: { createdAt: "desc" },
+      });
+      assert.ok(audit, "auth_phone_code_failed audited");
+      const meta = audit.metadata as { errorClass?: string; code?: string };
+      assert.equal(meta.errorClass, "SMS_PROVIDER_CONFIG_ERROR", "class lands in the log record");
+      assert.equal(meta.code, "phone_provider_disabled", "provider code preserved for operators");
+    });
+    await check("sms_send_failed -> SMS_DELIVERY_FAILED; class never leaks in kind", async () => {
+      const spy = spyClient({ sendError: "sms_send_failed" });
+      const outcome = await sendPhoneLoginCode({
+        phone: NUMBERS.providerErr,
+        client: spy.client,
+      });
+      assert.equal(outcome.kind, "sms_provider_unavailable");
+      assert.ok(outcome.kind === "sms_provider_unavailable");
+      assert.equal(outcome.errorClass, "SMS_DELIVERY_FAILED");
+    });
+    await check("classifier maps GoTrue/Twilio codes to the taxonomy", async () => {
+      const { classifyPhoneLoginProviderError } = await import(
+        "../src/lib/auth/phone-login-flow"
+      );
+      assert.equal(
+        classifyPhoneLoginProviderError({
+          code: "phone_provider_disabled",
+          message: "Unsupported phone provider",
+          status: 400,
+        }),
+        "SMS_PROVIDER_CONFIG_ERROR",
+        "the live production failure (2026-07-11) classifies as config",
+      );
+      assert.equal(
+        classifyPhoneLoginProviderError({
+          code: "over_sms_send_rate_limit",
+          message: "over rate limit",
+          status: 429,
+        }),
+        "SMS_PROVIDER_RATE_LIMITED",
+      );
+      assert.equal(
+        classifyPhoneLoginProviderError({
+          code: "sms_send_failed",
+          message: "Error sending sms: 20003 unable to authenticate",
+          status: 500,
+        }),
+        "SMS_PROVIDER_AUTH_ERROR",
+      );
+      assert.equal(
+        classifyPhoneLoginProviderError({
+          code: "sms_send_failed",
+          message: "Error sending sms: 60605 verification to this region is blocked",
+          status: 500,
+        }),
+        "SMS_PROVIDER_REGION_BLOCKED",
+      );
+      assert.equal(
+        classifyPhoneLoginProviderError({
+          code: "sms_send_failed",
+          message: "Error sending sms: carrier timeout",
+          status: 500,
+        }),
+        "SMS_DELIVERY_FAILED",
+      );
     });
 
     console.log(`\n${passed} checks passed`);
