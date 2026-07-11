@@ -29,9 +29,10 @@
  *       past email/phone rungs
  *   8.  Wrong/expired code outcomes + failure lock after 5 fails
  *   9.  Concurrent new-phone first login -> exactly one row (P2002 adopt)
- *   10. Phone-change verify still works AND attempts the guarded
- *       auth.users.phone sync (spy asserted; failure never blocks the
- *       claim; flag off -> no attempt)
+ *   10. Phone-change verify still works AND mirrors the number into
+ *       auth.users via the service-role admin client (spy asserted:
+ *       updateUserById + phone_confirm ONLY after approval; failure never
+ *       blocks the claim - durable FAILED state instead)
  */
 import "dotenv/config";
 import assert from "node:assert/strict";
@@ -392,17 +393,20 @@ async function main() {
     });
 
     // ----------------------------------------------------------- case 10
-    console.log("10. phone-change verify still works + guarded auth sync");
+    console.log("10. phone-change verify mirrors into auth.users (admin client)");
     const syncUserId = await createAppUser({ email: testEmail("sync") });
-    function syncSpy(fail = false) {
-      const calls: { phone: string }[] = [];
+    function adminSyncSpy(fail = false) {
+      const calls: { uid: string; phone: string; phone_confirm: boolean }[] = [];
       return {
         calls,
         client: {
-          async updateUser({ phone }: { phone: string }) {
-            calls.push({ phone });
+          async updateUserById(
+            uid: string,
+            attrs: { phone: string; phone_confirm: boolean },
+          ) {
+            calls.push({ uid, ...attrs });
             return fail
-              ? { error: { code: "phone_provider_disabled", message: "disabled" } }
+              ? { error: { code: "unexpected_failure", message: "boom" } }
               : { error: null };
           },
         },
@@ -414,61 +418,62 @@ async function main() {
         return "approved" as const;
       },
     };
-    await check("verify succeeds AND attempts updateUser({phone}) when flag on", async () => {
-      const sync = syncSpy();
+    await check("verify calls updateUserById(uid, {phone, phone_confirm:true}) -> SYNCED", async () => {
+      const sync = adminSyncSpy();
       const outcome = await confirmPhoneVerification({
         user: { id: syncUserId },
         phone: NUMBERS.sync,
         code: "123456",
         provider: approvedProvider,
-        authSync: sync.client,
+        adminSync: sync.client,
       });
       assert.equal(outcome.kind, "verified");
-      assert.deepEqual(sync.calls, [{ phone: NUMBERS.sync }], "guarded sync attempted");
+      assert.deepEqual(
+        sync.calls,
+        [{ uid: syncUserId, phone: NUMBERS.sync, phone_confirm: true }],
+        "admin sync ran exactly once, for the right uid, confirm only after approval",
+      );
       const row = await db.user.findUniqueOrThrow({ where: { id: syncUserId } });
       assert.equal(row.phoneE164, NUMBERS.sync);
       assert.ok(row.phoneVerifiedAt);
+      assert.equal(row.phoneSyncStatus, "SYNCED");
+      assert.equal(row.phoneSyncErrorCode, null);
+      assert.equal(row.authCompleted, true, "authCompleted finalizes with SYNCED");
       const audit = await db.authVerificationEvent.findFirst({
         where: { type: "phone_auth_sync", phoneE164: NUMBERS.sync, userId: syncUserId },
       });
       assert.ok(audit, "phone_auth_sync audited");
     });
-    await check("sync failure NEVER fails the app-side claim (audited instead)", async () => {
+    await check("sync failure NEVER fails the app-side claim (durable FAILED instead)", async () => {
       await db.user.update({
         where: { id: syncUserId },
-        data: { phoneE164: null, phone: null, phoneVerifiedAt: null },
+        data: {
+          phoneE164: null,
+          phone: null,
+          phoneVerifiedAt: null,
+          phoneSyncStatus: null,
+          authCompleted: false,
+        },
       });
-      const sync = syncSpy(true);
+      const sync = adminSyncSpy(true);
       const outcome = await confirmPhoneVerification({
         user: { id: syncUserId },
         phone: NUMBERS.sync,
         code: "123456",
         provider: approvedProvider,
-        authSync: sync.client,
+        adminSync: sync.client,
       });
       assert.equal(outcome.kind, "verified", "claim survives a failed sync");
       assert.equal(sync.calls.length, 1);
+      const row = await db.user.findUniqueOrThrow({ where: { id: syncUserId } });
+      assert.ok(row.phoneVerifiedAt, "business verification stays true");
+      assert.equal(row.phoneSyncStatus, "FAILED");
+      assert.equal(row.phoneSyncErrorCode, "unexpected_failure");
+      assert.equal(row.authCompleted, false, "authCompleted waits for SYNCED");
       const audit = await db.authVerificationEvent.findFirst({
         where: { type: "phone_auth_sync_failed", phoneE164: NUMBERS.sync, userId: syncUserId },
       });
       assert.ok(audit, "phone_auth_sync_failed audited");
-    });
-    await check("flag off -> NO sync attempt (idempotent re-verify short-circuits aside)", async () => {
-      process.env.PHONE_LOGIN_ENABLED = "false";
-      await db.user.update({
-        where: { id: syncUserId },
-        data: { phoneE164: null, phone: null, phoneVerifiedAt: null },
-      });
-      const sync = syncSpy();
-      const outcome = await confirmPhoneVerification({
-        user: { id: syncUserId },
-        phone: NUMBERS.sync,
-        code: "123456",
-        provider: approvedProvider,
-        authSync: sync.client,
-      });
-      assert.equal(outcome.kind, "verified");
-      assert.equal(sync.calls.length, 0, "sync must be guarded by PHONE_LOGIN_ENABLED");
     });
 
     console.log(`\n${passed} checks passed`);

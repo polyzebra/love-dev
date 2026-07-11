@@ -14,8 +14,6 @@ import { db } from "@/lib/db";
 import { Prisma, type User } from "@/generated/prisma/client";
 import {
   phoneVerificationProvider,
-  phoneVerificationProviderKind,
-  phoneLoginEnabled,
   PhoneOtpNotConfiguredError,
   PhoneProviderRejectedError,
   type PhoneVerificationProvider,
@@ -45,6 +43,14 @@ import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
  *  4. The final transaction re-checks the holder and relies on the unique
  *     index for the race: of two concurrent verifies for the same number,
  *     exactly one commits - the loser gets `duplicate_phone`.
+ *  5. auth.users.phone is a maintained MIRROR of the app claim, written by
+ *     the service-role admin client AFTER the app transaction commits. The
+ *     app row carries a durable disposition (phoneSyncStatus PENDING ->
+ *     SYNCED/FAILED + phoneSyncErrorCode): a failed or impossible sync
+ *     (service key absent) never rolls back the Twilio-approved business
+ *     verification - phoneVerifiedAt stays set, the FAILED state drives
+ *     reconciliation (src/lib/services/phone-reconcile.ts) and admin
+ *     re-sync. `authCompleted` is only finalized together with SYNCED.
  */
 
 // ---------------------------------------------------------------------------
@@ -223,65 +229,146 @@ function isUniqueViolation(error: unknown): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// auth.users.phone backfill (the exit ramp from the phone-login bridge)
+// auth.users.phone sync (service-role admin client). The app DB is the
+// source of truth; auth.users.phone is a maintained mirror with a durable
+// disposition on the User row. This REPLACES the old session-client
+// backfill (supabase.auth.updateUser({ phone })), which was inert with the
+// Supabase phone provider OFF (proven live 2026-07-09: 400
+// phone_provider_disabled) - the admin API writes the column directly and
+// does not depend on the provider toggle or the user's session.
 // ---------------------------------------------------------------------------
 
-/** Structural subset of supabase.auth the backfill needs - injectable in tests. */
-export type AuthPhoneSyncClient = {
-  updateUser(attributes: {
-    phone: string;
-  }): Promise<{ error: { code?: string; message: string } | null }>;
+/** Structural subset of supabase.auth.admin the sync needs - injectable in tests. */
+export type AdminPhoneSyncClient = {
+  updateUserById(
+    uid: string,
+    attributes: { phone: string; phone_confirm: boolean },
+  ): Promise<{ error: { code?: string; message: string } | null }>;
 };
 
 /**
- * Best-effort sync of a JUST-VERIFIED number into auth.users.phone via
- * supabase.auth.updateUser({ phone }) on the caller's live session. This
- * is the honest fix for existing owners: their number lives only in app
- * columns (User.phoneE164), so native phone LOGIN would hit the
- * IDENTITY_CONFLICT bridge; once auth.users.phone is populated, the
- * uid-match branch signs them straight into their canonical account.
- *
- * Guards (never fail the app-side claim because of the sync):
- *  - PHONE_LOGIN_ENABLED must be "true". With the Supabase phone provider
- *    OFF, GoTrue rejects any phone write outright - proven live
- *    2026-07-09: POST /auth/v1/otp {phone} -> 400 phone_provider_disabled
- *    - so attempting it would only add noise. The flag asserts the
- *    dashboard is configured (provider on + Twilio-in-Supabase).
- *  - provider kind must be "twilio". Under kind "supabase" the
- *    phone_change flow ITSELF wrote auth.users.phone (verifyOtp type
- *    "phone_change"), and updateUser({ phone }) is that flow's SEND - it
- *    would text a fresh code.
- *  - errors are audited (phone_auth_sync_failed) and swallowed. NOTE:
- *    when Supabase's "confirm phone change" is on, updateUser sends its
- *    own confirmation SMS instead of writing the column directly - keep
- *    phone-change confirmations OFF in the dashboard for a silent sync.
- *
- * Returns the disposition purely for tests/telemetry.
+ * GoTrue stores auth.users.phone WITHOUT the leading '+' (its
+ * formatPhoneNumber strips it before the E.164 digit check), so
+ * "+353861234501" lives in the column as "353861234501". Every SQL
+ * comparison against auth.users.phone must use this form; writes may pass
+ * canonical E.164 - GoTrue normalizes on the way in.
  */
-export async function syncPhoneToSupabaseAuth(opts: {
+export function gotruePhone(phoneE164: string): string {
+  return phoneE164.replace(/^\+/, "");
+}
+
+/** Is the server-side admin sync configured at all? (Named check so the
+ *  FAILED/PENDING branch never even attempts the server-only import.) */
+export function serviceRoleKeyPresent(): boolean {
+  return Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
+}
+
+/**
+ * The auth.users row currently holding this number (uid), or null. Read
+ * straight from auth.users - the admin sync would otherwise collide with
+ * an existing identity. Fails OPEN (null) on read errors: the sync itself
+ * then fails closed with a durable FAILED state instead of silently
+ * blocking verification on an audit read.
+ */
+export async function findAuthPhoneHolder(phoneE164: string): Promise<string | null> {
+  try {
+    const rows = await db.$queryRaw<{ id: string }[]>`
+      SELECT id::text FROM auth.users WHERE phone = ${gotruePhone(phoneE164)} LIMIT 1`;
+    return rows[0]?.id ?? null;
+  } catch (error) {
+    console.warn(
+      `[auth:phone] auth.users holder lookup failed - proceeding: ${String(error).slice(0, 120)}`,
+    );
+    return null;
+  }
+}
+
+export type PhoneSyncResult = { status: "SYNCED" | "FAILED"; errorCode: string | null };
+
+async function resolveAdminSyncClient(
+  injected?: AdminPhoneSyncClient,
+): Promise<{ ok: true; client: AdminPhoneSyncClient } | { ok: false; errorCode: string }> {
+  if (injected) return { ok: true, client: injected };
+  if (!serviceRoleKeyPresent()) return { ok: false, errorCode: "service_key_missing" };
+  try {
+    // Lazy so this module stays importable outside Next (tsx tests): the
+    // admin module carries a `server-only` build guard.
+    const { supabaseAdmin } = await import("@/lib/supabase/admin");
+    return { ok: true, client: supabaseAdmin().auth.admin };
+  } catch (error) {
+    console.warn(
+      `[auth:phone] admin client unavailable: ${String(error).slice(0, 120)}`,
+    );
+    return { ok: false, errorCode: "admin_client_unavailable" };
+  }
+}
+
+/**
+ * Mirror an app-VERIFIED number into auth.users.phone and stamp the
+ * durable disposition on the User row. Call ONLY after phoneE164 +
+ * phoneVerifiedAt are committed app-side (the Twilio approval is the
+ * business truth this mirrors - `phone_confirm: true` is legitimate
+ * exactly because approval already happened).
+ *
+ * Never throws and never unwinds the app claim: no client / failed write
+ * -> phoneSyncStatus FAILED with an error code, picked up by admin
+ * re-sync and the reconciliation service. Success -> SYNCED, and
+ * authCompleted is finalized in the SAME update (per the both-stores
+ * contract, an account is only "complete" once identity and app agree).
+ */
+export async function syncVerifiedPhoneToAuth(opts: {
   userId: string;
   phoneE164: string;
-  client?: AuthPhoneSyncClient;
+  client?: AdminPhoneSyncClient;
   req?: Request;
-}): Promise<"skipped" | "synced" | "failed"> {
-  if (!phoneLoginEnabled() || phoneVerificationProviderKind() !== "twilio") return "skipped";
+}): Promise<PhoneSyncResult> {
   const { userId, phoneE164, req } = opts;
+
+  async function stamp(result: PhoneSyncResult): Promise<PhoneSyncResult> {
+    await db.user
+      .update({
+        where: { id: userId },
+        data: {
+          phoneSyncStatus: result.status,
+          phoneSyncErrorCode: result.errorCode,
+          phoneSyncUpdatedAt: new Date(),
+          ...(result.status === "SYNCED" ? { authCompleted: true } : {}),
+        },
+      })
+      .catch((error) => {
+        console.error(`[auth:phone] failed to stamp phoneSyncStatus for ${userId}:`, error);
+      });
+    return result;
+  }
+
+  const resolved = await resolveAdminSyncClient(opts.client);
+  if (!resolved.ok) {
+    await recordAuthEvent({
+      type: "phone_auth_sync_failed",
+      phoneE164,
+      userId,
+      req,
+      metadata: { code: resolved.errorCode },
+    });
+    return stamp({ status: "FAILED", errorCode: resolved.errorCode });
+  }
+
   try {
-    const client =
-      opts.client ?? (await (await import("@/lib/supabase/server")).supabaseServer()).auth;
-    const { error } = await client.updateUser({ phone: phoneE164 });
+    const { error } = await resolved.client.updateUserById(userId, {
+      phone: phoneE164, // GoTrue strips the '+' itself (see gotruePhone)
+      phone_confirm: true, // approval-gated: Twilio said yes before this runs
+    });
     if (error) {
+      const code = String(error.code ?? error.message).slice(0, 80);
       await recordAuthEvent({
         type: "phone_auth_sync_failed",
         phoneE164,
         userId,
         req,
-        metadata: { code: error.code ?? error.message },
+        metadata: { code },
       });
-      return "failed";
+      return stamp({ status: "FAILED", errorCode: code });
     }
-    await recordAuthEvent({ type: "phone_auth_sync", phoneE164, userId, req });
-    return "synced";
   } catch (error) {
     console.warn(`[auth:phone] auth.users.phone sync failed: ${String(error).slice(0, 120)}`);
     await recordAuthEvent({
@@ -291,8 +378,11 @@ export async function syncPhoneToSupabaseAuth(opts: {
       req,
       metadata: { code: "exception" },
     });
-    return "failed";
+    return stamp({ status: "FAILED", errorCode: "exception" });
   }
+
+  await recordAuthEvent({ type: "phone_auth_sync", phoneE164, userId, req });
+  return stamp({ status: "SYNCED", errorCode: null });
 }
 
 export async function confirmPhoneVerification(opts: {
@@ -301,8 +391,8 @@ export async function confirmPhoneVerification(opts: {
   code: string;
   countryIso?: string;
   provider?: PhoneVerificationProvider;
-  /** Overrides the SSR supabase client for the auth.users.phone sync (tests). */
-  authSync?: AuthPhoneSyncClient;
+  /** Overrides the service-role admin client for the auth.users.phone sync (tests). */
+  adminSync?: AdminPhoneSyncClient;
   req?: Request;
 }): Promise<PhoneVerifyOutcome> {
   const { user, req } = opts;
@@ -316,10 +406,16 @@ export async function confirmPhoneVerification(opts: {
   const { phoneE164 } = normalized;
 
   // Idempotent success: this exact number is already verified on THIS
-  // account - don't burn a provider check on it.
+  // account - don't burn a provider check on it. Re-approval never
+  // duplicates audits: a SYNCED row returns untouched; an outstanding
+  // PENDING/FAILED mirror gets a retry-safe sync attempt (the helper
+  // audits its own disposition, nothing else is written).
   const self = await db.user.findUnique({ where: { id: user.id } });
   if (self && self.phoneE164 === phoneE164 && self.phoneVerifiedAt) {
-    return { kind: "already_verified", user: self };
+    if (self.phoneSyncStatus === "SYNCED") return { kind: "already_verified", user: self };
+    await syncVerifiedPhoneToAuth({ userId: user.id, phoneE164, client: opts.adminSync, req });
+    const fresh = await db.user.findUnique({ where: { id: user.id } });
+    return { kind: "already_verified", user: fresh ?? self };
   }
 
   // Ownership BEFORE the provider - a number held by another account is
@@ -328,6 +424,22 @@ export async function confirmPhoneVerification(opts: {
   if (holder && holder.id !== user.id) {
     await recordAuthEvent({ type: "phone_otp_verify_conflict", phoneE164, userId: user.id, req });
     return { kind: "duplicate_phone", holderId: holder.id };
+  }
+
+  // Same conflict, auth-side: a number attached to a DIFFERENT auth.users
+  // row (native phone login, an unreleased mirror) would make the admin
+  // sync collide with an existing identity. Same neutral duplicate answer
+  // as the app-level check, still pre-provider.
+  const authHolder = await findAuthPhoneHolder(phoneE164);
+  if (authHolder && authHolder !== user.id) {
+    await recordAuthEvent({
+      type: "phone_otp_verify_conflict",
+      phoneE164,
+      userId: user.id,
+      req,
+      metadata: { source: "auth_users" },
+    });
+    return { kind: "duplicate_phone", holderId: authHolder };
   }
 
   // Failure lock: 5 invalid attempts within 15 minutes (per number or per
@@ -410,7 +522,12 @@ export async function confirmPhoneVerification(opts: {
           // Legacy mirror columns - kept in sync until fully retired
           phone: phoneE164,
           phoneVerified: now,
-          authCompleted: true,
+          // The auth.users mirror is owed from this moment; the admin sync
+          // below settles it to SYNCED/FAILED. authCompleted is NOT set
+          // here - it finalizes together with SYNCED (both stores agree).
+          phoneSyncStatus: "PENDING",
+          phoneSyncErrorCode: null,
+          phoneSyncUpdatedAt: now,
         },
       });
     });
@@ -427,10 +544,14 @@ export async function confirmPhoneVerification(opts: {
 
   await recordAuthEvent({ type: "phone_otp_verify", phoneE164, userId: user.id, req });
 
-  // BACKFILL (guarded, best-effort, AFTER the claim committed): mirror the
-  // verified number into auth.users.phone so native phone LOGIN can key
-  // this member by uid instead of hitting the identity-conflict bridge.
-  await syncPhoneToSupabaseAuth({ userId: user.id, phoneE164, client: opts.authSync, req });
+  // MIRROR (AFTER the claim committed): write auth.users.phone via the
+  // service-role admin client and settle phoneSyncStatus. A failure here
+  // never unwinds the Twilio-approved claim - the caller still gets
+  // `verified` (business truth), while FAILED + errorCode drive admin
+  // re-sync and the reconciliation service. On success authCompleted is
+  // finalized in the same update as SYNCED.
+  await syncVerifiedPhoneToAuth({ userId: user.id, phoneE164, client: opts.adminSync, req });
+  const finalRow = await db.user.findUnique({ where: { id: user.id } });
 
-  return { kind: "verified", user: updated };
+  return { kind: "verified", user: finalRow ?? updated };
 }

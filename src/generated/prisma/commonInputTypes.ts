@@ -69,6 +69,13 @@ export type EnumAccountStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAccountStatusFilter<$PrismaModel> | $Enums.AccountStatus
 }
 
+export type EnumPhoneSyncStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhoneSyncStatus | Prisma.EnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel> | $Enums.PhoneSyncStatus | null
+}
+
 export type BoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -169,6 +176,16 @@ export type EnumAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAccountStatusFilter<$PrismaModel>
+}
+
+export type EnumPhoneSyncStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhoneSyncStatus | Prisma.EnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPhoneSyncStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.PhoneSyncStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel>
 }
 
 export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -924,6 +941,13 @@ export type NestedEnumAccountStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAccountStatusFilter<$PrismaModel> | $Enums.AccountStatus
 }
 
+export type NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhoneSyncStatus | Prisma.EnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel> | $Enums.PhoneSyncStatus | null
+}
+
 export type NestedBoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -1028,6 +1052,16 @@ export type NestedEnumAccountStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAccountStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPhoneSyncStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PhoneSyncStatus | Prisma.EnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PhoneSyncStatus[] | Prisma.ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPhoneSyncStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.PhoneSyncStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPhoneSyncStatusNullableFilter<$PrismaModel>
 }
 
 export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {

@@ -65,6 +65,9 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
         phoneCountryIso: null,
         phoneDialCode: null,
         phoneVerifiedAt: null,
+        phoneSyncStatus: null,
+        phoneSyncErrorCode: null,
+        phoneSyncUpdatedAt: null,
         authCompleted: false,
       },
     }),
@@ -276,6 +279,12 @@ export async function provisionPhoneLoginUser(opts: {
     // Legacy mirror columns - kept in sync until fully retired
     phone: phoneE164,
     phoneVerified: now,
+    // Native phone LOGIN is keyed BY auth.users.phone - GoTrue itself
+    // verified and stored the number before this write, so the mirror is
+    // SYNCED by construction (no admin-client call needed).
+    phoneSyncStatus: "SYNCED" as const,
+    phoneSyncErrorCode: null,
+    phoneSyncUpdatedAt: now,
     authCompleted: true,
   };
 

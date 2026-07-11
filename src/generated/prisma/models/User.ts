@@ -52,6 +52,9 @@ export type UserMinAggregateOutputType = {
   phoneCountryIso: string | null
   phoneDialCode: string | null
   phoneVerifiedAt: Date | null
+  phoneSyncStatus: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode: string | null
+  phoneSyncUpdatedAt: Date | null
   authCompleted: boolean | null
   riskScore: number | null
   bannedAt: Date | null
@@ -100,6 +103,9 @@ export type UserMaxAggregateOutputType = {
   phoneCountryIso: string | null
   phoneDialCode: string | null
   phoneVerifiedAt: Date | null
+  phoneSyncStatus: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode: string | null
+  phoneSyncUpdatedAt: Date | null
   authCompleted: boolean | null
   riskScore: number | null
   bannedAt: Date | null
@@ -148,6 +154,9 @@ export type UserCountAggregateOutputType = {
   phoneCountryIso: number
   phoneDialCode: number
   phoneVerifiedAt: number
+  phoneSyncStatus: number
+  phoneSyncErrorCode: number
+  phoneSyncUpdatedAt: number
   authCompleted: number
   riskScore: number
   bannedAt: number
@@ -210,6 +219,9 @@ export type UserMinAggregateInputType = {
   phoneCountryIso?: true
   phoneDialCode?: true
   phoneVerifiedAt?: true
+  phoneSyncStatus?: true
+  phoneSyncErrorCode?: true
+  phoneSyncUpdatedAt?: true
   authCompleted?: true
   riskScore?: true
   bannedAt?: true
@@ -258,6 +270,9 @@ export type UserMaxAggregateInputType = {
   phoneCountryIso?: true
   phoneDialCode?: true
   phoneVerifiedAt?: true
+  phoneSyncStatus?: true
+  phoneSyncErrorCode?: true
+  phoneSyncUpdatedAt?: true
   authCompleted?: true
   riskScore?: true
   bannedAt?: true
@@ -306,6 +321,9 @@ export type UserCountAggregateInputType = {
   phoneCountryIso?: true
   phoneDialCode?: true
   phoneVerifiedAt?: true
+  phoneSyncStatus?: true
+  phoneSyncErrorCode?: true
+  phoneSyncUpdatedAt?: true
   authCompleted?: true
   riskScore?: true
   bannedAt?: true
@@ -441,6 +459,9 @@ export type UserGroupByOutputType = {
   phoneCountryIso: string | null
   phoneDialCode: string | null
   phoneVerifiedAt: Date | null
+  phoneSyncStatus: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode: string | null
+  phoneSyncUpdatedAt: Date | null
   authCompleted: boolean
   riskScore: number
   bannedAt: Date | null
@@ -512,6 +533,9 @@ export type UserWhereInput = {
   phoneCountryIso?: Prisma.StringNullableFilter<"User"> | string | null
   phoneDialCode?: Prisma.StringNullableFilter<"User"> | string | null
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  phoneSyncStatus?: Prisma.EnumPhoneSyncStatusNullableFilter<"User"> | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneSyncUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   authCompleted?: Prisma.BoolFilter<"User"> | boolean
   riskScore?: Prisma.IntFilter<"User"> | number
   bannedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -585,6 +609,9 @@ export type UserOrderByWithRelationInput = {
   phoneCountryIso?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneDialCode?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneSyncStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneSyncErrorCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneSyncUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   authCompleted?: Prisma.SortOrder
   riskScore?: Prisma.SortOrder
   bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -661,6 +688,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   phoneCountryIso?: Prisma.StringNullableFilter<"User"> | string | null
   phoneDialCode?: Prisma.StringNullableFilter<"User"> | string | null
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  phoneSyncStatus?: Prisma.EnumPhoneSyncStatusNullableFilter<"User"> | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneSyncUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   authCompleted?: Prisma.BoolFilter<"User"> | boolean
   riskScore?: Prisma.IntFilter<"User"> | number
   bannedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -734,6 +764,9 @@ export type UserOrderByWithAggregationInput = {
   phoneCountryIso?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneDialCode?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneSyncStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneSyncErrorCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneSyncUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   authCompleted?: Prisma.SortOrder
   riskScore?: Prisma.SortOrder
   bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -790,6 +823,9 @@ export type UserScalarWhereWithAggregatesInput = {
   phoneCountryIso?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   phoneDialCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  phoneSyncStatus?: Prisma.EnumPhoneSyncStatusNullableWithAggregatesFilter<"User"> | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneSyncUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   authCompleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   riskScore?: Prisma.IntWithAggregatesFilter<"User"> | number
   bannedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -838,6 +874,9 @@ export type UserCreateInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -911,6 +950,9 @@ export type UserUncheckedCreateInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -984,6 +1026,9 @@ export type UserUpdateInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1057,6 +1102,9 @@ export type UserUncheckedUpdateInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1130,6 +1178,9 @@ export type UserCreateManyInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -1178,6 +1229,9 @@ export type UserUpdateManyMutationInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1226,6 +1280,9 @@ export type UserUncheckedUpdateManyInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1274,6 +1331,9 @@ export type UserCountOrderByAggregateInput = {
   phoneCountryIso?: Prisma.SortOrder
   phoneDialCode?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrder
+  phoneSyncStatus?: Prisma.SortOrder
+  phoneSyncErrorCode?: Prisma.SortOrder
+  phoneSyncUpdatedAt?: Prisma.SortOrder
   authCompleted?: Prisma.SortOrder
   riskScore?: Prisma.SortOrder
   bannedAt?: Prisma.SortOrder
@@ -1328,6 +1388,9 @@ export type UserMaxOrderByAggregateInput = {
   phoneCountryIso?: Prisma.SortOrder
   phoneDialCode?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrder
+  phoneSyncStatus?: Prisma.SortOrder
+  phoneSyncErrorCode?: Prisma.SortOrder
+  phoneSyncUpdatedAt?: Prisma.SortOrder
   authCompleted?: Prisma.SortOrder
   riskScore?: Prisma.SortOrder
   bannedAt?: Prisma.SortOrder
@@ -1376,6 +1439,9 @@ export type UserMinOrderByAggregateInput = {
   phoneCountryIso?: Prisma.SortOrder
   phoneDialCode?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrder
+  phoneSyncStatus?: Prisma.SortOrder
+  phoneSyncErrorCode?: Prisma.SortOrder
+  phoneSyncUpdatedAt?: Prisma.SortOrder
   authCompleted?: Prisma.SortOrder
   riskScore?: Prisma.SortOrder
   bannedAt?: Prisma.SortOrder
@@ -1444,6 +1510,10 @@ export type EnumRoleFieldUpdateOperationsInput = {
 
 export type EnumAccountStatusFieldUpdateOperationsInput = {
   set?: $Enums.AccountStatus
+}
+
+export type NullableEnumPhoneSyncStatusFieldUpdateOperationsInput = {
+  set?: $Enums.PhoneSyncStatus | null
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -1828,6 +1898,9 @@ export type UserCreateWithoutDevicesInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -1900,6 +1973,9 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -1988,6 +2064,9 @@ export type UserUpdateWithoutDevicesInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2060,6 +2139,9 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2132,6 +2214,9 @@ export type UserCreateWithoutProfileInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -2204,6 +2289,9 @@ export type UserUncheckedCreateWithoutProfileInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -2292,6 +2380,9 @@ export type UserUpdateWithoutProfileInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2364,6 +2455,9 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2436,6 +2530,9 @@ export type UserCreateWithoutPhotosInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -2508,6 +2605,9 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -2596,6 +2696,9 @@ export type UserUpdateWithoutPhotosInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2668,6 +2771,9 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2740,6 +2846,9 @@ export type UserCreateWithoutVerificationsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -2812,6 +2921,9 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -2900,6 +3012,9 @@ export type UserUpdateWithoutVerificationsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2972,6 +3087,9 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3044,6 +3162,9 @@ export type UserCreateWithoutLikesSentInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3116,6 +3237,9 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3193,6 +3317,9 @@ export type UserCreateWithoutLikesReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3265,6 +3392,9 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3353,6 +3483,9 @@ export type UserUpdateWithoutLikesSentInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3425,6 +3558,9 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3508,6 +3644,9 @@ export type UserUpdateWithoutLikesReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3580,6 +3719,9 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3652,6 +3794,9 @@ export type UserCreateWithoutMatchesAsAInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3724,6 +3869,9 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3801,6 +3949,9 @@ export type UserCreateWithoutMatchesAsBInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3873,6 +4024,9 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -3961,6 +4115,9 @@ export type UserUpdateWithoutMatchesAsAInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4033,6 +4190,9 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4116,6 +4276,9 @@ export type UserUpdateWithoutMatchesAsBInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4188,6 +4351,9 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4260,6 +4426,9 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -4332,6 +4501,9 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -4409,6 +4581,9 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -4481,6 +4656,9 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -4569,6 +4747,9 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4641,6 +4822,9 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4724,6 +4908,9 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4796,6 +4983,9 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4868,6 +5058,9 @@ export type UserCreateWithoutParticipantsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -4940,6 +5133,9 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5028,6 +5224,9 @@ export type UserUpdateWithoutParticipantsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5100,6 +5299,9 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5172,6 +5374,9 @@ export type UserCreateWithoutMessagesInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5244,6 +5449,9 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5332,6 +5540,9 @@ export type UserUpdateWithoutMessagesInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5404,6 +5615,9 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5476,6 +5690,9 @@ export type UserCreateWithoutReportsMadeInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5548,6 +5765,9 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5625,6 +5845,9 @@ export type UserCreateWithoutReportsReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5697,6 +5920,9 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -5785,6 +6011,9 @@ export type UserUpdateWithoutReportsMadeInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5857,6 +6086,9 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5940,6 +6172,9 @@ export type UserUpdateWithoutReportsReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6012,6 +6247,9 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6084,6 +6322,9 @@ export type UserCreateWithoutBlocksMadeInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -6156,6 +6397,9 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -6233,6 +6477,9 @@ export type UserCreateWithoutBlocksReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -6305,6 +6552,9 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -6393,6 +6643,9 @@ export type UserUpdateWithoutBlocksMadeInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6465,6 +6718,9 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6548,6 +6804,9 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6620,6 +6879,9 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6692,6 +6954,9 @@ export type UserCreateWithoutSubscriptionInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -6764,6 +7029,9 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -6852,6 +7120,9 @@ export type UserUpdateWithoutSubscriptionInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6924,6 +7195,9 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6996,6 +7270,9 @@ export type UserCreateWithoutPaymentsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7068,6 +7345,9 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7156,6 +7436,9 @@ export type UserUpdateWithoutPaymentsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7228,6 +7511,9 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7300,6 +7586,9 @@ export type UserCreateWithoutNotificationsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7372,6 +7661,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7460,6 +7752,9 @@ export type UserUpdateWithoutNotificationsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7532,6 +7827,9 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7604,6 +7902,9 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7676,6 +7977,9 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7764,6 +8068,9 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7836,6 +8143,9 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -7908,6 +8218,9 @@ export type UserCreateWithoutConversationPresenceInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -7980,6 +8293,9 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8068,6 +8384,9 @@ export type UserUpdateWithoutConversationPresenceInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8140,6 +8459,9 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8212,6 +8534,9 @@ export type UserCreateWithoutAdminLogsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8284,6 +8609,9 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8372,6 +8700,9 @@ export type UserUpdateWithoutAdminLogsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8444,6 +8775,9 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8516,6 +8850,9 @@ export type UserCreateWithoutExplorePreferencesInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8588,6 +8925,9 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8676,6 +9016,9 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8748,6 +9091,9 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8820,6 +9166,9 @@ export type UserCreateWithoutAuthEventsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8892,6 +9241,9 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -8980,6 +9332,9 @@ export type UserUpdateWithoutAuthEventsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9052,6 +9407,9 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9124,6 +9482,9 @@ export type UserCreateWithoutSettingsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -9196,6 +9557,9 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   phoneCountryIso?: string | null
   phoneDialCode?: string | null
   phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
   authCompleted?: boolean
   riskScore?: number
   bannedAt?: Date | string | null
@@ -9284,6 +9648,9 @@ export type UserUpdateWithoutSettingsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9356,6 +9723,9 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   riskScore?: Prisma.IntFieldUpdateOperationsInput | number
   bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9648,6 +10018,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phoneCountryIso?: boolean
   phoneDialCode?: boolean
   phoneVerifiedAt?: boolean
+  phoneSyncStatus?: boolean
+  phoneSyncErrorCode?: boolean
+  phoneSyncUpdatedAt?: boolean
   authCompleted?: boolean
   riskScore?: boolean
   bannedAt?: boolean
@@ -9722,6 +10095,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phoneCountryIso?: boolean
   phoneDialCode?: boolean
   phoneVerifiedAt?: boolean
+  phoneSyncStatus?: boolean
+  phoneSyncErrorCode?: boolean
+  phoneSyncUpdatedAt?: boolean
   authCompleted?: boolean
   riskScore?: boolean
   bannedAt?: boolean
@@ -9770,6 +10146,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phoneCountryIso?: boolean
   phoneDialCode?: boolean
   phoneVerifiedAt?: boolean
+  phoneSyncStatus?: boolean
+  phoneSyncErrorCode?: boolean
+  phoneSyncUpdatedAt?: boolean
   authCompleted?: boolean
   riskScore?: boolean
   bannedAt?: boolean
@@ -9818,6 +10197,9 @@ export type UserSelectScalar = {
   phoneCountryIso?: boolean
   phoneDialCode?: boolean
   phoneVerifiedAt?: boolean
+  phoneSyncStatus?: boolean
+  phoneSyncErrorCode?: boolean
+  phoneSyncUpdatedAt?: boolean
   authCompleted?: boolean
   riskScore?: boolean
   bannedAt?: boolean
@@ -9852,7 +10234,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
@@ -9927,6 +10309,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     phoneCountryIso: string | null
     phoneDialCode: string | null
     phoneVerifiedAt: Date | null
+    phoneSyncStatus: $Enums.PhoneSyncStatus | null
+    phoneSyncErrorCode: string | null
+    phoneSyncUpdatedAt: Date | null
     authCompleted: boolean
     riskScore: number
     bannedAt: Date | null
@@ -10420,6 +10805,9 @@ export interface UserFieldRefs {
   readonly phoneCountryIso: Prisma.FieldRef<"User", 'String'>
   readonly phoneDialCode: Prisma.FieldRef<"User", 'String'>
   readonly phoneVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly phoneSyncStatus: Prisma.FieldRef<"User", 'PhoneSyncStatus'>
+  readonly phoneSyncErrorCode: Prisma.FieldRef<"User", 'String'>
+  readonly phoneSyncUpdatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly authCompleted: Prisma.FieldRef<"User", 'Boolean'>
   readonly riskScore: Prisma.FieldRef<"User", 'Int'>
   readonly bannedAt: Prisma.FieldRef<"User", 'DateTime'>

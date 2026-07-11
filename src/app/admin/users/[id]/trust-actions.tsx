@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Ban, MailOpen, PhoneOff, RotateCcw, ShieldQuestion, Undo2 } from "lucide-react";
+import { Ban, MailOpen, PhoneOff, RefreshCw, RotateCcw, ShieldQuestion, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,6 +44,7 @@ export function TrustActions({
   banned,
   hasPhone,
   phoneVerified,
+  phoneSyncStatus,
   emailBlocked,
   onboardingDone,
 }: {
@@ -51,6 +52,8 @@ export function TrustActions({
   banned: boolean;
   hasPhone: boolean;
   phoneVerified: boolean;
+  /** auth.users.phone mirror state - null when no verified phone. */
+  phoneSyncStatus: string | null;
   emailBlocked: boolean;
   onboardingDone: boolean;
 }) {
@@ -159,6 +162,29 @@ export function TrustActions({
           }
         >
           <MailOpen className="size-4" /> Release email
+        </Button>
+      )}
+
+      {phoneVerified && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() =>
+            setConfirm({
+              title: "Re-sync phone to auth",
+              description:
+                phoneSyncStatus === "SYNCED"
+                  ? "The auth identity already mirrors this number - re-syncing rewrites it anyway. No SMS is sent."
+                  : "Writes the verified number into the auth identity (auth.users.phone). No SMS is sent; the app-side verification is untouched.",
+              endpoint: `${base}/resync-phone`,
+              success: "Phone re-synced to the auth identity.",
+              confirmLabel: "Re-sync phone",
+            })
+          }
+        >
+          <RefreshCw className="size-4" /> Re-sync phone
         </Button>
       )}
 

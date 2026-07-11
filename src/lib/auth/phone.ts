@@ -17,7 +17,10 @@
  *
  * With Twilio Verify the app-side User row (phoneE164 + phoneVerifiedAt,
  * stamped by the verify route) is the source of truth the auth gate
- * reads; the Supabase auth user does not carry the phone identity.
+ * reads; auth.users.phone is a maintained MIRROR written by the
+ * service-role admin client after each approval (phoneSyncStatus on the
+ * User row tracks PENDING/SYNCED/FAILED - see phone-flow.ts and
+ * src/lib/services/phone-reconcile.ts).
  */
 
 export class PhoneOtpNotConfiguredError extends Error {
@@ -250,8 +253,9 @@ export function phoneVerificationProvider(): PhoneVerificationProvider {
 //   2. Twilio Verify configured as Supabase's SMS provider (Account SID,
 //      Auth Token, Verify Service SID - the same Verify service the
 //      backend uses is fine; codes then come from one pool).
-// Flip PHONE_LOGIN_ENABLED="true" ONLY once both are done. The flag also
-// arms the auth.users.phone backfill in phone-flow.ts.
+// Flip PHONE_LOGIN_ENABLED="true" ONLY once both are done. (The
+// auth.users.phone mirror itself is NOT flag-gated anymore - it runs via
+// the service-role admin client on every approval, see phone-flow.ts.)
 // ---------------------------------------------------------------------------
 
 /**

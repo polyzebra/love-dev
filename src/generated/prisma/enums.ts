@@ -311,6 +311,15 @@ export const PhotoStatus = {
 export type PhotoStatus = (typeof PhotoStatus)[keyof typeof PhotoStatus]
 
 
+export const PhoneSyncStatus = {
+  PENDING: 'PENDING',
+  SYNCED: 'SYNCED',
+  FAILED: 'FAILED'
+} as const
+
+export type PhoneSyncStatus = (typeof PhoneSyncStatus)[keyof typeof PhoneSyncStatus]
+
+
 export const ExploreGroup = {
   LIFESTYLE: 'LIFESTYLE',
   INTERESTS: 'INTERESTS',

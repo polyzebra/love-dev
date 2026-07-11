@@ -88,6 +88,13 @@ export async function releasePhone(opts: {
       phoneCountryIso: null,
       phoneDialCode: null,
       phoneVerifiedAt: null,
+      // The sync disposition travels with the number. NOTE: this frees the
+      // APP claim only - a previously SYNCED auth.users.phone stays behind
+      // (no service key required here); the reconciliation service reports
+      // such auth-only numbers rather than auto-clearing an identity.
+      phoneSyncStatus: null,
+      phoneSyncErrorCode: null,
+      phoneSyncUpdatedAt: null,
     },
   });
   await audit({

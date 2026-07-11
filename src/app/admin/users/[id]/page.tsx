@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, CircleDashed } from "lucide-react";
 import { db } from "@/lib/db";
+import { currentUser } from "@/lib/auth";
+import { countryByIso } from "@/lib/auth/countries";
+import { maskPhone } from "@/lib/phone-mask";
 import { computeScamScore } from "@/lib/services/scam";
 import { formatRelativeTime } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
@@ -53,6 +56,22 @@ function VerifiedStamp({ verifiedAt, label }: { verifiedAt: Date | null; label: 
   );
 }
 
+const SYNC_BADGE: Record<string, "secondary" | "outline" | "destructive"> = {
+  SYNCED: "secondary",
+  PENDING: "outline",
+  FAILED: "destructive",
+};
+
+/** auth.users.phone mirror disposition - "-" when no verified phone. */
+function PhoneSyncBadge({ status }: { status: string | null }) {
+  if (!status) return <span className="text-muted-foreground">sync -</span>;
+  return (
+    <Badge variant={SYNC_BADGE[status] ?? "outline"} className="rounded-full">
+      sync {status.toLowerCase()}
+    </Badge>
+  );
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
@@ -77,6 +96,11 @@ export default async function AdminUserDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  // The admin layout admits MODERATOR too - the raw E.164 below is
+  // revealed to ADMIN only, everyone else gets the masked form.
+  const viewer = await currentUser();
+  const viewerIsAdmin = viewer?.role === "ADMIN";
 
   const user = await db.user.findUnique({
     where: { id },
@@ -155,6 +179,7 @@ export default async function AdminUserDetailPage({
         banned={banned}
         hasPhone={Boolean(user.phoneE164 ?? user.phone)}
         phoneVerified={Boolean(user.phoneVerifiedAt)}
+        phoneSyncStatus={user.phoneSyncStatus}
         emailBlocked={Boolean(emailBlock)}
         onboardingDone={user.onboardingDone}
       />
@@ -167,8 +192,39 @@ export default async function AdminUserDetailPage({
               <VerifiedStamp verifiedAt={user.emailVerified} label={user.emailVerified ? "Verified" : "Unverified"} />
             </Field>
             <Field label="Phone">
-              {user.phoneE164 ?? user.phone ?? "-"}
-              <VerifiedStamp verifiedAt={user.phoneVerifiedAt} label={user.phoneVerifiedAt ? "Verified" : "Unverified"} />
+              {(() => {
+                const number = user.phoneE164 ?? user.phone;
+                if (!number) return "-";
+                const country = countryByIso(user.phoneCountryIso);
+                return (
+                  <>
+                    <span>{maskPhone(number, user.phoneDialCode)}</span>
+                    {/* Raw E.164: ADMIN eyes only - moderators get the mask. */}
+                    {viewerIsAdmin && (
+                      <span className="block font-mono text-xs text-muted-foreground">
+                        {number}
+                      </span>
+                    )}
+                    <span className="block text-xs text-muted-foreground">
+                      {country?.name ?? "Unknown country"}
+                      {user.phoneCountryIso ? ` (${user.phoneCountryIso})` : ""}
+                      {user.phoneDialCode ? ` · ${user.phoneDialCode}` : ""}
+                    </span>
+                    <VerifiedStamp
+                      verifiedAt={user.phoneVerifiedAt}
+                      label={user.phoneVerifiedAt ? "Verified" : "Unverified"}
+                    />
+                    <span className="mt-1 block">
+                      <PhoneSyncBadge status={user.phoneSyncStatus} />
+                      {user.phoneSyncStatus === "FAILED" && user.phoneSyncErrorCode && (
+                        <span className="ml-1.5 text-xs text-muted-foreground">
+                          {user.phoneSyncErrorCode}
+                        </span>
+                      )}
+                    </span>
+                  </>
+                );
+              })()}
             </Field>
             <Field label="Photo verification">
               <VerifiedStamp verifiedAt={user.photoVerifiedAt} label={user.photoVerifiedAt ? "Verified" : "Not verified"} />

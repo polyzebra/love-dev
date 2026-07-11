@@ -186,8 +186,9 @@ vs `phone_otp_*`).
 - Therefore native phone OTP **cannot** sign an existing owner into their
   canonical account: GoTrue would mint a NEW phone-keyed auth user
   (uid != owner's `User.id`) - a duplicate canonical account, forbidden.
-  Without a service-role key we can neither backfill `auth.users.phone`
-  server-side nor fabricate sessions.
+  Without a service-role key we cannot backfill `auth.users.phone`
+  server-side (the durable `phoneSyncStatus` state in section 5f records
+  exactly that instead of pretending).
 
 **Shipped policy (`src/lib/auth/phone-login-flow.ts`):**
 
@@ -211,12 +212,12 @@ vs `phone_otp_*`).
   (`provisionPhoneLoginUser`), phone stamped in the same write; the gate
   then continues age -> legal -> onboarding (the first gate rung accepts
   either verified channel).
-- **Backfill (the exit ramp)**: with the flag on, every successful
-  authenticated phone-change verify also calls
-  `supabase.auth.updateUser({ phone })` on the live session
-  (`syncPhoneToSupabaseAuth`, audited `phone_auth_sync[_failed]`, never
-  blocks the app-side claim). Once `auth.users.phone` is populated,
-  owners re-verifying (or newly verifying) unlock uid-match phone login.
+- **Mirror (the exit ramp)**: every successful authenticated phone-change
+  verify mirrors the number into `auth.users.phone` via the SERVICE-ROLE
+  admin client (section 5f) - no longer the old session-client
+  `updateUser({ phone })` backfill, which was inert with the phone
+  provider OFF. Once `auth.users.phone` is populated, owners re-verifying
+  (or newly verifying) unlock uid-match phone login.
 
 **Dashboard config required to flip the flag:**
 
@@ -224,9 +225,9 @@ vs `phone_otp_*`).
 2. Supabase -> SMS provider: **Twilio Verify**, with the SAME Verify
    service the backend uses (Account SID, Auth Token,
    `TWILIO_VERIFY_SERVICE_SID`).
-3. Keep "confirm phone change" OFF so the backfill's
-   `updateUser({ phone })` writes the column silently instead of texting
-   a second code.
+3. Keep "confirm phone change" OFF - it only affects the 5b fallback
+   provider's `updateUser({ phone })` send; the 5f admin-client mirror
+   bypasses it entirely.
 4. Set `PHONE_LOGIN_ENABLED="true"` (+ optionally
    `SUPPORTED_PHONE_COUNTRIES` / `PHONE_LOGIN_COUNTRIES` to narrow).
 
@@ -234,7 +235,7 @@ vs `phone_otp_*`).
 
 | Setting | Where | Value | Purpose |
 | --- | --- | --- | --- |
-| `PHONE_LOGIN_ENABLED` | server env | `"true"` | THE phone-login switch: shows the `/login` button, opens `/login/phone(/verify)`, arms the auth.users.phone backfill |
+| `PHONE_LOGIN_ENABLED` | server env | `"true"` | THE phone-login switch: shows the `/login` button, opens `/login/phone(/verify)`. (The auth.users.phone mirror is NOT gated by it - see 5f) |
 | `SUPPORTED_PHONE_COUNTRIES` | server env | unset (default: all countries) | THE shared ISO base for every phone workflow (login, verification, change) |
 | `PHONE_LOGIN_COUNTRIES` | server env | unset (default: the shared base) | Narrow-only login override - intersection with the base; set only with a documented legal/provider reason |
 | `TWILIO_ACCOUNT_SID` | server env | `AC...` | Twilio Verify (backend phone-change flow) |
@@ -316,6 +317,79 @@ Google or Apple to access that account.") - no OTP is sent, nothing is
 written, the owner is untouched, and the message names no account
 details. Disposable/blocklisted addresses still get ONE indistinguishable
 neutral rejection (`email_not_allowed`).
+
+## 5f. auth.users.phone sync & reconciliation (service-role mirror)
+
+**Contract: a Twilio-approved verification lands in BOTH stores.** The app
+DB (`User.phoneE164` + `phoneVerifiedAt`) is the source of truth the auth
+gate reads; `auth.users.phone` is a maintained mirror so native phone
+login can key the same uid. The mirror is written by the SERVER-ONLY
+admin client (`src/lib/supabase/admin.ts`, service role,
+`autoRefreshToken/persistSession` off, `server-only` build guard - a
+client-component import fails the build).
+
+**Order of operations** (`confirmPhoneVerification`,
+`src/lib/auth/phone-flow.ts`):
+
+1. Twilio Verify approves the code (never before).
+2. Ownership re-checks: app-level holder AND `auth.users` holder (raw
+   SQL). A number attached to a DIFFERENT auth row 409s exactly like the
+   app-level duplicate - neutral copy, pre-provider.
+3. The app `$transaction` commits `phoneE164` + country metadata +
+   `phoneVerifiedAt` + `phoneSyncStatus = PENDING` (in-tx rival re-check,
+   unique index settles races).
+4. The admin client runs `updateUserById(uid, { phone, phone_confirm:
+   true })`. `phone_confirm` is legitimate exactly because Twilio already
+   approved. **GoTrue stores the phone WITHOUT the leading `+`**
+   (`+353861234501` -> `353861234501`); write E.164, compare via
+   `gotruePhone()`.
+5. Success -> `phoneSyncStatus = SYNCED` and `authCompleted = true` in the
+   same update (an account is "complete" only when both stores agree).
+   Failure or missing `SUPABASE_SERVICE_ROLE_KEY` -> durable
+   `phoneSyncStatus = FAILED` + `phoneSyncErrorCode`
+   (`service_key_missing`, GoTrue error code, `exception`, ...).
+
+**Deliberate semantics (documented choice):** a sync failure never throws
+away the user flow and is never silently "verified-in-full":
+`phoneVerifiedAt` stays set (the business truth - Twilio approved, the
+gate may pass), while `FAILED` keeps the identity mirror visibly
+unreconciled for the admin panel, `POST
+/api/admin/users/[id]/resync-phone` and the reconciliation service. The
+API response shape does not change on sync failure, so the frontend
+(`PhoneCodeStep`, which already waits for the server commit) needed no
+retry copy. Re-approval of the same number on the same account is
+idempotent: `SYNCED` short-circuits (zero provider/admin calls, zero new
+audit rows); `PENDING`/`FAILED` triggers a retry-safe sync attempt only.
+
+**Reconciliation** (`src/lib/services/phone-reconcile.ts`, run via `POST
+/api/admin/phone-reconcile`, RBAC `users:manage`, AdminLog'd):
+
+- app-verified but auth missing/mismatched -> repaired via the admin
+  client when unambiguous (same uid exists, number unheld elsewhere);
+  each repair audited (`phone_auth_sync` + AdminLog).
+- auth phone present with no app claim -> REPORT ONLY (an identity is
+  never auto-stripped).
+- conflicts (number on a different auth row / app row without any auth
+  identity) -> quarantine report + durable `FAILED`
+  (`auth_phone_conflict` / `auth_user_missing`), never auto-fixed.
+- no `SUPABASE_SERVICE_ROLE_KEY` -> `configured: false`, nothing touched.
+
+**Schema notes:** `phoneSyncStatus` is a nullable enum (`NULL` = no
+verified phone). `phoneE164`'s plain `@unique` already behaves as a
+partial unique index (Postgres ignores NULLs), and the column is only
+written on approval - so no `pendingPhoneE164` column is needed (a
+change-in-progress keeps the old number until approval) and
+`phoneCountryIso` carries no index (never queried; verified 2026-07-10).
+`releasePhone`/account teardown clear the sync fields with the number but
+leave `auth.users.phone` for the reconciliation report - identities are
+not mutated without the service key or an explicit admin action.
+
+Tests: `tests/phone-sync.test.ts` (normalization matrix, both-store
+proof - live against a throwaway auth user when the key is present,
+durable-FAILED + reconciliation repair when absent - conflict quarantine,
+idempotency, phone-change timing). `npm run build` + a grep of
+`.next/static` proves the service-role key name never reaches client
+chunks.
 
 ## 6. Auth flow map (code reference)
 

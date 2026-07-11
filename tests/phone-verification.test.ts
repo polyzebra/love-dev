@@ -111,6 +111,13 @@ async function main() {
         phone: NUMBERS.main,
         code: "123456",
         provider: confirm.provider,
+        // Injected succeeding admin client: this suite is about the app-side
+        // claim; the auth.users mirror matrix lives in phone-sync.test.ts.
+        adminSync: {
+          async updateUserById() {
+            return { error: null };
+          },
+        },
       });
       assert.equal(verified.kind, "verified");
       const row = await db.user.findUniqueOrThrow({ where: { id: ids.a } });
@@ -119,6 +126,7 @@ async function main() {
       assert.ok(row.phoneVerifiedAt, "phoneVerifiedAt stamped");
       assert.equal(row.phoneCountryIso, "IE");
       assert.equal(row.phoneDialCode, "+353");
+      assert.equal(row.phoneSyncStatus, "SYNCED");
       assert.equal(row.authCompleted, true);
     });
 

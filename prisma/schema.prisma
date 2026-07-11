@@ -243,6 +243,18 @@ enum PhotoStatus {
 // Identity & access
 // ---------------------------------------------------------------------------
 
+// Disposition of the app-verified phone's mirror into auth.users.phone.
+// NULL = no verified phone. PENDING = app claim committed, auth write not
+// yet confirmed. SYNCED = auth.users.phone equals phoneE164 (GoTrue stores
+// it without the leading '+'). FAILED = admin write failed / service-role
+// key absent - durable state the reconciliation service repairs; the
+// business verification (phoneVerifiedAt) stays true regardless.
+enum PhoneSyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+}
+
 model User {
   id            String        @id @default(cuid())
   email         String        @unique
@@ -266,9 +278,20 @@ model User {
   // admin releasePhone), so an unverified row can never hold a claim and
   // block the number for someone else. Keep it that way.
   phoneE164       String?   @unique
+  // No index on phoneCountryIso: written by the verify flows, read only by
+  // primary key - never filtered/sorted on (verified 2026-07-10). Add one
+  // only when a real query needs it.
   phoneCountryIso String?
   phoneDialCode   String?
   phoneVerifiedAt DateTime?
+  // auth.users.phone sync state (see PhoneSyncStatus above). Written in the
+  // same places as phoneE164: PENDING inside the final-success verify
+  // transaction, then SYNCED/FAILED by the admin sync; releasePhone/teardown
+  // NULL it with the number. No pendingPhoneE164 column: phoneE164 is only
+  // ever written on approval, so a change-in-progress keeps the old number.
+  phoneSyncStatus    PhoneSyncStatus?
+  phoneSyncErrorCode String?
+  phoneSyncUpdatedAt DateTime?
 
   // Auth hardening / risk
   authCompleted     Boolean   @default(false)

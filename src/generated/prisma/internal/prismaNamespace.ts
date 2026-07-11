@@ -2856,6 +2856,9 @@ export const UserScalarFieldEnum = {
   phoneCountryIso: 'phoneCountryIso',
   phoneDialCode: 'phoneDialCode',
   phoneVerifiedAt: 'phoneVerifiedAt',
+  phoneSyncStatus: 'phoneSyncStatus',
+  phoneSyncErrorCode: 'phoneSyncErrorCode',
+  phoneSyncUpdatedAt: 'phoneSyncUpdatedAt',
   authCompleted: 'authCompleted',
   riskScore: 'riskScore',
   bannedAt: 'bannedAt',
@@ -3505,6 +3508,20 @@ export type EnumAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'AccountStatus[]'
  */
 export type ListEnumAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PhoneSyncStatus'
+ */
+export type EnumPhoneSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhoneSyncStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PhoneSyncStatus[]'
+ */
+export type ListEnumPhoneSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhoneSyncStatus[]'>
     
 
 
