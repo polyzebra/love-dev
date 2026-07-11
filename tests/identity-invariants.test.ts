@@ -81,6 +81,18 @@ async function main() {
   };
   const ids = { a: randomUUID(), b: randomUUID(), race: randomUUID() };
 
+  // The phone-conflict invariants below assume LIVE holders. Since the
+  // dead-holder auto-release shipped (docs/IDENTITY.md "Phone-number
+  // lifecycle on deletion"), an app row without an auth.users identity is
+  // an orphan the flows may tear down - so give each actor a real
+  // (throwaway) auth.users row; removed in `finally`.
+  for (const id of Object.values(ids)) {
+    await db.$executeRaw`
+      INSERT INTO auth.users (id, instance_id, aud, role, created_at, updated_at)
+      VALUES (${id}::uuid, '00000000-0000-0000-0000-000000000000'::uuid,
+              'authenticated', 'authenticated', NOW(), NOW())`;
+  }
+
   try {
     // ------------------------------------------------------------ case 1
     console.log("1. two different emails -> two canonical accounts");
@@ -216,6 +228,9 @@ async function main() {
         },
       })
       .catch(() => {});
+    for (const id of Object.values(ids)) {
+      await db.$executeRaw`DELETE FROM auth.users WHERE id = ${id}::uuid`.catch(() => {});
+    }
     await db.$disconnect();
   }
 }

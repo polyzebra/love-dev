@@ -91,6 +91,14 @@ async function main() {
   try {
     for (const key of Object.keys(emails) as (keyof typeof emails)[]) {
       await db.user.create({ data: { id: ids[key], email: emails[key] } });
+      // LIVE holders required: since the dead-holder auto-release shipped
+      // (docs/IDENTITY.md), an app row with no auth.users identity is an
+      // orphan the flows may tear down instead of 409ing. Throwaway rows,
+      // removed in `finally`.
+      await db.$executeRaw`
+        INSERT INTO auth.users (id, instance_id, aud, role, created_at, updated_at)
+        VALUES (${ids[key]}::uuid, '00000000-0000-0000-0000-000000000000'::uuid,
+                'authenticated', 'authenticated', NOW(), NOW())`;
     }
 
     // ------------------------------------------------------------ case 1
@@ -353,6 +361,9 @@ async function main() {
         },
       })
       .catch(() => {});
+    for (const id of Object.values(ids)) {
+      await db.$executeRaw`DELETE FROM auth.users WHERE id = ${id}::uuid`.catch(() => {});
+    }
     await db.$disconnect();
   }
 }

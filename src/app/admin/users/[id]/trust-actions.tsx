@@ -47,6 +47,7 @@ export function TrustActions({
   phoneSyncStatus,
   emailBlocked,
   onboardingDone,
+  canReleaseDeletedPhone,
 }: {
   userId: string;
   banned: boolean;
@@ -56,11 +57,16 @@ export function TrustActions({
   phoneSyncStatus: string | null;
   emailBlocked: boolean;
   onboardingDone: boolean;
+  /** True only for SUPER_ADMIN viewers when the holder is conclusively
+   *  not alive (DELETED, or its auth.users row is gone) - server-decided. */
+  canReleaseDeletedPhone: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [banOpen, setBanOpen] = useState(false);
   const [banReason, setBanReason] = useState("");
+  const [releaseDeletedOpen, setReleaseDeletedOpen] = useState(false);
+  const [releaseDeletedReason, setReleaseDeletedReason] = useState("");
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
 
   function post(endpoint: string, success: string, body?: unknown) {
@@ -79,6 +85,8 @@ export function TrustActions({
         toast.success(success);
         setBanOpen(false);
         setBanReason("");
+        setReleaseDeletedOpen(false);
+        setReleaseDeletedReason("");
         setConfirm(null);
         router.refresh();
       } catch {
@@ -141,6 +149,18 @@ export function TrustActions({
           }
         >
           <PhoneOff className="size-4" /> Release phone
+        </Button>
+      )}
+
+      {canReleaseDeletedPhone && (
+        <Button
+          size="sm"
+          variant="destructive"
+          className="rounded-full"
+          disabled={pending}
+          onClick={() => setReleaseDeletedOpen(true)}
+        >
+          <PhoneOff className="size-4" /> Release phone (deleted account)
         </Button>
       )}
 
@@ -257,6 +277,48 @@ export function TrustActions({
               onClick={() => post(`${base}/ban`, "Account banned.", { reason: banReason.trim() })}
             >
               Ban account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={releaseDeletedOpen} onOpenChange={setReleaseDeletedOpen}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>Release phone from deleted account</DialogTitle>
+            <DialogDescription>
+              This account is not alive (deleted, or its auth identity is gone) but still holds a
+              verified phone number, blocking anyone else from verifying with it. Releasing frees
+              the number; nothing is attached anywhere - the next owner must verify it with a fresh
+              SMS code. A written reason is required and stored in the audit log.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={releaseDeletedReason}
+            onChange={(e) => setReleaseDeletedReason(e.target.value)}
+            placeholder="e.g. orphaned by account deletion - owner asked to reuse the number"
+            rows={3}
+            aria-label="Release reason"
+          />
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              className="rounded-full"
+              onClick={() => setReleaseDeletedOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="rounded-full"
+              disabled={pending || releaseDeletedReason.trim().length < 3}
+              onClick={() =>
+                post(`${base}/release-deleted-phone`, "Phone number released.", {
+                  reason: releaseDeletedReason.trim(),
+                })
+              }
+            >
+              Release number
             </Button>
           </DialogFooter>
         </DialogContent>

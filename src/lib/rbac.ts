@@ -29,6 +29,10 @@ export const PERMISSIONS = {
   // anchor itself, so no delegation below the owner tier.
   "roles:assign": ["SUPER_ADMIN"],
   "diagnostics:view": ["SUPER_ADMIN"],
+  // Releasing a number out of a DELETED/orphaned account moves an auth
+  // factor between identities - supers only (live-account releases stay
+  // under users:manage via the regular release-phone action).
+  "phones:release": ["SUPER_ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

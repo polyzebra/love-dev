@@ -3,7 +3,11 @@ import type { User } from "@/generated/prisma/client";
 import { normalizePhone } from "@/lib/auth/phone-flow";
 import { phoneLoginEnabled } from "@/lib/auth/phone";
 import { getSupportedPhoneCountrySet } from "@/lib/auth/phone-countries";
-import { provisionPhoneLoginUser } from "@/lib/auth/identity";
+import {
+  isReleasablePhoneHolder,
+  provisionPhoneLoginUser,
+  teardownAccount,
+} from "@/lib/auth/identity";
 import {
   resendCooldown,
   checkPhoneLoginSendIpLimit,
@@ -103,6 +107,35 @@ function normalizeForLogin(
 }
 
 /**
+ * The mirror of phone-flow's dead-holder auto-release for the LOGIN flow:
+ * an app owner whose account no longer lives (DELETED shell, or its
+ * auth.users identity was dashboard-deleted) must not hold the number
+ * hostage. Tears the shell down (audited) and reports "no owner" so the
+ * login proceeds as a fresh phone-keyed signup. A LIVE owner is never
+ * touched (isReleasablePhoneHolder fails safe).
+ */
+async function autoReleaseDeadOwner(opts: {
+  owner: { id: string; status: string };
+  phoneE164: string;
+  stage: "send" | "verify";
+  req?: Request;
+}): Promise<boolean> {
+  if (!(await isReleasablePhoneHolder(opts.owner))) return false;
+  await teardownAccount(opts.owner.id, "orphaned phone holder released for phone login");
+  await recordAuthEvent({
+    type: "phone_holder_auto_released",
+    phoneE164: opts.phoneE164,
+    req: opts.req,
+    metadata: {
+      holderId: opts.owner.id,
+      holderStatus: opts.owner.status,
+      flow: `phone_login_${opts.stage}`,
+    },
+  });
+  return true;
+}
+
+/**
  * The auth.users uid currently holding this number, if any. GoTrue stores
  * phone WITHOUT the leading "+" - match both spellings. Returns "unknown"
  * when auth.users is unreadable: the caller must then fall through to the
@@ -158,7 +191,11 @@ export async function sendPhoneLoginCode(opts: {
   // ever end in IDENTITY_CONFLICT - refuse now, before an SMS is burned
   // or GoTrue mints a stray phone-keyed auth user. An unreadable
   // auth.users falls through: the post-verify bridge still guards.
-  const owner = await db.user.findUnique({ where: { phoneE164 } });
+  let owner = await db.user.findUnique({ where: { phoneE164 } });
+  if (owner && (await autoReleaseDeadOwner({ owner, phoneE164, stage: "send", req }))) {
+    // Dead shell released - the number is free; proceed as a fresh signup.
+    owner = null;
+  }
   if (owner) {
     if (owner.bannedAt || owner.status === "SUSPENDED") {
       await recordAuthEvent({
@@ -349,8 +386,17 @@ export async function verifyPhoneLoginCode(opts: {
   // here - no second app account, owner untouched. (The orphan phone-
   // keyed auth.users row GoTrue minted cannot be deleted without a
   // service-role key; it is inert - no app row ever attaches to it - and
-  // the audit trail records it.)
-  const owner = await db.user.findUnique({ where: { phoneE164 } });
+  // the audit trail records it.) One exception, same as the send stage:
+  // an owner that is conclusively dead (DELETED shell / auth user gone)
+  // is auto-released so the fresh phone-keyed signup can proceed.
+  let owner = await db.user.findUnique({ where: { phoneE164 } });
+  if (
+    owner &&
+    owner.id !== authUid &&
+    (await autoReleaseDeadOwner({ owner, phoneE164, stage: "verify", req }))
+  ) {
+    owner = null;
+  }
   if (owner && owner.id !== authUid) {
     return rejectSession("identity_conflict", owner.id);
   }

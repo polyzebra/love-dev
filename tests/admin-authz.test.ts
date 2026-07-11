@@ -61,9 +61,9 @@ async function main() {
   });
 
   await check("ADMIN keeps every pre-existing permission but NOT the supers tier", () => {
+    const supersOnly: string[] = ["roles:assign", "diagnostics:view", "phones:release"];
     for (const p of Object.keys(PERMISSIONS) as (keyof typeof PERMISSIONS)[]) {
-      const expected = p !== "roles:assign" && p !== "diagnostics:view";
-      assert.equal(hasPermission("ADMIN", p), expected, `ADMIN vs ${p}`);
+      assert.equal(hasPermission("ADMIN", p), !supersOnly.includes(p), `ADMIN vs ${p}`);
     }
   });
 

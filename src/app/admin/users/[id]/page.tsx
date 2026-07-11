@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, CircleDashed } from "lucide-react";
 import { db } from "@/lib/db";
 import { requireAdminPage } from "@/lib/auth/require-user";
+import { isAuthUserAlive } from "@/lib/auth/identity";
 import { hasPermission } from "@/lib/rbac";
 import { countryByIso } from "@/lib/auth/countries";
 import { maskPhone } from "@/lib/phone-mask";
@@ -145,6 +146,17 @@ export default async function AdminUserDetailPage({
 
   const banned = Boolean(user.bannedAt) || user.status === "SUSPENDED";
 
+  // "Release phone from deleted account" is offered to supers only, and
+  // only when the holder is conclusively not alive: tombstoned, or its
+  // auth.users identity is gone (dashboard deletion that left the app row
+  // behind). isAuthUserAlive fails SAFE (alive), so the action never shows
+  // for a live account on a flaky auth read.
+  const viewerIsSuper = hasPermission(viewer.role, "phones:release");
+  const holderNotAlive =
+    viewerIsSuper &&
+    Boolean(user.phoneE164) &&
+    (user.status === "DELETED" || !(await isAuthUserAlive(user.id)));
+
   return (
     <>
       <Link
@@ -186,6 +198,7 @@ export default async function AdminUserDetailPage({
         phoneSyncStatus={user.phoneSyncStatus}
         emailBlocked={Boolean(emailBlock)}
         onboardingDone={user.onboardingDone}
+        canReleaseDeletedPhone={holderNotAlive}
       />
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">

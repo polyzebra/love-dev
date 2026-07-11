@@ -64,6 +64,43 @@ path does this automatically.
 2. Optional: disable public sign-ups if deletion should mean banned
    (otherwise use BlockedIdentity).
 
+## Phone-number lifecycle on deletion
+Policy: **hard-delete + tombstone stays the model.** A verified phone is
+an auth factor tied to exactly one account (`User.phoneE164 @unique`),
+and it is FREED when the account dies - on both stores - so the person
+(or anyone else legitimately holding the number) can verify it again on
+a new account. Attachment always requires a fresh OTP; no code path ever
+moves a number between accounts directly.
+
+Both deletion paths free the number:
+- **teardownAccount** (in-app deletion, webhook, orphan takeover): NULLs
+  every phone column on the app row in the teardown transaction, then
+  best-effort clears `auth.users.phone` for the SAME uid (same-database
+  UPDATE - GoTrue's admin API cannot NULL a phone) and records an
+  `phone_released_on_teardown` AuthVerificationEvent.
+- **Dashboard deletion without the webhook** leaves an orphan: an app row
+  whose `auth.users` identity is gone. Such a holder is *conclusively not
+  a live account* (`isReleasablePhoneHolder`: status DELETED, or
+  `isAuthUserAlive` false - fails SAFE to "alive"). When it blocks a
+  claim, the flows auto-release it, the phone twin of `ensureAppUser`'s
+  email-orphan takeover:
+  - phone-change send/verify (`phone-flow.ts`): dead holder -> audited
+    teardown (`phone_holder_auto_released`) and the claim proceeds; a
+    LIVE holder still gets the neutral 409 `duplicate_phone`.
+  - phone-login bridge (`phone-login-flow.ts`): dead owner -> audited
+    teardown, then the login proceeds as a fresh phone-keyed signup.
+- **Admin release from a deleted account** (`releaseDeletedUserPhone`,
+  supers-only route `release-deleted-phone`, rbac `phones:release`):
+  transactional (row locked FOR UPDATE), aborts with typed errors on any
+  ambiguity (live holder, holder mismatch, concurrent change), clears the
+  app claim + the same-uid `auth.users.phone` mirror, preserves all audit
+  rows/messages/photos, and NEVER attaches - an optional `newOwnerUserId`
+  is validated (exists + verified email) only; the new owner must verify
+  via the normal fresh-OTP flow. Audited as AdminLog
+  `admin.phone.release-deleted` (masked number) + AuthVerificationEvent
+  `admin_release_deleted_phone`. The existing `releasePhone`
+  (users:manage) remains the tool for LIVE accounts.
+
 ## Email-lookup policy
 Identity lookups by email are forbidden. Remaining email usages, all allowed:
 password reset + email verification (Supabase-owned), notification

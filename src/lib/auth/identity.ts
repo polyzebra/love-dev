@@ -1,6 +1,6 @@
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
-import { ipHashFrom, userAgentHashFrom } from "@/lib/auth/audit";
+import { ipHashFrom, recordAuthEvent, userAgentHashFrom } from "@/lib/auth/audit";
 import { PLACEHOLDER_EMAIL_SUFFIX } from "@/lib/auth/gate";
 import { Prisma, type User as AppUser } from "@/generated/prisma/client";
 
@@ -28,6 +28,23 @@ export async function isAuthUserAlive(userId: string): Promise<boolean> {
   }
 }
 
+/**
+ * Is this phone holder a shell that may be torn down so the number can be
+ * claimed by someone else? True only when the holder is conclusively not
+ * a live account: tombstoned (DELETED), or its auth.users identity is
+ * gone (dashboard deletion that left the app row behind - the orphan
+ * class ensureAppUser already handles for EMAIL). isAuthUserAlive fails
+ * SAFE (alive on read error), so a live account is never releasable by
+ * accident.
+ */
+export async function isReleasablePhoneHolder(holder: {
+  id: string;
+  status: string;
+}): Promise<boolean> {
+  if (holder.status === "DELETED") return true;
+  return !(await isAuthUserAlive(holder.id));
+}
+
 /** Is this email banned from authenticating (any provider unless scoped)? */
 export async function isIdentityBlocked(email: string, provider?: string): Promise<boolean> {
   const row = await db.blockedIdentity.findUnique({ where: { email: email.toLowerCase() } });
@@ -48,6 +65,7 @@ export async function isIdentityBlocked(email: string, provider?: string): Promi
 export async function teardownAccount(userId: string, reason: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
+  const heldPhone = user.phoneE164 ?? user.phone;
   const tombstone = `deleted+${userId}@tombstone.tirvea.app`;
   await db.$transaction([
     // Anonymized shell - identity gone, email freed for re-registration
@@ -86,6 +104,35 @@ export async function teardownAccount(userId: string, reason: string): Promise<v
     await db.$executeRaw`DELETE FROM storage.objects WHERE bucket_id = 'listing-images' AND name LIKE ${"users/" + userId + "/%"}`;
   } catch (error) {
     console.warn(`[identity] storage cleanup failed for ${userId}: ${String(error).slice(0, 120)}`);
+  }
+  // The PHONE is freed with the account, on BOTH stores. The app columns
+  // were NULLed in the transaction above; if auth.users still mirrors the
+  // number for this same uid (in-app deletion - dashboard deletion removed
+  // the row already), clear it too so the deleted identity cannot keep a
+  // number hostage. GoTrue's admin API cannot NULL a phone (empty string
+  // means "not provided"), so this is a same-database UPDATE, exactly like
+  // the storage cleanup above. Best-effort + audited; never breaks teardown.
+  if (heldPhone) {
+    const bare = heldPhone.replace(/^\+/, "");
+    let authPhoneCleared: "cleared" | "not_needed" | "failed" = "not_needed";
+    try {
+      const cleared = await db.$executeRaw`
+        UPDATE auth.users
+        SET phone = NULL, phone_confirmed_at = NULL, updated_at = NOW()
+        WHERE id::text = ${userId} AND (phone = ${bare} OR phone = ${heldPhone})`;
+      if (cleared > 0) authPhoneCleared = "cleared";
+    } catch (error) {
+      authPhoneCleared = "failed";
+      console.warn(
+        `[identity] auth.users.phone clear failed for ${userId}: ${String(error).slice(0, 120)}`,
+      );
+    }
+    await recordAuthEvent({
+      type: "phone_released_on_teardown",
+      userId,
+      phoneE164: heldPhone,
+      metadata: { reason, authPhoneCleared },
+    });
   }
   console.info(`[identity] account ${userId} deleted (${reason}) - email freed`);
 }

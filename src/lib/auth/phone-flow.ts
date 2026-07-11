@@ -21,6 +21,7 @@ import {
 import { resendCooldown, checkOtpVerifyBlocked } from "@/lib/auth/rate-limit";
 import { getSupportedPhoneCountrySet } from "@/lib/auth/phone-countries";
 import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
+import { isReleasablePhoneHolder, teardownAccount } from "@/lib/auth/identity";
 
 /**
  * The phone-verification flow itself, lifted out of the API routes so the
@@ -31,13 +32,17 @@ import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
  *  1. Normalize to E.164 FIRST. Invalid or region-less input is rejected
  *     before any rate-limit read, any audit write, any provider call.
  *  2. The ownership check runs BEFORE the provider and BEFORE rate-limit
- *     consumption. A number held by ANOTHER account never reaches the
- *     provider, never mutates auth.users, never creates pending state -
- *     the only trace of the attempt is one audit event.
+ *     consumption. A number held by ANOTHER LIVE account never reaches
+ *     the provider, never mutates auth.users, never creates pending
+ *     state - the only trace of the attempt is one audit event. A DEAD
+ *     holder (DELETED shell, or an app row whose auth.users identity was
+ *     dashboard-deleted) is auto-released first - audited teardown, the
+ *     phone twin of ensureAppUser's email-orphan takeover.
  *  3. `User.phoneE164` is written in exactly one place: the final-success
  *     transaction below, together with `phoneVerifiedAt`. Nothing writes
  *     it pre-verification (verified across the codebase - the only other
- *     writers are teardown/releasePhone, which NULL it). That makes the
+ *     writers are teardown/releasePhone/releaseDeletedUserPhone, which
+ *     NULL it). That makes the
  *     plain @unique on phoneE164 equivalent to a partial
  *     "unique-when-verified" index, so the schema stays untouched.
  *  4. The final transaction re-checks the holder and relies on the unique
@@ -101,6 +106,39 @@ function normalizeForChange(raw: string, defaultCountry?: string): NormalizedPho
 }
 
 // ---------------------------------------------------------------------------
+// Dead-holder auto-release (the phone twin of ensureAppUser's email-orphan
+// takeover). A number can be stuck on an account that no longer lives: a
+// DELETED shell (should not happen - teardown clears phones - but defended
+// anyway) or an app row whose auth.users identity was deleted from the
+// dashboard without the webhook. Such a holder is torn down (audited shell
+// teardown, same as the email path) so the claim can proceed. A LIVE
+// holder is NEVER touched - and isReleasablePhoneHolder fails safe.
+// ---------------------------------------------------------------------------
+
+async function tryAutoReleaseDeadHolder(opts: {
+  holder: { id: string; status: string };
+  claimantId: string;
+  phoneE164: string;
+  flow: "phone_change_send" | "phone_change_verify";
+  req?: Request;
+}): Promise<boolean> {
+  if (!(await isReleasablePhoneHolder(opts.holder))) return false;
+  await teardownAccount(opts.holder.id, "orphaned phone holder released for re-claim");
+  await recordAuthEvent({
+    type: "phone_holder_auto_released",
+    phoneE164: opts.phoneE164,
+    userId: opts.claimantId,
+    req: opts.req,
+    metadata: {
+      holderId: opts.holder.id,
+      holderStatus: opts.holder.status,
+      flow: opts.flow,
+    },
+  });
+  return true;
+}
+
+// ---------------------------------------------------------------------------
 // Send
 // ---------------------------------------------------------------------------
 
@@ -142,12 +180,24 @@ export async function sendPhoneVerification(opts: {
   // completed verification, so any other holder means the number belongs
   // to another account - even one under admin-forced re-verification
   // (phoneVerifiedAt cleared, claim kept). Rejecting here guarantees the
-  // rival attempt creates/mutates NOTHING: no provider call, no
-  // auth.users write, no cooldown consumption - one audit row only.
+  // rival attempt creates/mutates NOTHING against a LIVE holder: no
+  // provider call, no auth.users write, no cooldown consumption - one
+  // audit row only. A DEAD holder (DELETED shell / auth user gone) is the
+  // one exception: it is auto-released (audited teardown) and the claim
+  // proceeds - see tryAutoReleaseDeadHolder.
   const holder = await db.user.findUnique({ where: { phoneE164 } });
   if (holder && holder.id !== user.id) {
-    await recordAuthEvent({ type: "phone_otp_send_conflict", phoneE164, userId: user.id, req });
-    return { kind: "duplicate_phone", holderId: holder.id };
+    const released = await tryAutoReleaseDeadHolder({
+      holder,
+      claimantId: user.id,
+      phoneE164,
+      flow: "phone_change_send",
+      req,
+    });
+    if (!released) {
+      await recordAuthEvent({ type: "phone_otp_send_conflict", phoneE164, userId: user.id, req });
+      return { kind: "duplicate_phone", holderId: holder.id };
+    }
   }
   // Same number already verified on THIS account - success, no SMS.
   if (holder && holder.id === user.id && holder.phoneVerifiedAt) {
@@ -418,12 +468,23 @@ export async function confirmPhoneVerification(opts: {
     return { kind: "already_verified", user: fresh ?? self };
   }
 
-  // Ownership BEFORE the provider - a number held by another account is
-  // rejected without consuming the code or touching provider state.
+  // Ownership BEFORE the provider - a number held by another LIVE account
+  // is rejected without consuming the code or touching provider state. A
+  // dead holder (DELETED shell / auth user gone) is auto-released so the
+  // claim can complete (same policy as send).
   const holder = await db.user.findUnique({ where: { phoneE164 } });
   if (holder && holder.id !== user.id) {
-    await recordAuthEvent({ type: "phone_otp_verify_conflict", phoneE164, userId: user.id, req });
-    return { kind: "duplicate_phone", holderId: holder.id };
+    const released = await tryAutoReleaseDeadHolder({
+      holder,
+      claimantId: user.id,
+      phoneE164,
+      flow: "phone_change_verify",
+      req,
+    });
+    if (!released) {
+      await recordAuthEvent({ type: "phone_otp_verify_conflict", phoneE164, userId: user.id, req });
+      return { kind: "duplicate_phone", holderId: holder.id };
+    }
   }
 
   // Same conflict, auth-side: a number attached to a DIFFERENT auth.users

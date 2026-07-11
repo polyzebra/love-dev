@@ -214,6 +214,16 @@ async function main() {
       phoneVerifiedAt: new Date(),
       authCompleted: true,
     });
+    // LIVE owner required: since the dead-holder auto-release shipped
+    // (docs/IDENTITY.md "Phone-number lifecycle on deletion"), an app owner
+    // with no auth.users identity is an orphan the bridge tears down
+    // instead of answering identity_conflict. Throwaway row, removed in
+    // `finally` via seededAuthIds.
+    await db.$executeRaw`
+      INSERT INTO auth.users (id, instance_id, aud, role, created_at, updated_at)
+      VALUES (${ownerId}::uuid, '00000000-0000-0000-0000-000000000000'::uuid,
+              'authenticated', 'authenticated', NOW(), NOW())`;
+    seededAuthIds.push(ownerId);
     await check("owned number -> identity_conflict BEFORE any SMS/client call", async () => {
       const spy = spyClient();
       const outcome = await sendPhoneLoginCode({ phone: NUMBERS.ownerBridge, client: spy.client });

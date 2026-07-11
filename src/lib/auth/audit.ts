@@ -73,6 +73,12 @@ export type AuthEventType =
   // Backfill of auth.users.phone after an app-side phone-change verify
   | "phone_auth_sync"
   | "phone_auth_sync_failed"
+  // Phone-ownership lifecycle: teardown frees the number on both stores;
+  // a dead holder (DELETED shell / auth-user gone) blocking a claim is
+  // auto-released; a super-admin releases a deleted account's number.
+  | "phone_released_on_teardown"
+  | "phone_holder_auto_released"
+  | "admin_release_deleted_phone"
   // Authenticated email ATTACH (/auth/email - separate from anonymous
   // email login; send events double as the flow's rate-limit data)
   | "email_attach_send"
