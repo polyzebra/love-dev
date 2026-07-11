@@ -67,7 +67,7 @@ async function main() {
     const banned = await db.user.findUniqueOrThrow({ where: { id: target.id } });
     check("bannedAt set", banned.bannedAt != null);
     check("banReason stored", banned.banReason === "Spam - test run");
-    check("status SUSPENDED", banned.status === "SUSPENDED");
+    check("status BANNED (trust-safety ladder)", banned.status === "BANNED");
     check("gate routes to /account-blocked", authNextStep(banned) === "/account-blocked");
     const banLog = await db.adminLog.findFirst({
       where: { actorId: admin.id, action: "user.ban", targetId: target.id },

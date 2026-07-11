@@ -36,7 +36,9 @@ async function banContext(): Promise<{ id: string; banReason: string | null } | 
       where: { id: user.id },
       select: { id: true, banReason: true, bannedAt: true, status: true },
     });
-    if (!row || (!row.bannedAt && row.status !== "SUSPENDED")) return null;
+    if (!row || (!row.bannedAt && row.status !== "SUSPENDED" && row.status !== "BANNED")) {
+      return null;
+    }
     return { id: row.id, banReason: row.banReason };
   } catch {
     return null;

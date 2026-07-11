@@ -70,11 +70,31 @@ export async function parseBody<T>(
   return { data: parsed.data, response: null };
 }
 
-/** Authenticated session or a 401 response. */
-export async function requireSession() {
+export const accountRestricted = () =>
+  apiError(
+    403,
+    "account_restricted",
+    "This account is restricted. Visit your account status page for details.",
+  );
+
+/**
+ * Authenticated session or a 401 response.
+ *
+ * Trust & safety: SUSPENDED/BANNED sessions exist (auth() keeps them so the
+ * status/appeal surfaces work) but are refused HERE - the single choke
+ * point for every API route - with 403 account_restricted. The ONLY routes
+ * that may pass `allowRestricted: true` are the account-status read model
+ * and appeal submission.
+ */
+export async function requireSession(opts?: { allowRestricted?: boolean }) {
   const session = await auth();
   if (!session?.user?.id) return { user: null, response: unauthorized() } as const;
-  return { user: session.user, response: null } as const;
+  const { user } = session;
+  const restricted = user.status === "SUSPENDED" || user.status === "BANNED" || !!user.bannedAt;
+  if (restricted && !opts?.allowRestricted) {
+    return { user: null, response: accountRestricted() } as const;
+  }
+  return { user, response: null } as const;
 }
 
 /** Staff session holding a specific permission, or 401/403. */

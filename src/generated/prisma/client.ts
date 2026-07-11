@@ -122,6 +122,31 @@ export type Attachment = Prisma.AttachmentModel
  */
 export type Report = Prisma.ReportModel
 /**
+ * Model ModerationCase
+ * 
+ */
+export type ModerationCase = Prisma.ModerationCaseModel
+/**
+ * Model PhotoModerationResult
+ * 
+ */
+export type PhotoModerationResult = Prisma.PhotoModerationResultModel
+/**
+ * Model AccountViolation
+ * 
+ */
+export type AccountViolation = Prisma.AccountViolationModel
+/**
+ * Model Appeal
+ * 
+ */
+export type Appeal = Prisma.AppealModel
+/**
+ * Model BannedCredential
+ * 
+ */
+export type BannedCredential = Prisma.BannedCredentialModel
+/**
  * Model Block
  * 
  */

@@ -8,7 +8,13 @@ import { hasPermission, type Permission } from "@/lib/rbac";
 
 async function requireActor(permission: Permission) {
   const session = await auth();
-  if (!session?.user?.id || !hasPermission(session.user.role, permission)) {
+  // Status check matters now that auth() keeps suspended/banned sessions
+  // alive for the appeal surfaces - a restricted staff account may not act.
+  if (
+    !session?.user?.id ||
+    session.user.status !== "ACTIVE" ||
+    !hasPermission(session.user.role, permission)
+  ) {
     throw new Error("Forbidden");
   }
   return session.user;

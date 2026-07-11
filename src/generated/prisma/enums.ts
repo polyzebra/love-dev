@@ -21,7 +21,10 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const AccountStatus = {
   ACTIVE: 'ACTIVE',
+  LIMITED: 'LIMITED',
+  PHOTO_REVIEW_REQUIRED: 'PHOTO_REVIEW_REQUIRED',
   SUSPENDED: 'SUSPENDED',
+  BANNED: 'BANNED',
   SHADOW_BANNED: 'SHADOW_BANNED',
   DEACTIVATED: 'DEACTIVATED',
   DELETED: 'DELETED'
@@ -319,6 +322,108 @@ export const PhoneSyncStatus = {
 } as const
 
 export type PhoneSyncStatus = (typeof PhoneSyncStatus)[keyof typeof PhoneSyncStatus]
+
+
+export const ModerationCaseType = {
+  PHOTO_MISMATCH: 'PHOTO_MISMATCH',
+  STOLEN_IMAGES: 'STOLEN_IMAGES',
+  EXPLICIT_CONTENT: 'EXPLICIT_CONTENT',
+  MINOR_SAFETY: 'MINOR_SAFETY',
+  IMPERSONATION: 'IMPERSONATION',
+  SPAM: 'SPAM',
+  HARASSMENT: 'HARASSMENT',
+  SCAM: 'SCAM',
+  PAYMENT_ABUSE: 'PAYMENT_ABUSE',
+  OTHER: 'OTHER'
+} as const
+
+export type ModerationCaseType = (typeof ModerationCaseType)[keyof typeof ModerationCaseType]
+
+
+export const ModerationCaseStatus = {
+  OPEN: 'OPEN',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  ACTION_TAKEN: 'ACTION_TAKEN',
+  DISMISSED: 'DISMISSED',
+  APPEALED: 'APPEALED',
+  REVERSED: 'REVERSED'
+} as const
+
+export type ModerationCaseStatus = (typeof ModerationCaseStatus)[keyof typeof ModerationCaseStatus]
+
+
+export const CaseSeverity = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+} as const
+
+export type CaseSeverity = (typeof CaseSeverity)[keyof typeof CaseSeverity]
+
+
+export const CaseSource = {
+  AUTOMATED: 'AUTOMATED',
+  USER_REPORT: 'USER_REPORT',
+  ADMIN: 'ADMIN',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type CaseSource = (typeof CaseSource)[keyof typeof CaseSource]
+
+
+export const PhotoModerationResultStatus = {
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  NEEDS_REVIEW: 'NEEDS_REVIEW',
+  FAILED: 'FAILED'
+} as const
+
+export type PhotoModerationResultStatus = (typeof PhotoModerationResultStatus)[keyof typeof PhotoModerationResultStatus]
+
+
+export const EnforcementAction = {
+  WARNING: 'WARNING',
+  PHOTO_REMOVED: 'PHOTO_REMOVED',
+  UPLOAD_BLOCKED: 'UPLOAD_BLOCKED',
+  LIMITED: 'LIMITED',
+  SUSPENDED: 'SUSPENDED',
+  BANNED: 'BANNED'
+} as const
+
+export type EnforcementAction = (typeof EnforcementAction)[keyof typeof EnforcementAction]
+
+
+export const AppealStatus = {
+  SUBMITTED: 'SUBMITTED',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type AppealStatus = (typeof AppealStatus)[keyof typeof AppealStatus]
+
+
+export const BannedCredentialKind = {
+  PHONE: 'PHONE',
+  DEVICE: 'DEVICE'
+} as const
+
+export type BannedCredentialKind = (typeof BannedCredentialKind)[keyof typeof BannedCredentialKind]
+
+
+export const SafetyRecommendedAction = {
+  NO_ACTION: 'NO_ACTION',
+  SHOW_WARNING: 'SHOW_WARNING',
+  REQUIRE_PHOTO_VERIFICATION: 'REQUIRE_PHOTO_VERIFICATION',
+  HIDE_PROFILE: 'HIDE_PROFILE',
+  LIMIT_MESSAGING: 'LIMIT_MESSAGING',
+  SUSPEND_ACCOUNT: 'SUSPEND_ACCOUNT',
+  BAN_ACCOUNT: 'BAN_ACCOUNT',
+  SEND_TO_MANUAL_REVIEW: 'SEND_TO_MANUAL_REVIEW'
+} as const
+
+export type SafetyRecommendedAction = (typeof SafetyRecommendedAction)[keyof typeof SafetyRecommendedAction]
 
 
 export const ExploreGroup = {

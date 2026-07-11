@@ -5,6 +5,11 @@ import { planTierOf, recordSwipe, swipesRemainingToday, undoLastSwipe } from "@/
 import { schedulePushDispatch } from "@/lib/services/notify";
 import { SWIPE_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
+import {
+  canEngage,
+  isDiscoverableStatus,
+  sweepExpiredRestrictions,
+} from "@/lib/services/trust-safety";
 
 export async function POST(req: Request) {
   const { user, response } = await requireSession();
@@ -18,11 +23,23 @@ export async function POST(req: Request) {
 
   if (data.toId === user.id) return apiError(400, "invalid_target", "You cannot swipe on yourself.");
 
+  // LIMITED accounts keep read access but cannot send likes (trust-safety
+  // ladder). Suspended/banned never reach here - requireSession refused.
+  // The sweep returns fresh status so an expired restriction lifts itself.
+  const status = (await sweepExpiredRestrictions(user.id)) ?? user.status;
+  if (data.action !== "PASS" && !canEngage(status)) {
+    return apiError(
+      403,
+      "account_limited",
+      "Sending likes is paused on your account for now. Check your account status for details.",
+    );
+  }
+
   const target = await db.user.findUnique({
     where: { id: data.toId },
     select: { status: true },
   });
-  if (!target || target.status !== "ACTIVE") {
+  if (!target || !isDiscoverableStatus(target.status)) {
     return apiError(404, "not_found", "This profile is no longer available.");
   }
 

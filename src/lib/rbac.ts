@@ -25,6 +25,11 @@ export const PERMISSIONS = {
   "settings:manage": ["ADMIN", "SUPER_ADMIN"],
   "audit:read": ["ADMIN", "SUPER_ADMIN"],
   "analytics:read": ["MODERATOR", "ADMIN", "SUPER_ADMIN"],
+  // Trust & safety: moderators may READ cases/appeals queues; decisions
+  // (case review, appeal decisions, enforcement, trust recompute) change
+  // what can authenticate/engage, so ADMIN+ only.
+  "safety:read": ["MODERATOR", "ADMIN", "SUPER_ADMIN"],
+  "safety:manage": ["ADMIN", "SUPER_ADMIN"],
   // Supers-only tier. Role changes and auth diagnostics touch the trust
   // anchor itself, so no delegation below the owner tier.
   "roles:assign": ["SUPER_ADMIN"],

@@ -30,12 +30,14 @@ export type UserAvgAggregateOutputType = {
   riskScore: number | null
   deviceCount: number | null
   scamScore: number | null
+  safetyRiskScore: number | null
 }
 
 export type UserSumAggregateOutputType = {
   riskScore: number | null
   deviceCount: number | null
   scamScore: number | null
+  safetyRiskScore: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -70,6 +72,10 @@ export type UserMinAggregateOutputType = {
   scamScore: number | null
   riskReason: string | null
   riskUpdatedAt: Date | null
+  safetyRiskScore: number | null
+  safetyRiskReasons: string | null
+  safetyRecommendedAction: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt: Date | null
   ageConfirmedAt: Date | null
   ageConfirmedIpHash: string | null
   termsVersion: string | null
@@ -121,6 +127,10 @@ export type UserMaxAggregateOutputType = {
   scamScore: number | null
   riskReason: string | null
   riskUpdatedAt: Date | null
+  safetyRiskScore: number | null
+  safetyRiskReasons: string | null
+  safetyRecommendedAction: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt: Date | null
   ageConfirmedAt: Date | null
   ageConfirmedIpHash: string | null
   termsVersion: string | null
@@ -172,6 +182,10 @@ export type UserCountAggregateOutputType = {
   scamScore: number
   riskReason: number
   riskUpdatedAt: number
+  safetyRiskScore: number
+  safetyRiskReasons: number
+  safetyRecommendedAction: number
+  safetyRiskUpdatedAt: number
   ageConfirmedAt: number
   ageConfirmedIpHash: number
   termsVersion: number
@@ -197,12 +211,14 @@ export type UserAvgAggregateInputType = {
   riskScore?: true
   deviceCount?: true
   scamScore?: true
+  safetyRiskScore?: true
 }
 
 export type UserSumAggregateInputType = {
   riskScore?: true
   deviceCount?: true
   scamScore?: true
+  safetyRiskScore?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -237,6 +253,10 @@ export type UserMinAggregateInputType = {
   scamScore?: true
   riskReason?: true
   riskUpdatedAt?: true
+  safetyRiskScore?: true
+  safetyRiskReasons?: true
+  safetyRecommendedAction?: true
+  safetyRiskUpdatedAt?: true
   ageConfirmedAt?: true
   ageConfirmedIpHash?: true
   termsVersion?: true
@@ -288,6 +308,10 @@ export type UserMaxAggregateInputType = {
   scamScore?: true
   riskReason?: true
   riskUpdatedAt?: true
+  safetyRiskScore?: true
+  safetyRiskReasons?: true
+  safetyRecommendedAction?: true
+  safetyRiskUpdatedAt?: true
   ageConfirmedAt?: true
   ageConfirmedIpHash?: true
   termsVersion?: true
@@ -339,6 +363,10 @@ export type UserCountAggregateInputType = {
   scamScore?: true
   riskReason?: true
   riskUpdatedAt?: true
+  safetyRiskScore?: true
+  safetyRiskReasons?: true
+  safetyRecommendedAction?: true
+  safetyRiskUpdatedAt?: true
   ageConfirmedAt?: true
   ageConfirmedIpHash?: true
   termsVersion?: true
@@ -477,6 +505,10 @@ export type UserGroupByOutputType = {
   scamScore: number
   riskReason: string | null
   riskUpdatedAt: Date | null
+  safetyRiskScore: number
+  safetyRiskReasons: string | null
+  safetyRecommendedAction: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt: Date | null
   ageConfirmedAt: Date | null
   ageConfirmedIpHash: string | null
   termsVersion: string | null
@@ -551,6 +583,10 @@ export type UserWhereInput = {
   scamScore?: Prisma.IntFilter<"User"> | number
   riskReason?: Prisma.StringNullableFilter<"User"> | string | null
   riskUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  safetyRiskScore?: Prisma.IntFilter<"User"> | number
+  safetyRiskReasons?: Prisma.StringNullableFilter<"User"> | string | null
+  safetyRecommendedAction?: Prisma.EnumSafetyRecommendedActionNullableFilter<"User"> | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   ageConfirmedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   ageConfirmedIpHash?: Prisma.StringNullableFilter<"User"> | string | null
   termsVersion?: Prisma.StringNullableFilter<"User"> | string | null
@@ -593,6 +629,9 @@ export type UserWhereInput = {
   explorePreferences?: Prisma.UserExplorePreferenceListRelationFilter
   adminLogs?: Prisma.AdminLogListRelationFilter
   authEvents?: Prisma.AuthVerificationEventListRelationFilter
+  moderationCases?: Prisma.ModerationCaseListRelationFilter
+  violations?: Prisma.AccountViolationListRelationFilter
+  appeals?: Prisma.AppealListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -627,6 +666,10 @@ export type UserOrderByWithRelationInput = {
   scamScore?: Prisma.SortOrder
   riskReason?: Prisma.SortOrderInput | Prisma.SortOrder
   riskUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
+  safetyRiskReasons?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyRecommendedAction?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyRiskUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   ageConfirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   ageConfirmedIpHash?: Prisma.SortOrderInput | Prisma.SortOrder
   termsVersion?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -669,6 +712,9 @@ export type UserOrderByWithRelationInput = {
   explorePreferences?: Prisma.UserExplorePreferenceOrderByRelationAggregateInput
   adminLogs?: Prisma.AdminLogOrderByRelationAggregateInput
   authEvents?: Prisma.AuthVerificationEventOrderByRelationAggregateInput
+  moderationCases?: Prisma.ModerationCaseOrderByRelationAggregateInput
+  violations?: Prisma.AccountViolationOrderByRelationAggregateInput
+  appeals?: Prisma.AppealOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -706,6 +752,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   scamScore?: Prisma.IntFilter<"User"> | number
   riskReason?: Prisma.StringNullableFilter<"User"> | string | null
   riskUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  safetyRiskScore?: Prisma.IntFilter<"User"> | number
+  safetyRiskReasons?: Prisma.StringNullableFilter<"User"> | string | null
+  safetyRecommendedAction?: Prisma.EnumSafetyRecommendedActionNullableFilter<"User"> | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   ageConfirmedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   ageConfirmedIpHash?: Prisma.StringNullableFilter<"User"> | string | null
   termsVersion?: Prisma.StringNullableFilter<"User"> | string | null
@@ -748,6 +798,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   explorePreferences?: Prisma.UserExplorePreferenceListRelationFilter
   adminLogs?: Prisma.AdminLogListRelationFilter
   authEvents?: Prisma.AuthVerificationEventListRelationFilter
+  moderationCases?: Prisma.ModerationCaseListRelationFilter
+  violations?: Prisma.AccountViolationListRelationFilter
+  appeals?: Prisma.AppealListRelationFilter
 }, "id" | "email" | "phone" | "phoneE164">
 
 export type UserOrderByWithAggregationInput = {
@@ -782,6 +835,10 @@ export type UserOrderByWithAggregationInput = {
   scamScore?: Prisma.SortOrder
   riskReason?: Prisma.SortOrderInput | Prisma.SortOrder
   riskUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
+  safetyRiskReasons?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyRecommendedAction?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyRiskUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   ageConfirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   ageConfirmedIpHash?: Prisma.SortOrderInput | Prisma.SortOrder
   termsVersion?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -841,6 +898,10 @@ export type UserScalarWhereWithAggregatesInput = {
   scamScore?: Prisma.IntWithAggregatesFilter<"User"> | number
   riskReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   riskUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  safetyRiskScore?: Prisma.IntWithAggregatesFilter<"User"> | number
+  safetyRiskReasons?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  safetyRecommendedAction?: Prisma.EnumSafetyRecommendedActionNullableWithAggregatesFilter<"User"> | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   ageConfirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   ageConfirmedIpHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   termsVersion?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -892,6 +953,10 @@ export type UserCreateInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -934,6 +999,9 @@ export type UserCreateInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -968,6 +1036,10 @@ export type UserUncheckedCreateInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -1010,6 +1082,9 @@ export type UserUncheckedCreateInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -1044,6 +1119,10 @@ export type UserUpdateInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1086,6 +1165,9 @@ export type UserUpdateInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -1120,6 +1202,10 @@ export type UserUncheckedUpdateInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1162,6 +1248,9 @@ export type UserUncheckedUpdateInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1196,6 +1285,10 @@ export type UserCreateManyInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -1247,6 +1340,10 @@ export type UserUpdateManyMutationInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1298,6 +1395,10 @@ export type UserUncheckedUpdateManyInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1349,6 +1450,10 @@ export type UserCountOrderByAggregateInput = {
   scamScore?: Prisma.SortOrder
   riskReason?: Prisma.SortOrder
   riskUpdatedAt?: Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
+  safetyRiskReasons?: Prisma.SortOrder
+  safetyRecommendedAction?: Prisma.SortOrder
+  safetyRiskUpdatedAt?: Prisma.SortOrder
   ageConfirmedAt?: Prisma.SortOrder
   ageConfirmedIpHash?: Prisma.SortOrder
   termsVersion?: Prisma.SortOrder
@@ -1372,6 +1477,7 @@ export type UserAvgOrderByAggregateInput = {
   riskScore?: Prisma.SortOrder
   deviceCount?: Prisma.SortOrder
   scamScore?: Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -1406,6 +1512,10 @@ export type UserMaxOrderByAggregateInput = {
   scamScore?: Prisma.SortOrder
   riskReason?: Prisma.SortOrder
   riskUpdatedAt?: Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
+  safetyRiskReasons?: Prisma.SortOrder
+  safetyRecommendedAction?: Prisma.SortOrder
+  safetyRiskUpdatedAt?: Prisma.SortOrder
   ageConfirmedAt?: Prisma.SortOrder
   ageConfirmedIpHash?: Prisma.SortOrder
   termsVersion?: Prisma.SortOrder
@@ -1457,6 +1567,10 @@ export type UserMinOrderByAggregateInput = {
   scamScore?: Prisma.SortOrder
   riskReason?: Prisma.SortOrder
   riskUpdatedAt?: Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
+  safetyRiskReasons?: Prisma.SortOrder
+  safetyRecommendedAction?: Prisma.SortOrder
+  safetyRiskUpdatedAt?: Prisma.SortOrder
   ageConfirmedAt?: Prisma.SortOrder
   ageConfirmedIpHash?: Prisma.SortOrder
   termsVersion?: Prisma.SortOrder
@@ -1480,6 +1594,7 @@ export type UserSumOrderByAggregateInput = {
   riskScore?: Prisma.SortOrder
   deviceCount?: Prisma.SortOrder
   scamScore?: Prisma.SortOrder
+  safetyRiskScore?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1526,6 +1641,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput = {
+  set?: $Enums.SafetyRecommendedAction | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1728,6 +1847,48 @@ export type UserUpdateOneRequiredWithoutReportsReceivedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReportsReceivedInput, Prisma.UserUpdateWithoutReportsReceivedInput>, Prisma.UserUncheckedUpdateWithoutReportsReceivedInput>
 }
 
+export type UserCreateNestedOneWithoutModerationCasesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModerationCasesInput, Prisma.UserUncheckedCreateWithoutModerationCasesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModerationCasesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutModerationCasesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModerationCasesInput, Prisma.UserUncheckedCreateWithoutModerationCasesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModerationCasesInput
+  upsert?: Prisma.UserUpsertWithoutModerationCasesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutModerationCasesInput, Prisma.UserUpdateWithoutModerationCasesInput>, Prisma.UserUncheckedUpdateWithoutModerationCasesInput>
+}
+
+export type UserCreateNestedOneWithoutViolationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutViolationsInput, Prisma.UserUncheckedCreateWithoutViolationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutViolationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutViolationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutViolationsInput, Prisma.UserUncheckedCreateWithoutViolationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutViolationsInput
+  upsert?: Prisma.UserUpsertWithoutViolationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutViolationsInput, Prisma.UserUpdateWithoutViolationsInput>, Prisma.UserUncheckedUpdateWithoutViolationsInput>
+}
+
+export type UserCreateNestedOneWithoutAppealsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAppealsInput, Prisma.UserUncheckedCreateWithoutAppealsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAppealsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAppealsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAppealsInput, Prisma.UserUncheckedCreateWithoutAppealsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAppealsInput
+  upsert?: Prisma.UserUpsertWithoutAppealsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAppealsInput, Prisma.UserUpdateWithoutAppealsInput>, Prisma.UserUncheckedUpdateWithoutAppealsInput>
+}
+
 export type UserCreateNestedOneWithoutBlocksMadeInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBlocksMadeInput, Prisma.UserUncheckedCreateWithoutBlocksMadeInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBlocksMadeInput
@@ -1916,6 +2077,10 @@ export type UserCreateWithoutDevicesInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -1957,6 +2122,9 @@ export type UserCreateWithoutDevicesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDevicesInput = {
@@ -1991,6 +2159,10 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2032,6 +2204,9 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDevicesInput = {
@@ -2082,6 +2257,10 @@ export type UserUpdateWithoutDevicesInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2123,6 +2302,9 @@ export type UserUpdateWithoutDevicesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDevicesInput = {
@@ -2157,6 +2339,10 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2198,6 +2384,9 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -2232,6 +2421,10 @@ export type UserCreateWithoutProfileInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2273,6 +2466,9 @@ export type UserCreateWithoutProfileInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -2307,6 +2503,10 @@ export type UserUncheckedCreateWithoutProfileInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2348,6 +2548,9 @@ export type UserUncheckedCreateWithoutProfileInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -2398,6 +2601,10 @@ export type UserUpdateWithoutProfileInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2439,6 +2646,9 @@ export type UserUpdateWithoutProfileInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -2473,6 +2683,10 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2514,6 +2728,9 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPhotosInput = {
@@ -2548,6 +2765,10 @@ export type UserCreateWithoutPhotosInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2589,6 +2810,9 @@ export type UserCreateWithoutPhotosInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPhotosInput = {
@@ -2623,6 +2847,10 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2664,6 +2892,9 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPhotosInput = {
@@ -2714,6 +2945,10 @@ export type UserUpdateWithoutPhotosInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2755,6 +2990,9 @@ export type UserUpdateWithoutPhotosInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPhotosInput = {
@@ -2789,6 +3027,10 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2830,6 +3072,9 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVerificationsInput = {
@@ -2864,6 +3109,10 @@ export type UserCreateWithoutVerificationsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2905,6 +3154,9 @@ export type UserCreateWithoutVerificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVerificationsInput = {
@@ -2939,6 +3191,10 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -2980,6 +3236,9 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVerificationsInput = {
@@ -3030,6 +3289,10 @@ export type UserUpdateWithoutVerificationsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3071,6 +3334,9 @@ export type UserUpdateWithoutVerificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerificationsInput = {
@@ -3105,6 +3371,10 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3146,6 +3416,9 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLikesSentInput = {
@@ -3180,6 +3453,10 @@ export type UserCreateWithoutLikesSentInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -3221,6 +3498,9 @@ export type UserCreateWithoutLikesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesSentInput = {
@@ -3255,6 +3535,10 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -3296,6 +3580,9 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesSentInput = {
@@ -3335,6 +3622,10 @@ export type UserCreateWithoutLikesReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -3376,6 +3667,9 @@ export type UserCreateWithoutLikesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesReceivedInput = {
@@ -3410,6 +3704,10 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -3451,6 +3749,9 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesReceivedInput = {
@@ -3501,6 +3802,10 @@ export type UserUpdateWithoutLikesSentInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3542,6 +3847,9 @@ export type UserUpdateWithoutLikesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesSentInput = {
@@ -3576,6 +3884,10 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3617,6 +3929,9 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutLikesReceivedInput = {
@@ -3662,6 +3977,10 @@ export type UserUpdateWithoutLikesReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3703,6 +4022,9 @@ export type UserUpdateWithoutLikesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesReceivedInput = {
@@ -3737,6 +4059,10 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3778,6 +4104,9 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMatchesAsAInput = {
@@ -3812,6 +4141,10 @@ export type UserCreateWithoutMatchesAsAInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -3853,6 +4186,9 @@ export type UserCreateWithoutMatchesAsAInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMatchesAsAInput = {
@@ -3887,6 +4223,10 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -3928,6 +4268,9 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMatchesAsAInput = {
@@ -3967,6 +4310,10 @@ export type UserCreateWithoutMatchesAsBInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -4008,6 +4355,9 @@ export type UserCreateWithoutMatchesAsBInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMatchesAsBInput = {
@@ -4042,6 +4392,10 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -4083,6 +4437,9 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMatchesAsBInput = {
@@ -4133,6 +4490,10 @@ export type UserUpdateWithoutMatchesAsAInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4174,6 +4535,9 @@ export type UserUpdateWithoutMatchesAsAInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMatchesAsAInput = {
@@ -4208,6 +4572,10 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4249,6 +4617,9 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutMatchesAsBInput = {
@@ -4294,6 +4665,10 @@ export type UserUpdateWithoutMatchesAsBInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4335,6 +4710,9 @@ export type UserUpdateWithoutMatchesAsBInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMatchesAsBInput = {
@@ -4369,6 +4747,10 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4410,6 +4792,9 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFirstMessagesSentInput = {
@@ -4444,6 +4829,10 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -4485,6 +4874,9 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
@@ -4519,6 +4911,10 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -4560,6 +4956,9 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFirstMessagesSentInput = {
@@ -4599,6 +4998,10 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -4640,6 +5043,9 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
@@ -4674,6 +5080,10 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -4715,6 +5125,9 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFirstMessagesReceivedInput = {
@@ -4765,6 +5178,10 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4806,6 +5223,9 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
@@ -4840,6 +5260,10 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4881,6 +5305,9 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutFirstMessagesReceivedInput = {
@@ -4926,6 +5353,10 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4967,6 +5398,9 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
@@ -5001,6 +5435,10 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5042,6 +5480,9 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutParticipantsInput = {
@@ -5076,6 +5517,10 @@ export type UserCreateWithoutParticipantsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5117,6 +5562,9 @@ export type UserCreateWithoutParticipantsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutParticipantsInput = {
@@ -5151,6 +5599,10 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5192,6 +5644,9 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutParticipantsInput = {
@@ -5242,6 +5697,10 @@ export type UserUpdateWithoutParticipantsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5283,6 +5742,9 @@ export type UserUpdateWithoutParticipantsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutParticipantsInput = {
@@ -5317,6 +5779,10 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5358,6 +5824,9 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -5392,6 +5861,10 @@ export type UserCreateWithoutMessagesInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5433,6 +5906,9 @@ export type UserCreateWithoutMessagesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
@@ -5467,6 +5943,10 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5508,6 +5988,9 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -5558,6 +6041,10 @@ export type UserUpdateWithoutMessagesInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5599,6 +6086,9 @@ export type UserUpdateWithoutMessagesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -5633,6 +6123,10 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5674,6 +6168,9 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportsMadeInput = {
@@ -5708,6 +6205,10 @@ export type UserCreateWithoutReportsMadeInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5749,6 +6250,9 @@ export type UserCreateWithoutReportsMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsMadeInput = {
@@ -5783,6 +6287,10 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5824,6 +6332,9 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsMadeInput = {
@@ -5863,6 +6374,10 @@ export type UserCreateWithoutReportsReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5904,6 +6419,9 @@ export type UserCreateWithoutReportsReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsReceivedInput = {
@@ -5938,6 +6456,10 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -5979,6 +6501,9 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsReceivedInput = {
@@ -6029,6 +6554,10 @@ export type UserUpdateWithoutReportsMadeInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6070,6 +6599,9 @@ export type UserUpdateWithoutReportsMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsMadeInput = {
@@ -6104,6 +6636,10 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6145,6 +6681,9 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportsReceivedInput = {
@@ -6190,6 +6729,10 @@ export type UserUpdateWithoutReportsReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6231,6 +6774,9 @@ export type UserUpdateWithoutReportsReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsReceivedInput = {
@@ -6265,6 +6811,10 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6306,6 +6856,1041 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutModerationCasesInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutModerationCasesInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutModerationCasesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutModerationCasesInput, Prisma.UserUncheckedCreateWithoutModerationCasesInput>
+}
+
+export type UserUpsertWithoutModerationCasesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutModerationCasesInput, Prisma.UserUncheckedUpdateWithoutModerationCasesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutModerationCasesInput, Prisma.UserUncheckedCreateWithoutModerationCasesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutModerationCasesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutModerationCasesInput, Prisma.UserUncheckedUpdateWithoutModerationCasesInput>
+}
+
+export type UserUpdateWithoutModerationCasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutModerationCasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutViolationsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutViolationsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutViolationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutViolationsInput, Prisma.UserUncheckedCreateWithoutViolationsInput>
+}
+
+export type UserUpsertWithoutViolationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutViolationsInput, Prisma.UserUncheckedUpdateWithoutViolationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutViolationsInput, Prisma.UserUncheckedCreateWithoutViolationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutViolationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutViolationsInput, Prisma.UserUncheckedUpdateWithoutViolationsInput>
+}
+
+export type UserUpdateWithoutViolationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutViolationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAppealsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAppealsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAppealsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAppealsInput, Prisma.UserUncheckedCreateWithoutAppealsInput>
+}
+
+export type UserUpsertWithoutAppealsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAppealsInput, Prisma.UserUncheckedUpdateWithoutAppealsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAppealsInput, Prisma.UserUncheckedCreateWithoutAppealsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAppealsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAppealsInput, Prisma.UserUncheckedUpdateWithoutAppealsInput>
+}
+
+export type UserUpdateWithoutAppealsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAppealsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBlocksMadeInput = {
@@ -6340,6 +7925,10 @@ export type UserCreateWithoutBlocksMadeInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -6381,6 +7970,9 @@ export type UserCreateWithoutBlocksMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBlocksMadeInput = {
@@ -6415,6 +8007,10 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -6456,6 +8052,9 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBlocksMadeInput = {
@@ -6495,6 +8094,10 @@ export type UserCreateWithoutBlocksReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -6536,6 +8139,9 @@ export type UserCreateWithoutBlocksReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBlocksReceivedInput = {
@@ -6570,6 +8176,10 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -6611,6 +8221,9 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBlocksReceivedInput = {
@@ -6661,6 +8274,10 @@ export type UserUpdateWithoutBlocksMadeInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6702,6 +8319,9 @@ export type UserUpdateWithoutBlocksMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlocksMadeInput = {
@@ -6736,6 +8356,10 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6777,6 +8401,9 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutBlocksReceivedInput = {
@@ -6822,6 +8449,10 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6863,6 +8494,9 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
@@ -6897,6 +8531,10 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6938,6 +8576,9 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubscriptionInput = {
@@ -6972,6 +8613,10 @@ export type UserCreateWithoutSubscriptionInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7013,6 +8658,9 @@ export type UserCreateWithoutSubscriptionInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubscriptionInput = {
@@ -7047,6 +8695,10 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7088,6 +8740,9 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubscriptionInput = {
@@ -7138,6 +8793,10 @@ export type UserUpdateWithoutSubscriptionInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7179,6 +8838,9 @@ export type UserUpdateWithoutSubscriptionInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscriptionInput = {
@@ -7213,6 +8875,10 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7254,6 +8920,9 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentsInput = {
@@ -7288,6 +8957,10 @@ export type UserCreateWithoutPaymentsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7329,6 +9002,9 @@ export type UserCreateWithoutPaymentsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentsInput = {
@@ -7363,6 +9039,10 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7404,6 +9084,9 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentsInput = {
@@ -7454,6 +9137,10 @@ export type UserUpdateWithoutPaymentsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7495,6 +9182,9 @@ export type UserUpdateWithoutPaymentsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentsInput = {
@@ -7529,6 +9219,10 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7570,6 +9264,9 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -7604,6 +9301,10 @@ export type UserCreateWithoutNotificationsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7645,6 +9346,9 @@ export type UserCreateWithoutNotificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -7679,6 +9383,10 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7720,6 +9428,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -7770,6 +9481,10 @@ export type UserUpdateWithoutNotificationsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7811,6 +9526,9 @@ export type UserUpdateWithoutNotificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -7845,6 +9563,10 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7886,6 +9608,9 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPushSubscriptionsInput = {
@@ -7920,6 +9645,10 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -7961,6 +9690,9 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -7995,6 +9727,10 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8036,6 +9772,9 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -8086,6 +9825,10 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8127,6 +9870,9 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -8161,6 +9907,10 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8202,6 +9952,9 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationPresenceInput = {
@@ -8236,6 +9989,10 @@ export type UserCreateWithoutConversationPresenceInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8277,6 +10034,9 @@ export type UserCreateWithoutConversationPresenceInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationPresenceInput = {
@@ -8311,6 +10071,10 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8352,6 +10116,9 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationPresenceInput = {
@@ -8402,6 +10169,10 @@ export type UserUpdateWithoutConversationPresenceInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8443,6 +10214,9 @@ export type UserUpdateWithoutConversationPresenceInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationPresenceInput = {
@@ -8477,6 +10251,10 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8518,6 +10296,9 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdminLogsInput = {
@@ -8552,6 +10333,10 @@ export type UserCreateWithoutAdminLogsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8593,6 +10378,9 @@ export type UserCreateWithoutAdminLogsInput = {
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminLogsInput = {
@@ -8627,6 +10415,10 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8668,6 +10460,9 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminLogsInput = {
@@ -8718,6 +10513,10 @@ export type UserUpdateWithoutAdminLogsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8759,6 +10558,9 @@ export type UserUpdateWithoutAdminLogsInput = {
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminLogsInput = {
@@ -8793,6 +10595,10 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8834,6 +10640,9 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExplorePreferencesInput = {
@@ -8868,6 +10677,10 @@ export type UserCreateWithoutExplorePreferencesInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8909,6 +10722,9 @@ export type UserCreateWithoutExplorePreferencesInput = {
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExplorePreferencesInput = {
@@ -8943,6 +10759,10 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -8984,6 +10804,9 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExplorePreferencesInput = {
@@ -9034,6 +10857,10 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9075,6 +10902,9 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
@@ -9109,6 +10939,10 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9150,6 +10984,9 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthEventsInput = {
@@ -9184,6 +11021,10 @@ export type UserCreateWithoutAuthEventsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -9225,6 +11066,9 @@ export type UserCreateWithoutAuthEventsInput = {
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthEventsInput = {
@@ -9259,6 +11103,10 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -9300,6 +11148,9 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthEventsInput = {
@@ -9350,6 +11201,10 @@ export type UserUpdateWithoutAuthEventsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9391,6 +11246,9 @@ export type UserUpdateWithoutAuthEventsInput = {
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthEventsInput = {
@@ -9425,6 +11283,10 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9466,6 +11328,9 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSettingsInput = {
@@ -9500,6 +11365,10 @@ export type UserCreateWithoutSettingsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -9541,6 +11410,9 @@ export type UserCreateWithoutSettingsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -9575,6 +11447,10 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   scamScore?: number
   riskReason?: string | null
   riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
   ageConfirmedAt?: Date | string | null
   ageConfirmedIpHash?: string | null
   termsVersion?: string | null
@@ -9616,6 +11492,9 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
   authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -9666,6 +11545,10 @@ export type UserUpdateWithoutSettingsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9707,6 +11590,9 @@ export type UserUpdateWithoutSettingsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -9741,6 +11627,10 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   scamScore?: Prisma.IntFieldUpdateOperationsInput | number
   riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9782,6 +11672,9 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
   authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -9812,6 +11705,9 @@ export type UserCountOutputType = {
   explorePreferences: number
   adminLogs: number
   authEvents: number
+  moderationCases: number
+  violations: number
+  appeals: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -9837,6 +11733,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   explorePreferences?: boolean | UserCountOutputTypeCountExplorePreferencesArgs
   adminLogs?: boolean | UserCountOutputTypeCountAdminLogsArgs
   authEvents?: boolean | UserCountOutputTypeCountAuthEventsArgs
+  moderationCases?: boolean | UserCountOutputTypeCountModerationCasesArgs
+  violations?: boolean | UserCountOutputTypeCountViolationsArgs
+  appeals?: boolean | UserCountOutputTypeCountAppealsArgs
 }
 
 /**
@@ -10003,6 +11902,27 @@ export type UserCountOutputTypeCountAuthEventsArgs<ExtArgs extends runtime.Types
   where?: Prisma.AuthVerificationEventWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountModerationCasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationCaseWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountViolationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccountViolationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAppealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AppealWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -10036,6 +11956,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   scamScore?: boolean
   riskReason?: boolean
   riskUpdatedAt?: boolean
+  safetyRiskScore?: boolean
+  safetyRiskReasons?: boolean
+  safetyRecommendedAction?: boolean
+  safetyRiskUpdatedAt?: boolean
   ageConfirmedAt?: boolean
   ageConfirmedIpHash?: boolean
   termsVersion?: boolean
@@ -10078,6 +12002,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   explorePreferences?: boolean | Prisma.User$explorePreferencesArgs<ExtArgs>
   adminLogs?: boolean | Prisma.User$adminLogsArgs<ExtArgs>
   authEvents?: boolean | Prisma.User$authEventsArgs<ExtArgs>
+  moderationCases?: boolean | Prisma.User$moderationCasesArgs<ExtArgs>
+  violations?: boolean | Prisma.User$violationsArgs<ExtArgs>
+  appeals?: boolean | Prisma.User$appealsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -10113,6 +12040,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   scamScore?: boolean
   riskReason?: boolean
   riskUpdatedAt?: boolean
+  safetyRiskScore?: boolean
+  safetyRiskReasons?: boolean
+  safetyRecommendedAction?: boolean
+  safetyRiskUpdatedAt?: boolean
   ageConfirmedAt?: boolean
   ageConfirmedIpHash?: boolean
   termsVersion?: boolean
@@ -10164,6 +12095,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   scamScore?: boolean
   riskReason?: boolean
   riskUpdatedAt?: boolean
+  safetyRiskScore?: boolean
+  safetyRiskReasons?: boolean
+  safetyRecommendedAction?: boolean
+  safetyRiskUpdatedAt?: boolean
   ageConfirmedAt?: boolean
   ageConfirmedIpHash?: boolean
   termsVersion?: boolean
@@ -10215,6 +12150,10 @@ export type UserSelectScalar = {
   scamScore?: boolean
   riskReason?: boolean
   riskUpdatedAt?: boolean
+  safetyRiskScore?: boolean
+  safetyRiskReasons?: boolean
+  safetyRecommendedAction?: boolean
+  safetyRiskUpdatedAt?: boolean
   ageConfirmedAt?: boolean
   ageConfirmedIpHash?: boolean
   termsVersion?: boolean
@@ -10234,7 +12173,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
@@ -10261,6 +12200,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   explorePreferences?: boolean | Prisma.User$explorePreferencesArgs<ExtArgs>
   adminLogs?: boolean | Prisma.User$adminLogsArgs<ExtArgs>
   authEvents?: boolean | Prisma.User$authEventsArgs<ExtArgs>
+  moderationCases?: boolean | Prisma.User$moderationCasesArgs<ExtArgs>
+  violations?: boolean | Prisma.User$violationsArgs<ExtArgs>
+  appeals?: boolean | Prisma.User$appealsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -10294,6 +12236,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     explorePreferences: Prisma.$UserExplorePreferencePayload<ExtArgs>[]
     adminLogs: Prisma.$AdminLogPayload<ExtArgs>[]
     authEvents: Prisma.$AuthVerificationEventPayload<ExtArgs>[]
+    moderationCases: Prisma.$ModerationCasePayload<ExtArgs>[]
+    violations: Prisma.$AccountViolationPayload<ExtArgs>[]
+    appeals: Prisma.$AppealPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -10327,6 +12272,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     scamScore: number
     riskReason: string | null
     riskUpdatedAt: Date | null
+    safetyRiskScore: number
+    safetyRiskReasons: string | null
+    safetyRecommendedAction: $Enums.SafetyRecommendedAction | null
+    safetyRiskUpdatedAt: Date | null
     ageConfirmedAt: Date | null
     ageConfirmedIpHash: string | null
     termsVersion: string | null
@@ -10763,6 +12712,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   explorePreferences<T extends Prisma.User$explorePreferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$explorePreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserExplorePreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminLogs<T extends Prisma.User$adminLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   authEvents<T extends Prisma.User$authEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthVerificationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  moderationCases<T extends Prisma.User$moderationCasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$moderationCasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  violations<T extends Prisma.User$violationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$violationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountViolationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  appeals<T extends Prisma.User$appealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$appealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10823,6 +12775,10 @@ export interface UserFieldRefs {
   readonly scamScore: Prisma.FieldRef<"User", 'Int'>
   readonly riskReason: Prisma.FieldRef<"User", 'String'>
   readonly riskUpdatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly safetyRiskScore: Prisma.FieldRef<"User", 'Int'>
+  readonly safetyRiskReasons: Prisma.FieldRef<"User", 'String'>
+  readonly safetyRecommendedAction: Prisma.FieldRef<"User", 'SafetyRecommendedAction'>
+  readonly safetyRiskUpdatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly ageConfirmedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly ageConfirmedIpHash: Prisma.FieldRef<"User", 'String'>
   readonly termsVersion: Prisma.FieldRef<"User", 'String'>
@@ -11815,6 +13771,78 @@ export type User$authEventsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.AuthVerificationEventScalarFieldEnum | Prisma.AuthVerificationEventScalarFieldEnum[]
+}
+
+/**
+ * User.moderationCases
+ */
+export type User$moderationCasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationCase
+   */
+  select?: Prisma.ModerationCaseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationCase
+   */
+  omit?: Prisma.ModerationCaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationCaseInclude<ExtArgs> | null
+  where?: Prisma.ModerationCaseWhereInput
+  orderBy?: Prisma.ModerationCaseOrderByWithRelationInput | Prisma.ModerationCaseOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationCaseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationCaseScalarFieldEnum | Prisma.ModerationCaseScalarFieldEnum[]
+}
+
+/**
+ * User.violations
+ */
+export type User$violationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AccountViolation
+   */
+  select?: Prisma.AccountViolationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AccountViolation
+   */
+  omit?: Prisma.AccountViolationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountViolationInclude<ExtArgs> | null
+  where?: Prisma.AccountViolationWhereInput
+  orderBy?: Prisma.AccountViolationOrderByWithRelationInput | Prisma.AccountViolationOrderByWithRelationInput[]
+  cursor?: Prisma.AccountViolationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AccountViolationScalarFieldEnum | Prisma.AccountViolationScalarFieldEnum[]
+}
+
+/**
+ * User.appeals
+ */
+export type User$appealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Appeal
+   */
+  select?: Prisma.AppealSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Appeal
+   */
+  omit?: Prisma.AppealOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppealInclude<ExtArgs> | null
+  where?: Prisma.AppealWhereInput
+  orderBy?: Prisma.AppealOrderByWithRelationInput | Prisma.AppealOrderByWithRelationInput[]
+  cursor?: Prisma.AppealWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AppealScalarFieldEnum | Prisma.AppealScalarFieldEnum[]
 }
 
 /**

@@ -67,6 +67,11 @@ export const ModelName = {
   Message: 'Message',
   Attachment: 'Attachment',
   Report: 'Report',
+  ModerationCase: 'ModerationCase',
+  PhotoModerationResult: 'PhotoModerationResult',
+  AccountViolation: 'AccountViolation',
+  Appeal: 'Appeal',
+  BannedCredential: 'BannedCredential',
   Block: 'Block',
   Subscription: 'Subscription',
   Payment: 'Payment',
@@ -133,6 +138,10 @@ export const UserScalarFieldEnum = {
   scamScore: 'scamScore',
   riskReason: 'riskReason',
   riskUpdatedAt: 'riskUpdatedAt',
+  safetyRiskScore: 'safetyRiskScore',
+  safetyRiskReasons: 'safetyRiskReasons',
+  safetyRecommendedAction: 'safetyRecommendedAction',
+  safetyRiskUpdatedAt: 'safetyRiskUpdatedAt',
   ageConfirmedAt: 'ageConfirmedAt',
   ageConfirmedIpHash: 'ageConfirmedIpHash',
   termsVersion: 'termsVersion',
@@ -404,6 +413,97 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const ModerationCaseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  caseType: 'caseType',
+  status: 'status',
+  severity: 'severity',
+  source: 'source',
+  confidence: 'confidence',
+  summary: 'summary',
+  evidence: 'evidence',
+  photoId: 'photoId',
+  reportId: 'reportId',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  decisionReason: 'decisionReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ModerationCaseScalarFieldEnum = (typeof ModerationCaseScalarFieldEnum)[keyof typeof ModerationCaseScalarFieldEnum]
+
+
+export const PhotoModerationResultScalarFieldEnum = {
+  id: 'id',
+  photoId: 'photoId',
+  provider: 'provider',
+  resultStatus: 'resultStatus',
+  detectedLabels: 'detectedLabels',
+  faceCount: 'faceCount',
+  adultScore: 'adultScore',
+  violenceScore: 'violenceScore',
+  minorRiskScore: 'minorRiskScore',
+  aiGeneratedScore: 'aiGeneratedScore',
+  duplicateMatchScore: 'duplicateMatchScore',
+  reverseImageRisk: 'reverseImageRisk',
+  confidence: 'confidence',
+  rawProviderReference: 'rawProviderReference',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoModerationResultScalarFieldEnum = (typeof PhotoModerationResultScalarFieldEnum)[keyof typeof PhotoModerationResultScalarFieldEnum]
+
+
+export const AccountViolationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  violationType: 'violationType',
+  actionTaken: 'actionTaken',
+  description: 'description',
+  userVisibleReason: 'userVisibleReason',
+  internalReason: 'internalReason',
+  expiresAt: 'expiresAt',
+  appealAllowed: 'appealAllowed',
+  reversedAt: 'reversedAt',
+  moderationCaseId: 'moderationCaseId',
+  photoId: 'photoId',
+  createdAt: 'createdAt'
+} as const
+
+export type AccountViolationScalarFieldEnum = (typeof AccountViolationScalarFieldEnum)[keyof typeof AccountViolationScalarFieldEnum]
+
+
+export const AppealScalarFieldEnum = {
+  id: 'id',
+  violationId: 'violationId',
+  userId: 'userId',
+  status: 'status',
+  appealText: 'appealText',
+  adminNotes: 'adminNotes',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AppealScalarFieldEnum = (typeof AppealScalarFieldEnum)[keyof typeof AppealScalarFieldEnum]
+
+
+export const BannedCredentialScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  value: 'value',
+  reason: 'reason',
+  sourceUserId: 'sourceUserId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type BannedCredentialScalarFieldEnum = (typeof BannedCredentialScalarFieldEnum)[keyof typeof BannedCredentialScalarFieldEnum]
 
 
 export const BlockScalarFieldEnum = {

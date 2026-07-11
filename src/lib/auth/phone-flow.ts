@@ -22,6 +22,7 @@ import { resendCooldown, checkOtpVerifyBlocked } from "@/lib/auth/rate-limit";
 import { getSupportedPhoneCountrySet } from "@/lib/auth/phone-countries";
 import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
 import { isReleasablePhoneHolder, teardownAccount } from "@/lib/auth/identity";
+import { isCredentialBanned } from "@/lib/services/trust-safety";
 
 /**
  * The phone-verification flow itself, lifted out of the API routes so the
@@ -171,8 +172,22 @@ export async function sendPhoneVerification(opts: {
   const { phoneE164 } = normalized;
 
   // Banned accounts don't get to burn SMS credits.
-  if (user.bannedAt || user.status === "SUSPENDED") {
+  if (user.bannedAt || user.status === "SUSPENDED" || user.status === "BANNED") {
     await recordAuthEvent({ type: "phone_otp_send_blocked", phoneE164, userId: user.id, req });
+    return { kind: "account_blocked" };
+  }
+
+  // Ban evasion: a number snapshotted from a BANNED account can never be
+  // claimed by any account (BannedCredential blocklist; lifted only when
+  // the ban is reversed).
+  if (await isCredentialBanned("PHONE", phoneE164)) {
+    await recordAuthEvent({
+      type: "phone_otp_send_blocked",
+      phoneE164,
+      userId: user.id,
+      req,
+      metadata: { reason: "banned_credential" },
+    });
     return { kind: "account_blocked" };
   }
 
@@ -264,6 +279,8 @@ export type PhoneVerifyOutcome =
   | { kind: "invalid_phone" }
   | { kind: "unsupported_country" }
   | { kind: "locked" }
+  /** Ban-evasion blocklist hit (BannedCredential) - number may not verify. */
+  | { kind: "account_blocked" }
   /** `holderId` = the OTHER account that owns the number (diagnostics only, never UI). */
   | { kind: "duplicate_phone"; holderId: string }
   | { kind: "already_verified"; user: User }
@@ -454,6 +471,19 @@ export async function confirmPhoneVerification(opts: {
     return { kind: normalized.reason === "invalid_phone" ? "invalid_phone" : "unsupported_country" };
   }
   const { phoneE164 } = normalized;
+
+  // Ban evasion (same check as the send stage - the blocklist may have
+  // gained the number between send and verify).
+  if (await isCredentialBanned("PHONE", phoneE164)) {
+    await recordAuthEvent({
+      type: "otp_verify_fail",
+      phoneE164,
+      userId: user.id,
+      req,
+      metadata: { reason: "banned_credential" },
+    });
+    return { kind: "account_blocked" };
+  }
 
   // Idempotent success: this exact number is already verified on THIS
   // account - don't burn a provider check on it. Re-approval never

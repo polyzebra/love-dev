@@ -3,6 +3,7 @@ import { RATE_LIMITS } from "@/lib/rate-limit";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { moderatePhoto } from "@/lib/services/moderation";
+import { assertUploadAllowed } from "@/lib/services/trust-safety";
 import {
   deletePhotoObjects,
   makeBlurDataUrl,
@@ -24,6 +25,12 @@ export async function POST(req: Request) {
 
   const limited = await guardRate(`photos:${user.id}`, RATE_LIMITS.api);
   if (limited) return limited;
+
+  // Trust-safety enforcement: uploads are blocked while the account is
+  // restricted, photo-review-required, or carrying an active
+  // UPLOAD_BLOCKED violation (graduated ladder, trust-safety.ts).
+  const gate = await assertUploadAllowed(user.id);
+  if (!gate.ok) return apiError(403, gate.code, gate.message);
 
   let form: FormData;
   try {

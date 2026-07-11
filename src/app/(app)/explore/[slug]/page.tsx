@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, UserSearch } from "lucide-react";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { exploreFiltersSchema } from "@/lib/validators/explore";
 import { getExploreMatches, getExploreProfile, track } from "@/lib/services/explore";
@@ -22,8 +22,16 @@ export default async function ExploreCategoryPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string>>;
 }) {
-  const [{ slug }, rawFilters, session] = await Promise.all([params, searchParams, auth()]);
-  const userId = session!.user.id;
+  // requireUser (not bare auth()): segment pages render in PARALLEL with
+  // the (app) layout, so this page must gate itself - a restricted
+  // (suspended/banned) session would otherwise stream explore data while
+  // the layout redirects (same leak class as tests/admin-authz.test.ts).
+  const [{ slug }, rawFilters, sessionUser] = await Promise.all([
+    params,
+    searchParams,
+    requireUser(),
+  ]);
+  const userId = sessionUser.id;
   const { profile: profileParam, ...filterParams } = rawFilters;
   const filters = exploreFiltersSchema.safeParse(filterParams);
   // Independent reads (saved-state resolves the category via its slug

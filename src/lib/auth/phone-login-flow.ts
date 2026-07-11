@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
+import { isCredentialBanned } from "@/lib/services/trust-safety";
 import type { User } from "@/generated/prisma/client";
 import { normalizePhone } from "@/lib/auth/phone-flow";
 import { phoneLoginEnabled } from "@/lib/auth/phone";
@@ -314,6 +315,27 @@ export async function sendPhoneLoginCode(opts: {
   }
   const { phoneE164, countryIso, dialCode } = normalized.value;
 
+  // Ban evasion: a number snapshotted from a BANNED account may never
+  // start a login again, even after the banned row is deleted
+  // (BannedCredential outlives the account; lifted only by appeal
+  // approval/unban). Checked before any SMS is sent.
+  if (await isCredentialBanned("PHONE", phoneE164)) {
+    await recordAuthEvent({
+      type: "auth_login_failed",
+      phoneE164,
+      req,
+      metadata: { provider: "phone", stage: "send", reason: "banned_credential" },
+    });
+    logPhoneLoginFailure({
+      correlationId: cid,
+      stage: "send",
+      errorClass: "PHONE_ACCOUNT_CONFLICT",
+      phoneE164,
+      detail: "banned_credential",
+    });
+    return { kind: "account_blocked" };
+  }
+
   // EXISTING-OWNER BRIDGE, part 1 (pre-provider): when the app owner's
   // number is NOT mapped to the same uid in auth.users, verify could only
   // ever end in IDENTITY_CONFLICT - refuse now, before an SMS is burned
@@ -477,6 +499,18 @@ export async function verifyPhoneLoginCode(opts: {
     return { kind: normalized.kind };
   }
   const { phoneE164, countryIso, dialCode } = normalized.value;
+
+  // Ban evasion (same check as the send stage - the blocklist may have
+  // gained the number between send and verify).
+  if (await isCredentialBanned("PHONE", phoneE164)) {
+    await recordAuthEvent({
+      type: "auth_login_failed",
+      phoneE164,
+      req,
+      metadata: { provider: "phone", stage: "verify", reason: "banned_credential" },
+    });
+    return { kind: "account_blocked" };
+  }
 
   // Failure lock BEFORE the provider: 5 invalid attempts per number or
   // per IP within 15 minutes -> locked 15 minutes. Locked attempts audit

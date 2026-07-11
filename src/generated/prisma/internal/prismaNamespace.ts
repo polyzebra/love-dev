@@ -400,6 +400,11 @@ export const ModelName = {
   Message: 'Message',
   Attachment: 'Attachment',
   Report: 'Report',
+  ModerationCase: 'ModerationCase',
+  PhotoModerationResult: 'PhotoModerationResult',
+  AccountViolation: 'AccountViolation',
+  Appeal: 'Appeal',
+  BannedCredential: 'BannedCredential',
   Block: 'Block',
   Subscription: 'Subscription',
   Payment: 'Payment',
@@ -431,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "block" | "subscription" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "bannedCredential" | "block" | "subscription" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1616,6 +1621,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ReportCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ReportCountAggregateOutputType> | number
+        }
+      }
+    }
+    ModerationCase: {
+      payload: Prisma.$ModerationCasePayload<ExtArgs>
+      fields: Prisma.ModerationCaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ModerationCaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ModerationCaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>
+        }
+        findFirst: {
+          args: Prisma.ModerationCaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ModerationCaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>
+        }
+        findMany: {
+          args: Prisma.ModerationCaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>[]
+        }
+        create: {
+          args: Prisma.ModerationCaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>
+        }
+        createMany: {
+          args: Prisma.ModerationCaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ModerationCaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>[]
+        }
+        delete: {
+          args: Prisma.ModerationCaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>
+        }
+        update: {
+          args: Prisma.ModerationCaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>
+        }
+        deleteMany: {
+          args: Prisma.ModerationCaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ModerationCaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ModerationCaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>[]
+        }
+        upsert: {
+          args: Prisma.ModerationCaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModerationCasePayload>
+        }
+        aggregate: {
+          args: Prisma.ModerationCaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateModerationCase>
+        }
+        groupBy: {
+          args: Prisma.ModerationCaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModerationCaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ModerationCaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModerationCaseCountAggregateOutputType> | number
+        }
+      }
+    }
+    PhotoModerationResult: {
+      payload: Prisma.$PhotoModerationResultPayload<ExtArgs>
+      fields: Prisma.PhotoModerationResultFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhotoModerationResultFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhotoModerationResultFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>
+        }
+        findFirst: {
+          args: Prisma.PhotoModerationResultFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhotoModerationResultFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>
+        }
+        findMany: {
+          args: Prisma.PhotoModerationResultFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>[]
+        }
+        create: {
+          args: Prisma.PhotoModerationResultCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>
+        }
+        createMany: {
+          args: Prisma.PhotoModerationResultCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhotoModerationResultCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>[]
+        }
+        delete: {
+          args: Prisma.PhotoModerationResultDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>
+        }
+        update: {
+          args: Prisma.PhotoModerationResultUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>
+        }
+        deleteMany: {
+          args: Prisma.PhotoModerationResultDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhotoModerationResultUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhotoModerationResultUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>[]
+        }
+        upsert: {
+          args: Prisma.PhotoModerationResultUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoModerationResultPayload>
+        }
+        aggregate: {
+          args: Prisma.PhotoModerationResultAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhotoModerationResult>
+        }
+        groupBy: {
+          args: Prisma.PhotoModerationResultGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotoModerationResultGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhotoModerationResultCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotoModerationResultCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccountViolation: {
+      payload: Prisma.$AccountViolationPayload<ExtArgs>
+      fields: Prisma.AccountViolationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccountViolationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccountViolationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>
+        }
+        findFirst: {
+          args: Prisma.AccountViolationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccountViolationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>
+        }
+        findMany: {
+          args: Prisma.AccountViolationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>[]
+        }
+        create: {
+          args: Prisma.AccountViolationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>
+        }
+        createMany: {
+          args: Prisma.AccountViolationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccountViolationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>[]
+        }
+        delete: {
+          args: Prisma.AccountViolationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>
+        }
+        update: {
+          args: Prisma.AccountViolationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccountViolationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccountViolationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccountViolationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccountViolationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountViolationPayload>
+        }
+        aggregate: {
+          args: Prisma.AccountViolationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccountViolation>
+        }
+        groupBy: {
+          args: Prisma.AccountViolationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountViolationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccountViolationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountViolationCountAggregateOutputType> | number
+        }
+      }
+    }
+    Appeal: {
+      payload: Prisma.$AppealPayload<ExtArgs>
+      fields: Prisma.AppealFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AppealFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AppealFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>
+        }
+        findFirst: {
+          args: Prisma.AppealFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AppealFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>
+        }
+        findMany: {
+          args: Prisma.AppealFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>[]
+        }
+        create: {
+          args: Prisma.AppealCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>
+        }
+        createMany: {
+          args: Prisma.AppealCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AppealCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>[]
+        }
+        delete: {
+          args: Prisma.AppealDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>
+        }
+        update: {
+          args: Prisma.AppealUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>
+        }
+        deleteMany: {
+          args: Prisma.AppealDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AppealUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AppealUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>[]
+        }
+        upsert: {
+          args: Prisma.AppealUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealPayload>
+        }
+        aggregate: {
+          args: Prisma.AppealAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAppeal>
+        }
+        groupBy: {
+          args: Prisma.AppealGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AppealGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AppealCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AppealCountAggregateOutputType> | number
+        }
+      }
+    }
+    BannedCredential: {
+      payload: Prisma.$BannedCredentialPayload<ExtArgs>
+      fields: Prisma.BannedCredentialFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BannedCredentialFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BannedCredentialFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>
+        }
+        findFirst: {
+          args: Prisma.BannedCredentialFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BannedCredentialFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>
+        }
+        findMany: {
+          args: Prisma.BannedCredentialFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>[]
+        }
+        create: {
+          args: Prisma.BannedCredentialCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>
+        }
+        createMany: {
+          args: Prisma.BannedCredentialCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BannedCredentialCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>[]
+        }
+        delete: {
+          args: Prisma.BannedCredentialDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>
+        }
+        update: {
+          args: Prisma.BannedCredentialUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>
+        }
+        deleteMany: {
+          args: Prisma.BannedCredentialDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BannedCredentialUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BannedCredentialUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>[]
+        }
+        upsert: {
+          args: Prisma.BannedCredentialUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BannedCredentialPayload>
+        }
+        aggregate: {
+          args: Prisma.BannedCredentialAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBannedCredential>
+        }
+        groupBy: {
+          args: Prisma.BannedCredentialGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BannedCredentialGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BannedCredentialCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BannedCredentialCountAggregateOutputType> | number
         }
       }
     }
@@ -2874,6 +3249,10 @@ export const UserScalarFieldEnum = {
   scamScore: 'scamScore',
   riskReason: 'riskReason',
   riskUpdatedAt: 'riskUpdatedAt',
+  safetyRiskScore: 'safetyRiskScore',
+  safetyRiskReasons: 'safetyRiskReasons',
+  safetyRecommendedAction: 'safetyRecommendedAction',
+  safetyRiskUpdatedAt: 'safetyRiskUpdatedAt',
   ageConfirmedAt: 'ageConfirmedAt',
   ageConfirmedIpHash: 'ageConfirmedIpHash',
   termsVersion: 'termsVersion',
@@ -3145,6 +3524,97 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const ModerationCaseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  caseType: 'caseType',
+  status: 'status',
+  severity: 'severity',
+  source: 'source',
+  confidence: 'confidence',
+  summary: 'summary',
+  evidence: 'evidence',
+  photoId: 'photoId',
+  reportId: 'reportId',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  decisionReason: 'decisionReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ModerationCaseScalarFieldEnum = (typeof ModerationCaseScalarFieldEnum)[keyof typeof ModerationCaseScalarFieldEnum]
+
+
+export const PhotoModerationResultScalarFieldEnum = {
+  id: 'id',
+  photoId: 'photoId',
+  provider: 'provider',
+  resultStatus: 'resultStatus',
+  detectedLabels: 'detectedLabels',
+  faceCount: 'faceCount',
+  adultScore: 'adultScore',
+  violenceScore: 'violenceScore',
+  minorRiskScore: 'minorRiskScore',
+  aiGeneratedScore: 'aiGeneratedScore',
+  duplicateMatchScore: 'duplicateMatchScore',
+  reverseImageRisk: 'reverseImageRisk',
+  confidence: 'confidence',
+  rawProviderReference: 'rawProviderReference',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoModerationResultScalarFieldEnum = (typeof PhotoModerationResultScalarFieldEnum)[keyof typeof PhotoModerationResultScalarFieldEnum]
+
+
+export const AccountViolationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  violationType: 'violationType',
+  actionTaken: 'actionTaken',
+  description: 'description',
+  userVisibleReason: 'userVisibleReason',
+  internalReason: 'internalReason',
+  expiresAt: 'expiresAt',
+  appealAllowed: 'appealAllowed',
+  reversedAt: 'reversedAt',
+  moderationCaseId: 'moderationCaseId',
+  photoId: 'photoId',
+  createdAt: 'createdAt'
+} as const
+
+export type AccountViolationScalarFieldEnum = (typeof AccountViolationScalarFieldEnum)[keyof typeof AccountViolationScalarFieldEnum]
+
+
+export const AppealScalarFieldEnum = {
+  id: 'id',
+  violationId: 'violationId',
+  userId: 'userId',
+  status: 'status',
+  appealText: 'appealText',
+  adminNotes: 'adminNotes',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AppealScalarFieldEnum = (typeof AppealScalarFieldEnum)[keyof typeof AppealScalarFieldEnum]
+
+
+export const BannedCredentialScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  value: 'value',
+  reason: 'reason',
+  sourceUserId: 'sourceUserId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type BannedCredentialScalarFieldEnum = (typeof BannedCredentialScalarFieldEnum)[keyof typeof BannedCredentialScalarFieldEnum]
 
 
 export const BlockScalarFieldEnum = {
@@ -3547,6 +4017,20 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'SafetyRecommendedAction'
+ */
+export type EnumSafetyRecommendedActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SafetyRecommendedAction'>
+    
+
+
+/**
+ * Reference to a field of type 'SafetyRecommendedAction[]'
+ */
+export type ListEnumSafetyRecommendedActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SafetyRecommendedAction[]'>
+    
+
+
+/**
  * Reference to a field of type 'Gender'
  */
 export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
@@ -3855,6 +4339,118 @@ export type ListEnumReportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'ModerationCaseType'
+ */
+export type EnumModerationCaseTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationCaseType'>
+    
+
+
+/**
+ * Reference to a field of type 'ModerationCaseType[]'
+ */
+export type ListEnumModerationCaseTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationCaseType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ModerationCaseStatus'
+ */
+export type EnumModerationCaseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationCaseStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ModerationCaseStatus[]'
+ */
+export type ListEnumModerationCaseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationCaseStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CaseSeverity'
+ */
+export type EnumCaseSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CaseSeverity'>
+    
+
+
+/**
+ * Reference to a field of type 'CaseSeverity[]'
+ */
+export type ListEnumCaseSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CaseSeverity[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CaseSource'
+ */
+export type EnumCaseSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CaseSource'>
+    
+
+
+/**
+ * Reference to a field of type 'CaseSource[]'
+ */
+export type ListEnumCaseSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CaseSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PhotoModerationResultStatus'
+ */
+export type EnumPhotoModerationResultStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhotoModerationResultStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PhotoModerationResultStatus[]'
+ */
+export type ListEnumPhotoModerationResultStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PhotoModerationResultStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EnforcementAction'
+ */
+export type EnumEnforcementActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EnforcementAction'>
+    
+
+
+/**
+ * Reference to a field of type 'EnforcementAction[]'
+ */
+export type ListEnumEnforcementActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EnforcementAction[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AppealStatus'
+ */
+export type EnumAppealStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppealStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AppealStatus[]'
+ */
+export type ListEnumAppealStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppealStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BannedCredentialKind'
+ */
+export type EnumBannedCredentialKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BannedCredentialKind'>
+    
+
+
+/**
+ * Reference to a field of type 'BannedCredentialKind[]'
+ */
+export type ListEnumBannedCredentialKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BannedCredentialKind[]'>
+    
+
+
+/**
  * Reference to a field of type 'PlanTier'
  */
 export type EnumPlanTierFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanTier'>
@@ -4105,6 +4701,11 @@ export type GlobalOmitConfig = {
   message?: Prisma.MessageOmit
   attachment?: Prisma.AttachmentOmit
   report?: Prisma.ReportOmit
+  moderationCase?: Prisma.ModerationCaseOmit
+  photoModerationResult?: Prisma.PhotoModerationResultOmit
+  accountViolation?: Prisma.AccountViolationOmit
+  appeal?: Prisma.AppealOmit
+  bannedCredential?: Prisma.BannedCredentialOmit
   block?: Prisma.BlockOmit
   subscription?: Prisma.SubscriptionOmit
   payment?: Prisma.PaymentOmit

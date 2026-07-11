@@ -67,9 +67,21 @@ export const auth = cache(async (): Promise<AppSession | null> => {
   // the email-OTP verify route or the phone-login verify route.
   // A session whose app user vanished (deleted account, revoked access)
   // is terminated on the spot: sign out, clear cookies, return null.
+  //
+  // SUSPENDED/BANNED sessions deliberately SURVIVE (trust & safety
+  // milestone): the gate routes them to the status area (/account-blocked)
+  // where they can read their violations and appeal. They stay locked out
+  // of everything else centrally:
+  //  - pages: requireUser -> authNextStep -> /account-blocked
+  //  - APIs:  requireSession answers 403 account_restricted (lib/api.ts)
+  //  - admin: getCurrentAdmin requires status ACTIVE
+  // NEW logins for banned/suspended accounts remain rejected at the login
+  // flows (ensureAppUser / provisionPhoneLoginUser) - an existing session
+  // may read status + appeal, but a restricted account cannot mint fresh
+  // sessions.
   const appUser = await db.user.findUnique({ where: { id: user.id } });
   const blocked = appUser ? false : user.email ? await isIdentityBlocked(user.email) : false;
-  if (!appUser || blocked || appUser.status === "SUSPENDED" || appUser.status === "DELETED") {
+  if (!appUser || blocked || appUser.status === "DELETED") {
     console.warn(`[auth:guard] invalid app user for auth.uid=${user.id} - signing out`);
     await supabase.auth.signOut().catch(() => {});
     return null;

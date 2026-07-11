@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { DISCOVERABLE_USER_WHERE } from "@/lib/services/trust-safety";
 import { calculateAge } from "@/lib/utils";
 import { computeCompatibility, type ScoringProfile } from "@/lib/services/scoring";
 import { getReplySignals } from "@/lib/services/signals";
@@ -116,7 +117,11 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       birthDate: { gte: minBirth, lte: maxBirth },
       // Candidate must also be interested in my gender
       interestedIn: { has: me.gender },
-      user: { is: { status: "ACTIVE" } },
+      // Status ladder: suspended/banned/shadow-banned/deleted are never
+      // discoverable; limited/photo-review-required stay visible (their
+      // restriction is outbound engagement, not visibility) - single
+      // source in trust-safety.ts.
+      user: { is: DISCOVERABLE_USER_WHERE },
     },
     include: {
       interests: { include: { interest: true } },

@@ -402,6 +402,7 @@ export type PhotoWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Photo"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   moderationEvents?: Prisma.PhotoModerationEventListRelationFilter
+  moderationResults?: Prisma.PhotoModerationResultListRelationFilter
 }
 
 export type PhotoOrderByWithRelationInput = {
@@ -432,6 +433,7 @@ export type PhotoOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   moderationEvents?: Prisma.PhotoModerationEventOrderByRelationAggregateInput
+  moderationResults?: Prisma.PhotoModerationResultOrderByRelationAggregateInput
 }
 
 export type PhotoWhereUniqueInput = Prisma.AtLeast<{
@@ -465,6 +467,7 @@ export type PhotoWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Photo"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   moderationEvents?: Prisma.PhotoModerationEventListRelationFilter
+  moderationResults?: Prisma.PhotoModerationResultListRelationFilter
 }, "id">
 
 export type PhotoOrderByWithAggregationInput = {
@@ -558,6 +561,7 @@ export type PhotoCreateInput = {
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPhotosInput
   moderationEvents?: Prisma.PhotoModerationEventCreateNestedManyWithoutPhotoInput
+  moderationResults?: Prisma.PhotoModerationResultCreateNestedManyWithoutPhotoInput
 }
 
 export type PhotoUncheckedCreateInput = {
@@ -587,6 +591,7 @@ export type PhotoUncheckedCreateInput = {
   mediaVersion?: number
   createdAt?: Date | string
   moderationEvents?: Prisma.PhotoModerationEventUncheckedCreateNestedManyWithoutPhotoInput
+  moderationResults?: Prisma.PhotoModerationResultUncheckedCreateNestedManyWithoutPhotoInput
 }
 
 export type PhotoUpdateInput = {
@@ -616,6 +621,7 @@ export type PhotoUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPhotosNestedInput
   moderationEvents?: Prisma.PhotoModerationEventUpdateManyWithoutPhotoNestedInput
+  moderationResults?: Prisma.PhotoModerationResultUpdateManyWithoutPhotoNestedInput
 }
 
 export type PhotoUncheckedUpdateInput = {
@@ -645,6 +651,7 @@ export type PhotoUncheckedUpdateInput = {
   mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   moderationEvents?: Prisma.PhotoModerationEventUncheckedUpdateManyWithoutPhotoNestedInput
+  moderationResults?: Prisma.PhotoModerationResultUncheckedUpdateManyWithoutPhotoNestedInput
 }
 
 export type PhotoCreateManyInput = {
@@ -917,6 +924,20 @@ export type PhotoUpdateOneRequiredWithoutModerationEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PhotoUpdateToOneWithWhereWithoutModerationEventsInput, Prisma.PhotoUpdateWithoutModerationEventsInput>, Prisma.PhotoUncheckedUpdateWithoutModerationEventsInput>
 }
 
+export type PhotoCreateNestedOneWithoutModerationResultsInput = {
+  create?: Prisma.XOR<Prisma.PhotoCreateWithoutModerationResultsInput, Prisma.PhotoUncheckedCreateWithoutModerationResultsInput>
+  connectOrCreate?: Prisma.PhotoCreateOrConnectWithoutModerationResultsInput
+  connect?: Prisma.PhotoWhereUniqueInput
+}
+
+export type PhotoUpdateOneRequiredWithoutModerationResultsNestedInput = {
+  create?: Prisma.XOR<Prisma.PhotoCreateWithoutModerationResultsInput, Prisma.PhotoUncheckedCreateWithoutModerationResultsInput>
+  connectOrCreate?: Prisma.PhotoCreateOrConnectWithoutModerationResultsInput
+  upsert?: Prisma.PhotoUpsertWithoutModerationResultsInput
+  connect?: Prisma.PhotoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PhotoUpdateToOneWithWhereWithoutModerationResultsInput, Prisma.PhotoUpdateWithoutModerationResultsInput>, Prisma.PhotoUncheckedUpdateWithoutModerationResultsInput>
+}
+
 export type PhotoCreateWithoutUserInput = {
   id?: string
   url: string
@@ -943,6 +964,7 @@ export type PhotoCreateWithoutUserInput = {
   mediaVersion?: number
   createdAt?: Date | string
   moderationEvents?: Prisma.PhotoModerationEventCreateNestedManyWithoutPhotoInput
+  moderationResults?: Prisma.PhotoModerationResultCreateNestedManyWithoutPhotoInput
 }
 
 export type PhotoUncheckedCreateWithoutUserInput = {
@@ -971,6 +993,7 @@ export type PhotoUncheckedCreateWithoutUserInput = {
   mediaVersion?: number
   createdAt?: Date | string
   moderationEvents?: Prisma.PhotoModerationEventUncheckedCreateNestedManyWithoutPhotoInput
+  moderationResults?: Prisma.PhotoModerationResultUncheckedCreateNestedManyWithoutPhotoInput
 }
 
 export type PhotoCreateOrConnectWithoutUserInput = {
@@ -1056,6 +1079,7 @@ export type PhotoCreateWithoutModerationEventsInput = {
   mediaVersion?: number
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPhotosInput
+  moderationResults?: Prisma.PhotoModerationResultCreateNestedManyWithoutPhotoInput
 }
 
 export type PhotoUncheckedCreateWithoutModerationEventsInput = {
@@ -1084,6 +1108,7 @@ export type PhotoUncheckedCreateWithoutModerationEventsInput = {
   moderatedAt?: Date | string | null
   mediaVersion?: number
   createdAt?: Date | string
+  moderationResults?: Prisma.PhotoModerationResultUncheckedCreateNestedManyWithoutPhotoInput
 }
 
 export type PhotoCreateOrConnectWithoutModerationEventsInput = {
@@ -1128,6 +1153,7 @@ export type PhotoUpdateWithoutModerationEventsInput = {
   mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPhotosNestedInput
+  moderationResults?: Prisma.PhotoModerationResultUpdateManyWithoutPhotoNestedInput
 }
 
 export type PhotoUncheckedUpdateWithoutModerationEventsInput = {
@@ -1156,6 +1182,139 @@ export type PhotoUncheckedUpdateWithoutModerationEventsInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  moderationResults?: Prisma.PhotoModerationResultUncheckedUpdateManyWithoutPhotoNestedInput
+}
+
+export type PhotoCreateWithoutModerationResultsInput = {
+  id?: string
+  url: string
+  thumbUrl?: string | null
+  galleryUrl?: string | null
+  fullUrl?: string | null
+  blurDataUrl?: string | null
+  width?: number | null
+  height?: number | null
+  position?: number
+  isCover?: boolean
+  status?: $Enums.PhotoStatus
+  storagePath?: string | null
+  dominantColor?: string | null
+  faceDetected?: boolean | null
+  facesCount?: number | null
+  aiScore?: number | null
+  mimeType?: string | null
+  sizeBytes?: number | null
+  blurhash?: string | null
+  moderation?: $Enums.ModerationStatus
+  moderatedById?: string | null
+  moderatedAt?: Date | string | null
+  mediaVersion?: number
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPhotosInput
+  moderationEvents?: Prisma.PhotoModerationEventCreateNestedManyWithoutPhotoInput
+}
+
+export type PhotoUncheckedCreateWithoutModerationResultsInput = {
+  id?: string
+  userId: string
+  url: string
+  thumbUrl?: string | null
+  galleryUrl?: string | null
+  fullUrl?: string | null
+  blurDataUrl?: string | null
+  width?: number | null
+  height?: number | null
+  position?: number
+  isCover?: boolean
+  status?: $Enums.PhotoStatus
+  storagePath?: string | null
+  dominantColor?: string | null
+  faceDetected?: boolean | null
+  facesCount?: number | null
+  aiScore?: number | null
+  mimeType?: string | null
+  sizeBytes?: number | null
+  blurhash?: string | null
+  moderation?: $Enums.ModerationStatus
+  moderatedById?: string | null
+  moderatedAt?: Date | string | null
+  mediaVersion?: number
+  createdAt?: Date | string
+  moderationEvents?: Prisma.PhotoModerationEventUncheckedCreateNestedManyWithoutPhotoInput
+}
+
+export type PhotoCreateOrConnectWithoutModerationResultsInput = {
+  where: Prisma.PhotoWhereUniqueInput
+  create: Prisma.XOR<Prisma.PhotoCreateWithoutModerationResultsInput, Prisma.PhotoUncheckedCreateWithoutModerationResultsInput>
+}
+
+export type PhotoUpsertWithoutModerationResultsInput = {
+  update: Prisma.XOR<Prisma.PhotoUpdateWithoutModerationResultsInput, Prisma.PhotoUncheckedUpdateWithoutModerationResultsInput>
+  create: Prisma.XOR<Prisma.PhotoCreateWithoutModerationResultsInput, Prisma.PhotoUncheckedCreateWithoutModerationResultsInput>
+  where?: Prisma.PhotoWhereInput
+}
+
+export type PhotoUpdateToOneWithWhereWithoutModerationResultsInput = {
+  where?: Prisma.PhotoWhereInput
+  data: Prisma.XOR<Prisma.PhotoUpdateWithoutModerationResultsInput, Prisma.PhotoUncheckedUpdateWithoutModerationResultsInput>
+}
+
+export type PhotoUpdateWithoutModerationResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumPhotoStatusFieldUpdateOperationsInput | $Enums.PhotoStatus
+  storagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dominantColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faceDetected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  facesCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  blurhash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
+  moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPhotosNestedInput
+  moderationEvents?: Prisma.PhotoModerationEventUpdateManyWithoutPhotoNestedInput
+}
+
+export type PhotoUncheckedUpdateWithoutModerationResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blurDataUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumPhotoStatusFieldUpdateOperationsInput | $Enums.PhotoStatus
+  storagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dominantColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faceDetected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  facesCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sizeBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  blurhash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
+  moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  moderationEvents?: Prisma.PhotoModerationEventUncheckedUpdateManyWithoutPhotoNestedInput
 }
 
 export type PhotoCreateManyUserInput = {
@@ -1211,6 +1370,7 @@ export type PhotoUpdateWithoutUserInput = {
   mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   moderationEvents?: Prisma.PhotoModerationEventUpdateManyWithoutPhotoNestedInput
+  moderationResults?: Prisma.PhotoModerationResultUpdateManyWithoutPhotoNestedInput
 }
 
 export type PhotoUncheckedUpdateWithoutUserInput = {
@@ -1239,6 +1399,7 @@ export type PhotoUncheckedUpdateWithoutUserInput = {
   mediaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   moderationEvents?: Prisma.PhotoModerationEventUncheckedUpdateManyWithoutPhotoNestedInput
+  moderationResults?: Prisma.PhotoModerationResultUncheckedUpdateManyWithoutPhotoNestedInput
 }
 
 export type PhotoUncheckedUpdateManyWithoutUserInput = {
@@ -1275,10 +1436,12 @@ export type PhotoUncheckedUpdateManyWithoutUserInput = {
 
 export type PhotoCountOutputType = {
   moderationEvents: number
+  moderationResults: number
 }
 
 export type PhotoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   moderationEvents?: boolean | PhotoCountOutputTypeCountModerationEventsArgs
+  moderationResults?: boolean | PhotoCountOutputTypeCountModerationResultsArgs
 }
 
 /**
@@ -1296,6 +1459,13 @@ export type PhotoCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
  */
 export type PhotoCountOutputTypeCountModerationEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PhotoModerationEventWhereInput
+}
+
+/**
+ * PhotoCountOutputType without action
+ */
+export type PhotoCountOutputTypeCountModerationResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PhotoModerationResultWhereInput
 }
 
 
@@ -1327,6 +1497,7 @@ export type PhotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   moderationEvents?: boolean | Prisma.Photo$moderationEventsArgs<ExtArgs>
+  moderationResults?: boolean | Prisma.Photo$moderationResultsArgs<ExtArgs>
   _count?: boolean | Prisma.PhotoCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["photo"]>
 
@@ -1420,6 +1591,7 @@ export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
 export type PhotoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   moderationEvents?: boolean | Prisma.Photo$moderationEventsArgs<ExtArgs>
+  moderationResults?: boolean | Prisma.Photo$moderationResultsArgs<ExtArgs>
   _count?: boolean | Prisma.PhotoCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PhotoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1434,6 +1606,7 @@ export type $PhotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     moderationEvents: Prisma.$PhotoModerationEventPayload<ExtArgs>[]
+    moderationResults: Prisma.$PhotoModerationResultPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1857,6 +2030,7 @@ export interface Prisma__PhotoClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   moderationEvents<T extends Prisma.Photo$moderationEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Photo$moderationEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhotoModerationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  moderationResults<T extends Prisma.Photo$moderationResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Photo$moderationResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhotoModerationResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2333,6 +2507,30 @@ export type Photo$moderationEventsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PhotoModerationEventScalarFieldEnum | Prisma.PhotoModerationEventScalarFieldEnum[]
+}
+
+/**
+ * Photo.moderationResults
+ */
+export type Photo$moderationResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PhotoModerationResult
+   */
+  select?: Prisma.PhotoModerationResultSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PhotoModerationResult
+   */
+  omit?: Prisma.PhotoModerationResultOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PhotoModerationResultInclude<ExtArgs> | null
+  where?: Prisma.PhotoModerationResultWhereInput
+  orderBy?: Prisma.PhotoModerationResultOrderByWithRelationInput | Prisma.PhotoModerationResultOrderByWithRelationInput[]
+  cursor?: Prisma.PhotoModerationResultWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PhotoModerationResultScalarFieldEnum | Prisma.PhotoModerationResultScalarFieldEnum[]
 }
 
 /**

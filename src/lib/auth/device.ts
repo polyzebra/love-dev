@@ -127,6 +127,19 @@ export async function registerDeviceCore(
     data: { lastDeviceHash: fingerprint, deviceCount },
   });
 
+  // Ban evasion: a device hash snapshotted from a BANNED account opens a
+  // SYSTEM moderation case for manual review (never a hard block - the
+  // cookie-based hash can be a shared/household device; the verified-phone
+  // blocklist is the hard signal). Best-effort: must not break a login.
+  if (!existing) {
+    try {
+      const { flagDeviceBanEvasion } = await import("@/lib/services/trust-safety");
+      await flagDeviceBanEvasion(userId, fingerprint);
+    } catch (error) {
+      console.warn(`[auth:device] ban-evasion check failed for ${userId}:`, error);
+    }
+  }
+
   return { deviceHash: fingerprint, isNewDevice: !existing, deviceCount };
 }
 

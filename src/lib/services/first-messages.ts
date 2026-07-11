@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { canEngage, isDiscoverableStatus } from "@/lib/services/trust-safety";
 import {
   FIRST_MESSAGE_LIMITS,
   FIRST_MESSAGE_MAX_LENGTH,
@@ -166,10 +167,13 @@ export async function sendFirstMessage(
     }),
   ]);
 
-  if (!sender || sender.status !== "ACTIVE" || !sender.profile) {
+  // Engagement + visibility come from the trust-safety status ladder:
+  // LIMITED/suspended/banned senders cannot start conversations; targets
+  // stay reachable while their status is discoverable.
+  if (!sender || !canEngage(sender.status) || !sender.profile) {
     throw new FirstMessageError("forbidden", "Your account cannot send messages right now.");
   }
-  if (!receiver || receiver.status !== "ACTIVE" || !receiver.profile) {
+  if (!receiver || !isDiscoverableStatus(receiver.status) || !receiver.profile) {
     throw new FirstMessageError("not_found", "This profile is no longer available.");
   }
   if (block) throw new FirstMessageError("blocked", "You cannot message this person.");

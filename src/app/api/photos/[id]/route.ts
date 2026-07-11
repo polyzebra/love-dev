@@ -1,6 +1,7 @@
 import { notFound, ok, requireSession } from "@/lib/api";
 import { db } from "@/lib/db";
 import { deletePhotoObjects } from "@/lib/services/photos";
+import { resolveCasesForDeletedPhoto } from "@/lib/services/trust-safety";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -26,6 +27,10 @@ export async function DELETE(_req: Request, { params }: Params) {
   }
 
   await db.photo.delete({ where: { id: photo.id } });
+
+  // Edge case: photo deleted mid-review - auto-resolve moderation cases
+  // whose subject was exactly this photo (trust-safety.ts).
+  await resolveCasesForDeletedPhoto(photo.id).catch(() => undefined);
 
   // If the cover was removed, promote the photo now first in line.
   if (photo.isCover) {

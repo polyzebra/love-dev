@@ -1,4 +1,5 @@
-import { forbidden, guardRate, created, ok, requireSession } from "@/lib/api";
+import { apiError, forbidden, guardRate, created, ok, requireSession } from "@/lib/api";
+import { canEngage, sweepExpiredRestrictions } from "@/lib/services/trust-safety";
 import { parseBody } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { sendMessageSchema } from "@/lib/validators/chat";
@@ -46,6 +47,18 @@ export async function POST(req: Request, { params }: Params) {
 
   const limited = await guardRate(`message:${user.id}`, RATE_LIMITS.message);
   if (limited) return limited;
+
+  // Trust-safety ladder: LIMITED accounts cannot send chat messages
+  // (suspended/banned are already refused by requireSession). The sweep
+  // lifts an expired restriction on the spot.
+  const status = (await sweepExpiredRestrictions(user.id)) ?? user.status;
+  if (!canEngage(status)) {
+    return apiError(
+      403,
+      "account_limited",
+      "Sending messages is paused on your account for now. Check your account status for details.",
+    );
+  }
 
   const participant = await assertParticipant(conversationId, user.id);
   if (!participant) return forbidden();

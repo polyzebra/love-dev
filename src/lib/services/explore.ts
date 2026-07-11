@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { DISCOVERABLE_USER_WHERE } from "@/lib/services/trust-safety";
 import { calculateAge } from "@/lib/utils";
 import { promptLabel } from "@/config/prompts";
 import { getReplySignals } from "@/lib/services/signals";
@@ -80,7 +81,9 @@ function membershipWhere(categoryId: string, matcher: Matcher | null): Prisma.Us
 function visibleWhere(viewerId: string, blockedIds: string[]): Prisma.UserWhereInput {
   return {
     id: { notIn: [viewerId, ...blockedIds] },
-    status: "ACTIVE",
+    // Status ladder single source: trust-safety.ts (suspended/banned/
+    // shadow-banned/deleted excluded; limited stays visible).
+    ...DISCOVERABLE_USER_WHERE,
     onboardingDone: true,
     profile: { is: { isVisible: true } },
   };

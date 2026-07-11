@@ -93,6 +93,11 @@ export type AuthEventType =
   | "risk_triggered"
   | "age_confirmed"
   | "terms_accepted"
+  // Trust & safety enforcement (trust-safety.ts / appeals.ts / webhooks)
+  | "enforcement_action"
+  | "appeal_submitted"
+  | "ban_evasion_device_flag"
+  | "photo_verification_webhook"
   | (string & {});
 
 /**

@@ -24,9 +24,25 @@ enum Role {
   SUPER_ADMIN
 }
 
+// Account status ladder (trust & safety). The enforcement semantics live in
+// src/lib/services/trust-safety.ts (single source):
+//   ACTIVE                -> full access
+//   LIMITED               -> app access, cannot send likes/messages (expires
+//                            with the backing AccountViolation)
+//   PHOTO_REVIEW_REQUIRED -> app access, uploads blocked until photo
+//                            verification / review clears
+//   SUSPENDED             -> no app access; gate routes to /account-blocked;
+//                            reversible, appealable
+//   BANNED                -> terminal (bannedAt set alongside); appeal allowed
+//   SHADOW_BANNED         -> legacy soft-hide (invisible to others)
+//   DEACTIVATED           -> self-service deletion grace window
+//   DELETED               -> tombstoned shell
 enum AccountStatus {
   ACTIVE
+  LIMITED
+  PHOTO_REVIEW_REQUIRED
   SUSPENDED
+  BANNED
   SHADOW_BANNED
   DEACTIVATED
   DELETED
@@ -280,13 +296,13 @@ model User {
   // pre-verification (the only other writers NULL it: identity teardown,
   // admin releasePhone), so an unverified row can never hold a claim and
   // block the number for someone else. Keep it that way.
-  phoneE164       String?   @unique
+  phoneE164          String?          @unique
   // No index on phoneCountryIso: written by the verify flows, read only by
   // primary key - never filtered/sorted on (verified 2026-07-10). Add one
   // only when a real query needs it.
-  phoneCountryIso String?
-  phoneDialCode   String?
-  phoneVerifiedAt DateTime?
+  phoneCountryIso    String?
+  phoneDialCode      String?
+  phoneVerifiedAt    DateTime?
   // auth.users.phone sync state (see PhoneSyncStatus above). Written in the
   // same places as phoneE164: PENDING inside the final-success verify
   // transaction, then SYNCED/FAILED by the admin sync; releasePhone/teardown
@@ -314,6 +330,19 @@ model User {
   scamScore     Int       @default(0)
   riskReason    String?
   riskUpdatedAt DateTime?
+
+  // Trust ENGINE composite (src/lib/services/trust-engine.ts) - deliberately
+  // separate columns from the LOGIN risk engine's riskScore above (risk.ts
+  // owns that one; overwriting it here would be the split-brain the
+  // verification.ts header warns about). The verification-derived trustScore
+  // stays DERIVED (never stored) - see TRUST_WEIGHTS in verification.ts.
+  // UserTrustStatus decision: User already carries status/riskScore/
+  // scamScore/bannedAt, so per the audit-first doctrine these extend User
+  // instead of adding a parallel 1:1 table.
+  safetyRiskScore         Int                      @default(0)
+  safetyRiskReasons       String?
+  safetyRecommendedAction SafetyRecommendedAction?
+  safetyRiskUpdatedAt     DateTime?
 
   // Age + legal consent (versioned; hashes, never raw IP/UA)
   ageConfirmedAt       DateTime?
@@ -362,15 +391,18 @@ model User {
   blocksMade      Block[]  @relation("BlocksMade")
   blocksReceived  Block[]  @relation("BlocksReceived")
 
-  subscription       Subscription?
-  settings           UserSettings?
-  payments           Payment[]
-  notifications      Notification[]
-  pushSubscriptions  PushSubscription[]
+  subscription         Subscription?
+  settings             UserSettings?
+  payments             Payment[]
+  notifications        Notification[]
+  pushSubscriptions    PushSubscription[]
   conversationPresence ConversationPresence[]
-  explorePreferences UserExplorePreference[]
-  adminLogs          AdminLog[]              @relation("AdminActor")
-  authEvents         AuthVerificationEvent[]
+  explorePreferences   UserExplorePreference[]
+  adminLogs            AdminLog[]              @relation("AdminActor")
+  authEvents           AuthVerificationEvent[]
+  moderationCases      ModerationCase[]        @relation("ModerationCases")
+  violations           AccountViolation[]      @relation("AccountViolations")
+  appeals              Appeal[]                @relation("Appeals")
 
   @@index([status, lastActiveAt])
   @@index([role])
@@ -488,8 +520,9 @@ model Photo {
   mediaVersion  Int              @default(0)
   createdAt     DateTime         @default(now())
 
-  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  moderationEvents PhotoModerationEvent[]
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moderationEvents  PhotoModerationEvent[]
+  moderationResults PhotoModerationResult[]
 
   @@index([userId, position])
   @@index([moderation])
@@ -710,6 +743,231 @@ model Report {
 
   @@index([status, createdAt])
   @@index([reportedId])
+}
+
+// --- Trust & safety enforcement (moderation cases / violations / appeals) --
+// Naming: the raw spec's snake_case values map 1:1 onto these SCREAMING_CASE
+// enum members (photo_mismatch -> PHOTO_MISMATCH, action_taken ->
+// ACTION_TAKEN, ...). Prisma camelCase models per repo convention.
+
+enum ModerationCaseType {
+  PHOTO_MISMATCH
+  STOLEN_IMAGES
+  EXPLICIT_CONTENT
+  MINOR_SAFETY
+  IMPERSONATION
+  SPAM
+  HARASSMENT
+  SCAM
+  PAYMENT_ABUSE
+  OTHER
+}
+
+enum ModerationCaseStatus {
+  OPEN
+  UNDER_REVIEW
+  ACTION_TAKEN
+  DISMISSED
+  APPEALED
+  REVERSED
+}
+
+enum CaseSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CaseSource {
+  AUTOMATED
+  USER_REPORT
+  ADMIN
+  SYSTEM
+}
+
+enum PhotoModerationResultStatus {
+  APPROVED
+  REJECTED
+  NEEDS_REVIEW
+  FAILED
+}
+
+// What enforcement actually did to the account/photo (graduated ladder in
+// trust-safety.ts). WARNING < PHOTO_REMOVED < UPLOAD_BLOCKED < LIMITED <
+// SUSPENDED < BANNED.
+enum EnforcementAction {
+  WARNING
+  PHOTO_REMOVED
+  UPLOAD_BLOCKED
+  LIMITED
+  SUSPENDED
+  BANNED
+}
+
+enum AppealStatus {
+  SUBMITTED
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum BannedCredentialKind {
+  PHONE
+  DEVICE
+}
+
+// Trust-engine recommendation (server-side only - NEVER exposed to users).
+enum SafetyRecommendedAction {
+  NO_ACTION
+  SHOW_WARNING
+  REQUIRE_PHOTO_VERIFICATION
+  HIDE_PROFILE
+  LIMIT_MESSAGING
+  SUSPEND_ACCOUNT
+  BAN_ACCOUNT
+  SEND_TO_MANUAL_REVIEW
+}
+
+// One investigation about one user. Dedupe rule (service-enforced, like
+// FirstMessage's "one PENDING per pair" - status-dependent, so it cannot be
+// a @@unique): at most one OPEN/UNDER_REVIEW case per (userId, caseType);
+// new automated signals append to the open case's evidence instead.
+model ModerationCase {
+  id             String               @id @default(cuid())
+  userId         String
+  caseType       ModerationCaseType
+  status         ModerationCaseStatus @default(OPEN)
+  severity       CaseSeverity
+  source         CaseSource
+  /**
+   * 0-1 confidence of the triggering signal; null for human-sourced cases.
+   */
+  confidence     Float?
+  summary        String
+  /**
+   * PII-stripped structured evidence: photo ids, score snapshots, report ids.
+   */
+  evidence       Json?
+  photoId        String?
+  reportId       String?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  decisionReason String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  user       User               @relation("ModerationCases", fields: [userId], references: [id], onDelete: Cascade)
+  violations AccountViolation[]
+
+  @@index([userId, status])
+  @@index([status, severity, createdAt])
+}
+
+// Automated moderation provider output for one photo - scores only, PII
+// stripped. NO biometric vectors, face templates or embeddings, ever;
+// rawProviderReference is an opaque id on the provider's side.
+model PhotoModerationResult {
+  id                   String                      @id @default(cuid())
+  photoId              String
+  provider             String
+  resultStatus         PhotoModerationResultStatus
+  detectedLabels       Json                        @default("[]")
+  faceCount            Int?
+  adultScore           Float?
+  violenceScore        Float?
+  minorRiskScore       Float?
+  aiGeneratedScore     Float?
+  duplicateMatchScore  Float?
+  reverseImageRisk     Float?
+  confidence           Float?
+  rawProviderReference String?
+  createdAt            DateTime                    @default(now())
+
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@index([photoId, createdAt])
+}
+
+// One enforcement action applied to one account. userVisibleReason is the
+// ONLY reason field surfaced to the user (calm, legally-safe copy);
+// internalReason and confidence stay staff-side.
+model AccountViolation {
+  id                String             @id @default(cuid())
+  userId            String
+  violationType     ModerationCaseType
+  actionTaken       EnforcementAction
+  description       String
+  userVisibleReason String
+  internalReason    String?
+  /**
+   * null = does not expire (warnings, suspensions pending review, bans).
+   */
+  expiresAt         DateTime?
+  appealAllowed     Boolean            @default(true)
+  /**
+   * Set when an approved appeal reversed this violation.
+   */
+  reversedAt        DateTime?
+  moderationCaseId  String?
+  /**
+   * The photo the action was about, when there is one. Deliberately on the
+   * violation itself (not only the case): cases DEDUPE per user+type, so a
+   * merged case's photoId cannot drive an accurate reversal.
+   */
+  photoId           String?
+  createdAt         DateTime           @default(now())
+
+  user           User            @relation("AccountViolations", fields: [userId], references: [id], onDelete: Cascade)
+  moderationCase ModerationCase? @relation(fields: [moderationCaseId], references: [id], onDelete: SetNull)
+  appeals        Appeal[]
+
+  @@index([userId, createdAt])
+  @@index([userId, actionTaken, expiresAt])
+}
+
+// One user appeal against one violation. "One open appeal per violation" is
+// status-dependent (a REJECTED appeal on a still-active ban may not retry,
+// but an APPROVED one closes the story) - enforced in appeals.ts inside the
+// submit transaction, same pattern as FirstMessage.
+model Appeal {
+  id           String       @id @default(cuid())
+  violationId  String
+  userId       String
+  status       AppealStatus @default(SUBMITTED)
+  appealText   String       @db.Text
+  adminNotes   String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  violation AccountViolation @relation(fields: [violationId], references: [id], onDelete: Cascade)
+  user      User             @relation("Appeals", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([violationId, status])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// Ban-evasion blocklist - legally-acceptable signals only: the verified
+// E.164 number and the salted device hash (see device.ts - never a raw
+// identifier). Checked at phone login/verification and device registration.
+// Rows are removed when a ban is reversed (appeal approved / admin unban).
+model BannedCredential {
+  id           String               @id @default(cuid())
+  kind         BannedCredentialKind
+  /**
+   * E.164 phone (kind PHONE) or salted device hash (kind DEVICE).
+   */
+  value        String
+  reason       String?
+  sourceUserId String?
+  createdAt    DateTime             @default(now())
+  expiresAt    DateTime?
+
+  @@unique([kind, value])
+  @@index([sourceUserId])
 }
 
 model Block {

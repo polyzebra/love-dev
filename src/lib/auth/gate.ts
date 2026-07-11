@@ -64,11 +64,24 @@ export function needsEmailAttach(user: Pick<GateUser, "email" | "emailVerified">
   return user.email.endsWith(PLACEHOLDER_EMAIL_SUFFIX) || !user.emailVerified;
 }
 
+/**
+ * Canonical landing spot for restricted (suspended/banned) accounts.
+ * Phase-2 status/appeal pages under /account/status* should pass
+ * requireUser({ allow: RESTRICTED_ACCOUNT_ROUTE }) so the gate lets them
+ * render for restricted sessions.
+ */
+export const RESTRICTED_ACCOUNT_ROUTE = "/account-blocked";
+
 export function authNextStep(
   user: GateUser,
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
 ): string {
-  if (user.bannedAt || user.status === "SUSPENDED") return "/account-blocked";
+  // Suspended/banned: the ONLY destination is the status area. Sessions for
+  // these accounts survive (see auth()) so the user can read their status
+  // and appeal; every API rejects them centrally (requireSession).
+  if (user.bannedAt || user.status === "SUSPENDED" || user.status === "BANNED") {
+    return RESTRICTED_ACCOUNT_ROUTE;
+  }
   // First rung = ONE verified sign-in channel. Email/OAuth identities
   // verify email here as always (the /login entry leads into
   // /login/email); a phone-LOGIN account (verified phone, placeholder

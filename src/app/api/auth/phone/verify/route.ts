@@ -78,6 +78,11 @@ export const POST = withUnavailableGuard(
           { ok: false, code: "too_many_attempts", error: LOCKED },
           { status: 429 },
         );
+      case "account_blocked":
+        return NextResponse.json(
+          { ok: false, code: "account_blocked", error: CODE_FAILED },
+          { status: 403 },
+        );
       case "duplicate_phone":
         // Dev diagnostic - console only, never UI. See docs/IDENTITY.md
         // "Two emails = two accounts".

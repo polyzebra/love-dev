@@ -3,6 +3,7 @@ import { audit } from "@/lib/audit";
 import { recordAuthEvent } from "@/lib/auth/audit";
 import { maskPhone } from "@/lib/phone-mask";
 import { gotruePhone } from "@/lib/auth/phone-flow";
+import { applyDirectAction, clearBanCredentials } from "@/lib/services/trust-safety";
 
 /**
  * Admin trust actions on a user account. Every action here:
@@ -15,15 +16,32 @@ import { gotruePhone } from "@/lib/auth/phone-flow";
  * own the mutations, so they are directly exercisable by tests.
  */
 
+/**
+ * Human-decided ban. Since the trust & safety milestone this writes the
+ * FULL enforcement picture, not just the User columns:
+ *  - status BANNED (was SUSPENDED before the ladder existed) + bannedAt
+ *  - an AccountViolation (actionTaken BANNED, appealable) so the appeals
+ *    surface has something to attach to
+ *  - the ban-evasion credential snapshot (verified phone + device hash)
+ *  - the SAFETY notice through the notification outbox
+ * Existing behavior preserved: gate -> /account-blocked, login flows keep
+ * rejecting (they check bannedAt, which is still stamped).
+ */
 export async function banUser(opts: {
   actorId: string;
   userId: string;
   reason: string;
   req?: Request;
 }): Promise<void> {
-  const user = await db.user.update({
+  const outcome = await applyDirectAction({
+    userId: opts.userId,
+    violationType: "OTHER",
+    action: "BANNED",
+    internalReason: `admin ban by ${opts.actorId}: ${opts.reason}`,
+    userVisibleReason: opts.reason,
+  });
+  const user = await db.user.findUniqueOrThrow({
     where: { id: opts.userId },
-    data: { bannedAt: new Date(), banReason: opts.reason, status: "SUSPENDED" },
     select: { email: true },
   });
   await audit({
@@ -31,14 +49,14 @@ export async function banUser(opts: {
     action: "user.ban",
     targetType: "user",
     targetId: opts.userId,
-    metadata: { reason: opts.reason },
+    metadata: { reason: opts.reason, violationId: outcome.violationId },
   });
   await recordAuthEvent({
     type: "admin_ban",
     userId: opts.userId,
     email: user.email,
     req: opts.req,
-    metadata: { actorId: opts.actorId, reason: opts.reason },
+    metadata: { actorId: opts.actorId, reason: opts.reason, violationId: outcome.violationId },
   });
 }
 
@@ -52,6 +70,13 @@ export async function unbanUser(opts: {
     data: { bannedAt: null, banReason: null, status: "ACTIVE" },
     select: { email: true },
   });
+  // Reverse the ban's enforcement footprint: open BANNED violations and
+  // the ban-evasion credential snapshot (phone/device may sign in again).
+  await db.accountViolation.updateMany({
+    where: { userId: opts.userId, actionTaken: "BANNED", reversedAt: null },
+    data: { reversedAt: new Date() },
+  });
+  await clearBanCredentials(opts.userId);
   await audit({
     actorId: opts.actorId,
     action: "user.unban",
