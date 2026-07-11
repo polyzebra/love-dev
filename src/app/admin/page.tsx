@@ -10,6 +10,7 @@ import {
   LifeBuoy,
   MessageSquare,
   PauseCircle,
+  Scale,
   ShieldCheck,
   UserCheck,
   Users,
@@ -45,6 +46,8 @@ export default async function AdminDashboardPage() {
     pendingPhotos,
     pendingVerifications,
     paidSubscriptions,
+    openAppeals,
+    openCases,
   ] = await Promise.all([
     db.user.count({ where: { status: { not: "DELETED" } } }),
     db.user.count({ where: { status: "ACTIVE" } }),
@@ -68,6 +71,8 @@ export default async function AdminDashboardPage() {
     db.photo.count({ where: { moderation: "PENDING", status: { not: "DELETED" } } }),
     db.verification.count({ where: { status: { in: ["PENDING", "IN_REVIEW"] }, type: { in: ["PHOTO", "IDENTITY"] } } }),
     db.subscription.count({ where: { tier: { not: "FREE" }, status: "ACTIVE" } }),
+    db.appeal.count({ where: { status: { in: ["SUBMITTED", "PENDING_REVIEW"] } } }),
+    db.moderationCase.count({ where: { status: { in: ["OPEN", "UNDER_REVIEW"] } } }),
   ]);
 
   const accountStats = [
@@ -89,16 +94,15 @@ export default async function AdminDashboardPage() {
     { href: "/admin/reports", label: "Open reports", value: openReports, urgent: openReports > 0, icon: Flag },
     { href: "/admin/photos", label: "Photo moderation", value: pendingPhotos, urgent: pendingPhotos > 10, icon: ImageIcon },
     { href: "/admin/verification", label: "Verification queue", value: pendingVerifications, urgent: pendingVerifications > 10, icon: BadgeCheck },
+    { href: "/admin/moderation-cases", label: "Moderation cases", value: openCases, urgent: openCases > 0, icon: Gavel },
+    { href: "/admin/appeals", label: "Appeals", value: openAppeals, urgent: openAppeals > 0, icon: Scale },
   ];
 
   // Modules the product does not have yet. Rendered as inert "Not
   // configured" cards (never a crash) so the dashboard is honest about
   // its coverage; wire a real model + queue page, then move the entry
   // up into `queues`.
-  const notConfigured = [
-    { label: "Ban appeals", icon: Gavel },
-    { label: "Support inbox", icon: LifeBuoy },
-  ];
+  const notConfigured = [{ label: "Support inbox", icon: LifeBuoy }];
 
   return (
     <>

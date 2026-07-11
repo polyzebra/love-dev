@@ -518,6 +518,53 @@ export async function applyDirectAction(input: DirectActionInput): Promise<Enfor
 }
 
 // ---------------------------------------------------------------------------
+// Require photo verification (human decision - case dashboard)
+// ---------------------------------------------------------------------------
+
+export type RequireVerificationResult =
+  | { ok: true; previousStatus: AccountStatus }
+  | { ok: false; code: "user_not_found" | "already_required" | "status_blocks"; message: string };
+
+/**
+ * Move an account to PHOTO_REVIEW_REQUIRED: it stays visible and readable
+ * but must complete photo verification before uploading photos again (the
+ * verification webhook/status-poll lifts it back to ACTIVE on approval).
+ * Only meaningful from ACTIVE/LIMITED - a suspended or banned account is
+ * already under a stronger restriction. Queues the verification_required
+ * safety notice; callers own the AdminLog entry.
+ */
+export async function requirePhotoVerification(userId: string): Promise<RequireVerificationResult> {
+  const user = await db.user.findUnique({ where: { id: userId }, select: { status: true } });
+  if (!user) return { ok: false, code: "user_not_found", message: "User not found." };
+  if (user.status === "PHOTO_REVIEW_REQUIRED") {
+    return {
+      ok: false,
+      code: "already_required",
+      message: "Photo verification is already required for this account.",
+    };
+  }
+  if (user.status !== "ACTIVE" && user.status !== "LIMITED") {
+    return {
+      ok: false,
+      code: "status_blocks",
+      message: `A ${user.status.toLowerCase().replace(/_/g, " ")} account can't be moved to photo review.`,
+    };
+  }
+  await db.user.update({ where: { id: userId }, data: { status: "PHOTO_REVIEW_REQUIRED" } });
+  await recordAuthEvent({
+    type: "enforcement_action",
+    userId,
+    metadata: { action: "PHOTO_REVIEW_REQUIRED", previousStatus: user.status },
+  });
+  await sendSafetyNotice(
+    userId,
+    "verification_required",
+    `require-verification:${userId}:${Date.now()}`,
+  );
+  return { ok: true, previousStatus: user.status };
+}
+
+// ---------------------------------------------------------------------------
 // Reversal (approved appeal / false-positive / admin reinstatement)
 // ---------------------------------------------------------------------------
 

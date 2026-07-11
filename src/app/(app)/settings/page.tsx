@@ -28,6 +28,7 @@ const GROUPS = [
     title: "Your account",
     items: [
       { href: "/settings/account", icon: UserRound, label: "Account & verification", hint: "Email, phone, password" },
+      { href: "/account/status", icon: ShieldCheck, label: "Account status", hint: "Standing, restrictions and appeals" },
       { href: "/settings/sign-in-methods", icon: KeyRound, label: "Sign-in methods", hint: "Google, email and phone sign-in" },
       { href: "/settings/discovery", icon: SlidersHorizontal, label: "Discovery preferences", hint: "Who you see, who sees you" },
       { href: "/settings/notifications", icon: Bell, label: "Notifications", hint: "Matches, messages, likes" },

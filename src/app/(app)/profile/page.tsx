@@ -16,6 +16,10 @@ import {
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { toVerificationState, VERIFICATION_USER_SELECT } from "@/lib/services/verification";
+import {
+  deriveVerificationUxState,
+  isPhotoVerificationConfigured,
+} from "@/lib/services/photo-verification";
 import { promptLabel } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -48,6 +52,17 @@ export default async function ProfilePage() {
   // admin trust panel and badges read. Never derive from Verification
   // rows directly (EMAIL/PHONE rows do not exist).
   const verification = toVerificationState(profile.user);
+  // Full UX state for the verification flow card (workflow row fields the
+  // shared select doesn't carry: providerSessionId + reviewNote).
+  const photoWorkflow = await db.verification.findUnique({
+    where: { userId_type: { userId: user.id, type: "PHOTO" } },
+    select: { status: true, providerSessionId: true, reviewNote: true },
+  });
+  const verificationUx = deriveVerificationUxState({
+    photoVerifiedAt: profile.user.photoVerifiedAt,
+    verification: photoWorkflow,
+  });
+  const verificationConfigured = isPhotoVerificationConfigured();
   const photos = profile.user.photos;
   const age = calculateAge(profile.birthDate);
   const prompts = profile.prompts;
@@ -109,7 +124,7 @@ export default async function ProfilePage() {
             happens on the provider's side; no biometrics are ever stored. */}
         {!verification.photoVerified && (
           <Reveal>
-            <PhotoVerifyCard />
+            <PhotoVerifyCard state={verificationUx} configured={verificationConfigured} />
           </Reveal>
         )}
       </PhotoManager>

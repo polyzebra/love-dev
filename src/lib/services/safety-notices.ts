@@ -101,7 +101,7 @@ export async function sendSafetyNotice(
     type: "SAFETY",
     title: copy.title,
     body: copy.body,
-    url: "/account-blocked",
+    url: "/account/status",
     dedupeKey,
     data: { noticeKind: kind, ...(data ?? {}) },
   });

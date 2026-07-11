@@ -21,7 +21,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  APPEAL_STATUS_BADGE,
+  CASE_STATUS_BADGE,
+  ENFORCEMENT_BADGE,
+  SEVERITY_BADGE,
+  pretty,
+} from "../../safety-badges";
 import { TrustActions } from "./trust-actions";
+import { SafetyActions } from "./safety-actions";
 
 export const metadata: Metadata = { title: "User detail" };
 export const dynamic = "force-dynamic";
@@ -133,6 +141,35 @@ export default async function AdminUserDetailPage({
     scam = null;
   }
 
+  // Trust & safety records: enforcement history + open cases for the panel.
+  const [violations, moderationCases] = await Promise.all([
+    db.accountViolation.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        actionTaken: true,
+        violationType: true,
+        createdAt: true,
+        expiresAt: true,
+        reversedAt: true,
+        moderationCaseId: true,
+        appeals: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { id: true, status: true },
+        },
+      },
+    }),
+    db.moderationCase.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: { id: true, caseType: true, status: true, severity: true, createdAt: true },
+    }),
+  ]);
+
   const eventScope = { OR: [{ userId: user.id }, { email: user.email.toLowerCase() }] };
   const [events, otpSends, otpVerifyOk, otpFails, riskWarnings, emailBlock] = await Promise.all([
     db.authVerificationEvent.findMany({
@@ -205,6 +242,12 @@ export default async function AdminUserDetailPage({
         onboardingDone={user.onboardingDone}
         canReleaseDeletedPhone={holderNotAlive}
       />
+
+      {/* Safety enforcement (phase-1 safety routes: violations, notices,
+          AdminLog). Rendered under the identity trust actions. */}
+      <div className="mt-2">
+        <SafetyActions userId={user.id} userStatus={user.status} />
+      </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <Section title="Identity">
@@ -294,6 +337,128 @@ export default async function AdminUserDetailPage({
             </Field>
             <Field label="Ban reason">{user.banReason ?? "-"}</Field>
           </dl>
+        </Section>
+
+        <Section title="Safety">
+          <dl className="grid gap-3 sm:grid-cols-2">
+            <Field label="Safety risk score">
+              <span className="tabular-nums">
+                {user.safetyRiskUpdatedAt ? user.safetyRiskScore : "-"}
+              </span>
+              {user.safetyRiskUpdatedAt && (
+                <span className="ml-1.5 text-xs text-muted-foreground">
+                  updated {formatRelativeTime(user.safetyRiskUpdatedAt)} ago
+                </span>
+              )}
+            </Field>
+            <Field label="Recommended action">
+              {user.safetyRecommendedAction ? pretty(user.safetyRecommendedAction) : "-"}
+            </Field>
+            <Field label="Signals">
+              {user.safetyRiskReasons ? (
+                <span className="flex flex-wrap gap-1.5">
+                  {user.safetyRiskReasons
+                    .split(",")
+                    .filter(Boolean)
+                    .map((reason) => (
+                      <span
+                        key={reason}
+                        className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium"
+                      >
+                        {reason}
+                      </span>
+                    ))}
+                </span>
+              ) : (
+                "-"
+              )}
+            </Field>
+            <Field label="Open cases">
+              <span className="tabular-nums">
+                {moderationCases.filter((c) => c.status === "OPEN" || c.status === "UNDER_REVIEW").length}
+              </span>
+            </Field>
+          </dl>
+
+          {violations.length > 0 && (
+            <>
+              <h3 className="mb-1.5 mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Violations
+              </h3>
+              <ul className="divide-y">
+                {violations.map((v) => (
+                  <li key={v.id} className="flex flex-wrap items-center gap-2 py-2">
+                    <Badge
+                      variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"}
+                      className="rounded-full"
+                    >
+                      {pretty(v.actionTaken)}
+                    </Badge>
+                    <span className="text-sm">{pretty(v.violationType)}</span>
+                    {v.reversedAt && (
+                      <Badge variant="outline" className="rounded-full">
+                        reversed
+                      </Badge>
+                    )}
+                    {v.appeals[0] && (
+                      <Badge
+                        variant={APPEAL_STATUS_BADGE[v.appeals[0].status] ?? "outline"}
+                        className="rounded-full"
+                      >
+                        appeal {pretty(v.appeals[0].status)}
+                      </Badge>
+                    )}
+                    {v.moderationCaseId && (
+                      <Link
+                        href={`/admin/moderation-cases/${v.moderationCaseId}`}
+                        className="text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+                      >
+                        case
+                      </Link>
+                    )}
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {formatRelativeTime(v.createdAt)} ago
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {moderationCases.length > 0 && (
+            <>
+              <h3 className="mb-1.5 mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Moderation cases
+              </h3>
+              <ul className="divide-y">
+                {moderationCases.map((c) => (
+                  <li key={c.id} className="flex flex-wrap items-center gap-2 py-2">
+                    <Badge variant={SEVERITY_BADGE[c.severity] ?? "outline"} className="rounded-full">
+                      {pretty(c.severity)}
+                    </Badge>
+                    <Badge variant={CASE_STATUS_BADGE[c.status] ?? "outline"} className="rounded-full">
+                      {pretty(c.status)}
+                    </Badge>
+                    <Link
+                      href={`/admin/moderation-cases/${c.id}`}
+                      className="text-sm font-medium hover:underline"
+                    >
+                      {pretty(c.caseType)}
+                    </Link>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {formatRelativeTime(c.createdAt)} ago
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {violations.length === 0 && moderationCases.length === 0 && (
+            <p className="mt-3 text-sm text-muted-foreground">
+              No violations or moderation cases on file.
+            </p>
+          )}
         </Section>
 
         <Section title="IP history">
