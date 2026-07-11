@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireAdminPage } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import {
@@ -14,6 +15,7 @@ export const metadata: Metadata = { title: "Audit log" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminAuditPage() {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const entries = await db.adminLog.findMany({
     include: { actor: { select: { email: true } } },
     orderBy: { createdAt: "desc" },

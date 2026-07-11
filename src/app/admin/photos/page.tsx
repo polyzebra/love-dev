@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PhotoActions } from "./photo-actions";
+import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Photo moderation" };
 export const dynamic = "force-dynamic";
@@ -65,6 +66,7 @@ export default async function AdminPhotosPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const { tab: rawTab } = await searchParams;
   const tab: TabKey = TABS.some((t) => t.key === rawTab) ? (rawTab as TabKey) : "pending";
   const active = TABS.find((t) => t.key === tab)!;

@@ -4,6 +4,19 @@
  * Shared by the settings sign-in-methods page and the admin user panel -
  * only the masked string should reach non-ADMIN eyes.
  */
+/**
+ * Mask an email for display: first two local characters + domain.
+ * "info@tirvea.com" -> "in••@tirvea.com". Same display-only purpose as
+ * maskPhone; used by the admin auth-diagnostics page.
+ */
+export function maskEmail(email: string): string {
+  const at = email.indexOf("@");
+  if (at <= 0) return "•••";
+  const local = email.slice(0, at);
+  const keep = local.slice(0, Math.min(2, local.length));
+  return `${keep}${"•".repeat(Math.max(1, local.length - keep.length))}${email.slice(at)}`;
+}
+
 export function maskPhone(e164: string, dialCode: string | null): string {
   const dial = dialCode && e164.startsWith(dialCode) ? dialCode : e164.slice(0, 4);
   const national = e164.slice(dial.length);

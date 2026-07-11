@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { UserRowActions } from "./row-actions";
 import { formatRelativeTime } from "@/lib/utils";
+import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Users" };
 export const dynamic = "force-dynamic";
@@ -31,6 +32,7 @@ export default async function AdminUsersPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const { q } = await searchParams;
 
   const users = await db.user.findMany({

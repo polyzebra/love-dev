@@ -7,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { VerificationActions } from "./verification-actions";
 import { formatRelativeTime } from "@/lib/utils";
+import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Verification queue" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminVerificationPage() {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const queue = await db.verification.findMany({
     where: { status: { in: ["PENDING", "IN_REVIEW"] }, type: { in: ["PHOTO", "IDENTITY"] } },
     include: {

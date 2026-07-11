@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReportActions } from "./report-actions";
 import { formatRelativeTime } from "@/lib/utils";
+import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Reports" };
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ const REASON_LABELS: Record<string, string> = {
 const SEVERE = new Set(["UNDERAGE", "SCAM", "HARASSMENT"]);
 
 export default async function AdminReportsPage() {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const reports = await db.report.findMany({
     where: { status: { in: ["OPEN", "IN_REVIEW"] } },
     include: {

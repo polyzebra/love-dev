@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, CircleDashed } from "lucide-react";
 import { db } from "@/lib/db";
-import { currentUser } from "@/lib/auth";
+import { requireAdminPage } from "@/lib/auth/require-user";
+import { hasPermission } from "@/lib/rbac";
 import { countryByIso } from "@/lib/auth/countries";
 import { maskPhone } from "@/lib/phone-mask";
 import { computeScamScore } from "@/lib/services/scam";
@@ -97,10 +98,13 @@ export default async function AdminUserDetailPage({
 }) {
   const { id } = await params;
 
+  // Pages gate themselves ON TOP of the layout (see requireAdminPage).
   // The admin layout admits MODERATOR too - the raw E.164 below is
-  // revealed to ADMIN only, everyone else gets the masked form.
-  const viewer = await currentUser();
-  const viewerIsAdmin = viewer?.role === "ADMIN";
+  // revealed to identity-managing roles only (ADMIN/SUPER_ADMIN via rbac
+  // users:manage), everyone else gets the masked form.
+  const viewer = await requireAdminPage();
+  if (!viewer) return null;
+  const viewerIsAdmin = hasPermission(viewer.role, "users:manage");
 
   const user = await db.user.findUnique({
     where: { id },

@@ -4,11 +4,13 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ExploreCard3DVisual } from "@/components/explore/explore-card";
 import { ExploreRowActions } from "./explore-admin-actions";
 import { Badge } from "@/components/ui/badge";
+import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Explore categories" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminExplorePage() {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const categories = await db.exploreCategory.findMany({
     orderBy: [{ group: "asc" }, { sortOrder: "asc" }],
     include: { _count: { select: { preferences: true } } },

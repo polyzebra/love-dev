@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireAdminPage } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { daysAgo } from "@/lib/presence";
 import { PageHeader } from "@/components/shared/page-header";
@@ -17,6 +18,7 @@ export const metadata: Metadata = { title: "Payments" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminPaymentsPage() {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const monthAgo = daysAgo(30);
 
   const [payments, revenueAgg, plusCount, premiumCount] = await Promise.all([

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { FlagToggle } from "./flag-toggle";
+import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Feature flags" };
 export const dynamic = "force-dynamic";
@@ -18,6 +19,7 @@ const KNOWN_FLAGS = [
 ] as const;
 
 export default async function AdminFlagsPage() {
+  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const stored = await db.featureFlag.findMany();
   const byKey = new Map(stored.map((f) => [f.key, f]));
 

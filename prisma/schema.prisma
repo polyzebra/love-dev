@@ -19,6 +19,9 @@ enum Role {
   USER
   MODERATOR
   ADMIN
+  // Owner tier: everything ADMIN has plus roles:assign + diagnostics:view
+  // (src/lib/rbac.ts). Minted once via the admin bootstrap (docs/ADMIN-SETUP.md).
+  SUPER_ADMIN
 }
 
 enum AccountStatus {

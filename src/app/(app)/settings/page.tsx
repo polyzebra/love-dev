@@ -15,6 +15,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
+import { isStaff } from "@/lib/rbac";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -77,6 +78,35 @@ export default async function SettingsPage() {
       />
 
       <div className="space-y-8">
+        {/* Staff-only nav row (MODERATOR/ADMIN/SUPER_ADMIN). This is a
+            server-side render conditional for NAVIGATION only - it is not
+            the security boundary; /admin enforces its own role gate
+            (getCurrentAdmin) on every request. */}
+        {isStaff(user.role) && (
+          <section aria-label="Staff">
+            <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Staff
+            </h2>
+            <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+              <Link
+                href="/admin"
+                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted"
+              >
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
+                  <ShieldCheck className="size-5 text-accent-foreground" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium">Admin</span>
+                  <span className="block truncate text-sm text-muted-foreground">
+                    Moderation, users and platform tools
+                  </span>
+                </span>
+                <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              </Link>
+            </div>
+          </section>
+        )}
+
         {GROUPS.map((group) => (
           <section key={group.title} aria-label={group.title}>
             <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
