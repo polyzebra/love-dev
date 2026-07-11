@@ -259,6 +259,29 @@ SMS-in-hand test unlocks the moment the two dashboard flips above are
 made - no code change needed; the existing-owner invariant is already
 proven by `tests/phone-login.test.ts` (spy-client suite, 12/12).
 
+**Phone login session mechanism (audited 2026-07-10):**
+
+- The ONLY thing that creates a session in this flow is native GoTrue:
+  `signInWithOtp({ phone })` at send and `verifyOtp({ phone, token,
+  type: "sms" })` at verify, both called on the `@supabase/ssr` SERVER
+  client (`supabaseServer()`), so the `sb-*` auth cookies are written by
+  the library onto the verify response. There is no `setSession`, no
+  `admin.createSession`/`generateLink`, no JWT minting and no custom
+  `sb-*` cookie writes anywhere in `src/` - a phone match in the app DB
+  is NEVER treated as authentication.
+- The admin phone sync (5f, `updateUserById(uid, { phone,
+  phone_confirm: true })`) is OWNERSHIP METADATA only: it mirrors an
+  already-Twilio-approved number into `auth.users.phone` so future
+  native OTP logins resolve to the same uid. It never issues tokens or
+  cookies, and nothing reads `phoneSyncStatus` or `auth.users.phone` to
+  grant access - `auth()` trusts only `supabase.auth.getUser()`.
+- Consequence: the Supabase Phone provider MUST be enabled (with Twilio
+  Verify configured in the DASHBOARD) for phone login to work. Our
+  `TWILIO_*` env vars serve only the authenticated verification/change
+  flow (5a); GoTrue does not read them - it needs its own Twilio config
+  in Auth settings. Provider off = `/api/auth/phone-login/send` answers
+  `503 SMS_PROVIDER_UNAVAILABLE` honestly and no session is ever set.
+
 ## 5d. Apple sign-in (feature-flagged, default OFF)
 
 "Continue with Apple" (login entry `/login` + `oauth-buttons.tsx`) renders
@@ -326,7 +349,10 @@ gate reads; `auth.users.phone` is a maintained mirror so native phone
 login can key the same uid. The mirror is written by the SERVER-ONLY
 admin client (`src/lib/supabase/admin.ts`, service role,
 `autoRefreshToken/persistSession` off, `server-only` build guard - a
-client-component import fails the build).
+client-component import fails the build). This sync is ownership
+metadata, never authentication: it creates no session, and no auth
+decision reads `phoneSyncStatus` or `auth.users.phone` (see the "Phone
+login session mechanism" note in 5c).
 
 **Order of operations** (`confirmPhoneVerification`,
 `src/lib/auth/phone-flow.ts`):
