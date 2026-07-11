@@ -58,7 +58,8 @@ export default async function ConversationPage({
                 },
               },
             },
-            verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
+            // Canonical photo-verified verdict (see lib/services/verification.ts)
+            photoVerifiedAt: true,
             photos: {
               orderBy: [{ isCover: "desc" }, { position: "asc" }],
               take: 1,
@@ -134,7 +135,7 @@ export default async function ConversationPage({
     sharedInterests: otherInterests
       .filter((i) => mySlugs.has(i.interest.slug))
       .map((i) => i.interest.label),
-    isVerified: (other?.user.verifications.length ?? 0) > 0,
+    isVerified: Boolean(other?.user.photoVerifiedAt),
     isOnline: online,
     photoUrl: other?.user.photos[0]?.url ?? null,
     sameCity:

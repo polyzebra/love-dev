@@ -69,14 +69,14 @@ async function main() {
       create: {
         email,
         name: demo.name,
+        // Verdicts live on User columns (see src/lib/services/verification.ts);
+        // the PHOTO row mirrors the review workflow that produced the verdict.
         emailVerified: new Date(),
+        photoVerifiedAt: new Date(),
         onboardingDone: true,
         subscription: { create: { tier: "FREE" } },
         verifications: {
-          create: [
-            { type: "EMAIL", status: "APPROVED" },
-            { type: "PHOTO", status: "APPROVED", provider: "internal" },
-          ],
+          create: [{ type: "PHOTO", status: "APPROVED", provider: "internal" }],
         },
       },
       update: {},
@@ -249,10 +249,16 @@ for (let i = 0; i < EXTRA.length; i++) {
     update: { ...e.tags, relationshipGoal: e.goal },
   });
   if (i % 2 === 0) {
+    // Verdict on the User column + workflow row, exactly like a real
+    // approved review (see src/lib/services/verification.ts).
     await db.verification.upsert({
       where: { userId_type: { userId: u.id, type: "PHOTO" } },
       create: { userId: u.id, type: "PHOTO", status: "APPROVED", provider: "internal" },
       update: { status: "APPROVED" },
+    });
+    await db.user.update({
+      where: { id: u.id },
+      data: { photoVerifiedAt: new Date() },
     });
   }
 }

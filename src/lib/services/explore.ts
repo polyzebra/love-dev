@@ -9,6 +9,7 @@ import {
   type TaxonomyGroup,
 } from "@/lib/discovery/taxonomy";
 import type { Prisma } from "@/generated/prisma/client";
+import { PHOTO_VERIFIED_WHERE } from "@/lib/services/verification";
 
 /**
  * Explore - discovery categories driven by the canonical taxonomy
@@ -234,9 +235,7 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
           },
         },
       },
-      ...(filters.verifiedOnly
-        ? [{ verifications: { some: { type: "PHOTO" as const, status: "APPROVED" as const } } }]
-        : []),
+      ...(filters.verifiedOnly ? [PHOTO_VERIFIED_WHERE] : []),
     ],
   };
 
@@ -251,7 +250,6 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
         take: 1,
         select: { url: true, galleryUrl: true, blurDataUrl: true },
       },
-      verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
       explorePreferences: { where: { categoryId: category.id }, select: { id: true } },
     },
     take: 200,
@@ -263,7 +261,9 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
     .map((u) => {
       const p = u.profile!;
       const shared = p.interests.filter((i) => mySlugs.has(i.interest.slug)).length;
-      const verified = u.verifications.length > 0;
+      // Canonical photo-verified verdict (User.photoVerifiedAt - the full
+      // row is already loaded by the `include` above; see lib/services/verification.ts)
+      const verified = u.photoVerifiedAt !== null;
       const recent = now - u.lastActiveAt.getTime() < 24 * 3600_000;
       const score =
         (u.explorePreferences.length > 0 ? 50 : 0) + // explicit category membership
@@ -324,7 +324,6 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
           take: 10,
           select: { url: true, blurDataUrl: true },
         },
-        verifications: { where: { type: "PHOTO", status: "APPROVED" }, select: { id: true } },
       },
     }),
     db.profile.findUnique({
@@ -348,7 +347,8 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
     country: p.country,
     relationshipGoal: p.relationshipGoal,
     replySignal: signals.get(target.id) ?? null,
-    isVerified: target.verifications.length > 0,
+    // Canonical photo-verified verdict (full row is loaded via `include`)
+    isVerified: target.photoVerifiedAt !== null,
     isOnline: Date.now() - target.lastActiveAt.getTime() < 5 * 60_000,
     photos: target.photos,
     prompts: p.prompts.map((pr) => ({ label: promptLabel(pr.promptKey), answer: pr.answer })),

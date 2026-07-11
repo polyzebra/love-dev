@@ -11,14 +11,16 @@ export const metadata: Metadata = { title: "Sign-in methods" };
 export default async function SignInMethodsPage() {
   const user = await requireUser();
 
-  // The session doesn't carry the raw number - fetch the canonical
-  // phone columns for display masking only.
+  // The session doesn't carry the raw number - fetch the canonical phone
+  // columns (verdict = phoneVerifiedAt, see lib/services/verification.ts).
+  // A verified stamp without a number (admin released the phone) renders
+  // as "no phone", so the verdict is AND-ed with phoneE164 presence.
   const phoneRow = await db.user.findUnique({
     where: { id: user.id },
-    select: { phoneE164: true, phoneDialCode: true },
+    select: { phoneE164: true, phoneDialCode: true, phoneVerifiedAt: true },
   });
 
-  const phoneVerified = Boolean(user.phoneVerifiedAt && phoneRow?.phoneE164);
+  const phoneVerified = Boolean(phoneRow?.phoneVerifiedAt && phoneRow.phoneE164);
   const masked =
     phoneVerified && phoneRow?.phoneE164
       ? maskPhone(phoneRow.phoneE164, phoneRow.phoneDialCode)

@@ -3,6 +3,11 @@ import Link from "next/link";
 import { BadgeCheck, CircleDashed } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
+import {
+  toVerificationState,
+  TRUST_WEIGHTS,
+  VERIFICATION_USER_SELECT,
+} from "@/lib/services/verification";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,47 +18,47 @@ export default async function AccountSettingsPage() {
   const viewer = await requireUser();
   const user = await db.user.findUnique({
     where: { id: viewer.id },
+    // phoneE164 is the canonical phone column (User.phone is write-only
+    // legacy); verification verdicts come from the shared accessor.
     select: {
       email: true,
-      emailVerified: true,
-      phone: true,
-      phoneVerified: true,
-      verifications: { select: { type: true, status: true } },
+      phoneE164: true,
+      ...VERIFICATION_USER_SELECT,
     },
   });
 
-  const photoVerification = user?.verifications.find((v) => v.type === "PHOTO");
-  const idVerification = user?.verifications.find((v) => v.type === "IDENTITY");
+  // Canonical verification state - same accessor the profile hero,
+  // admin trust panel and badges read.
+  const verification = user ? toVerificationState(user) : null;
 
   const rows = [
     {
       label: "Email",
       value: user?.email ?? "-",
-      verified: !!user?.emailVerified,
-      action: user?.emailVerified ? null : "Resend link",
+      verified: !!verification?.emailVerified,
+      action: verification?.emailVerified ? null : "Resend link",
     },
     {
       label: "Phone",
-      value: user?.phone ?? "Not added",
-      verified: !!user?.phoneVerified,
-      action: user?.phone ? null : "Add phone",
+      value: user?.phoneE164 ?? "Not added",
+      verified: !!verification?.phoneVerified,
+      action: user?.phoneE164 ? null : "Add phone",
     },
     {
       label: "Photo verification",
-      value:
-        photoVerification?.status === "APPROVED"
-          ? "Verified"
-          : photoVerification?.status === "IN_REVIEW"
-            ? "In review"
-            : "Not verified",
-      verified: photoVerification?.status === "APPROVED",
-      action: photoVerification?.status === "APPROVED" ? null : "Start",
+      value: verification?.photoVerified
+        ? "Verified"
+        : verification?.photoStatus === "IN_REVIEW"
+          ? "In review"
+          : "Not verified",
+      verified: !!verification?.photoVerified,
+      action: verification?.photoVerified ? null : "Start",
     },
     {
       label: "ID verification (optional)",
-      value: idVerification?.status === "APPROVED" ? "Verified" : "Not verified",
-      verified: idVerification?.status === "APPROVED",
-      action: idVerification?.status === "APPROVED" ? null : "Start",
+      value: verification?.idVerified ? "Verified" : "Not verified",
+      verified: !!verification?.idVerified,
+      action: verification?.idVerified ? null : "Start",
     },
   ];
 
@@ -63,16 +68,12 @@ export default async function AccountSettingsPage() {
 
       {/* Trust score - real verification state, never faked */}
       {(() => {
-        const score =
-          (user?.emailVerified ? 25 : 0) +
-          (user?.phoneVerified ? 25 : 0) +
-          (photoVerification?.status === "APPROVED" ? 35 : 0) +
-          (idVerification?.status === "APPROVED" ? 15 : 0);
-        const nextStep = !user?.phoneVerified
+        const score = verification?.trustScore ?? 0;
+        const nextStep = !verification?.phoneVerified
           ? "Add phone verification to build trust with matches."
-          : photoVerification?.status !== "APPROVED"
+          : !verification.photoVerified
             ? "Photo verification increases profile trust the most."
-            : idVerification?.status !== "APPROVED"
+            : !verification.idVerified
               ? "Optional ID verification completes your trust profile."
               : "Fully verified - matches can trust who they're meeting.";
         return (
@@ -84,8 +85,8 @@ export default async function AccountSettingsPage() {
                 <p className="mt-1 max-w-sm text-sm text-muted-foreground">{nextStep}</p>
               </div>
               <div className="hidden text-right text-xs text-muted-foreground sm:block">
-                <p>Email +25 · Phone +25</p>
-                <p>Photo +35 · ID +15</p>
+                <p>Email +{TRUST_WEIGHTS.email} · Phone +{TRUST_WEIGHTS.phone}</p>
+                <p>Photo +{TRUST_WEIGHTS.photo} · ID +{TRUST_WEIGHTS.id}</p>
               </div>
             </div>
             <div className="mt-4 h-2 overflow-hidden rounded-full border border-border bg-foreground/10">

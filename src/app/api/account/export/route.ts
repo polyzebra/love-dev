@@ -16,8 +16,10 @@ export async function GET() {
         email: true,
         name: true,
         createdAt: true,
+        // Canonical verification verdicts (see lib/services/verification.ts)
         emailVerified: true,
-        phoneVerified: true,
+        phoneVerifiedAt: true,
+        photoVerifiedAt: true,
         marketingOptIn: true,
       },
     }),

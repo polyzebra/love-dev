@@ -9,6 +9,7 @@ import { hasPermission } from "@/lib/rbac";
 import { countryByIso } from "@/lib/auth/countries";
 import { maskPhone } from "@/lib/phone-mask";
 import { computeScamScore } from "@/lib/services/scam";
+import { toVerificationState } from "@/lib/services/verification";
 import { formatRelativeTime } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -119,6 +120,10 @@ export default async function AdminUserDetailPage({
   });
   if (!user) notFound();
 
+  // Canonical verification verdicts - same accessor as the profile hero
+  // and the member-facing account page (full row satisfies the source shape).
+  const verification = toVerificationState(user);
+
   // Scam score is recomputed lazily on page load - always fresh, always
   // derived from real persisted signals. Failure renders "-", never a guess.
   let scam: Awaited<ReturnType<typeof computeScamScore>> | null = null;
@@ -194,7 +199,7 @@ export default async function AdminUserDetailPage({
         userId={user.id}
         banned={banned}
         hasPhone={Boolean(user.phoneE164 ?? user.phone)}
-        phoneVerified={Boolean(user.phoneVerifiedAt)}
+        phoneVerified={verification.phoneVerified}
         phoneSyncStatus={user.phoneSyncStatus}
         emailBlocked={Boolean(emailBlock)}
         onboardingDone={user.onboardingDone}
@@ -206,7 +211,7 @@ export default async function AdminUserDetailPage({
           <dl className="grid gap-3 sm:grid-cols-2">
             <Field label="Email">
               <span className="break-all">{user.email}</span>
-              <VerifiedStamp verifiedAt={user.emailVerified} label={user.emailVerified ? "Verified" : "Unverified"} />
+              <VerifiedStamp verifiedAt={verification.emailVerifiedAt} label={verification.emailVerified ? "Verified" : "Unverified"} />
             </Field>
             <Field label="Phone">
               {(() => {
@@ -228,8 +233,8 @@ export default async function AdminUserDetailPage({
                       {user.phoneDialCode ? ` · ${user.phoneDialCode}` : ""}
                     </span>
                     <VerifiedStamp
-                      verifiedAt={user.phoneVerifiedAt}
-                      label={user.phoneVerifiedAt ? "Verified" : "Unverified"}
+                      verifiedAt={verification.phoneVerifiedAt}
+                      label={verification.phoneVerified ? "Verified" : "Unverified"}
                     />
                     <span className="mt-1 block">
                       <PhoneSyncBadge status={user.phoneSyncStatus} />
@@ -244,7 +249,7 @@ export default async function AdminUserDetailPage({
               })()}
             </Field>
             <Field label="Photo verification">
-              <VerifiedStamp verifiedAt={user.photoVerifiedAt} label={user.photoVerifiedAt ? "Verified" : "Not verified"} />
+              <VerifiedStamp verifiedAt={verification.photoVerifiedAt} label={verification.photoVerified ? "Verified" : "Not verified"} />
               <span className="text-xs text-muted-foreground">
                 Provider: {user.photoVerificationProvider ?? "-"}
               </span>

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/db";
 import { requireAdminPage } from "@/lib/auth/require-user";
+import { PHOTO_VERIFIED_WHERE } from "@/lib/services/verification";
 import { daysAgo } from "@/lib/presence";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,8 +48,16 @@ export default async function AdminDashboardPage() {
   ] = await Promise.all([
     db.user.count({ where: { status: { not: "DELETED" } } }),
     db.user.count({ where: { status: "ACTIVE" } }),
-    // "Verified" = holds at least one APPROVED verification (photo/identity).
-    db.user.count({ where: { verifications: { some: { status: "APPROVED" } } } }),
+    // "Verified" = carries the photo-verified badge (canonical column,
+    // see lib/services/verification.ts) or an APPROVED identity review.
+    db.user.count({
+      where: {
+        OR: [
+          PHOTO_VERIFIED_WHERE,
+          { verifications: { some: { type: "IDENTITY", status: "APPROVED" } } },
+        ],
+      },
+    }),
     db.user.count({ where: { status: "SUSPENDED", bannedAt: null } }),
     db.user.count({ where: { bannedAt: { not: null } } }),
     db.user.count({ where: { createdAt: { gte: weekAgo } } }),

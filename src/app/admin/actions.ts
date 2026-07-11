@@ -52,12 +52,25 @@ export async function resolveReport(
 
 export async function reviewVerification(verificationId: string, approve: boolean) {
   const actor = await requireActor("verifications:review");
-  const verification = await db.verification.update({
-    where: { id: verificationId },
-    data: {
-      status: approve ? "APPROVED" : "REJECTED",
-      reviewedById: actor.id,
-    },
+  // The verdict lives on User columns (see lib/services/verification.ts);
+  // the Verification row is provider workflow state. A PHOTO review must
+  // stamp/clear User.photoVerifiedAt atomically with the row update or the
+  // badge surfaces and the review queue would disagree.
+  const verification = await db.$transaction(async (tx) => {
+    const row = await tx.verification.update({
+      where: { id: verificationId },
+      data: {
+        status: approve ? "APPROVED" : "REJECTED",
+        reviewedById: actor.id,
+      },
+    });
+    if (row.type === "PHOTO") {
+      await tx.user.update({
+        where: { id: row.userId },
+        data: { photoVerifiedAt: approve ? new Date() : null },
+      });
+    }
+    return row;
   });
   if (approve) {
     await db.notification.create({

@@ -129,14 +129,12 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
         select: {
           lastActiveAt: true,
           createdAt: true,
+          // Canonical photo-verified verdict (see lib/services/verification.ts)
+          photoVerifiedAt: true,
           photos: {
             where: { moderation: { not: "REJECTED" } },
             orderBy: [{ isCover: "desc" }, { position: "asc" }],
             select: { url: true, blurDataUrl: true },
-          },
-          verifications: {
-            where: { type: "PHOTO", status: "APPROVED" },
-            select: { id: true },
           },
         },
       },
@@ -172,7 +170,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       city: c.city,
       occupation: c.occupation,
       distanceKm,
-      isVerified: c.user.verifications.length > 0,
+      isVerified: c.user.photoVerifiedAt !== null,
       isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,
       isBoosted: c.isBoosted,
       interests: c.interests.map((i) => i.interest.label),
@@ -188,7 +186,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
           viewerScoring,
           toScoringProfile(c),
           {
-            isVerified: c.user.verifications.length > 0,
+            isVerified: c.user.photoVerifiedAt !== null,
             lastActiveAt: c.user.lastActiveAt,
             createdAt: c.user.createdAt,
             isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,

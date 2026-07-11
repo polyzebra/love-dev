@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
+import { toVerificationState, VERIFICATION_USER_SELECT } from "@/lib/services/verification";
 import { promptLabel } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,16 +36,18 @@ export default async function ProfilePage() {
       prompts: { orderBy: { sortOrder: "asc" } },
       user: {
         select: {
-          photoVerifiedAt: true,
+          ...VERIFICATION_USER_SELECT,
           photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }] },
-          verifications: { where: { status: "APPROVED" }, select: { type: true } },
         },
       },
     },
   });
   if (!profile) redirect("/onboarding");
 
-  const verifiedTypes = new Set(profile.user.verifications.map((v) => v.type));
+  // Canonical verification verdicts - same accessor the account page,
+  // admin trust panel and badges read. Never derive from Verification
+  // rows directly (EMAIL/PHONE rows do not exist).
+  const verification = toVerificationState(profile.user);
   const photos = profile.user.photos;
   const age = calculateAge(profile.birthDate);
   const prompts = profile.prompts;
@@ -70,19 +73,18 @@ export default async function ProfilePage() {
         city={profile.city}
         country={profile.country}
         goalLabel={GOAL_LABELS[profile.relationshipGoal]}
-        photoVerified={verifiedTypes.has("PHOTO")}
+        photoVerified={verification.photoVerified}
         gradientSeed={profile.userId}
       >
         {/* ================= TRUST ================= */}
         <RevealGroup className="grid gap-2.5 sm:grid-cols-3">
           {(
             [
-              ["EMAIL", "Email verified"],
-              ["PHONE", "Phone verified"],
-              ["PHOTO", "Photo verified"],
+              ["email", "Email verified", verification.emailVerified],
+              ["phone", "Phone verified", verification.phoneVerified],
+              ["photo", "Photo verified", verification.photoVerified],
             ] as const
-          ).map(([type, label]) => {
-            const done = verifiedTypes.has(type);
+          ).map(([type, label, done]) => {
             return (
               <RevealItem key={type}>
                 <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
@@ -105,7 +107,7 @@ export default async function ProfilePage() {
 
         {/* Photo verification nudge - only while unverified. Selfie capture
             happens on the provider's side; no biometrics are ever stored. */}
-        {!profile.user.photoVerifiedAt && (
+        {!verification.photoVerified && (
           <Reveal>
             <PhotoVerifyCard />
           </Reveal>
