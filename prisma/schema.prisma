@@ -1001,6 +1001,11 @@ model UserSettings {
   pushDailyPicks   Boolean @default(false)
   pushOffers       Boolean @default(false)
   smsEnabled       Boolean @default(false)
+  // Native-only preferences: in-app notification sounds/haptics belong to
+  // the future native (Capacitor) shell - the web app neither reads nor
+  // writes them and the OS decides push sound/vibration on every platform.
+  // Kept (not dropped) so a native client can adopt them without a
+  // migration. See docs/NOTIFICATIONS-NATIVE.md.
   inAppVibrations  Boolean @default(true)
   inAppSounds      Boolean @default(false)
 

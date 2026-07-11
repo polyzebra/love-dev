@@ -20,6 +20,10 @@ import {
   type NotificationCapabilities,
 } from "@/lib/notifications/capabilities";
 import {
+  getPlatformNotificationCapabilities,
+  type PlatformNotificationCapabilities,
+} from "@/lib/notifications/platform";
+import {
   fetchPushStatus,
   getLocalSubscription,
   sendTestPush,
@@ -53,6 +57,7 @@ const IOS_STEPS = [
 
 export function PushSetup() {
   const [caps, setCaps] = useState<NotificationCapabilities | null>(null);
+  const [platformCaps, setPlatformCaps] = useState<PlatformNotificationCapabilities | null>(null);
   const [status, setStatus] = useState<PushStatus | null>(null);
   const [statusLoaded, setStatusLoaded] = useState(false);
   const [hasLocalSub, setHasLocalSub] = useState(false);
@@ -62,8 +67,10 @@ export function PushSetup() {
 
   const refresh = useCallback(async () => {
     const nextCaps = detectCapabilities();
+    const nextPlatform = getPlatformNotificationCapabilities();
     const [nextStatus, sub] = await Promise.all([fetchPushStatus(), getLocalSubscription()]);
     setCaps(nextCaps);
+    setPlatformCaps(nextPlatform);
     setStatus(nextStatus);
     setHasLocalSub(Boolean(sub));
     setStatusLoaded(true);
@@ -74,9 +81,11 @@ export function PushSetup() {
   useEffect(() => {
     let cancelled = false;
     const nextCaps = detectCapabilities();
+    const nextPlatform = getPlatformNotificationCapabilities();
     void Promise.all([fetchPushStatus(), getLocalSubscription()]).then(([nextStatus, sub]) => {
       if (cancelled) return;
       setCaps(nextCaps);
+      setPlatformCaps(nextPlatform);
       setStatus(nextStatus);
       setHasLocalSub(Boolean(sub));
       setStatusLoaded(true);
@@ -92,10 +101,9 @@ export function PushSetup() {
   const devices = status?.devices ?? [];
 
   let state: SetupState = "loading";
-  if (caps && statusLoaded) {
-    const pushCapable = caps.serviceWorker && caps.pushManager && caps.notificationsApi;
+  if (caps && platformCaps && statusLoaded) {
     if (caps.ios && !caps.installedPwa) state = "ios-install";
-    else if (!pushCapable) state = "unsupported";
+    else if (!platformCaps.pushSupported) state = "unsupported";
     else if (caps.permission === "denied") state = "blocked";
     else if (hasLocalSub) state = "enabled";
     else if (caps.permission === "granted" && configured && devices.length > 0)
@@ -278,10 +286,16 @@ export function PushSetup() {
               <CircleCheck className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" />
               <div>
                 <p className="font-medium">Push is on for this device</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Delivery, sound and vibration outside the app follow your device&apos;s
-                  notification settings.
-                </p>
+                {/* On platforms where the app can't configure notification
+                    sounds/haptics itself (all of web), say so honestly. */}
+                {platformCaps &&
+                  !platformCaps.notificationSoundsConfigurable &&
+                  !platformCaps.hapticsConfigurable && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Delivery, sound and vibration outside the app follow your device&apos;s
+                      notification settings.
+                    </p>
+                  )}
               </div>
             </div>
 

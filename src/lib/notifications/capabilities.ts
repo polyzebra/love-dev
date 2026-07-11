@@ -22,10 +22,6 @@ export type NotificationCapabilities = {
   installedPwa: boolean;
   /** iOS/iPadOS device - the platform where push requires Home Screen install. */
   ios: boolean;
-  /** navigator.vibrate is exposed (Android Chrome mostly; iOS never). */
-  vibrationApi: boolean;
-  /** HTMLAudioElement playback is constructible. */
-  audioPlayback: boolean;
   /** Current permission, or "unsupported" when Notification doesn't exist. */
   permission: NotificationPermissionState;
 };
@@ -62,8 +58,6 @@ export function detectCapabilities(): NotificationCapabilities {
       pushManager: false,
       installedPwa: false,
       ios: false,
-      vibrationApi: false,
-      audioPlayback: false,
       permission: "unsupported",
     };
   }
@@ -75,8 +69,6 @@ export function detectCapabilities(): NotificationCapabilities {
     pushManager: "PushManager" in window,
     installedPwa: detectInstalledPwa(),
     ios: detectIos(),
-    vibrationApi: "vibrate" in navigator,
-    audioPlayback: typeof Audio !== "undefined",
     permission: notificationsApi ? Notification.permission : "unsupported",
   };
 }

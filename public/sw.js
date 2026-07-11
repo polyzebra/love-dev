@@ -2,7 +2,9 @@
  * Tirvea service worker - Web Push display + click routing only.
  * Plain JS, no build step, served from / so its scope covers the app.
  *
- * Payload contract (JSON): { title, body?, url?, notificationId?, tag?, silent? }
+ * Payload contract (JSON): { title, body?, url?, notificationId?, tag? }
+ * Sound and vibration for a displayed notification are the OS's call -
+ * the payload carries no silent/vibration hints.
  */
 
 /* Take over immediately so push works right after first registration. */
@@ -45,7 +47,6 @@ self.addEventListener("push", (event) => {
       badge: "/icons/icon-192.png",
       tag: typeof data.tag === "string" ? data.tag : undefined,
       renotify: false,
-      silent: data.silent === true,
       data: {
         url: safePath(data.url),
         notificationId:

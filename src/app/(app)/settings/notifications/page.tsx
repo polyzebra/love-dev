@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BellRing, ChevronRight, Mail, MessageSquareText } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
-import { getUserSettings } from "@/lib/services/settings";
-import { InAppFeedbackSettings } from "@/components/settings/in-app-feedback";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 
 export const metadata: Metadata = { title: "Notifications" };
@@ -30,8 +28,7 @@ const CHANNELS = [
 ] as const;
 
 export default async function NotificationSettingsPage() {
-  const user = await requireUser();
-  const settings = await getUserSettings(user.id);
+  await requireUser();
 
   return (
     <>
@@ -62,18 +59,6 @@ export default async function NotificationSettingsPage() {
           </Link>
         ))}
       </nav>
-
-      <section className="mt-8" aria-label="In-app">
-        <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          In-app
-        </h2>
-        <InAppFeedbackSettings
-          initial={{
-            inAppVibrations: settings.inAppVibrations,
-            inAppSounds: settings.inAppSounds,
-          }}
-        />
-      </section>
     </>
   );
 }

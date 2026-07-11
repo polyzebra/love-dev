@@ -20,6 +20,10 @@ export const settingsPatchSchema = z
     pushDailyPicks: z.boolean(),
     pushOffers: z.boolean(),
     smsEnabled: z.boolean(),
+    // Native-only, not exposed on web: reserved for a future Capacitor
+    // shell's in-app sound/haptic preferences (see docs/NOTIFICATIONS-NATIVE.md).
+    // The web UI neither renders nor patches these; the schema keeps
+    // accepting them so a native client can PATCH without a migration.
     inAppVibrations: z.boolean(),
     inAppSounds: z.boolean(),
     safetyPush: z.boolean(),

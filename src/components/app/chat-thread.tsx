@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { assistant, type Suggestion } from "@/lib/assistant";
 import { emitInteraction } from "@/lib/interaction-events";
-import { playMessageSound, preloadMessageSound, vibrate } from "@/lib/notifications/sound";
 import { SPRING } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -79,8 +78,6 @@ export function ChatThread({
   theirPrompts = [],
   theyAreOnline = false,
   initialDraft = "",
-  soundEnabled = false,
-  vibrationEnabled = false,
 }: {
   conversationId: string;
   currentUserId: string;
@@ -93,10 +90,6 @@ export function ChatThread({
   theyAreOnline?: boolean;
   /** Prefill for the composer, e.g. from a ?suggest= link. */
   initialDraft?: string;
-  /** User's inAppSounds preference - chime on incoming messages. */
-  soundEnabled?: boolean;
-  /** User's inAppVibrations preference - short buzz on incoming messages. */
-  vibrationEnabled?: boolean;
 }) {
   const [messages, setMessages] = useState<ThreadMessage[]>(initialMessages);
   const [draft, setDraft] = useState(initialDraft);
@@ -132,18 +125,6 @@ export function ChatThread({
     scrollToBottom(false);
   }, [scrollToBottom]);
 
-  // Chime is decoded ahead of the first incoming message.
-  useEffect(() => {
-    if (soundEnabled) preloadMessageSound();
-  }, [soundEnabled]);
-
-  // Every message id we've already seen - so a poll can tell which
-  // incoming messages are genuinely new (and worth a sound/buzz).
-  const knownIdsRef = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)));
-  useEffect(() => {
-    for (const m of messages) knownIdsRef.current.add(m.id);
-  }, [messages]);
-
   // Presence heartbeat - tells the server this conversation is on
   // screen so the other side's "online" and read states stay honest.
   useEffect(() => {
@@ -171,15 +152,6 @@ export function ChatThread({
         const res = await fetch(`/api/conversations/${conversationId}/messages?take=50`);
         if (!res.ok) return;
         const { data } = (await res.json()) as { data: { messages: ThreadMessage[] } };
-        // In-app feedback: a genuinely NEW message from the other person
-        // while this tab is visible gets the soft chime / short buzz.
-        const incoming = data.messages.filter(
-          (m) => m.senderId !== currentUserId && !knownIdsRef.current.has(m.id),
-        );
-        if (incoming.length > 0 && document.visibilityState === "visible") {
-          playMessageSound(soundEnabled);
-          if (vibrationEnabled) vibrate(true, 30);
-        }
         setMessages((prev) => {
           const pending = prev.filter((m) => m.pending);
           const merged = [...data.messages, ...pending];
@@ -196,7 +168,7 @@ export function ChatThread({
       }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [conversationId, scrollToBottom, currentUserId, soundEnabled, vibrationEnabled]);
+  }, [conversationId, scrollToBottom]);
 
   async function send(text?: string) {
     const body = (text ?? draft).trim();

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
-import { getUserSettings } from "@/lib/services/settings";
 import { db } from "@/lib/db";
 import { assertParticipant, markRead } from "@/lib/services/chat";
 import { ChatThread, type ThreadMessage } from "@/components/app/chat-thread";
@@ -34,7 +33,7 @@ export default async function ConversationPage({
   // them as one parallel batch and gate on the check before using any of
   // it. markRead stays AFTER the gate: its participant.update throws for
   // non-participants and its SEEN sweep must never run for outsiders.
-  const [participant, other, myProfile, messages, settings] = await Promise.all([
+  const [participant, other, myProfile, messages] = await Promise.all([
     assertParticipant(conversationId, userId),
     db.participant.findFirst({
       where: { conversationId, userId: { not: userId } },
@@ -85,7 +84,6 @@ export default async function ConversationPage({
       take: 100,
       select: { id: true, senderId: true, body: true, status: true, createdAt: true },
     }),
-    getUserSettings(userId),
   ]);
   if (!participant) notFound();
 
@@ -212,8 +210,6 @@ export default async function ConversationPage({
         theyAreOnline={online}
         initialDraft={suggestedDraft}
         initialMessages={messages as ThreadMessage[]}
-        soundEnabled={settings.inAppSounds}
-        vibrationEnabled={settings.inAppVibrations}
       />
     </>
   );
