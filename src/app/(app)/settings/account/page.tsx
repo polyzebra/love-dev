@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BadgeCheck, CircleDashed } from "lucide-react";
+import { BadgeCheck, CircleAlert, CircleDashed, Hourglass, type LucideIcon } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import {
@@ -8,7 +8,7 @@ import {
   TRUST_WEIGHTS,
   VERIFICATION_USER_SELECT,
 } from "@/lib/services/verification";
-import { PageHeader } from "@/components/shared/page-header";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -31,40 +31,94 @@ export default async function AccountSettingsPage() {
   // admin trust panel and badges read.
   const verification = user ? toVerificationState(user) : null;
 
-  const rows = [
+  // Four visual registers, never color-only: each pairs an icon with the
+  // state text (verified / pending / needs another try / not available).
+  type RowState = "verified" | "pending" | "needs-action" | "todo" | "unavailable";
+  type Row = {
+    label: string;
+    value: string;
+    state: RowState;
+    /** Real destination only - no dead buttons. */
+    action: { label: string; href: string } | null;
+  };
+
+  // Workflow (not verdict) state for the photo row - PENDING/IN_REVIEW
+  // must read as pending, REJECTED/EXPIRED as "try again". The verdict
+  // itself stays canonical via toVerificationState.
+  const photoState: RowState = verification?.photoVerified
+    ? "verified"
+    : verification?.photoStatus === "PENDING" || verification?.photoStatus === "IN_REVIEW"
+      ? "pending"
+      : verification?.photoStatus === "REJECTED" || verification?.photoStatus === "EXPIRED"
+        ? "needs-action"
+        : "todo";
+
+  const rows: Row[] = [
     {
       label: "Email",
       value: user?.email ?? "-",
-      verified: !!verification?.emailVerified,
-      action: verification?.emailVerified ? null : "Resend link",
+      state: verification?.emailVerified ? "verified" : "todo",
+      // The authenticated attach+verify flow at /auth/email is the one
+      // real way to (re)verify an address on this account.
+      action: verification?.emailVerified
+        ? null
+        : { label: "Verify email", href: "/auth/email" },
     },
     {
       label: "Phone",
       value: user?.phoneE164 ?? "Not added",
-      verified: !!verification?.phoneVerified,
-      action: user?.phoneE164 ? null : "Add phone",
+      state: verification?.phoneVerified ? "verified" : "todo",
+      action: verification?.phoneVerified
+        ? null
+        : { label: "Add phone", href: "/auth/phone" },
     },
     {
       label: "Photo verification",
-      value: verification?.photoVerified
-        ? "Verified"
-        : verification?.photoStatus === "IN_REVIEW"
-          ? "In review"
-          : "Not verified",
-      verified: !!verification?.photoVerified,
-      action: verification?.photoVerified ? null : "Start",
+      value:
+        photoState === "verified"
+          ? "Verified"
+          : photoState === "pending"
+            ? verification?.photoStatus === "IN_REVIEW"
+              ? "In review"
+              : "In progress"
+            : photoState === "needs-action"
+              ? "Didn't go through - try again"
+              : "Not verified",
+      state: photoState,
+      // The verification flow card lives on the profile page.
+      action:
+        photoState === "verified"
+          ? null
+          : photoState === "pending"
+            ? { label: "View status", href: "/profile" }
+            : { label: photoState === "needs-action" ? "Try again" : "Start", href: "/profile" },
     },
     {
       label: "ID verification (optional)",
-      value: verification?.idVerified ? "Verified" : "Not verified",
-      verified: !!verification?.idVerified,
-      action: verification?.idVerified ? null : "Start",
+      value: verification?.idVerified ? "Verified" : "Not available yet",
+      state: verification?.idVerified ? "verified" : "unavailable",
+      // No user-facing ID flow exists yet - an honest quiet state beats
+      // a dead "Start" button.
+      action: null,
     },
   ];
 
+  const STATE_ICON: Record<RowState, { icon: LucideIcon; className: string }> = {
+    verified: { icon: BadgeCheck, className: "text-success" },
+    pending: { icon: Hourglass, className: "text-gold" },
+    "needs-action": { icon: CircleAlert, className: "text-muted-foreground" },
+    todo: { icon: CircleDashed, className: "text-muted-foreground/50" },
+    unavailable: { icon: CircleDashed, className: "text-muted-foreground/50" },
+  };
+
   return (
     <>
-      <PageHeader title="Account" description="Identity, verification and sign-in." />
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
+        title="Account"
+        description="Identity, verification and sign-in."
+      />
 
       {/* Trust score - real verification state, never faked */}
       {(() => {
@@ -105,24 +159,25 @@ export default async function AccountSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="divide-y">
-          {rows.map((row) => (
-            <div key={row.label} className="flex items-center gap-3 py-3.5 first:pt-0 last:pb-0">
-              {row.verified ? (
-                <BadgeCheck className="size-5 shrink-0 text-success" aria-hidden="true" />
-              ) : (
-                <CircleDashed className="size-5 shrink-0 text-muted-foreground/50" aria-hidden="true" />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{row.label}</p>
-                <p className="truncate text-sm text-muted-foreground">{row.value}</p>
+          {rows.map((row) => {
+            const { icon: Icon, className } = STATE_ICON[row.state];
+            return (
+              <div key={row.label} className="flex items-center gap-3 py-3.5 first:pt-0 last:pb-0">
+                <Icon className={`size-5 shrink-0 ${className}`} aria-hidden="true" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{row.label}</p>
+                  <p className="truncate text-sm text-muted-foreground" title={row.value}>
+                    {row.value}
+                  </p>
+                </div>
+                {row.action && (
+                  <Button variant="outline" className="h-11 shrink-0 rounded-full px-4" asChild>
+                    <Link href={row.action.href}>{row.action.label}</Link>
+                  </Button>
+                )}
               </div>
-              {row.action && (
-                <Button variant="outline" size="sm" className="rounded-full">
-                  {row.action}
-                </Button>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -134,7 +189,7 @@ export default async function AccountSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant="outline" className="rounded-full" asChild>
+          <Button variant="outline" className="h-11 rounded-full px-5" asChild>
             <Link href="/forgot-password">
               Change password
             </Link>

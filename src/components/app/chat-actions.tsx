@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Ban, EllipsisVertical, Flag, Loader2 } from "lucide-react";
@@ -40,6 +40,13 @@ export function ChatActions({ otherUserId, otherName }: { otherUserId: string; o
   const [reason, setReason] = useState<string>("FAKE_PROFILE");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
+  // The dialogs open from a dropdown ITEM that unmounts with the menu, so
+  // Radix has nothing to restore focus to - send it back to the trigger.
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const restoreFocus = (e: Event) => {
+    e.preventDefault();
+    triggerRef.current?.focus();
+  };
 
   async function submitReport() {
     setBusy(true);
@@ -81,7 +88,13 @@ export function ChatActions({ otherUserId, otherName }: { otherUserId: string; o
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Conversation options" className="rounded-full">
+          <Button
+            ref={triggerRef}
+            variant="ghost"
+            size="icon"
+            aria-label="Conversation options"
+            className="rounded-full"
+          >
             <EllipsisVertical className="size-5" />
           </Button>
         </DropdownMenuTrigger>
@@ -98,7 +111,7 @@ export function ChatActions({ otherUserId, otherName }: { otherUserId: string; o
 
       {/* Report dialog */}
       <Dialog open={reportOpen} onOpenChange={setReportOpen}>
-        <DialogContent className="rounded-3xl sm:max-w-md">
+        <DialogContent className="rounded-3xl sm:max-w-md" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Report {otherName}</DialogTitle>
             <DialogDescription>
@@ -136,7 +149,7 @@ export function ChatActions({ otherUserId, otherName }: { otherUserId: string; o
 
       {/* Block confirmation */}
       <Dialog open={blockOpen} onOpenChange={setBlockOpen}>
-        <DialogContent className="rounded-3xl sm:max-w-sm">
+        <DialogContent className="rounded-3xl sm:max-w-sm" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Block {otherName}?</DialogTitle>
             <DialogDescription>

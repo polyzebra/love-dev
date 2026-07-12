@@ -12,7 +12,7 @@ import { signOutEverywhere } from "@/components/auth/sign-out";
  */
 
 const ROW_CLASS =
-  "flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted disabled:opacity-60";
+  "flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20 disabled:opacity-60";
 
 export function RestorePurchasesRow() {
   const [busy, setBusy] = useState(false);

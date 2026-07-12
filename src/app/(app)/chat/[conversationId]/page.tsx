@@ -144,6 +144,9 @@ export default async function ConversationPage({
 
   return (
     <>
+      {/* Page heading for AT - the visual header below is a toolbar */}
+      <h1 className="sr-only">Conversation with {otherName}</h1>
+
       {/* Gradient conversation header */}
       <header className="glass relative mb-3 flex items-center gap-3 overflow-hidden rounded-lg p-2.5 pr-3">
         <div

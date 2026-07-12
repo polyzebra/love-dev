@@ -8,7 +8,12 @@ import { cn } from "@/lib/utils"
 function Drawer({
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) {
-  return <DrawerPrimitive.Root data-slot="drawer" {...props} />
+  // autoFocus: vaul suppresses Radix's open auto-focus by default, which
+  // leaves keyboard/SR focus on the page BEHIND the sheet (no trap entry).
+  // Defaulting it on restores the Dialog contract: focus moves into the
+  // sheet on open and back to the trigger on close. Callers can still
+  // pass autoFocus={false} for special cases.
+  return <DrawerPrimitive.Root autoFocus data-slot="drawer" {...props} />
 }
 
 function DrawerTrigger({

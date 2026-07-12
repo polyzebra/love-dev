@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { assistant, type Suggestion } from "@/lib/assistant";
 import { emitInteraction } from "@/lib/interaction-events";
-import { SPRING } from "@/lib/motion";
+import { DURATIONS, SPRING, standardEase } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -36,6 +36,9 @@ export type ThreadMessage = {
   status: "SENT" | "DELIVERED" | "SEEN";
   createdAt: string | Date;
   pending?: boolean;
+  /** Client-only: arrived while the thread was open, so animate its entrance.
+      Messages present at mount (and confirmed sends) never carry it. */
+  isNew?: boolean;
 };
 
 const POLL_INTERVAL_MS = 5000;
@@ -154,7 +157,20 @@ export function ChatThread({
         const { data } = (await res.json()) as { data: { messages: ThreadMessage[] } };
         setMessages((prev) => {
           const pending = prev.filter((m) => m.pending);
-          const merged = [...data.messages, ...pending];
+          // MERGE by id instead of replacing: the poll only carries the
+          // last 50 messages, and dropping older ones mid-read would yank
+          // the scroll position on long threads. Server rows win so status
+          // updates (SEEN) still land.
+          const byId = new Map(prev.filter((m) => !m.pending).map((m) => [m.id, m]));
+          for (const m of data.messages) {
+            // Ids we have never seen arrived while the thread was open -
+            // they animate in; known ids only update in place (SEEN etc.).
+            byId.set(m.id, byId.has(m.id) ? { ...m, isNew: byId.get(m.id)!.isNew } : { ...m, isNew: true });
+          }
+          const settled = [...byId.values()].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          );
+          const merged = [...settled, ...pending];
           const nearBottom =
             listRef.current &&
             listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight < 120;
@@ -196,7 +212,19 @@ export function ChatThread({
       if (!res.ok) throw new Error();
       const { data } = (await res.json()) as { data: ThreadMessage };
       emitInteraction("message-send");
-      setMessages((prev) => prev.map((m) => (m.id === optimistic.id ? data : m)));
+      // The confirmed message never re-animates (isNew stays unset) - it
+      // visually IS the optimistic bubble settling, not a new arrival.
+      const confirmed: ThreadMessage = { ...data, isNew: false };
+      setMessages((prev) => {
+        // The poll may have delivered the confirmed message while the POST
+        // was in flight - swap the optimistic bubble out and dedupe by id
+        // so a retry/poll race can never show the message twice.
+        const withoutOptimistic = prev.filter((m) => m.id !== optimistic.id);
+        if (withoutOptimistic.some((m) => m.id === data.id)) {
+          return withoutOptimistic.map((m) => (m.id === data.id ? confirmed : m));
+        }
+        return prev.map((m) => (m.id === optimistic.id ? confirmed : m));
+      });
     } catch {
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
       setDraft(body);
@@ -246,6 +274,9 @@ export function ChatThread({
             !prev ||
             new Date(m.createdAt).getTime() - new Date(prev.createdAt).getTime() > 20 * 60_000;
           const isLastMine = mine && i === messages.length - 1;
+          // Pending sends and polled-in arrivals animate; the history that
+          // was already on screen at mount renders settled.
+          const isNewArrival = Boolean(m.pending || m.isNew);
 
           return (
             <div key={m.id} className={cn(pos === "first" || pos === "solo" ? "pt-3" : "pt-0.5")}>
@@ -255,9 +286,9 @@ export function ChatThread({
                 </p>
               )}
               <motion.div
-                initial={{ opacity: 0, y: 14, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 420, damping: 30 }}
+                initial={isNewArrival ? { opacity: 0, y: 8 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: DURATIONS.standard, ease: standardEase }}
                 className={cn("flex", mine ? "justify-end" : "justify-start")}
               >
                 <div
@@ -287,17 +318,26 @@ export function ChatThread({
                 </div>
               </motion.div>
               {isLastMine && (
-                <p
-                  className="flex items-center justify-end gap-1 pr-2 pt-1 text-[10px] text-muted-foreground"
-                  aria-label={m.status === "SEEN" ? "Seen" : "Delivered"}
-                >
-                  {m.status === "SEEN" ? (
+                /* Honest transport states only: the backend stamps SENT on
+                   create and SEEN via markRead - "Delivered" renders only
+                   if a realtime transport ever sets it. While the POST is
+                   in flight the bubble says so instead of claiming SENT. */
+                <p className="flex items-center justify-end gap-1 pr-2 pt-1 text-[10px] text-muted-foreground">
+                  {m.pending ? (
                     <>
-                      Seen <CheckCheck className="size-3 text-primary-soft" />
+                      Sending <Clock className="size-3" aria-hidden="true" />
+                    </>
+                  ) : m.status === "SEEN" ? (
+                    <>
+                      Seen <CheckCheck className="size-3 text-primary-soft" aria-hidden="true" />
+                    </>
+                  ) : m.status === "DELIVERED" ? (
+                    <>
+                      Delivered <CheckCheck className="size-3" aria-hidden="true" />
                     </>
                   ) : (
                     <>
-                      Delivered <Check className="size-3" />
+                      Sent <Check className="size-3" aria-hidden="true" />
                     </>
                   )}
                 </p>

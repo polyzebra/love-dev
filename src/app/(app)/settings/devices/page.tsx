@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { MonitorSmartphone, ShieldCheck } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { PageHeader } from "@/components/shared/page-header";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatAgo } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Devices & sessions" };
 
@@ -18,7 +18,9 @@ export default async function DevicesSettingsPage() {
 
   return (
     <>
-      <PageHeader
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
         title="Devices"
         description="Everywhere your account is signed in."
       />
@@ -47,7 +49,7 @@ export default async function DevicesSettingsPage() {
                       {d.platform ?? "Unknown device"}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Last active {formatRelativeTime(d.lastSeenAt)} ago
+                      Last active {formatAgo(d.lastSeenAt)}
                     </p>
                   </div>
                   {d.trusted && (

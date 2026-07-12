@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
-  ArrowLeft,
   Ban,
   EyeOff,
   Flag,
@@ -10,7 +8,7 @@ import {
   Users,
   Car,
 } from "lucide-react";
-import { PageHeader } from "@/components/shared/page-header";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Safety Centre" };
@@ -54,15 +52,12 @@ const TOOLS = [
 export default function SafetyCentrePage() {
   return (
     <>
-      <Link
-        href="/settings"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to settings
-      </Link>
-
-      <PageHeader title="Safety Centre" description="Tools and guidance for safer dating." />
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
+        title="Safety Centre"
+        description="Tools and guidance for safer dating."
+      />
 
       <div className="space-y-6">
         <Card className="rounded-3xl">

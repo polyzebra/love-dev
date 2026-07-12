@@ -89,7 +89,7 @@ export default async function SettingsPage() {
             <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
               <Link
                 href="/admin"
-                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted"
+                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
               >
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
                   <ShieldCheck className="size-5 text-accent-foreground" aria-hidden="true" />
@@ -116,7 +116,7 @@ export default async function SettingsPage() {
                 <Link
                   key={href}
                   href={href}
-                  className={`flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted ${
+                  className={`flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20 ${
                     i > 0 ? "border-t" : ""
                   }`}
                 >
@@ -146,7 +146,7 @@ export default async function SettingsPage() {
           <div className="mt-4 overflow-hidden rounded-3xl border border-destructive/30 bg-card/80 shadow-card">
             <Link
               href="/settings/privacy"
-              className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-destructive/10"
+              className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-destructive/10 focus-visible:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-destructive/15">
                 <Trash2 className="size-5 text-destructive" aria-hidden="true" />

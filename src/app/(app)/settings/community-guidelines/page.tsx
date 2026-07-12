@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowLeft,
   Gavel,
   HeartHandshake,
   ShieldAlert,
   Sparkles,
   UserRound,
 } from "lucide-react";
-import { PageHeader } from "@/components/shared/page-header";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 
 export const metadata: Metadata = { title: "Community Guidelines" };
 
@@ -38,15 +37,9 @@ const GUIDELINES = [
 export default function CommunityGuidelinesPage() {
   return (
     <>
-      <Link
-        href="/settings"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to settings
-      </Link>
-
-      <PageHeader
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
         title="Community Guidelines"
         description="A few clear rules, so everyone here can be themselves."
       />

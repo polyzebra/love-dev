@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { PageHeader } from "@/components/shared/page-header";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeleteAccountButton, ExportDataButton } from "@/components/app/privacy-actions";
 
@@ -18,7 +18,9 @@ export default async function PrivacySettingsPage() {
 
   return (
     <>
-      <PageHeader
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
         title="Privacy Centre"
         description="Your data, your rules - as GDPR intended."
       />

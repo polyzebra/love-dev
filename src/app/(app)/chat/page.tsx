@@ -43,7 +43,7 @@ export default async function ChatListPage() {
           <li key={c.conversationId}>
             <Link
               href={`/chat/${c.conversationId}`}
-              className="flex items-center gap-4 rounded-3xl p-3 transition-colors hover:bg-card hover:shadow-card"
+              className="flex items-center gap-4 rounded-3xl p-3 transition-colors hover:bg-card hover:shadow-card focus-visible:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
             >
               <div className="relative shrink-0">
                 <Avatar className="size-14">
@@ -57,7 +57,9 @@ export default async function ChatListPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate font-medium">{c.other?.displayName ?? "Member"}</p>
+                  <p className="truncate font-medium" title={c.other?.displayName ?? "Member"}>
+                    {c.other?.displayName ?? "Member"}
+                  </p>
                   {c.isPinned && <Pin className="size-3.5 text-muted-foreground" aria-label="Pinned" />}
                   {c.lastMessage && (
                     <span className="ml-auto shrink-0 text-xs text-muted-foreground">
@@ -71,11 +73,15 @@ export default async function ChatListPage() {
                       "truncate text-sm",
                       c.unread > 0 ? "font-medium text-foreground" : "text-muted-foreground",
                     )}
+                    title={c.lastMessage?.body ?? undefined}
                   >
                     {c.lastMessage?.body ?? "You matched - say hello!"}
                   </p>
                   {c.unread > 0 && (
-                    <Badge className="ml-auto size-5 shrink-0 justify-center rounded-full p-0 text-[11px]">
+                    <Badge
+                      aria-label={`${c.unread} unread message${c.unread === 1 ? "" : "s"}`}
+                      className="ml-auto size-5 shrink-0 justify-center rounded-full p-0 text-[11px]"
+                    >
                       {c.unread > 9 ? "9+" : c.unread}
                     </Badge>
                   )}

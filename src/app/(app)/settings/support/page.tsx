@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowLeft,
   BookOpenText,
   ChevronRight,
   LifeBuoy,
   Mail,
   ShieldCheck,
 } from "lucide-react";
-import { PageHeader } from "@/components/shared/page-header";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Help & Support" };
@@ -39,15 +38,12 @@ const FAQ = [
 export default function SupportPage() {
   return (
     <>
-      <Link
-        href="/settings"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to settings
-      </Link>
-
-      <PageHeader title="Help & Support" description="We're here to help." />
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
+        title="Help & Support"
+        description="We're here to help."
+      />
 
       <div className="space-y-6">
         <a

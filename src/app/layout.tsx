@@ -55,6 +55,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // Keyboard resizes the LAYOUT viewport where supported (Chrome 108+,
+  // Safari 26+): dvh-sized surfaces (chat thread) shrink with it, so the
+  // composer stays pinned above the keyboard instead of being covered.
+  interactiveWidget: "resizes-content",
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#0B0709" },
     { media: "(prefers-color-scheme: light)", color: "#FAF6F4" },
