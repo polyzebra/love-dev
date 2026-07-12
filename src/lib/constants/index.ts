@@ -13,13 +13,14 @@ export const PHOTO_LIMITS = { min: 2, max: 10, maxSizeMb: 10 } as const;
 export const BIO_MAX_LENGTH = 500;
 export const MESSAGE_MAX_LENGTH = 2000;
 
-/** Free-tier daily budgets; enforced server-side. NOTE: boostsPerMonth is
- * aspirational pricing copy - no boost mechanism exists in the product
- * yet, so it is NOT exposed through entitlements (honesty rule). */
+/** Daily swipe budgets by plan; enforced server-side via entitlements.
+ * HONESTY RULE: only capabilities that exist in the product belong here.
+ * Boosts had a constant once (aspirational copy) - removed until a boost
+ * mechanism actually ships. */
 export const SWIPE_LIMITS = {
-  FREE: { likesPerDay: 25, superLikesPerDay: 1, undo: false, boostsPerMonth: 0 },
-  PLUS: { likesPerDay: Infinity, superLikesPerDay: 5, undo: true, boostsPerMonth: 1 },
-  GOLD: { likesPerDay: Infinity, superLikesPerDay: 10, undo: true, boostsPerMonth: 4 },
+  FREE: { likesPerDay: 25, superLikesPerDay: 1, undo: false },
+  PLUS: { likesPerDay: Infinity, superLikesPerDay: 5, undo: true },
+  GOLD: { likesPerDay: Infinity, superLikesPerDay: 10, undo: true },
 } as const;
 
 /** "Message before match" first messages per day, by plan tier. */
@@ -34,18 +35,30 @@ export const FIRST_MESSAGE_MAX_LENGTH = 280;
 /** A pending first message waits this long before it expires. */
 export const FIRST_MESSAGE_TTL_DAYS = 14;
 
+/**
+ * The plan catalogue - THE single client-safe source for plan naming and
+ * pricing (stripe.ts derives its price expectations from here). Exact
+ * naming everywhere: "Tirvea Free" / "Tirvea Plus" / "Tirvea Gold" -
+ * never a bare "Tirvea" plan chip.
+ *
+ * HONESTY RULE (same as entitlements.ts): every feature line below is a
+ * capability that exists in the product today. Boosts, "see who liked
+ * you", priority discovery and premium filters have no mechanism yet and
+ * must not be sold. First messages exist on EVERY tier (3/10/25 a day),
+ * so paid copy says "more", never "exclusive".
+ */
 export const PLANS = [
   {
     tier: "FREE",
-    name: "Tirvea",
+    name: "Tirvea Free",
     priceMonthlyCents: 0,
     tagline: "Start meeting people",
     features: [
-      "25 daily picks, each with real reasons you match",
-      "Conversation starters built from what you share",
-      "First-date ideas once the chat gets going",
+      "25 likes a day, each with real reasons you match",
       "1 Super Like a day to show real interest",
+      "3 first messages a day - say hello before you match",
       "Photo verification so people know it's you",
+      "Profile prompts that show the real you",
     ],
   },
   {
@@ -55,10 +68,10 @@ export const PLANS = [
     tagline: "Date with momentum",
     features: [
       "Like without a daily cap - never lose momentum",
-      "See who is already waiting for you - reply first",
-      "Take back an accidental pass",
+      "Rewind - take back an accidental pass",
       "5 Super Likes a day to open with intent",
-      "1 Boost a month to be seen first",
+      "10 first messages a day - more chances to go first",
+      "Everything in Tirvea Free",
     ],
   },
   {
@@ -67,12 +80,10 @@ export const PLANS = [
     priceMonthlyCents: 2999,
     tagline: "The full experience",
     features: [
-      "Everything in Plus",
-      "Priority discovery - shown to more of the right people",
-      "Say hello before you match",
-      "Sharper filters to find exactly your kind of person",
-      "10 Super Likes a day",
-      "4 Boosts a month for the moments that matter",
+      "Everything in Tirvea Plus",
+      "Unlimited likes and rewind, included",
+      "10 Super Likes a day - double the intent",
+      "25 first messages a day - open every door yourself",
     ],
   },
 ] as const;

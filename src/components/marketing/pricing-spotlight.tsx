@@ -7,13 +7,17 @@ import { EASE_LUXE } from "@/lib/motion";
 import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/fx/magnetic";
+import { CheckoutButton } from "@/components/billing/checkout-button";
 import { PLANS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
+// HONESTY RULE: descriptions sell only what exists - unlimited likes,
+// rewind, Super Likes and first-message budgets. No boosts, no "be seen
+// first", no priority discovery until those mechanisms ship.
 const DESCRIPTIONS: Record<string, string> = {
   FREE: "Everything you need to meet someone real. No card, no catch.",
   PLUS: "For when you're ready to move - never run out of likes, never lose a maybe.",
-  GOLD: "Be seen first and skip the waiting. Every tool Tirvea has, working for you.",
+  GOLD: "The most Super Likes and first messages Tirvea offers - open every door yourself.",
 };
 
 function price(cents: number) {
@@ -54,7 +58,7 @@ export function PricingSpotlight() {
               aria-selected={active}
               onClick={() => setTier(p.tier)}
               className={cn(
-                "tap-target relative rounded-full px-5 py-2 text-sm font-semibold transition-colors sm:px-8",
+                "tap-target relative whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition-colors sm:px-8",
                 active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
@@ -98,13 +102,22 @@ export function PricingSpotlight() {
                 {DESCRIPTIONS[plan.tier]}
               </p>
             </div>
-            <Magnetic className="inline-block">
-              <Button size="lg" className="h-14 rounded-full px-10 text-base" asChild>
-                <Link href="/login">
-                  {plan.tier === "FREE" ? "Join free" : `Get ${plan.name}`}
-                </Link>
-              </Button>
-            </Magnetic>
+            {plan.tier === "FREE" ? (
+              <Magnetic className="inline-block">
+                <Button size="lg" className="h-14 rounded-full px-10 text-base" asChild>
+                  <Link href="/login">Join free</Link>
+                </Button>
+              </Magnetic>
+            ) : (
+              // Real checkout, not a bounce through /login: POSTs
+              // /api/billing/checkout and redirects to Stripe. Signed-out
+              // visitors get /login?callbackUrl=/pricing from the 401.
+              <CheckoutButton
+                plan={plan.tier}
+                className="h-14 rounded-full px-8 text-base"
+                errorClassName="mx-auto md:mx-0"
+              />
+            )}
             <p className="text-xs text-muted-foreground">
               Prices include VAT · Cancel in two taps · Billed via Stripe
             </p>

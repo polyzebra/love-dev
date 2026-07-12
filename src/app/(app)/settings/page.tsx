@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { isStaff } from "@/lib/rbac";
-import { db } from "@/lib/db";
+import { effectiveTierOf } from "@/lib/services/entitlements";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { RestorePurchasesRow, SignOutRow } from "@/components/settings/restore-purchases";
@@ -60,11 +60,9 @@ const GROUPS = [
 
 export default async function SettingsPage() {
   const user = await requireUser();
-  const subscription = await db.subscription.findUnique({
-    where: { userId: user.id },
-    select: { tier: true },
-  });
-  const tier = subscription?.tier ?? "FREE";
+  // Effective tier (same status policy the entitlement gates use) so the
+  // badge never claims a plan the product isn't honoring.
+  const tier = await effectiveTierOf(user.id);
 
   return (
     <>
@@ -73,7 +71,7 @@ export default async function SettingsPage() {
         description={user.email}
         actions={
           <Badge variant={tier === "FREE" ? "secondary" : "default"} className="rounded-full px-3">
-            {tier === "FREE" ? "Free plan" : tier === "PLUS" ? "Plus" : "Gold"}
+            {tier === "FREE" ? "Tirvea Free" : tier === "PLUS" ? "Tirvea Plus" : "Tirvea Gold"}
           </Badge>
         }
       />

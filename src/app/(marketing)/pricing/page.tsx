@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Reveal } from "@/components/fx/reveal";
 import { MarketingHero } from "@/components/marketing/hero";
+import { CheckoutCancelledNotice } from "@/components/marketing/checkout-cancelled-notice";
 import { PricingSpotlight } from "@/components/marketing/pricing-spotlight";
 
 export const metadata: Metadata = {
@@ -24,6 +26,10 @@ export default function PricingPage() {
       />
       <section className="relative pb-28 md:pb-40">
         <div className="mx-auto max-w-5xl px-6 pt-10 md:px-10 md:pt-14">
+          {/* Stripe cancel_url returns here with ?checkout=cancelled. */}
+          <Suspense fallback={null}>
+            <CheckoutCancelledNotice />
+          </Suspense>
           <Reveal delay={0.1}>
             <PricingSpotlight />
           </Reveal>

@@ -1,4 +1,5 @@
 import { env, isProd } from "@/lib/env";
+import { PLANS } from "@/lib/constants";
 import type { PlanTier } from "@/generated/prisma/enums";
 
 /**
@@ -249,13 +250,18 @@ export function stripeConfigured(): boolean {
 export const PAID_PLANS = ["PLUS", "GOLD"] as const;
 export type PaidPlan = (typeof PAID_PLANS)[number];
 
-/** Expected live catalogue - EUR monthly, 14.99 / 29.99. */
+/** Expected live catalogue - EUR monthly, derived from the ONE plan
+ * pricing source (PLANS in lib/constants) so UI and Stripe validation
+ * can never drift apart. */
+const planPriceCents = (tier: PaidPlan): number =>
+  PLANS.find((p) => p.tier === tier)!.priceMonthlyCents;
+
 export const PLAN_PRICE_EXPECTATIONS: Record<
   PaidPlan,
   { amountCents: number; currency: string; interval: string }
 > = {
-  PLUS: { amountCents: 1499, currency: "eur", interval: "month" },
-  GOLD: { amountCents: 2999, currency: "eur", interval: "month" },
+  PLUS: { amountCents: planPriceCents("PLUS"), currency: "eur", interval: "month" },
+  GOLD: { amountCents: planPriceCents("GOLD"), currency: "eur", interval: "month" },
 };
 
 export function stripePriceIdFor(plan: PaidPlan): string | null {
