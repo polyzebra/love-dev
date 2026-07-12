@@ -252,7 +252,7 @@ export function CountryCodeSheet({
           </DrawerTitle>
           <DrawerDescription>Pick where your number is from.</DrawerDescription>
         </DrawerHeader>
-        <div className="flex min-h-0 flex-1 flex-col px-4 pb-[var(--safe-bottom)]">
+        <div className="flex min-h-0 flex-1 flex-col px-4">
           {search}
           {list}
         </div>

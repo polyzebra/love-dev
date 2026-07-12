@@ -190,7 +190,7 @@ function ChipToggle({
       className={cn(
         "tap-target inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
         selected
-          ? "border-transparent bg-linear-160 from-[#fb4a6e] to-[#be123c] text-primary-foreground shadow-[0_4px_18px_rgba(225,29,72,0.35)]"
+          ? "border-transparent bg-linear-160 from-brand-bright to-brand-hover text-primary-foreground shadow-[0_4px_18px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
           : "glass-chip text-muted-foreground hover:text-foreground",
       )}
     >
@@ -540,7 +540,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 14 }}
-          className="flex size-20 items-center justify-center rounded-full bg-accent shadow-[0_0_60px_rgba(225,29,72,0.4)]"
+          className="flex size-20 items-center justify-center rounded-full bg-accent shadow-[0_0_60px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
         >
           <Heart className="size-9 fill-primary text-primary" aria-hidden="true" />
         </motion.span>

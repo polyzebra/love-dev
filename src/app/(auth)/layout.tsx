@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <Logo />
       </header>
       <main className="relative flex flex-1 items-center justify-center px-4 pb-16">
-        <div className="glass w-full max-w-md rounded-[32px] p-7 sm:p-10">{children}</div>
+        <div className="glass w-full max-w-md rounded-2xl p-7 sm:p-10">{children}</div>
       </main>
       <footer className="safe-bottom relative pb-6 text-center text-xs text-muted-foreground">
         By continuing you agree to our{" "}

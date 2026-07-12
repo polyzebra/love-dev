@@ -30,6 +30,14 @@
   --accent: #2c151d;
   --accent-foreground: #fda4af;
 
+  /* Brand rose scale - THEME-INVARIANT on purpose: brand moments (CTA,
+     Like, match, premium) render identically in light and dark, so these
+     are defined once here and never overridden in .light.
+     brand itself is --primary (#e11d48, rose-600). */
+  --brand-bright: #fb4a6e; /* CTA gradient top stop */
+  --brand-hover: #be123c; /* darker rose - hover/pressed gradient stop */
+  --brand-active: #a3123a; /* deepest rose - CTA gradient base stop */
+
   /* Champagne - small luxury moments only */
   --gold: #e7c9a1;
 
@@ -40,6 +48,8 @@
   --success-foreground: #04220f;
   --warning: #fbbf24;
   --warning-foreground: #2e1e02;
+  --info: #22d3ee;
+  --info-foreground: #042a30;
 
   /* Lines & focus */
   --border: rgba(255, 255, 255, 0.09);
@@ -124,6 +134,8 @@
   --success-foreground: #ffffff;
   --warning: #a16207;
   --warning-foreground: #ffffff;
+  --info: #0e7490;
+  --info-foreground: #ffffff;
 
   --border: rgba(38, 24, 30, 0.1);
   --input: rgba(38, 24, 30, 0.14);
@@ -188,6 +200,8 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -205,9 +219,48 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* ---- Semantic aliases (Phase A consolidation) ----------------------
+     Same values as the tokens above - clearer intent for new code.
+     Text roles have no separate tokens; the convention is:
+       text primary   -> text-foreground
+       text secondary -> text-muted-foreground
+       text muted     -> text-muted-foreground/70                        */
+  --color-surface: var(--card);
+  --color-surface-elevated: var(--popover);
+  --color-border-strong: var(--input);
+  --color-brand: var(--primary);
+  --color-brand-bright: var(--brand-bright);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-active: var(--brand-active);
+  --color-danger: var(--destructive);
+  --color-danger-foreground: var(--destructive-foreground);
+  /* Focus: canonical utilities are `focus-visible:ring-2 ring-foreground/20`
+     (controls) and `focus-visible:border-foreground/30 ring-0` (fields).
+     This token exists for non-utility contexts only. Never use the rose
+     --ring for focus - it reads as a validation error. */
+  --color-focus-ring: color-mix(in srgb, var(--foreground) 20%, transparent);
+
+  /* ---- Typography scale ----------------------------------------------
+     font-display (Playfair serif) is for editorial moments ONLY: hero and
+     page/section headings, dialog/sheet titles, large stat numerals and
+     brand moments. Never on small labels, form controls, buttons, table
+     cells or dense admin rows - those are always font-sans.
+       display      font-display text-4xl..text-6xl  hero / marketing
+       page title   font-display text-2xl..text-3xl  h1 per page
+       section      font-display text-lg..text-xl    h2 / card titles
+       body         font-sans text-base (md:text-sm in dense UI)
+       small        font-sans text-sm
+       caption      font-sans text-xs text-muted-foreground
+       label        font-sans text-sm font-medium
+       button       font-sans text-sm font-medium                        */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-playfair), ui-serif, Georgia, serif;
 
+  /* ---- Radius scale ---------------------------------------------------
+     Derived from --radius (1.5rem = 24px). Computed sizes:
+       sm 14px · md 18px · lg 24px · xl 28px · 2xl 32px · 3xl 38px · full
+     Use these instead of arbitrary rounded-[Npx]. Sanctioned one-offs:
+     chat bubbles 22px, composer 26px, hero panels 36px.                 */
   --radius-sm: calc(var(--radius) - 10px);
   --radius-md: calc(var(--radius) - 6px);
   --radius-lg: var(--radius);
@@ -215,6 +268,11 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 14px);
 
+  /* ---- Shadow scale ---------------------------------------------------
+     shadow-card (resting panels) · shadow-float (overlays, popovers) ·
+     shadow-glow (rose brand glow, brand moments only). Component-specific
+     glows (CTA button, Like, nav halo) are sanctioned recipes that build
+     on color-mix(...var(--primary)...) - see docs/DESIGN-SYSTEM.md.     */
   --shadow-card: var(--shadow-card);
   --shadow-float: var(--shadow-float);
   --shadow-glow: var(--glow-rose);
@@ -287,6 +345,14 @@
   animation: rise 0.9s var(--ease-luxe) both;
   animation-delay: var(--rise-delay, 0s);
 }
+
+/* ---- Z-index scale ----------------------------------------------------
+   1-2   in-card layers          20  elevated in-card (drag lift)
+   10    card overlays/status    30  page overlays, sticky action bars
+   40    app chrome (bottom nav, desktop rail, admin header/sidebar)
+   50    Radix overlays: dialog, drawer, popover, select, tooltip
+   60    top progress bars       70  full-screen viewers (profile viewer)
+   Do not invent tiers between these.                                    */
 
 @layer base {
   * {

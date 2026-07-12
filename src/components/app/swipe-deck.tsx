@@ -140,7 +140,7 @@ const TRUST_CHIP_VARIANTS = {
 const STAGE_COLUMN_WIDTH =
   "md:w-[min(100%,calc((100dvh-1.5rem)*0.78))] lg:w-[min(100%,calc((100dvh-2rem)*0.78))]";
 /* Edge-to-edge on mobile; rounded inside the ambient field on md+ */
-const STAGE_RADIUS = "rounded-[24px] md:rounded-[28px] lg:rounded-[32px]";
+const STAGE_RADIUS = "rounded-lg md:rounded-xl lg:rounded-2xl";
 /* Action row floats over the photo, clear of the mobile nav capsule */
 const ACTION_ROW_BOTTOM =
   "bottom-[calc(max(1rem,var(--safe-bottom))+4.75rem)] lg:bottom-[calc(var(--safe-bottom)+2rem)]";
@@ -758,7 +758,7 @@ export function SwipeDeck({
                   whileTap={{ scale: 0.85 }}
                   whileHover={{ scale: 1.08 }}
                   aria-label="Like"
-                  className="pointer-events-auto flex size-[4.5rem] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_32px_rgba(225,29,72,0.5),0_18px_44px_rgba(225,29,72,0.35)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  className="pointer-events-auto flex size-[4.5rem] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_32px_color-mix(in_srgb,var(--primary)_50%,transparent),0_18px_44px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                   onClick={() => act("LIKE")}
                 >
                   <Heart className="size-8 fill-current" aria-hidden="true" />
@@ -827,7 +827,7 @@ export function SwipeDeck({
 
       {/* Match celebration - the moment leads with what you share */}
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>
-        <DialogContent className="overflow-hidden rounded-[32px] border-border text-center sm:max-w-sm">
+        <DialogContent className="overflow-hidden rounded-2xl border-border text-center sm:max-w-sm">
           {matchedWith && <HeartBurst />}
           <DialogHeader className="relative items-center space-y-3">
             <motion.span

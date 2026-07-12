@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  ACCOUNT_STATUS_BADGE,
   APPEAL_STATUS_BADGE,
   CASE_STATUS_BADGE,
   ENFORCEMENT_BADGE,
@@ -33,14 +34,6 @@ import { SafetyActions } from "./safety-actions";
 
 export const metadata: Metadata = { title: "User detail" };
 export const dynamic = "force-dynamic";
-
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-  ACTIVE: "secondary",
-  SUSPENDED: "destructive",
-  SHADOW_BANNED: "outline",
-  DEACTIVATED: "outline",
-  DELETED: "outline",
-};
 
 /** Salted hashes are long - show enough to compare, never pretend it's an IP. */
 function shortHash(hash: string | null): string {
@@ -214,7 +207,7 @@ export default async function AdminUserDetailPage({
       />
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
-        <Badge variant={STATUS_VARIANT[user.status] ?? "outline"} className="rounded-full">
+        <Badge variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"} className="rounded-full">
           {user.status.toLowerCase().replace(/_/g, " ")}
         </Badge>
         {banned && (

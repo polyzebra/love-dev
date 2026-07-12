@@ -81,7 +81,7 @@ export function HeroScene() {
       {/* Ambient key light + drifting particles */}
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 size-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.26),transparent_70%)] blur-2xl"
+        className="absolute left-1/2 top-1/2 size-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_26%,transparent),transparent_70%)] blur-2xl"
       />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         {[
@@ -122,10 +122,10 @@ export function HeroScene() {
         style={{ x: midX, y: midY, rotateY: rotY }}
         className="preserve-3d absolute inset-x-8 top-6 h-[440px]"
       >
-        <div className="animate-float-slow relative h-full w-full overflow-hidden rounded-[28px] border border-white/12 shadow-float light:border-border">
+        <div className="animate-float-slow relative h-full w-full overflow-hidden rounded-xl border border-white/12 shadow-float light:border-border">
           <Image src={PHOTO_SAOIRSE} alt="" fill priority sizes="(max-width:768px) 80vw, 340px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
-          <div className="absolute inset-0 rounded-[28px] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
+          <div className="absolute inset-0 rounded-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
 
           {/* Compatibility + why */}
           <div className="absolute left-3.5 top-3.5 space-y-1.5">
@@ -206,7 +206,7 @@ export function HeroScene() {
           <p className="rounded-2xl rounded-bl-md bg-foreground/8 px-3 py-2 text-xs leading-snug text-foreground/85">
             The Forty Foot at 7am - you in?
           </p>
-          <p className="ml-auto mt-1.5 w-fit rounded-2xl rounded-br-md bg-linear-160 from-[#f43f5e] to-[#be123c] px-3 py-2 text-xs leading-snug text-primary-foreground shadow-[0_4px_14px_rgba(225,29,72,0.3)]">
+          <p className="ml-auto mt-1.5 w-fit rounded-2xl rounded-br-md bg-linear-160 from-[#f43f5e] to-brand-hover px-3 py-2 text-xs leading-snug text-primary-foreground shadow-[0_4px_14px_color-mix(in_srgb,var(--primary)_30%,transparent)]">
             Only if breakfast follows ☕
           </p>
           <span className="mt-2 flex items-center gap-1" aria-hidden="true">

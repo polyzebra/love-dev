@@ -329,7 +329,7 @@ export function FirstMessageSheet({
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <div className="flex min-h-0 flex-1 flex-col px-6">{composer}</div>
-        <DrawerFooter className="gap-2 px-6 pb-[calc(1rem+var(--safe-bottom))]">
+        <DrawerFooter className="gap-2 px-6 pb-4">
           {sendButton}
           {cancelButton}
         </DrawerFooter>

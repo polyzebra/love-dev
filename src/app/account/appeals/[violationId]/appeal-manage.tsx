@@ -78,7 +78,7 @@ export function AppealRespond({
 
   if (sent) {
     return (
-      <section aria-label="Reply sent" className="glass mt-6 rounded-[28px] p-6">
+      <section aria-label="Reply sent" className="glass mt-6 rounded-xl p-6">
         <h2 className="font-display text-xl font-semibold tracking-tight">Thanks - reply sent</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
           Your reply was added to the appeal and our team will continue the review. We&apos;ll
@@ -91,7 +91,7 @@ export function AppealRespond({
   return (
     <section
       aria-label="We need a bit more information"
-      className="mt-6 rounded-[28px] border border-gold/40 bg-gold/5 p-6"
+      className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-6"
     >
       <div className="flex items-start gap-4">
         <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gold/15">

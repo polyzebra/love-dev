@@ -145,10 +145,10 @@ export default async function ConversationPage({
   return (
     <>
       {/* Gradient conversation header */}
-      <header className="glass relative mb-3 flex items-center gap-3 overflow-hidden rounded-[24px] p-2.5 pr-3">
+      <header className="glass relative mb-3 flex items-center gap-3 overflow-hidden rounded-lg p-2.5 pr-3">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(24rem_10rem_at_20%_0%,rgba(225,29,72,0.14),transparent_70%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(24rem_10rem_at_20%_0%,color-mix(in_srgb,var(--primary)_14%,transparent),transparent_70%)]"
         />
         <Button
           variant="ghost"

@@ -374,7 +374,7 @@ export function ExploreProfileViewer({
             </Button>
           </motion.div>
           <motion.div whileTap={{ scale: 0.85 }}>
-            <Button size="icon" aria-label="Like" className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_rgba(225,29,72,0.45)]" disabled={busy} onClick={() => decide("LIKE")}>
+            <Button size="icon" aria-label="Like" className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_color-mix(in_srgb,var(--primary)_45%,transparent)]" disabled={busy} onClick={() => decide("LIKE")}>
               <Heart className="size-7 fill-current" />
             </Button>
           </motion.div>

@@ -157,7 +157,7 @@ export function CheckoutConfirm({ sessionId }: { sessionId: string | null }) {
   }, [sessionId, startPolling]);
 
   return (
-    <div className="glass mx-auto max-w-md rounded-[28px] p-8 text-center">
+    <div className="glass mx-auto max-w-md rounded-xl p-8 text-center">
       {state.kind === "CHECKING" && (
         <StateBlock
           icon={
@@ -178,7 +178,7 @@ export function CheckoutConfirm({ sessionId }: { sessionId: string | null }) {
               initial={{ scale: 0.4, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.6, ease: EASE_LUXE }}
-              className="flex size-14 items-center justify-center rounded-full bg-linear-160 from-[#fb4a6e] via-[#e11d48] to-[#a3123a] shadow-[0_8px_24px_rgba(225,29,72,0.35)]"
+              className="flex size-14 items-center justify-center rounded-full bg-linear-160 from-brand-bright via-brand to-brand-active shadow-[0_8px_24px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
             >
               <Check className="size-7 text-primary-foreground" aria-hidden="true" />
             </motion.span>

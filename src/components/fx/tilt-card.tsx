@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -18,6 +18,7 @@ export function TiltCard({
   maxTilt?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
 
@@ -29,7 +30,7 @@ export function TiltCard({
   const glare = useMotionTemplate`radial-gradient(24rem 24rem at ${glareX} ${glareY}, rgba(255,255,255,0.10), transparent 60%)`;
 
   function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== "mouse" || !ref.current) return;
+    if (reduced || e.pointerType !== "mouse" || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     px.set((e.clientX - rect.left) / rect.width);
     py.set((e.clientY - rect.top) / rect.height);

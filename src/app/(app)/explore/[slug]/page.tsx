@@ -56,7 +56,7 @@ export default async function ExploreCategoryPage({
     <>
       {/* Category hero */}
       <section
-        className="relative mb-6 overflow-hidden rounded-[32px] border border-border p-6 shadow-card"
+        className="relative mb-6 overflow-hidden rounded-2xl border border-border p-6 shadow-card"
         style={{ background: `radial-gradient(130% 120% at 20% 0%, ${category.gradientFrom}40, transparent 60%), radial-gradient(120% 130% at 90% 100%, ${category.gradientTo}30, transparent 55%)` }}
       >
         <div className="flex items-start justify-between">
@@ -131,7 +131,7 @@ export default async function ExploreCategoryPage({
       )}
       {profileParam && !viewerProfile && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/95 p-6 backdrop-blur-xl" role="alertdialog" aria-label="Profile unavailable">
-          <div className="glass max-w-xs space-y-4 rounded-[28px] p-6 text-center">
+          <div className="glass max-w-xs space-y-4 rounded-xl p-6 text-center">
             <p className="font-display text-xl">This profile isn&apos;t available</p>
             <p className="text-sm text-muted-foreground">It may have been hidden or is no longer on Tirvea.</p>
             <Button className="rounded-full" asChild>

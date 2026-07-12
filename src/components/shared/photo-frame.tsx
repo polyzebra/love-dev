@@ -34,7 +34,7 @@ type PhotoFrameProps = {
    */
   mode?: "ratio" | "fill";
   /**
-   * Radius token. "default" = rounded-[28px] mobile -> rounded-[32px] lg,
+   * Radius token. "default" = rounded-xl mobile -> rounded-2xl lg,
    * applied with overflow-hidden on the SAME element so the image reaches
    * exactly the rounded edge - no borders, rings, or inset highlights.
    * "none" for parent-clipped tiles; custom radii go via className.
@@ -51,7 +51,7 @@ type PhotoFrameProps = {
 };
 
 const RADIUS: Record<NonNullable<PhotoFrameProps["radius"]>, string> = {
-  default: "rounded-[28px] lg:rounded-[32px]",
+  default: "rounded-xl lg:rounded-2xl",
   none: "",
 };
 

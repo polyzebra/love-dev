@@ -130,7 +130,7 @@ export default async function AccountStatusPage() {
         Account status
       </h1>
 
-      <section aria-label="Current standing" className="glass mt-6 rounded-[28px] p-6">
+      <section aria-label="Current standing" className="glass mt-6 rounded-xl p-6">
         <div className="flex items-start gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
             <StatusIcon className={`size-6 ${statusIconClass}`} aria-hidden="true" />

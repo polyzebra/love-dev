@@ -44,7 +44,7 @@ export default async function NotificationSettingsPage() {
           <Link
             key={href}
             href={href}
-            className={`flex min-h-14 items-center gap-4 px-5 py-4 transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:outline-none ${
+            className={`flex min-h-14 items-center gap-4 px-5 py-4 transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20 ${
               i > 0 ? "border-t border-border" : ""
             }`}
           >

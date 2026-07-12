@@ -20,27 +20,12 @@ import { formatAgo } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ENFORCEMENT_BADGE, SEVERITY_BADGE } from "../safety-badges";
 
 export const metadata: Metadata = { title: "Trust & safety" };
 export const dynamic = "force-dynamic";
 
 const SEVERITIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const;
-
-const SEVERITY_BADGE: Record<(typeof SEVERITIES)[number], "destructive" | "default" | "secondary" | "outline"> = {
-  CRITICAL: "destructive",
-  HIGH: "default",
-  MEDIUM: "secondary",
-  LOW: "outline",
-};
-
-const ACTION_BADGE: Record<string, "destructive" | "secondary" | "outline"> = {
-  BANNED: "destructive",
-  SUSPENDED: "destructive",
-  LIMITED: "secondary",
-  UPLOAD_BLOCKED: "secondary",
-  PHOTO_REMOVED: "outline",
-  WARNING: "outline",
-};
 
 /** Risk-score bands - aligned with trust-engine.recommendedActionFor. */
 const RISK_BANDS = [
@@ -624,7 +609,7 @@ export default async function TrustSafetyOverviewPage() {
             <ul className="divide-y">
               {recentViolations.map((v) => (
                 <li key={v.id} className="flex items-center gap-3 py-2.5">
-                  <Badge variant={ACTION_BADGE[v.actionTaken] ?? "outline"} className="rounded-full">
+                  <Badge variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"} className="rounded-full">
                     {v.actionTaken.toLowerCase().replace(/_/g, " ")}
                   </Badge>
                   <div className="min-w-0 flex-1">

@@ -55,7 +55,7 @@ export function AppealForm({ violationId }: { violationId: string }) {
 
   if (submitted) {
     return (
-      <section aria-label="Appeal submitted" className="glass mt-6 rounded-[28px] p-6">
+      <section aria-label="Appeal submitted" className="glass mt-6 rounded-xl p-6">
         <div className="flex items-start gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
             <Hourglass className="size-6 text-gold" aria-hidden="true" />

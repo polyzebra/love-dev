@@ -11,9 +11,9 @@ const buttonVariants = cva(
       variant: {
         // House CTA: rose gradient with depth, inner highlight and glow
         default:
-          "relative overflow-hidden bg-linear-160 from-[#fb4a6e] via-[#e11d48] to-[#a3123a] text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_24px_rgba(225,29,72,0.35)] transition-[transform,box-shadow] duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_10px_36px_rgba(225,29,72,0.5)] hover:brightness-110 active:scale-[0.97]",
+          "relative overflow-hidden bg-linear-160 from-brand-bright via-brand to-brand-active text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_24px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-[transform,box-shadow] duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_10px_36px_color-mix(in_srgb,var(--primary)_50%,transparent)] hover:brightness-110 active:scale-[0.97]",
         destructive:
-          "bg-destructive/15 border border-destructive/40 text-destructive shadow-xs hover:bg-destructive/25 focus-visible:ring-destructive/30 active:scale-[0.97]",
+          "bg-destructive/15 border border-destructive/40 text-destructive shadow-xs hover:bg-destructive/25 active:scale-[0.97]",
         // Frosted glass secondary
         outline:
           "glass-chip text-foreground transition-[transform,background-color] duration-300 hover:bg-foreground/10 active:scale-[0.97]",

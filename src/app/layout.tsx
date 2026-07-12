@@ -1,5 +1,6 @@
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { ThemeSync } from "@/components/theme/theme-sync";
+import { MotionProvider } from "@/components/fx/motion-provider";
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
@@ -71,7 +72,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${playfair.variable} min-h-dvh font-sans`}>
         <ThemeSync />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster position="top-center" richColors theme="system" />
       </body>
     </html>

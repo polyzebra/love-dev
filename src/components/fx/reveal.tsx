@@ -68,10 +68,13 @@ export function RevealItem({
   className?: string;
   y?: number;
 }) {
+  // Own gate so a RevealItem misused outside RevealGroup still respects
+  // reduced motion (the group's `initial=false` only covers its children).
+  const reduced = useReducedMotion();
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y },
+        hidden: reduced ? {} : { opacity: 0, y },
         show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE_LUXE } },
       }}
       className={className}

@@ -71,7 +71,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
                     <motion.span
                       layoutId="app-nav-halo"
                       transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                      className="absolute inset-x-1 inset-y-0 rounded-full bg-primary/25 shadow-[0_0_18px_rgba(225,29,72,0.35)]"
+                      className="absolute inset-x-1 inset-y-0 rounded-full bg-primary/25 shadow-[0_0_18px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
                     />
                   )}
                   <Icon className={cn("relative size-5", active && "fill-primary/30")} aria-hidden="true" />
@@ -85,7 +85,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
       </nav>
 
       {/* Desktop frosted rail */}
-      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-[28px] border border-border bg-card/50 backdrop-blur-2xl lg:flex">
+      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-xl border border-border bg-card/50 backdrop-blur-2xl lg:flex">
         <div className="px-6 py-7">
           <Logo href="/discover" />
         </div>

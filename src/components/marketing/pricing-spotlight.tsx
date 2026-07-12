@@ -51,7 +51,7 @@ export function PricingSpotlight({
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute -top-40 size-[30rem] rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.18),transparent_70%)] blur-2xl transition-all duration-700",
+          "pointer-events-none absolute -top-40 size-[30rem] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_18%,transparent),transparent_70%)] blur-2xl transition-all duration-700",
           tier === "FREE" ? "left-[-10%]" : tier === "PLUS" ? "left-1/2 -translate-x-1/2" : "right-[-10%]",
         )}
       />
@@ -79,7 +79,7 @@ export function PricingSpotlight({
                 <motion.span
                   layoutId="plan-pill"
                   transition={{ type: "spring", stiffness: 350, damping: 32 }}
-                  className="absolute inset-0 rounded-full bg-linear-160 from-[#fb4a6e] via-[#e11d48] to-[#a3123a] shadow-[0_6px_20px_rgba(225,29,72,0.4)]"
+                  className="absolute inset-0 rounded-full bg-linear-160 from-brand-bright via-brand to-brand-active shadow-[0_6px_20px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
                 />
               )}
               <span className="relative">{p.name}</span>

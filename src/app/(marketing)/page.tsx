@@ -100,8 +100,8 @@ export default function LandingPage() {
         <Aurora intensity="faint" />
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 md:grid-cols-2 md:px-10">
           <Reveal className="order-2 md:order-1">
-            <TiltCard maxTilt={7} className="rounded-[32px]">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[32px] border border-white/12 shadow-float light:border-border">
+            <TiltCard maxTilt={7} className="rounded-2xl">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/12 shadow-float light:border-border">
                 <Image
                   src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=640&q=75&auto=format&fit=crop"
                   alt="A couple laughing together over coffee"
@@ -166,7 +166,7 @@ export default function LandingPage() {
                 key={number}
                 className={i === 1 ? "md:translate-y-14" : i === 2 ? "md:translate-y-28" : ""}
               >
-                <article className="glass group relative overflow-hidden rounded-[28px] p-8 transition-transform duration-500 hover:-translate-y-1.5">
+                <article className="glass group relative overflow-hidden rounded-xl p-8 transition-transform duration-500 hover:-translate-y-1.5">
                   <span
                     aria-hidden="true"
                     className="pointer-events-none absolute -right-4 -top-8 font-display text-[7rem] font-semibold leading-none text-foreground/4 transition-colors duration-500 group-hover:text-primary/10"

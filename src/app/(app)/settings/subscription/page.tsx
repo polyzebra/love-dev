@@ -136,7 +136,7 @@ export default async function SubscriptionSettingsPage() {
           {/* Same spotlight the pricing stage carries, centred on the plan */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -top-40 left-1/2 size-[30rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.18),transparent_70%)] blur-2xl"
+            className="pointer-events-none absolute -top-40 left-1/2 size-[30rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_18%,transparent),transparent_70%)] blur-2xl"
           />
 
           <div className="relative space-y-4">

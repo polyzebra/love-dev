@@ -15,17 +15,10 @@ import {
 import { UserRowActions } from "./row-actions";
 import { formatRelativeTime } from "@/lib/utils";
 import { requireAdminPage } from "@/lib/auth/require-user";
+import { ACCOUNT_STATUS_BADGE } from "../safety-badges";
 
 export const metadata: Metadata = { title: "Users" };
 export const dynamic = "force-dynamic";
-
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-  ACTIVE: "secondary",
-  SUSPENDED: "destructive",
-  SHADOW_BANNED: "outline",
-  DEACTIVATED: "outline",
-  DELETED: "outline",
-};
 
 export default async function AdminUsersPage({
   searchParams,
@@ -91,7 +84,7 @@ export default async function AdminUsersPage({
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={STATUS_VARIANT[user.status] ?? "outline"} className="rounded-full">
+                  <Badge variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"} className="rounded-full">
                     {user.status.toLowerCase().replace(/_/g, " ")}
                   </Badge>
                 </TableCell>

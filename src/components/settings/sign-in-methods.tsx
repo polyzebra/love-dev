@@ -173,7 +173,7 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
       <Tooltip>
         {/* span wrapper so the tooltip still opens over the disabled button */}
         <TooltipTrigger asChild>
-          <span tabIndex={0} className="shrink-0 rounded-full focus-visible:outline-none">
+          <span tabIndex={0} className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20">
             {unlinkButton}
           </span>
         </TooltipTrigger>

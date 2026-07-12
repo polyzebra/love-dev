@@ -141,7 +141,7 @@ export default async function ProfilePage() {
         </Reveal>
       ) : (
         <Reveal>
-          <section className="glass rounded-[28px] p-6 text-center">
+          <section className="glass rounded-xl p-6 text-center">
             <p className="text-sm text-muted-foreground">
               No bio yet - profiles with a story get far more matches.{" "}
               <Link href="/settings" className="font-medium text-primary-soft underline-offset-2 hover:underline">
@@ -155,7 +155,7 @@ export default async function ProfilePage() {
       {/* ================= YOUR PROMPTS - editorial Q&A ================= */}
       {prompts.length > 0 && (
         <Reveal>
-          <section className="glass rounded-[28px] p-6 md:p-8">
+          <section className="glass rounded-xl p-6 md:p-8">
             <div className="mb-5 flex items-baseline justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Your prompts</p>
               <Button variant="link" size="sm" className="h-auto p-0 text-xs" asChild>
@@ -182,7 +182,7 @@ export default async function ProfilePage() {
       )}
       {prompts.length < 3 && (
         <Reveal>
-          <section className="glass flex flex-col items-center gap-3 rounded-[28px] border border-dashed border-foreground/15 p-7 text-center">
+          <section className="glass flex flex-col items-center gap-3 rounded-xl border border-dashed border-foreground/15 p-7 text-center">
             <span className="glass-chip flex size-12 items-center justify-center rounded-full">
               <MessageSquareQuote className="size-5 text-gold" aria-hidden="true" />
             </span>
@@ -204,7 +204,7 @@ export default async function ProfilePage() {
       {/* ================= INTEREST CLOUD ================= */}
       {profile.interests.length > 0 && (
         <Reveal>
-          <section className="glass rounded-[28px] p-6">
+          <section className="glass rounded-xl p-6">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
               Into
             </p>
@@ -229,7 +229,7 @@ export default async function ProfilePage() {
       {/* ================= THE BASICS - demoted, collapsed ================= */}
       {basics.length > 0 && (
         <Reveal>
-          <details className="group rounded-[28px] border border-border bg-card/40">
+          <details className="group rounded-xl border border-border bg-card/40">
             <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground [&::-webkit-details-marker]:hidden">
               The basics
               <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />

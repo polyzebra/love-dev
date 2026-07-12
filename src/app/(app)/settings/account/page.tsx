@@ -77,7 +77,7 @@ export default async function AccountSettingsPage() {
               ? "Optional ID verification completes your trust profile."
               : "Fully verified - matches can trust who they're meeting.";
         return (
-          <section className="glass mb-6 rounded-[28px] p-6" aria-label={`Trust score ${score} percent`}>
+          <section className="glass mb-6 rounded-xl p-6" aria-label={`Trust score ${score} percent`}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Trust score</p>
@@ -90,7 +90,7 @@ export default async function AccountSettingsPage() {
               </div>
             </div>
             <div className="mt-4 h-2 overflow-hidden rounded-full border border-border bg-foreground/10">
-              <div className="h-full rounded-full bg-linear-90 from-[#fb4a6e] to-[#e7c9a1] shadow-[0_0_12px_rgba(225,29,72,0.4)] transition-[width] duration-700" style={{ width: `${score}%` }} />
+              <div className="h-full rounded-full bg-linear-90 from-brand-bright to-[#e7c9a1] shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_40%,transparent)] transition-[width] duration-700" style={{ width: `${score}%` }} />
             </div>
           </section>
         );
