@@ -154,8 +154,15 @@ check("cancelAtPeriodEnd and PAST_DUE grace states have honest copy", () => {
   assert.match(subPage, /didn(?:'|&apos;)t go through/);
 });
 
-check("upgrade CTAs are the shared CheckoutButton; billing runs through the portal button", () => {
-  assert.match(subPage, /<CheckoutButton/);
+check("upgrade CTAs are the shared pricing spotlight (whose paid CTAs are CheckoutButton); billing runs through the portal button", () => {
+  // The upgrade section embeds the ONE plan-card surface - no duplicated
+  // Plus/Gold markup on the settings page. CheckoutButton lives inside
+  // PricingSpotlight (pinned below in the pricing honesty section).
+  assert.match(subPage, /<PricingSpotlight variant="embedded"/);
+  assert.ok(
+    !/<CheckoutButton/.test(subPage),
+    "no second copy of the upgrade CTA outside the shared spotlight",
+  );
   assert.match(subPage, /<ManageBillingButton/);
 });
 

@@ -27,10 +27,23 @@ function price(cents: number) {
 /**
  * One glass stage, three plans. The selector drives an animated
  * spotlight; price and features crossfade and cascade per plan.
+ *
+ * THE plan-card surface for the whole product - /pricing renders the
+ * default "marketing" variant, /settings/subscription embeds the same
+ * component (variant="embedded"), so Plus/Gold card markup exists
+ * exactly once. Embedded drops the FREE tab (a signed-in member is
+ * already on Free; "Join free" would bounce them to /login) and keeps
+ * everything else - selector, spotlight, price, features, CheckoutButton
+ * - pixel-identical to the pricing page.
  */
-export function PricingSpotlight() {
+export function PricingSpotlight({
+  variant = "marketing",
+}: {
+  variant?: "marketing" | "embedded";
+}) {
+  const plans = variant === "embedded" ? PLANS.filter((p) => p.tier !== "FREE") : PLANS;
   const [tier, setTier] = useState<(typeof PLANS)[number]["tier"]>("PLUS");
-  const plan = PLANS.find((p) => p.tier === tier)!;
+  const plan = plans.find((p) => p.tier === tier) ?? plans[0];
 
   return (
     <div className="border-glow noise relative overflow-hidden rounded-[36px] bg-card/60 p-6 md:p-12">
@@ -49,7 +62,7 @@ export function PricingSpotlight() {
         aria-label="Choose a plan"
         className="glass-chip relative mx-auto mb-10 flex w-fit max-w-full rounded-full p-1"
       >
-        {PLANS.map((p) => {
+        {plans.map((p) => {
           const active = p.tier === tier;
           return (
             <button

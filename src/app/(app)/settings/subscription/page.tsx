@@ -1,15 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ExternalLink, Receipt } from "lucide-react";
+import {
+  CheckCircle2,
+  CreditCard,
+  ExternalLink,
+  Hourglass,
+  Receipt,
+  RotateCcw,
+  Sparkles,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { PLANS } from "@/lib/constants";
 import { effectiveTier } from "@/lib/services/entitlements";
-import { PageHeader } from "@/components/shared/page-header";
+import type { PaymentStatus } from "@/generated/prisma/enums";
+import { cn } from "@/lib/utils";
+import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Badge } from "@/components/ui/badge";
-import { CheckoutButton } from "@/components/billing/checkout-button";
 import { ManageBillingButton } from "@/components/billing/manage-billing-button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PricingSpotlight } from "@/components/marketing/pricing-spotlight";
+import { EmptyState } from "@/components/shared/empty-state";
+import { Reveal } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Subscription & billing" };
 
@@ -22,12 +35,32 @@ const formatDate = (d: Date) =>
 
 const price = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 
+/** Payment timeline registers - same icon/badge vocabulary as the appeal timeline. */
+const PAYMENT_ICON: Record<PaymentStatus, { icon: LucideIcon; className: string }> = {
+  SUCCEEDED: { icon: CheckCircle2, className: "text-success" },
+  FAILED: { icon: XCircle, className: "text-muted-foreground" },
+  PENDING: { icon: Hourglass, className: "text-gold" },
+  REFUNDED: { icon: RotateCcw, className: "text-muted-foreground" },
+};
+
+const PAYMENT_BADGE: Record<PaymentStatus, "secondary" | "destructive" | "outline"> = {
+  SUCCEEDED: "secondary",
+  FAILED: "destructive",
+  PENDING: "outline",
+  REFUNDED: "outline",
+};
+
 /**
  * The billing home. Everything shown here is persisted, Stripe-verified
  * state (Subscription/Payment rows) - the page reads the database on
  * every render and displays the EFFECTIVE plan (same status policy the
  * entitlement gates use), so what the user sees is what the product
  * enforces. Plan naming is exact: Tirvea Free / Tirvea Plus / Tirvea Gold.
+ *
+ * Design register: the membership hero reuses the pricing spotlight
+ * surface (border-glow glass stage) and the profile page's editorial
+ * type; the upgrade section IS the pricing spotlight (embedded variant);
+ * the payment history matches the appeal-timeline register.
  */
 export default async function SubscriptionSettingsPage() {
   const user = await requireUser();
@@ -74,140 +107,208 @@ export default async function SubscriptionSettingsPage() {
           ? `Renews on ${formatDate(subscription.currentPeriodEnd)}.`
           : plan.tagline;
 
+  // The membership chip - one calm word about where the plan stands.
+  const membershipChip = pastDue
+    ? { label: "Payment past due", className: "text-warning" }
+    : !paid
+      ? { label: "Free plan", className: "text-muted-foreground" }
+      : subscription?.cancelAtPeriodEnd
+        ? { label: "Ends soon", className: "text-muted-foreground" }
+        : subscription?.status === "TRIALING"
+          ? { label: "Trial", className: "text-gold" }
+          : { label: "Active", className: "text-gold" };
+
   return (
     <>
-      <PageHeader title="Subscription" description="Your plan, invoices and receipts." />
+      <SettingsSubheader
+        backHref="/settings"
+        backLabel="Back to settings"
+        title="Subscription"
+        description="Your plan, invoices and receipts."
+      />
 
-      <Card className="mb-6 rounded-3xl">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-3">
-            <CardTitle className="text-base">Current plan</CardTitle>
-            <Badge
-              variant={paid ? "default" : "secondary"}
-              className="rounded-full px-3"
-            >
-              {plan.name}
-            </Badge>
+      {/* ============ MEMBERSHIP HERO - the pricing stage material ============ */}
+      <Reveal y={16}>
+        <section
+          aria-labelledby="current-plan-heading"
+          className="border-glow noise relative overflow-hidden rounded-[36px] bg-card/60 p-6 md:p-10"
+        >
+          {/* Same spotlight the pricing stage carries, centred on the plan */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-40 left-1/2 size-[30rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.18),transparent_70%)] blur-2xl"
+          />
+
+          <div className="relative space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p
+                id="current-plan-heading"
+                className="text-xs font-semibold uppercase tracking-[0.3em] text-gold"
+              >
+                Current plan
+              </p>
+              <span
+                className={cn(
+                  "glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest",
+                  membershipChip.className,
+                )}
+              >
+                {(paid && !pastDue && !subscription?.cancelAtPeriodEnd) && (
+                  <Sparkles className="size-3" aria-hidden="true" />
+                )}
+                {membershipChip.label}
+              </span>
+            </div>
+
+            <div>
+              <h2 className="font-display text-3xl font-medium tracking-tight md:text-4xl">
+                {plan.name}
+              </h2>
+              {paid && (
+                <p className="mt-2 flex items-baseline gap-2">
+                  <span className="font-display text-5xl font-medium tracking-tight">
+                    {price(plan.priceMonthlyCents)}
+                  </span>
+                  <span className="text-muted-foreground">/ month, VAT included</span>
+                </p>
+              )}
+            </div>
+
+            <p className="max-w-md text-sm text-muted-foreground md:text-base">{statusLine}</p>
+
+            {/* Dunning warning while the paid tier is still honored (grace). */}
+            {paid && pastDue && (
+              <div className="glass rounded-2xl px-5 py-4 text-sm">
+                <p className="font-medium">Your last payment didn&apos;t go through.</p>
+                <p className="text-muted-foreground">
+                  We&apos;ll retry for a few days. Update your payment method in billing to keep{" "}
+                  {plan.name}.
+                </p>
+              </div>
+            )}
+
+            {hasBillingProfile && (
+              <div className="space-y-3 pt-1">
+                <ManageBillingButton />
+                {/* No Stripe brand asset ships in this repo - the lucide
+                    credit-card glyph stands in as the payment mark. */}
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <CreditCard className="size-3.5" aria-hidden="true" />
+                  Billed securely via Stripe
+                </p>
+              </div>
+            )}
           </div>
-          <CardDescription>{statusLine}</CardDescription>
-        </CardHeader>
-        {(paid || hasBillingProfile) && (
-        <CardContent className="space-y-4">
-          {paid && (
-            <p className="text-sm">
-              <span className="font-display text-2xl font-medium tabular-nums">
-                {price(plan.priceMonthlyCents)}
-              </span>{" "}
-              <span className="text-muted-foreground">/ month, VAT included</span>
-            </p>
-          )}
+        </section>
+      </Reveal>
 
-          {/* Dunning warning while the paid tier is still honored (grace). */}
-          {paid && pastDue && (
-            <div className="rounded-2xl bg-muted px-4 py-3 text-sm">
-              <p className="font-medium">Your last payment didn&apos;t go through.</p>
-              <p className="text-muted-foreground">
-                We&apos;ll retry for a few days. Update your payment method in billing to keep{" "}
-                {plan.name}.
+      {/* ============ UPGRADE - the same stage /pricing renders ============ */}
+      {/* Only while no live subscription exists (a live one 409s at
+          checkout; plan CHANGES go through the portal above). */}
+      {!hasLiveSub && (
+        <Reveal>
+          <section aria-labelledby="upgrade-heading" className="mt-10">
+            <div className="mb-6 space-y-1 px-1">
+              <h2
+                id="upgrade-heading"
+                className="font-display text-3xl font-medium tracking-tight md:text-4xl"
+              >
+                Upgrade your membership
+              </h2>
+              <p className="text-sm text-muted-foreground md:text-base">
+                Billed monthly via Stripe. Cancel anytime in two taps - no dark patterns.
               </p>
             </div>
-          )}
-
-          {hasBillingProfile && <ManageBillingButton />}
-        </CardContent>
-        )}
-      </Card>
-
-      {/* Upgrade paths - only while no live subscription exists (a live one
-          409s at checkout; plan CHANGES go through the portal above). */}
-      {!hasLiveSub && (
-        <Card className="mb-6 rounded-3xl">
-          <CardHeader>
-            <CardTitle className="text-base">Upgrade your membership</CardTitle>
-            <CardDescription>
-              Billed monthly via Stripe. Cancel anytime in two taps - no dark patterns.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {PLANS.filter((p) => p.tier !== "FREE").map((p) => (
-              <div
-                key={p.tier}
-                className="flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-5 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium">{p.name}</p>
-                  <p className="text-sm text-muted-foreground">{p.tagline}</p>
-                  <p className="mt-1 text-sm">
-                    <span className="font-semibold tabular-nums">
-                      {price(p.priceMonthlyCents)}
-                    </span>{" "}
-                    <span className="text-muted-foreground">/ month</span>
-                  </p>
-                </div>
-                <CheckoutButton
-                  plan={p.tier as "PLUS" | "GOLD"}
-                  className="rounded-full px-6"
-                />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+            <PricingSpotlight variant="embedded" />
+          </section>
+        </Reveal>
       )}
 
-      <Card className="rounded-3xl">
-        <CardHeader>
-          <CardTitle className="text-base">Payment history</CardTitle>
-          <CardDescription>Receipts are also emailed after every payment.</CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* ============ PAYMENT HISTORY - appeal-timeline register ============ */}
+      <Reveal>
+        <section aria-labelledby="payments-heading" className="mt-10">
+          <div className="mb-3 px-1">
+            <h2
+              id="payments-heading"
+              className="text-xs font-semibold uppercase tracking-[0.3em] text-gold"
+            >
+              Payment history
+            </h2>
+          </div>
+
           {payments.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-2xl bg-muted px-4 py-6 text-sm text-muted-foreground">
-              <Receipt className="size-5" aria-hidden="true" />
-              No payments yet.
+            <div className="rounded-3xl border border-border bg-card/80 shadow-card">
+              <EmptyState
+                icon={Receipt}
+                title="No payments yet."
+                description="When you join a plan, every receipt lands here - and in your inbox."
+                className="min-h-0 px-8 py-14"
+              />
             </div>
           ) : (
-            <ul className="divide-y">
-              {payments.map((p) => {
+            <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+              {payments.map((p, i) => {
                 const receipt = p.receiptUrl ?? p.invoiceUrl;
-                return (
-                  <li key={p.id} className="flex items-center justify-between gap-3 py-3 text-sm">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium">{p.description ?? "Subscription"}</p>
-                      <p className="text-muted-foreground">
+                const { icon: Icon, className } = PAYMENT_ICON[p.status];
+                const row = (
+                  <>
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
+                      <Icon className={`size-5 ${className}`} aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">
+                        {p.description ?? "Subscription"}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
                         {p.createdAt.toLocaleDateString("en-IE", {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
                         })}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-3">
-                      <span className="tabular-nums">{price(p.amountCents)}</span>
-                      <Badge
-                        variant={p.status === "SUCCEEDED" ? "secondary" : "destructive"}
-                        className="rounded-full"
-                      >
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 flex-col items-end gap-1">
+                      <span className="text-sm font-medium tabular-nums">
+                        {price(p.amountCents)}
+                      </span>
+                      <Badge variant={PAYMENT_BADGE[p.status]} className="rounded-full">
                         {p.status.toLowerCase()}
                       </Badge>
-                      {receipt && (
-                        <Link
-                          href={receipt}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground transition-colors hover:text-foreground"
-                          aria-label="Open receipt"
-                        >
-                          <ExternalLink className="size-4" aria-hidden="true" />
-                        </Link>
-                      )}
-                    </div>
-                  </li>
+                    </span>
+                  </>
+                );
+                const rowClass = cn(
+                  "flex min-h-11 items-center gap-4 px-5 py-4",
+                  i > 0 && "border-t",
+                );
+                return receipt ? (
+                  <Link
+                    key={p.id}
+                    href={receipt}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open receipt - ${p.description ?? "Subscription"}, ${price(p.amountCents)}`}
+                    className={cn(rowClass, "transition-colors hover:bg-muted")}
+                  >
+                    {row}
+                    <ExternalLink
+                      className="size-4 shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                ) : (
+                  <div key={p.id} className={rowClass}>
+                    {row}
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           )}
-        </CardContent>
-      </Card>
+          <p className="mt-3 px-1 text-xs text-muted-foreground">
+            Receipts are also emailed after every payment.
+          </p>
+        </section>
+      </Reveal>
     </>
   );
 }
