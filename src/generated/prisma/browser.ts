@@ -118,6 +118,11 @@ export type AccountViolation = Prisma.AccountViolationModel
  */
 export type Appeal = Prisma.AppealModel
 /**
+ * Model AppealEvent
+ * 
+ */
+export type AppealEvent = Prisma.AppealEventModel
+/**
  * Model BannedCredential
  * 
  */
@@ -152,6 +157,16 @@ export type PushSubscription = Prisma.PushSubscriptionModel
  * 
  */
 export type NotificationDelivery = Prisma.NotificationDeliveryModel
+/**
+ * Model SuppressedEmail
+ * 
+ */
+export type SuppressedEmail = Prisma.SuppressedEmailModel
+/**
+ * Model ProviderHealth
+ * 
+ */
+export type ProviderHealth = Prisma.ProviderHealthModel
 /**
  * Model ConversationPresence
  * 

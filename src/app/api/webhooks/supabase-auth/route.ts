@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { teardownAccount } from "@/lib/auth/identity";
+import { secretsEqual } from "@/lib/webhook-signatures";
 
 /**
  * Supabase Auth webhook - keeps the app User table in lockstep with
@@ -9,7 +10,8 @@ import { teardownAccount } from "@/lib/auth/identity";
  */
 export async function POST(req: Request) {
   const secret = process.env.SUPABASE_WEBHOOK_SECRET;
-  if (!secret || req.headers.get("x-webhook-secret") !== secret) {
+  // Constant-time compare (audit 2026-07-11: was `!==` - a timing oracle).
+  if (!secret || !secretsEqual(req.headers.get("x-webhook-secret"), secret)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 

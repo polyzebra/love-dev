@@ -871,6 +871,23 @@ export type EnumAppealStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumAppealStatusFilter<$PrismaModel>
 }
 
+export type EnumAppealActorRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppealActorRole | Prisma.EnumAppealActorRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppealActorRoleFilter<$PrismaModel> | $Enums.AppealActorRole
+}
+
+export type EnumAppealActorRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppealActorRole | Prisma.EnumAppealActorRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppealActorRoleWithAggregatesFilter<$PrismaModel> | $Enums.AppealActorRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAppealActorRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAppealActorRoleFilter<$PrismaModel>
+}
+
 export type EnumBannedCredentialKindFilter<$PrismaModel = never> = {
   equals?: $Enums.BannedCredentialKind | Prisma.EnumBannedCredentialKindFieldRefInput<$PrismaModel>
   in?: $Enums.BannedCredentialKind[] | Prisma.ListEnumBannedCredentialKindFieldRefInput<$PrismaModel>
@@ -1844,6 +1861,23 @@ export type NestedEnumAppealStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAppealStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAppealStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumAppealActorRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppealActorRole | Prisma.EnumAppealActorRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppealActorRoleFilter<$PrismaModel> | $Enums.AppealActorRole
+}
+
+export type NestedEnumAppealActorRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppealActorRole | Prisma.EnumAppealActorRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppealActorRole[] | Prisma.ListEnumAppealActorRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppealActorRoleWithAggregatesFilter<$PrismaModel> | $Enums.AppealActorRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAppealActorRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAppealActorRoleFilter<$PrismaModel>
 }
 
 export type NestedEnumBannedCredentialKindFilter<$PrismaModel = never> = {

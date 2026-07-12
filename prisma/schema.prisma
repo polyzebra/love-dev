@@ -232,6 +232,11 @@ enum DeliveryStatus {
   FAILED
   DEAD
   SUPPRESSED
+  // Email-only terminal states from the provider webhook: the recipient
+  // mailbox rejected the message (BOUNCED) or the recipient marked it as
+  // spam (COMPLAINED). Both feed the SuppressedEmail list.
+  BOUNCED
+  COMPLAINED
 }
 
 enum FirstMessageStatus {
@@ -805,11 +810,29 @@ enum EnforcementAction {
   BANNED
 }
 
+// Appeal lifecycle. SUBMITTED and PENDING_REVIEW are BOTH the
+// "submitted, awaiting review" state (PENDING_REVIEW is the legacy alias -
+// kept so no data/API rename breaks; new code writes SUBMITTED).
+//   SUBMITTED/PENDING_REVIEW -> UNDER_REVIEW -> APPROVED/REJECTED
+//   UNDER_REVIEW -> NEEDS_INFO -> (user responds) -> UNDER_REVIEW
+//   NEEDS_INFO stale 14d -> EXPIRED (system)
+//   any pre-decision state -> WITHDRAWN (user)
 enum AppealStatus {
   SUBMITTED
   PENDING_REVIEW
+  UNDER_REVIEW
+  NEEDS_INFO
   APPROVED
   REJECTED
+  EXPIRED
+  WITHDRAWN
+}
+
+// Who wrote an AppealEvent timeline entry.
+enum AppealActorRole {
+  USER
+  STAFF
+  SYSTEM
 }
 
 enum BannedCredentialKind {
@@ -854,14 +877,34 @@ model ModerationCase {
   reviewedById   String?
   reviewedAt     DateTime?
   decisionReason String?
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+
+  // --- SLA / queue workflow (policy constants in trust-safety.ts) ---------
+  // priority defaults to the severity at creation (service-set; escalation
+  // may bump it above severity later - severity itself never changes).
+  priority        CaseSeverity @default(MEDIUM)
+  // Deadline derived from priority at creation: critical 4h, high 24h,
+  // medium 72h, low 7d. Escalation does NOT move an existing deadline.
+  slaDueAt        DateTime?
+  assignedToId    String?
+  // Stamped once - the first staff workflow action on the case.
+  firstResponseAt DateTime?
+  // Stamped when the case reaches a terminal decision (ACTION_TAKEN/
+  // DISMISSED/REVERSED); cleared if it is reopened.
+  resolvedAt      DateTime?
+  lastActivityAt  DateTime     @default(now())
+  // Set when the overdue sweep escalated this case (one bump only).
+  escalatedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user       User               @relation("ModerationCases", fields: [userId], references: [id], onDelete: Cascade)
   violations AccountViolation[]
 
   @@index([userId, status])
   @@index([status, severity, createdAt])
+  @@index([status, slaDueAt])
+  @@index([assignedToId, status])
 }
 
 // Automated moderation provider output for one photo - scores only, PII
@@ -936,18 +979,49 @@ model Appeal {
   userId       String
   status       AppealStatus @default(SUBMITTED)
   appealText   String       @db.Text
+  /**
+   * STAFF-ONLY. Never selected into any user read model (asserted in tests).
+   */
   adminNotes   String?
   reviewedById String?
   reviewedAt   DateTime?
+  /**
+   * Set when staff moved the appeal to NEEDS_INFO; drives the 14-day
+   * auto-expiry sweep. Cleared when the user responds.
+   */
+  needsInfoRequestedAt DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
   violation AccountViolation @relation(fields: [violationId], references: [id], onDelete: Cascade)
   user      User             @relation("Appeals", fields: [userId], references: [id], onDelete: Cascade)
+  events    AppealEvent[]
 
   @@index([violationId, status])
   @@index([userId, createdAt])
   @@index([status, createdAt])
+  @@index([status, needsInfoRequestedAt])
+}
+
+// Append-only appeal timeline (message thread + state changes). `note` is
+// USER-VISIBLE copy (the needs-info question, the user's reply, decision
+// notices) - staff-private commentary belongs in Appeal.adminNotes, never
+// here.
+model AppealEvent {
+  id        String          @id @default(cuid())
+  appealId  String
+  /**
+   * submitted | under_review | needs_info_requested | user_responded |
+   * approved | rejected | withdrawn | expired
+   */
+  type      String
+  actorRole AppealActorRole
+  note      String?         @db.Text
+  createdAt DateTime        @default(now())
+
+  appeal Appeal @relation(fields: [appealId], references: [id], onDelete: Cascade)
+
+  @@index([appealId, createdAt])
 }
 
 // Ban-evasion blocklist - legally-acceptable signals only: the verified
@@ -1099,6 +1173,44 @@ model NotificationDelivery {
 
   @@index([notificationId, channel])
   @@index([status, createdAt])
+  // Email provider webhooks (delivered/bounced/complained) look rows up by
+  // the provider's message id.
+  @@index([providerMessageId])
+}
+
+// Email suppression list - addresses we must NOT send to any more (hard
+// bounce or spam complaint reported by the provider webhook). Checked by
+// the email outbox worker before every send; rows are only removed by a
+// deliberate admin action, never automatically.
+model SuppressedEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  /**
+   * "hard_bounce" | "complaint" | "manual"
+   */
+  reason    String
+  /**
+   * Provider message id of the delivery that triggered the suppression.
+   */
+  sourceMessageId String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Rolling health of one external provider (moderation/email). Written by
+// the fallback chain on every attempt; read by the admin dashboard. A row
+// per provider name - consecutiveFailures resets to 0 on success.
+model ProviderHealth {
+  id                  String    @id @default(cuid())
+  provider            String    @unique
+  consecutiveFailures Int       @default(0)
+  totalFailures       Int       @default(0)
+  totalSuccesses      Int       @default(0)
+  lastError           String?
+  lastErrorAt         DateTime?
+  lastSuccessAt       DateTime?
+  updatedAt           DateTime  @updatedAt
 }
 
 // Heartbeat of "user X is looking at conversation Y right now" - used to

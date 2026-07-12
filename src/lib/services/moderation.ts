@@ -1,5 +1,9 @@
 import { db } from "@/lib/db";
 import type { ModerationCaseType, PhotoModerationResultStatus } from "@/generated/prisma/enums";
+import {
+  buildModerationChain,
+  resolveConfiguredProviders,
+} from "@/lib/services/moderation-providers";
 import { PHOTOS_BUCKET } from "@/lib/services/photos";
 import { enforceGraduated, openModerationCase } from "@/lib/services/trust-safety";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -277,6 +281,11 @@ export function pickProvider(): ModerationProvider {
   if (process.env.MODERATION_PROVIDER?.trim().toLowerCase() === "mock") {
     return mockProvider;
   }
+  // Ordered fallback chain (MODERATION_PROVIDERS="openai,google_vision,...").
+  // Adapters missing their env are skipped inside the resolver; an empty
+  // result falls through to the legacy single-provider selection.
+  const chain = resolveConfiguredProviders(externalProvider);
+  if (chain.length > 0) return buildModerationChain(chain);
   if (process.env.MODERATION_API_URL && process.env.MODERATION_API_KEY) {
     return externalProvider;
   }
@@ -464,8 +473,9 @@ export async function moderatePhoto(photoId: string): Promise<ModeratePhotoOutco
   let verdict: ModerationVerdict;
   try {
     let input: ModerationInput = {};
-    if (provider === externalProvider) {
-      // The bucket is private, so a real provider gets the bytes, not a URL.
+    if (provider !== nullProvider && provider !== mockProvider) {
+      // The bucket is private, so a real provider (single or chain) gets
+      // the bytes, not a URL.
       input = { buffer: await downloadCardVariant(photo.storagePath) };
     }
     verdict = await provider.analyze(input, context);

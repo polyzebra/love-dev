@@ -29,6 +29,10 @@
  *      persisted
  */
 import "dotenv/config";
+
+// Zero real emails from tests: the enforcement paths kick the email outbox;
+// the worker must see "not configured" even when .env has a real key.
+process.env.RESEND_API_KEY = "";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";

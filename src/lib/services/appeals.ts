@@ -8,6 +8,7 @@ import { audit } from "@/lib/audit";
 import { recordAuthEvent } from "@/lib/auth/audit";
 import { sendSafetyNotice } from "@/lib/services/safety-notices";
 import {
+  isCaseOverdue,
   reverseViolation,
   sweepExpiredRestrictions,
   userVisibleCopyFor,
@@ -33,7 +34,8 @@ export type AppealErrorCode =
   | "appeal_already_decided"
   | "appeal_rate_limited"
   | "appeal_not_found"
-  | "appeal_not_pending";
+  | "appeal_not_pending"
+  | "appeal_not_needs_info";
 
 const APPEAL_ERROR_STATUS: Record<AppealErrorCode, number> = {
   violation_not_found: 404,
@@ -43,7 +45,33 @@ const APPEAL_ERROR_STATUS: Record<AppealErrorCode, number> = {
   appeal_rate_limited: 429,
   appeal_not_found: 404,
   appeal_not_pending: 409,
+  appeal_not_needs_info: 409,
 };
+
+// ---------------------------------------------------------------------------
+// Lifecycle sets (see AppealStatus in the schema)
+// ---------------------------------------------------------------------------
+
+/** Awaiting some action - blocks a second appeal on the same violation. */
+export const OPEN_APPEAL_STATUSES = [
+  "SUBMITTED",
+  "PENDING_REVIEW", // legacy alias of SUBMITTED - treated identically
+  "UNDER_REVIEW",
+  "NEEDS_INFO",
+] as const satisfies readonly AppealStatus[];
+
+/** A human decided - final for that violation. */
+export const DECIDED_APPEAL_STATUSES = ["APPROVED", "REJECTED"] as const satisfies readonly AppealStatus[];
+
+/** Closed without a decision - the user may appeal the violation again. */
+export const REOPENABLE_APPEAL_STATUSES = ["WITHDRAWN", "EXPIRED"] as const satisfies readonly AppealStatus[];
+
+export function isOpenAppealStatus(status: string): boolean {
+  return (OPEN_APPEAL_STATUSES as readonly string[]).includes(status);
+}
+
+/** Days a NEEDS_INFO appeal waits for the user before auto-expiring. */
+export const NEEDS_INFO_EXPIRY_DAYS = 14;
 
 export class AppealError extends Error {
   readonly httpStatus: number;
@@ -110,7 +138,7 @@ export async function submitAppeal(input: {
       orderBy: { createdAt: "desc" },
       select: { status: true },
     });
-    if (existing?.status === "SUBMITTED" || existing?.status === "PENDING_REVIEW") {
+    if (existing && isOpenAppealStatus(existing.status)) {
       throw new AppealError(
         "appeal_already_open",
         "An appeal for this decision is already being reviewed.",
@@ -122,6 +150,7 @@ export async function submitAppeal(input: {
         "This decision has already been through an appeal.",
       );
     }
+    // WITHDRAWN/EXPIRED closed without a decision - a fresh appeal may open.
 
     const dayAgo = new Date(Date.now() - 24 * 3600 * 1000);
     const recent = await tx.appeal.count({
@@ -140,6 +169,9 @@ export async function submitAppeal(input: {
         userId: input.userId,
         status: "SUBMITTED",
         appealText: text,
+        events: {
+          create: { type: "submitted", actorRole: "USER", note: null },
+        },
       },
       select: { id: true, status: true, violation: { select: { moderationCaseId: true } } },
     });
@@ -195,7 +227,9 @@ export async function reviewAppeal(input: {
     select: { id: true, status: true, userId: true, violationId: true },
   });
   if (!appeal) throw new AppealError("appeal_not_found", "Appeal not found.");
-  if (appeal.status !== "SUBMITTED" && appeal.status !== "PENDING_REVIEW") {
+  // Any pre-decision state may be decided (a NEEDS_INFO appeal can still be
+  // approved/rejected if staff have enough to go on).
+  if (!isOpenAppealStatus(appeal.status)) {
     throw new AppealError("appeal_not_pending", "This appeal has already been decided.");
   }
 
@@ -210,11 +244,21 @@ export async function reviewAppeal(input: {
       adminNotes: input.adminNotes ?? null,
       reviewedById: input.actorId,
       reviewedAt: now,
+      needsInfoRequestedAt: null,
     },
   });
   if (claimed.count === 0) {
     throw new AppealError("appeal_not_pending", "This appeal has already been decided.");
   }
+  await db.appealEvent.create({
+    data: {
+      appealId: appeal.id,
+      type: input.decision === "approve" ? "approved" : "rejected",
+      actorRole: "STAFF",
+      // USER-VISIBLE timeline copy only - input.adminNotes stays private.
+      note: null,
+    },
+  });
 
   let restoredStatus: string | null = null;
   let restoredPhotoIds: string[] = [];
@@ -248,16 +292,256 @@ export async function reviewAppeal(input: {
 }
 
 // ---------------------------------------------------------------------------
+// Lifecycle: withdraw (user), needs-info round trip, under-review, expiry
+// ---------------------------------------------------------------------------
+
+/**
+ * User withdraws their own appeal - only while it is pre-decision. The
+ * violation stays in force; because a withdrawal is not a decision, the
+ * user may submit a fresh appeal later.
+ */
+export async function withdrawAppeal(input: {
+  userId: string;
+  appealId: string;
+}): Promise<{ appealId: string; status: AppealStatus }> {
+  const appeal = await db.appeal.findFirst({
+    // Ownership INSIDE the lookup - a foreign id reads as not-found (no IDOR).
+    where: { id: input.appealId, userId: input.userId },
+    select: { id: true, status: true, violation: { select: { moderationCaseId: true } } },
+  });
+  if (!appeal) throw new AppealError("appeal_not_found", "Appeal not found.");
+  if (!isOpenAppealStatus(appeal.status)) {
+    throw new AppealError("appeal_not_pending", "This appeal can no longer be withdrawn.");
+  }
+
+  const claimed = await db.appeal.updateMany({
+    where: { id: appeal.id, status: appeal.status },
+    data: { status: "WITHDRAWN", needsInfoRequestedAt: null },
+  });
+  if (claimed.count === 0) {
+    throw new AppealError("appeal_not_pending", "This appeal can no longer be withdrawn.");
+  }
+  await db.appealEvent.create({
+    data: { appealId: appeal.id, type: "withdrawn", actorRole: "USER", note: null },
+  });
+  // The case had moved to APPEALED on submit; with the appeal gone and the
+  // violation still in force, it returns to ACTION_TAKEN.
+  if (appeal.violation.moderationCaseId) {
+    await db.moderationCase.updateMany({
+      where: { id: appeal.violation.moderationCaseId, status: "APPEALED" },
+      data: { status: "ACTION_TAKEN", lastActivityAt: new Date() },
+    });
+  }
+  await recordAuthEvent({
+    type: "appeal_withdrawn",
+    userId: input.userId,
+    metadata: { appealId: appeal.id },
+  });
+  await sendSafetyNotice(input.userId, "appeal_withdrawn", `appeal:${appeal.id}:withdrawn`, {
+    appealId: appeal.id,
+  });
+  return { appealId: appeal.id, status: "WITHDRAWN" };
+}
+
+/** Staff marks an appeal as actively being reviewed. */
+export async function markAppealUnderReview(input: {
+  actorId: string;
+  appealId: string;
+}): Promise<{ appealId: string; status: AppealStatus }> {
+  const appeal = await db.appeal.findUnique({
+    where: { id: input.appealId },
+    select: { id: true, status: true },
+  });
+  if (!appeal) throw new AppealError("appeal_not_found", "Appeal not found.");
+  if (appeal.status !== "SUBMITTED" && appeal.status !== "PENDING_REVIEW") {
+    throw new AppealError("appeal_not_pending", "This appeal is not awaiting review.");
+  }
+  const claimed = await db.appeal.updateMany({
+    where: { id: appeal.id, status: appeal.status },
+    data: { status: "UNDER_REVIEW", reviewedById: input.actorId },
+  });
+  if (claimed.count === 0) {
+    throw new AppealError("appeal_not_pending", "This appeal is not awaiting review.");
+  }
+  await db.appealEvent.create({
+    data: { appealId: appeal.id, type: "under_review", actorRole: "STAFF", note: null },
+  });
+  return { appealId: appeal.id, status: "UNDER_REVIEW" };
+}
+
+/**
+ * Staff asks the user for more information. `message` is USER-VISIBLE (it
+ * is the question) and lands on the timeline; staff-private commentary
+ * belongs in adminNotes via the decide flow. The user gets 14 days to
+ * respond before the appeal auto-expires.
+ */
+export async function requestAppealInfo(input: {
+  actorId: string;
+  appealId: string;
+  message: string;
+}): Promise<{ appealId: string; status: AppealStatus }> {
+  const message = input.message.trim();
+  if (message.length < 3 || message.length > 1000) {
+    throw new AppealError("appeal_not_allowed", "The question must be 3-1000 characters.");
+  }
+  const appeal = await db.appeal.findUnique({
+    where: { id: input.appealId },
+    select: { id: true, status: true, userId: true },
+  });
+  if (!appeal) throw new AppealError("appeal_not_found", "Appeal not found.");
+  if (!isOpenAppealStatus(appeal.status) || appeal.status === "NEEDS_INFO") {
+    throw new AppealError("appeal_not_pending", "This appeal cannot be asked for more information.");
+  }
+  const now = new Date();
+  const claimed = await db.appeal.updateMany({
+    where: { id: appeal.id, status: appeal.status },
+    data: { status: "NEEDS_INFO", needsInfoRequestedAt: now, reviewedById: input.actorId },
+  });
+  if (claimed.count === 0) {
+    throw new AppealError("appeal_not_pending", "This appeal cannot be asked for more information.");
+  }
+  await db.appealEvent.create({
+    data: {
+      appealId: appeal.id,
+      type: "needs_info_requested",
+      actorRole: "STAFF",
+      note: message,
+    },
+  });
+  await sendSafetyNotice(appeal.userId, "appeal_needs_info", `appeal:${appeal.id}:needs-info:${now.getTime()}`, {
+    appealId: appeal.id,
+  });
+  return { appealId: appeal.id, status: "NEEDS_INFO" };
+}
+
+/**
+ * The user answers a NEEDS_INFO question - ONE response per round trip;
+ * the appeal returns to UNDER_REVIEW for staff.
+ */
+export async function respondAppealInfo(input: {
+  userId: string;
+  appealId: string;
+  message: string;
+}): Promise<{ appealId: string; status: AppealStatus }> {
+  const message = input.message.trim();
+  if (message.length < 3 || message.length > 2000) {
+    throw new AppealError("appeal_not_allowed", "Your reply must be 3-2000 characters.");
+  }
+  const appeal = await db.appeal.findFirst({
+    where: { id: input.appealId, userId: input.userId }, // ownership = not-found
+    select: { id: true, status: true },
+  });
+  if (!appeal) throw new AppealError("appeal_not_found", "Appeal not found.");
+  if (appeal.status !== "NEEDS_INFO") {
+    throw new AppealError("appeal_not_needs_info", "This appeal is not waiting on your reply.");
+  }
+  const claimed = await db.appeal.updateMany({
+    where: { id: appeal.id, status: "NEEDS_INFO" },
+    data: { status: "UNDER_REVIEW", needsInfoRequestedAt: null },
+  });
+  if (claimed.count === 0) {
+    throw new AppealError("appeal_not_needs_info", "This appeal is not waiting on your reply.");
+  }
+  await db.appealEvent.create({
+    data: { appealId: appeal.id, type: "user_responded", actorRole: "USER", note: message },
+  });
+  await recordAuthEvent({
+    type: "appeal_info_response",
+    userId: input.userId,
+    metadata: { appealId: appeal.id },
+  });
+  return { appealId: appeal.id, status: "UNDER_REVIEW" };
+}
+
+/**
+ * Sweep: NEEDS_INFO appeals whose question went unanswered for
+ * NEEDS_INFO_EXPIRY_DAYS expire (system close - the user may appeal the
+ * violation again). Called lazily from getAccountStatusView (scoped to one
+ * user) and globally by /api/cron/notifications.
+ */
+export async function expireStaleNeedsInfo(
+  opts: { userId?: string; now?: Date } = {},
+): Promise<number> {
+  const now = opts.now ?? new Date();
+  const cutoff = new Date(now.getTime() - NEEDS_INFO_EXPIRY_DAYS * 24 * 3600 * 1000);
+  const stale = await db.appeal.findMany({
+    where: {
+      status: "NEEDS_INFO",
+      needsInfoRequestedAt: { lt: cutoff },
+      ...(opts.userId ? { userId: opts.userId } : {}),
+    },
+    take: 100,
+    select: { id: true, userId: true },
+  });
+  let expired = 0;
+  for (const appeal of stale) {
+    const claimed = await db.appeal.updateMany({
+      where: { id: appeal.id, status: "NEEDS_INFO" },
+      data: { status: "EXPIRED" },
+    });
+    if (claimed.count === 0) continue;
+    expired += 1;
+    await db.appealEvent.create({
+      data: {
+        appealId: appeal.id,
+        type: "expired",
+        actorRole: "SYSTEM",
+        note: "No reply was received within 14 days, so this appeal was closed.",
+      },
+    });
+    await sendSafetyNotice(appeal.userId, "appeal_expired", `appeal:${appeal.id}:expired`, {
+      appealId: appeal.id,
+    });
+  }
+  return expired;
+}
+
+// ---------------------------------------------------------------------------
+// Appeal attachments - designed, NOT enabled (honest flag)
+// ---------------------------------------------------------------------------
+
+/**
+ * Evidence attachments for appeals are DESIGNED BUT NOT ENABLED. The
+ * intended shape (when APPEAL_ATTACHMENTS_ENABLED="true" ships):
+ *  - 1-3 images per appeal, uploaded through the SAME sharp validation
+ *    pipeline as profile photos (decode -> re-encode webp, size caps),
+ *    stored in the private bucket under users/{uid}/appeals/{appealId}/
+ *  - served staff-only through the media-proxy pattern (permission check
+ *    + short-lived signed URL; never public)
+ *  - an AppealEvent type "attachment_added" records each upload
+ * Until then this flag reports false and the API surface returns an honest
+ * 501 - nothing pretends to accept files it would drop.
+ */
+export function appealAttachmentsEnabled(): boolean {
+  return process.env.APPEAL_ATTACHMENTS_ENABLED?.trim().toLowerCase() === "true";
+}
+
+// ---------------------------------------------------------------------------
 // Account status read model (phase-2 UI renders this verbatim)
 // ---------------------------------------------------------------------------
 
 export type ViolationTab = "active" | "expired" | "appealed";
+
+/** One user-visible timeline entry (note is user-safe copy by contract). */
+export type AppealTimelineEntry = {
+  type: string;
+  actorRole: "USER" | "STAFF" | "SYSTEM";
+  note: string | null;
+  at: Date;
+};
 
 export type AppealView = {
   id: string;
   status: AppealStatus;
   submittedAt: Date;
   decidedAt: Date | null;
+  /** True while the appeal is pre-decision (user may withdraw it). */
+  canWithdraw: boolean;
+  /** True when staff asked for more info and the user has not replied. */
+  canRespond: boolean;
+  /** Deadline for the NEEDS_INFO reply (submittedAt+14d of the request). */
+  respondBy: Date | null;
+  timeline: AppealTimelineEntry[];
 };
 
 export type ViolationView = {
@@ -320,8 +604,10 @@ const STATUS_CARD: Record<string, { headline: string; body: string }> = {
  * never leave the server.
  */
 export async function getAccountStatusView(userId: string): Promise<AccountStatusView | null> {
-  // Lazy expiry first so a lapsed LIMITED shows as ACTIVE.
+  // Lazy sweeps first so a lapsed LIMITED shows as ACTIVE and a stale
+  // NEEDS_INFO appeal shows as EXPIRED.
   await sweepExpiredRestrictions(userId);
+  await expireStaleNeedsInfo({ userId });
 
   const user = await db.user.findUnique({
     where: { id: userId },
@@ -341,7 +627,18 @@ export async function getAccountStatusView(userId: string): Promise<AccountStatu
           appeals: {
             orderBy: { createdAt: "desc" },
             take: 1,
-            select: { id: true, status: true, createdAt: true, reviewedAt: true },
+            // USER-VISIBLE fields only: never adminNotes / reviewedById.
+            select: {
+              id: true,
+              status: true,
+              createdAt: true,
+              reviewedAt: true,
+              needsInfoRequestedAt: true,
+              events: {
+                orderBy: { createdAt: "asc" },
+                select: { type: true, actorRole: true, note: true, createdAt: true },
+              },
+            },
           },
         },
       },
@@ -353,8 +650,13 @@ export async function getAccountStatusView(userId: string): Promise<AccountStatu
   const violations: ViolationView[] = user.violations.map((v) => {
     const latestAppeal = v.appeals[0] ?? null;
     const expired = v.reversedAt !== null || (v.expiresAt !== null && v.expiresAt <= now);
-    const tab: ViolationTab = latestAppeal ? "appealed" : expired ? "expired" : "active";
-    const canAppeal = v.appealAllowed && !v.reversedAt && !latestAppeal;
+    // A withdrawn/expired appeal closed without a decision - the violation
+    // shows in its normal tab again and a fresh appeal is allowed.
+    const appealCounts =
+      !!latestAppeal &&
+      !(REOPENABLE_APPEAL_STATUSES as readonly string[]).includes(latestAppeal.status);
+    const tab: ViolationTab = appealCounts ? "appealed" : expired ? "expired" : "active";
+    const canAppeal = v.appealAllowed && !v.reversedAt && !appealCounts;
     return {
       id: v.id,
       violationType: v.violationType,
@@ -372,6 +674,21 @@ export async function getAccountStatusView(userId: string): Promise<AccountStatu
             status: latestAppeal.status,
             submittedAt: latestAppeal.createdAt,
             decidedAt: latestAppeal.reviewedAt,
+            canWithdraw: isOpenAppealStatus(latestAppeal.status),
+            canRespond: latestAppeal.status === "NEEDS_INFO",
+            respondBy:
+              latestAppeal.status === "NEEDS_INFO" && latestAppeal.needsInfoRequestedAt
+                ? new Date(
+                    latestAppeal.needsInfoRequestedAt.getTime() +
+                      NEEDS_INFO_EXPIRY_DAYS * 24 * 3600 * 1000,
+                  )
+                : null,
+            timeline: latestAppeal.events.map((e) => ({
+              type: e.type,
+              actorRole: e.actorRole,
+              note: e.note,
+              at: e.createdAt,
+            })),
           }
         : null,
     };
@@ -406,6 +723,12 @@ export async function listAppeals(filter: { status?: AppealStatus; take?: number
         },
       },
       user: { select: { id: true, email: true, status: true } },
+      // Full timeline for staff (notes here are user-visible copy;
+      // adminNotes rides on the appeal row itself, staff-only).
+      events: {
+        orderBy: { createdAt: "asc" },
+        select: { type: true, actorRole: true, note: true, createdAt: true },
+      },
     },
   });
 }
@@ -414,16 +737,33 @@ export async function listModerationCases(
   filter: {
     status?: "OPEN" | "UNDER_REVIEW" | "ACTION_TAKEN" | "DISMISSED" | "APPEALED" | "REVERSED";
     severity?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+    /** "me:{userId}" filters to one assignee; "unassigned" to nobody. */
+    assignedToId?: string | "unassigned";
+    overdueOnly?: boolean;
     take?: number;
   } = {},
 ) {
-  return db.moderationCase.findMany({
+  const now = new Date();
+  const rows = await db.moderationCase.findMany({
     where: {
       ...(filter.status ? { status: filter.status } : {}),
       ...(filter.severity ? { severity: filter.severity } : {}),
+      ...(filter.assignedToId === "unassigned"
+        ? { assignedToId: null }
+        : filter.assignedToId
+          ? { assignedToId: filter.assignedToId }
+          : {}),
+      ...(filter.overdueOnly
+        ? {
+            resolvedAt: null,
+            slaDueAt: { lt: now },
+            status: filter.status ?? { in: ["OPEN", "UNDER_REVIEW", "APPEALED"] },
+          }
+        : {}),
     },
-    // Most urgent first, oldest first within a severity.
-    orderBy: [{ severity: "desc" }, { createdAt: "asc" }],
+    // Most urgent first (queue priority, not raw severity), oldest first
+    // within a priority tier.
+    orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
     take: Math.min(filter.take ?? 50, 200),
     include: {
       user: {
@@ -438,4 +778,11 @@ export async function listModerationCases(
       violations: { select: { id: true, actionTaken: true, reversedAt: true } },
     },
   });
+  // isOverdue is derived (single definition in trust-safety.isCaseOverdue).
+  return rows.map((c) => ({ ...c, isOverdue: isCaseOverdue(c, now) }));
+}
+
+/** Staff read model: provider health of the moderation fallback chain. */
+export async function listProviderHealth() {
+  return db.providerHealth.findMany({ orderBy: { provider: "asc" } });
 }

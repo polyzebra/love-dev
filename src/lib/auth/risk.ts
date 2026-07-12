@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { isDisposableEmail } from "@/lib/auth/disposable-domains";
+import { buildIpIntelProviderFromEnv } from "@/lib/auth/ip-intel";
 
 /**
  * Login risk engine - additive 0-100 score built ONLY from signals we can
@@ -74,6 +75,14 @@ export const notConfiguredIpIntel: IpIntelProvider = {
 let ipIntelProvider: IpIntelProvider = notConfiguredIpIntel;
 
 export function getIpIntelProvider(): IpIntelProvider {
+  // Lazy env resolution: with IP_INTEL_API_KEY set the real adapter
+  // (ip-intel.ts - ipqs/ipinfo) replaces the stub on first use. An explicit
+  // setIpIntelProvider (tests) always wins. No import cycle: ip-intel.ts
+  // imports only TYPES from this module (erased at runtime).
+  if (ipIntelProvider === notConfiguredIpIntel) {
+    const fromEnv = buildIpIntelProviderFromEnv();
+    if (fromEnv) ipIntelProvider = fromEnv;
+  }
   return ipIntelProvider;
 }
 

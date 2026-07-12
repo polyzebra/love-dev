@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { clientIp, guardRate } from "@/lib/api";
 import { recordAuthEvent } from "@/lib/auth/audit";
 import {
   applyVerificationOutcome,
@@ -23,6 +24,13 @@ import { sendSafetyNotice } from "@/lib/services/safety-notices";
  *  3. status + provider reference only - no images, no biometrics, ever
  */
 export async function POST(req: Request) {
+  // Coarse flood guard in front of the crypto work (audit 2026-07-11).
+  const limited = await guardRate(`webhook-verification:${clientIp(req)}`, {
+    limit: 300,
+    windowMs: 60_000,
+  });
+  if (limited) return limited;
+
   const provider = getPhotoVerificationProvider();
   const rawBody = await req.text();
   const signature =
@@ -72,7 +80,7 @@ export async function POST(req: Request) {
     } else if (event.status === "rejected") {
       await sendSafetyNotice(
         result.userId,
-        "verification_required",
+        "verification_rejected",
         `verification:${event.sessionId}:rejected`,
       );
     }

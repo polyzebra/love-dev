@@ -71,6 +71,7 @@ export const ModelName = {
   PhotoModerationResult: 'PhotoModerationResult',
   AccountViolation: 'AccountViolation',
   Appeal: 'Appeal',
+  AppealEvent: 'AppealEvent',
   BannedCredential: 'BannedCredential',
   Block: 'Block',
   Subscription: 'Subscription',
@@ -78,6 +79,8 @@ export const ModelName = {
   Notification: 'Notification',
   PushSubscription: 'PushSubscription',
   NotificationDelivery: 'NotificationDelivery',
+  SuppressedEmail: 'SuppressedEmail',
+  ProviderHealth: 'ProviderHealth',
   ConversationPresence: 'ConversationPresence',
   AdminLog: 'AdminLog',
   FeatureFlag: 'FeatureFlag',
@@ -430,6 +433,13 @@ export const ModerationCaseScalarFieldEnum = {
   reviewedById: 'reviewedById',
   reviewedAt: 'reviewedAt',
   decisionReason: 'decisionReason',
+  priority: 'priority',
+  slaDueAt: 'slaDueAt',
+  assignedToId: 'assignedToId',
+  firstResponseAt: 'firstResponseAt',
+  resolvedAt: 'resolvedAt',
+  lastActivityAt: 'lastActivityAt',
+  escalatedAt: 'escalatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -486,11 +496,24 @@ export const AppealScalarFieldEnum = {
   adminNotes: 'adminNotes',
   reviewedById: 'reviewedById',
   reviewedAt: 'reviewedAt',
+  needsInfoRequestedAt: 'needsInfoRequestedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type AppealScalarFieldEnum = (typeof AppealScalarFieldEnum)[keyof typeof AppealScalarFieldEnum]
+
+
+export const AppealEventScalarFieldEnum = {
+  id: 'id',
+  appealId: 'appealId',
+  type: 'type',
+  actorRole: 'actorRole',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type AppealEventScalarFieldEnum = (typeof AppealEventScalarFieldEnum)[keyof typeof AppealEventScalarFieldEnum]
 
 
 export const BannedCredentialScalarFieldEnum = {
@@ -606,6 +629,32 @@ export const NotificationDeliveryScalarFieldEnum = {
 } as const
 
 export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
+
+
+export const SuppressedEmailScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  reason: 'reason',
+  sourceMessageId: 'sourceMessageId',
+  createdAt: 'createdAt'
+} as const
+
+export type SuppressedEmailScalarFieldEnum = (typeof SuppressedEmailScalarFieldEnum)[keyof typeof SuppressedEmailScalarFieldEnum]
+
+
+export const ProviderHealthScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  consecutiveFailures: 'consecutiveFailures',
+  totalFailures: 'totalFailures',
+  totalSuccesses: 'totalSuccesses',
+  lastError: 'lastError',
+  lastErrorAt: 'lastErrorAt',
+  lastSuccessAt: 'lastSuccessAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderHealthScalarFieldEnum = (typeof ProviderHealthScalarFieldEnum)[keyof typeof ProviderHealthScalarFieldEnum]
 
 
 export const ConversationPresenceScalarFieldEnum = {

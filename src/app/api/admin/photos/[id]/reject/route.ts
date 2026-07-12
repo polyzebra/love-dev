@@ -2,6 +2,7 @@ import { z } from "zod";
 import { notFound, ok, parseBody, requirePermission } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { sendSafetyNotice } from "@/lib/services/safety-notices";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -56,6 +57,10 @@ export async function POST(req: Request, { params }: Params) {
     targetType: "photo",
     targetId: photo.id,
     metadata: { ownerId: photo.userId, reason: data.reason },
+  });
+  // Tell the owner (calm generic copy - the staff reason stays internal).
+  await sendSafetyNotice(photo.userId, "photo_removed", `photo:${photo.id}:staff-rejected`, {
+    photoId: photo.id,
   });
 
   return ok({ id: photo.id, moderation: "REJECTED", status: "REJECTED" });

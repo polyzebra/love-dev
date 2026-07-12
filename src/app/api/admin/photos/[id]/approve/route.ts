@@ -1,6 +1,7 @@
 import { notFound, ok, requirePermission } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { sendSafetyNotice } from "@/lib/services/safety-notices";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -46,6 +47,10 @@ export async function POST(_req: Request, { params }: Params) {
     targetType: "photo",
     targetId: photo.id,
     metadata: { ownerId: photo.userId, previousModeration: photo.moderation },
+  });
+  // Tell the owner their photo cleared review (idempotent per photo).
+  await sendSafetyNotice(photo.userId, "photo_approved", `photo:${photo.id}:staff-approved`, {
+    photoId: photo.id,
   });
 
   return ok({ id: photo.id, moderation: "APPROVED", status: "ACTIVE" });

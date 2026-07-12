@@ -10,6 +10,7 @@ import {
   type PushEndpointResult,
   type PushPayload,
 } from "@/lib/services/push";
+import { pickEmailProvider, renderNotificationEmail } from "@/lib/services/email";
 
 /**
  * Notification pipeline - a transactional outbox.
@@ -24,10 +25,15 @@ import {
  *
  * Honesty rules:
  *  - a delivery is only SENT when a provider accepted it
- *  - EMAIL/SMS have no provider wired yet: rows are created for
- *    safety/account notices and immediately marked DEAD with
- *    errorCode "not_configured" unless the provider env exists (then they
- *    stay PENDING for the future email/sms worker - still never fake-SENT)
+ *  - EMAIL rows are drained by processPendingEmail() through the provider
+ *    abstraction in email.ts (Resend adapter); without RESEND_API_KEY the
+ *    row goes DEAD with errorCode "not_configured" at creation - never
+ *    fake-SENT. Provider webhooks advance SENT -> DELIVERED/BOUNCED/
+ *    COMPLAINED (see /api/webhooks/email); hard bounces + complaints land
+ *    on the SuppressedEmail list and are never sent to again.
+ *  - SMS has no provider wired yet: rows are created for safety/account
+ *    notices and immediately marked DEAD with "not_configured" unless the
+ *    Twilio env exists (then they stay PENDING for the future sms worker)
  *  - push payloads never carry chat text (see pushCopyFor)
  */
 
@@ -319,20 +325,22 @@ export async function notifyUser(
   }
 
   // EMAIL/SMS - safety and account notices only, never engagement volume.
-  // No provider integration is wired yet: with the provider env present the
-  // row waits PENDING for the future worker; without it the row goes DEAD
-  // with not_configured immediately. Nothing is ever fake-SENT.
+  // EMAIL rows wait PENDING for processPendingEmail() when a provider is
+  // configured; without one the row goes DEAD with not_configured
+  // immediately. Nothing is ever fake-SENT.
   const category = categoryOf(input.type);
   if (category === "safety" || category === "account") {
     const emailPref = category === "safety" ? settings.safetyEmail : settings.accountEmail;
     if (emailPref) {
-      const hasResend = !!process.env.RESEND_API_KEY?.trim();
+      const emailProvider = pickEmailProvider();
       rows.push({
         notificationId: notification.id,
         channel: "EMAIL",
-        status: hasResend ? "PENDING" : "DEAD",
-        provider: hasResend ? "resend" : "none",
-        ...(hasResend ? {} : { errorCode: "not_configured" }),
+        status: emailProvider.configured ? "PENDING" : "DEAD",
+        provider: emailProvider.configured ? emailProvider.name : "none",
+        ...(emailProvider.configured
+          ? { nextAttemptAt: now }
+          : { errorCode: "not_configured" }),
         idempotencyKey: `${input.dedupeKey}:email`,
       });
     }
@@ -549,6 +557,269 @@ export function schedulePushDispatch(): void {
   } catch {
     void run();
   }
+}
+
+/**
+ * Kick BOTH outbox channels (push + email) after the response. Safety and
+ * account notices use this so an email leaves promptly instead of waiting
+ * for the 5-minute cron sweep (which still executes backed-off retries).
+ */
+export function scheduleOutboxDispatch(): void {
+  const run = async () => {
+    await processPendingPush().catch((error) => {
+      console.error("[notify] push dispatch failed:", error);
+    });
+    await processPendingEmail().catch((error) => {
+      console.error("[notify] email dispatch failed:", error);
+    });
+  };
+  try {
+    after(() => void run());
+  } catch {
+    void run();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Email outbox worker (provider abstraction in email.ts)
+// ---------------------------------------------------------------------------
+
+export const MAX_EMAIL_ATTEMPTS = 4;
+
+/** Exponential backoff after the nth failed email attempt: 60s, 120s, 240s. */
+export function emailBackoffMs(attempt: number): number {
+  return 60_000 * 2 ** Math.max(0, attempt - 1);
+}
+
+export function isEmailSuppressed(email: string): Promise<boolean> {
+  return db.suppressedEmail
+    .findUnique({ where: { email: email.toLowerCase() }, select: { id: true } })
+    .then((row) => !!row);
+}
+
+export type EmailDispatchResult = {
+  deliveryId: string;
+  status: DeliveryStatus | "skipped";
+  errorCode?: string;
+};
+
+/**
+ * Sends one PENDING EMAIL delivery through the configured provider and
+ * records the honest outcome:
+ *  - provider accepted            -> SENT (+ providerMessageId; DELIVERED/
+ *                                   BOUNCED/COMPLAINED arrive via webhook)
+ *  - suppressed recipient         -> DEAD "suppressed" (never sent)
+ *  - not configured               -> DEAD "not_configured"
+ *  - permanent provider rejection -> FAILED (errorCode/errorMessage kept)
+ *  - transient failure            -> retry with backoff; after
+ *                                   MAX_EMAIL_ATTEMPTS -> FAILED "max_attempts"
+ * Claims the row optimistically (status+attempt CAS) like the push worker,
+ * so overlapping workers never double-send.
+ */
+export async function dispatchEmailDelivery(
+  deliveryId: string,
+  now: Date = new Date(),
+): Promise<EmailDispatchResult> {
+  const delivery = await db.notificationDelivery.findUnique({
+    where: { id: deliveryId },
+    include: { notification: { include: { user: { select: { email: true } } } } },
+  });
+  if (!delivery || delivery.channel !== "EMAIL" || delivery.status !== "PENDING") {
+    return { deliveryId, status: "skipped" };
+  }
+
+  // Optimistic claim (5-minute lease, same pattern as push).
+  const claimed = await db.notificationDelivery.updateMany({
+    where: { id: delivery.id, status: "PENDING", attempt: delivery.attempt },
+    data: { attempt: delivery.attempt + 1, nextAttemptAt: new Date(now.getTime() + 5 * 60_000) },
+  });
+  if (claimed.count === 0) return { deliveryId, status: "skipped" };
+  const attempt = delivery.attempt + 1;
+
+  const fail = async (
+    status: DeliveryStatus,
+    errorCode: string,
+    errorMessage: string | null,
+    retryAt: Date | null,
+  ): Promise<EmailDispatchResult> => {
+    await db.notificationDelivery.update({
+      where: { id: delivery.id },
+      data: {
+        status,
+        errorCode,
+        errorMessage: errorMessage?.slice(0, 500) ?? null,
+        nextAttemptAt: retryAt,
+      },
+    });
+    return { deliveryId, status, errorCode };
+  };
+
+  const provider = pickEmailProvider();
+  if (!provider.configured) {
+    return fail("DEAD", "not_configured", "no email provider configured", null);
+  }
+
+  const to = delivery.notification.user.email.toLowerCase();
+  // Suppression list: hard-bounced/complained addresses are dead ends -
+  // sending again hurts deliverability and the recipient asked us to stop.
+  if (await isEmailSuppressed(to)) {
+    return fail("DEAD", "suppressed", "recipient address is on the suppression list", null);
+  }
+
+  const n = delivery.notification;
+  const data = (n.data ?? {}) as Record<string, unknown>;
+  const rendered = renderNotificationEmail({
+    title: n.title,
+    body: n.body,
+    url: typeof data.url === "string" ? data.url : null,
+  });
+
+  const result = await provider.send({
+    to,
+    subject: rendered.subject,
+    text: rendered.text,
+    html: rendered.html,
+    idempotencyKey: delivery.idempotencyKey,
+  });
+
+  if (result.ok) {
+    await db.notificationDelivery.update({
+      where: { id: delivery.id },
+      data: {
+        status: "SENT",
+        provider: provider.name,
+        providerMessageId: result.providerMessageId,
+        sentAt: now,
+        errorCode: null,
+        errorMessage: null,
+        nextAttemptAt: null,
+      },
+    });
+    return { deliveryId, status: "SENT" };
+  }
+
+  if (!result.transient) {
+    return fail("FAILED", result.errorCode, result.errorMessage, null);
+  }
+  if (attempt >= MAX_EMAIL_ATTEMPTS) {
+    return fail("FAILED", "max_attempts", `${result.errorCode}: ${result.errorMessage}`, null);
+  }
+  return fail(
+    "PENDING",
+    result.errorCode,
+    result.errorMessage,
+    new Date(now.getTime() + emailBackoffMs(attempt)),
+  );
+}
+
+/**
+ * Drains due PENDING EMAIL deliveries. Called by scheduleOutboxDispatch()
+ * after safety/account notices and by the /api/cron/notifications sweep
+ * (which executes the backed-off retries).
+ */
+export async function processPendingEmail(
+  limit = 50,
+  now: Date = new Date(),
+): Promise<ProcessResult> {
+  const due = await db.notificationDelivery.findMany({
+    where: {
+      channel: "EMAIL",
+      status: "PENDING",
+      attempt: { lt: MAX_EMAIL_ATTEMPTS },
+      OR: [{ nextAttemptAt: null }, { nextAttemptAt: { lte: now } }],
+    },
+    orderBy: { createdAt: "asc" },
+    take: limit,
+    select: { id: true },
+  });
+
+  const summary: ProcessResult = { claimed: 0, sent: 0, dead: 0, retrying: 0 };
+  for (const row of due) {
+    const result = await dispatchEmailDelivery(row.id, now);
+    if (result.status === "skipped") continue;
+    summary.claimed += 1;
+    if (result.status === "SENT") summary.sent += 1;
+    else if (result.status === "PENDING") summary.retrying += 1;
+    else summary.dead += 1; // DEAD or FAILED - both terminal
+  }
+  return summary;
+}
+
+// ---------------------------------------------------------------------------
+// Email provider webhook application (route: /api/webhooks/email)
+// ---------------------------------------------------------------------------
+
+export type EmailWebhookEventType =
+  | "email.delivered"
+  | "email.bounced"
+  | "email.complained";
+
+export type ApplyEmailEventResult =
+  | { applied: true; deliveryId: string; status: DeliveryStatus; suppressed: boolean }
+  | { applied: false; reason: "unknown_message" | "already_applied" | "ignored_type" };
+
+/**
+ * Apply one provider webhook event to the delivery lifecycle, idempotently:
+ *  - email.delivered  -> SENT -> DELIVERED (deliveredAt stamped)
+ *  - email.bounced    -> BOUNCED + the recipient joins SuppressedEmail
+ *  - email.complained -> COMPLAINED + suppression (they marked us as spam)
+ * A repeat delivery of the same event finds the row already in the target
+ * state and no-ops. Unknown message ids report unknown_message (200 at the
+ * route - provider retries must not error-loop).
+ */
+export async function applyEmailProviderEvent(
+  type: string,
+  providerMessageId: string,
+  recipientEmail: string | null,
+  now: Date = new Date(),
+): Promise<ApplyEmailEventResult> {
+  if (type !== "email.delivered" && type !== "email.bounced" && type !== "email.complained") {
+    return { applied: false, reason: "ignored_type" };
+  }
+  const delivery = await db.notificationDelivery.findFirst({
+    where: { providerMessageId, channel: "EMAIL" },
+    include: { notification: { include: { user: { select: { email: true } } } } },
+  });
+  if (!delivery) return { applied: false, reason: "unknown_message" };
+
+  const target: DeliveryStatus =
+    type === "email.delivered" ? "DELIVERED" : type === "email.bounced" ? "BOUNCED" : "COMPLAINED";
+  if (delivery.status === target) return { applied: false, reason: "already_applied" };
+  // A terminal bounce/complaint outranks a late "delivered" event.
+  if (target === "DELIVERED" && (delivery.status === "BOUNCED" || delivery.status === "COMPLAINED")) {
+    return { applied: false, reason: "already_applied" };
+  }
+
+  await db.notificationDelivery.update({
+    where: { id: delivery.id },
+    data: {
+      status: target,
+      ...(target === "DELIVERED" ? { deliveredAt: now } : {}),
+      ...(target !== "DELIVERED"
+        ? { errorCode: target === "BOUNCED" ? "hard_bounce" : "complaint" }
+        : {}),
+    },
+  });
+
+  let suppressed = false;
+  if (target === "BOUNCED" || target === "COMPLAINED") {
+    const email = (recipientEmail ?? delivery.notification.user.email).toLowerCase();
+    await db.suppressedEmail.upsert({
+      where: { email },
+      create: {
+        email,
+        reason: target === "BOUNCED" ? "hard_bounce" : "complaint",
+        sourceMessageId: providerMessageId,
+      },
+      update: {}, // first suppression reason wins; row is already terminal
+    });
+    suppressed = true;
+    console.warn(
+      `[notify:email] ${email} suppressed (${target.toLowerCase()}) - delivery ${delivery.id}`,
+    );
+  }
+
+  return { applied: true, deliveryId: delivery.id, status: target, suppressed };
 }
 
 // ---------------------------------------------------------------------------

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { apiError, notFound, ok, parseBody, requirePermission } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { caseWorkflowStamps } from "@/lib/services/trust-safety";
 
 const reviewSchema = z
   .object({
@@ -29,7 +30,7 @@ export async function POST(req: Request, { params }: Params) {
 
   const existing = await db.moderationCase.findUnique({
     where: { id },
-    select: { id: true, status: true, userId: true },
+    select: { id: true, status: true, userId: true, firstResponseAt: true },
   });
   if (!existing) return notFound("Case");
   if (existing.status === "REVERSED") {
@@ -43,12 +44,16 @@ export async function POST(req: Request, { params }: Params) {
         ? "ACTION_TAKEN"
         : "DISMISSED";
 
+  const now = new Date();
   const updated = await db.moderationCase.update({
     where: { id },
     data: {
       status: nextStatus,
       reviewedById: actor.id,
-      reviewedAt: data.action === "under_review" ? null : new Date(),
+      reviewedAt: data.action === "under_review" ? null : now,
+      // SLA stamps: firstResponseAt once, resolvedAt on terminal decisions
+      // (cleared when the case reopens), lastActivityAt always.
+      ...caseWorkflowStamps(data.action, existing, now),
       ...(data.decisionReason ? { decisionReason: data.decisionReason } : {}),
     },
     select: { id: true, status: true, userId: true, caseType: true, severity: true },

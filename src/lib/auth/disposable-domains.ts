@@ -42,12 +42,24 @@ const DISPOSABLE_DOMAINS = new Set([
   "mail-temp.com",
 ]);
 
+/**
+ * Env override/extension: DISPOSABLE_EMAIL_DOMAINS is a comma-separated
+ * list merged into the curated set at call time (ops can react to a new
+ * provider without a deploy). Invalid entries are ignored.
+ */
+function extraDomainsFromEnv(): string[] {
+  const raw = process.env.DISPOSABLE_EMAIL_DOMAINS?.trim();
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter((d) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d));
+}
+
 export function isDisposableEmail(email: string): boolean {
   const domain = email.trim().toLowerCase().split("@").pop();
   if (!domain) return false;
+  const all = [...DISPOSABLE_DOMAINS, ...extraDomainsFromEnv()];
   // Match the domain and any subdomain of a listed domain
-  return (
-    DISPOSABLE_DOMAINS.has(domain) ||
-    [...DISPOSABLE_DOMAINS].some((d) => domain.endsWith(`.${d}`))
-  );
+  return all.includes(domain) || all.some((d) => domain.endsWith(`.${d}`));
 }

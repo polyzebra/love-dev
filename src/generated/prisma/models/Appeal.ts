@@ -33,6 +33,7 @@ export type AppealMinAggregateOutputType = {
   adminNotes: string | null
   reviewedById: string | null
   reviewedAt: Date | null
+  needsInfoRequestedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +47,7 @@ export type AppealMaxAggregateOutputType = {
   adminNotes: string | null
   reviewedById: string | null
   reviewedAt: Date | null
+  needsInfoRequestedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +61,7 @@ export type AppealCountAggregateOutputType = {
   adminNotes: number
   reviewedById: number
   reviewedAt: number
+  needsInfoRequestedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,6 +77,7 @@ export type AppealMinAggregateInputType = {
   adminNotes?: true
   reviewedById?: true
   reviewedAt?: true
+  needsInfoRequestedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +91,7 @@ export type AppealMaxAggregateInputType = {
   adminNotes?: true
   reviewedById?: true
   reviewedAt?: true
+  needsInfoRequestedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +105,7 @@ export type AppealCountAggregateInputType = {
   adminNotes?: true
   reviewedById?: true
   reviewedAt?: true
+  needsInfoRequestedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -186,6 +192,7 @@ export type AppealGroupByOutputType = {
   adminNotes: string | null
   reviewedById: string | null
   reviewedAt: Date | null
+  needsInfoRequestedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: AppealCountAggregateOutputType | null
@@ -220,10 +227,12 @@ export type AppealWhereInput = {
   adminNotes?: Prisma.StringNullableFilter<"Appeal"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"Appeal"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"Appeal"> | Date | string | null
+  needsInfoRequestedAt?: Prisma.DateTimeNullableFilter<"Appeal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Appeal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appeal"> | Date | string
   violation?: Prisma.XOR<Prisma.AccountViolationScalarRelationFilter, Prisma.AccountViolationWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  events?: Prisma.AppealEventListRelationFilter
 }
 
 export type AppealOrderByWithRelationInput = {
@@ -235,10 +244,12 @@ export type AppealOrderByWithRelationInput = {
   adminNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  needsInfoRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   violation?: Prisma.AccountViolationOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
+  events?: Prisma.AppealEventOrderByRelationAggregateInput
 }
 
 export type AppealWhereUniqueInput = Prisma.AtLeast<{
@@ -253,10 +264,12 @@ export type AppealWhereUniqueInput = Prisma.AtLeast<{
   adminNotes?: Prisma.StringNullableFilter<"Appeal"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"Appeal"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"Appeal"> | Date | string | null
+  needsInfoRequestedAt?: Prisma.DateTimeNullableFilter<"Appeal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Appeal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appeal"> | Date | string
   violation?: Prisma.XOR<Prisma.AccountViolationScalarRelationFilter, Prisma.AccountViolationWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  events?: Prisma.AppealEventListRelationFilter
 }, "id">
 
 export type AppealOrderByWithAggregationInput = {
@@ -268,6 +281,7 @@ export type AppealOrderByWithAggregationInput = {
   adminNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  needsInfoRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AppealCountOrderByAggregateInput
@@ -287,6 +301,7 @@ export type AppealScalarWhereWithAggregatesInput = {
   adminNotes?: Prisma.StringNullableWithAggregatesFilter<"Appeal"> | string | null
   reviewedById?: Prisma.StringNullableWithAggregatesFilter<"Appeal"> | string | null
   reviewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appeal"> | Date | string | null
+  needsInfoRequestedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Appeal"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Appeal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Appeal"> | Date | string
 }
@@ -298,10 +313,12 @@ export type AppealCreateInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   violation: Prisma.AccountViolationCreateNestedOneWithoutAppealsInput
   user: Prisma.UserCreateNestedOneWithoutAppealsInput
+  events?: Prisma.AppealEventCreateNestedManyWithoutAppealInput
 }
 
 export type AppealUncheckedCreateInput = {
@@ -313,8 +330,10 @@ export type AppealUncheckedCreateInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  events?: Prisma.AppealEventUncheckedCreateNestedManyWithoutAppealInput
 }
 
 export type AppealUpdateInput = {
@@ -324,10 +343,12 @@ export type AppealUpdateInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   violation?: Prisma.AccountViolationUpdateOneRequiredWithoutAppealsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAppealsNestedInput
+  events?: Prisma.AppealEventUpdateManyWithoutAppealNestedInput
 }
 
 export type AppealUncheckedUpdateInput = {
@@ -339,8 +360,10 @@ export type AppealUncheckedUpdateInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.AppealEventUncheckedUpdateManyWithoutAppealNestedInput
 }
 
 export type AppealCreateManyInput = {
@@ -352,6 +375,7 @@ export type AppealCreateManyInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -363,6 +387,7 @@ export type AppealUpdateManyMutationInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -376,6 +401,7 @@ export type AppealUncheckedUpdateManyInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -399,6 +425,7 @@ export type AppealCountOrderByAggregateInput = {
   adminNotes?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
+  needsInfoRequestedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -412,6 +439,7 @@ export type AppealMaxOrderByAggregateInput = {
   adminNotes?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
+  needsInfoRequestedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -425,8 +453,14 @@ export type AppealMinOrderByAggregateInput = {
   adminNotes?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
+  needsInfoRequestedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type AppealScalarRelationFilter = {
+  is?: Prisma.AppealWhereInput
+  isNot?: Prisma.AppealWhereInput
 }
 
 export type AppealCreateNestedManyWithoutUserInput = {
@@ -517,6 +551,20 @@ export type EnumAppealStatusFieldUpdateOperationsInput = {
   set?: $Enums.AppealStatus
 }
 
+export type AppealCreateNestedOneWithoutEventsInput = {
+  create?: Prisma.XOR<Prisma.AppealCreateWithoutEventsInput, Prisma.AppealUncheckedCreateWithoutEventsInput>
+  connectOrCreate?: Prisma.AppealCreateOrConnectWithoutEventsInput
+  connect?: Prisma.AppealWhereUniqueInput
+}
+
+export type AppealUpdateOneRequiredWithoutEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppealCreateWithoutEventsInput, Prisma.AppealUncheckedCreateWithoutEventsInput>
+  connectOrCreate?: Prisma.AppealCreateOrConnectWithoutEventsInput
+  upsert?: Prisma.AppealUpsertWithoutEventsInput
+  connect?: Prisma.AppealWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppealUpdateToOneWithWhereWithoutEventsInput, Prisma.AppealUpdateWithoutEventsInput>, Prisma.AppealUncheckedUpdateWithoutEventsInput>
+}
+
 export type AppealCreateWithoutUserInput = {
   id?: string
   status?: $Enums.AppealStatus
@@ -524,9 +572,11 @@ export type AppealCreateWithoutUserInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   violation: Prisma.AccountViolationCreateNestedOneWithoutAppealsInput
+  events?: Prisma.AppealEventCreateNestedManyWithoutAppealInput
 }
 
 export type AppealUncheckedCreateWithoutUserInput = {
@@ -537,8 +587,10 @@ export type AppealUncheckedCreateWithoutUserInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  events?: Prisma.AppealEventUncheckedCreateNestedManyWithoutAppealInput
 }
 
 export type AppealCreateOrConnectWithoutUserInput = {
@@ -579,6 +631,7 @@ export type AppealScalarWhereInput = {
   adminNotes?: Prisma.StringNullableFilter<"Appeal"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"Appeal"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"Appeal"> | Date | string | null
+  needsInfoRequestedAt?: Prisma.DateTimeNullableFilter<"Appeal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Appeal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appeal"> | Date | string
 }
@@ -590,9 +643,11 @@ export type AppealCreateWithoutViolationInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAppealsInput
+  events?: Prisma.AppealEventCreateNestedManyWithoutAppealInput
 }
 
 export type AppealUncheckedCreateWithoutViolationInput = {
@@ -603,8 +658,10 @@ export type AppealUncheckedCreateWithoutViolationInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  events?: Prisma.AppealEventUncheckedCreateNestedManyWithoutAppealInput
 }
 
 export type AppealCreateOrConnectWithoutViolationInput = {
@@ -633,6 +690,78 @@ export type AppealUpdateManyWithWhereWithoutViolationInput = {
   data: Prisma.XOR<Prisma.AppealUpdateManyMutationInput, Prisma.AppealUncheckedUpdateManyWithoutViolationInput>
 }
 
+export type AppealCreateWithoutEventsInput = {
+  id?: string
+  status?: $Enums.AppealStatus
+  appealText: string
+  adminNotes?: string | null
+  reviewedById?: string | null
+  reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  violation: Prisma.AccountViolationCreateNestedOneWithoutAppealsInput
+  user: Prisma.UserCreateNestedOneWithoutAppealsInput
+}
+
+export type AppealUncheckedCreateWithoutEventsInput = {
+  id?: string
+  violationId: string
+  userId: string
+  status?: $Enums.AppealStatus
+  appealText: string
+  adminNotes?: string | null
+  reviewedById?: string | null
+  reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AppealCreateOrConnectWithoutEventsInput = {
+  where: Prisma.AppealWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppealCreateWithoutEventsInput, Prisma.AppealUncheckedCreateWithoutEventsInput>
+}
+
+export type AppealUpsertWithoutEventsInput = {
+  update: Prisma.XOR<Prisma.AppealUpdateWithoutEventsInput, Prisma.AppealUncheckedUpdateWithoutEventsInput>
+  create: Prisma.XOR<Prisma.AppealCreateWithoutEventsInput, Prisma.AppealUncheckedCreateWithoutEventsInput>
+  where?: Prisma.AppealWhereInput
+}
+
+export type AppealUpdateToOneWithWhereWithoutEventsInput = {
+  where?: Prisma.AppealWhereInput
+  data: Prisma.XOR<Prisma.AppealUpdateWithoutEventsInput, Prisma.AppealUncheckedUpdateWithoutEventsInput>
+}
+
+export type AppealUpdateWithoutEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAppealStatusFieldUpdateOperationsInput | $Enums.AppealStatus
+  appealText?: Prisma.StringFieldUpdateOperationsInput | string
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  violation?: Prisma.AccountViolationUpdateOneRequiredWithoutAppealsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAppealsNestedInput
+}
+
+export type AppealUncheckedUpdateWithoutEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  violationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAppealStatusFieldUpdateOperationsInput | $Enums.AppealStatus
+  appealText?: Prisma.StringFieldUpdateOperationsInput | string
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type AppealCreateManyUserInput = {
   id?: string
   violationId: string
@@ -641,6 +770,7 @@ export type AppealCreateManyUserInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -652,9 +782,11 @@ export type AppealUpdateWithoutUserInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   violation?: Prisma.AccountViolationUpdateOneRequiredWithoutAppealsNestedInput
+  events?: Prisma.AppealEventUpdateManyWithoutAppealNestedInput
 }
 
 export type AppealUncheckedUpdateWithoutUserInput = {
@@ -665,8 +797,10 @@ export type AppealUncheckedUpdateWithoutUserInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.AppealEventUncheckedUpdateManyWithoutAppealNestedInput
 }
 
 export type AppealUncheckedUpdateManyWithoutUserInput = {
@@ -677,6 +811,7 @@ export type AppealUncheckedUpdateManyWithoutUserInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -689,6 +824,7 @@ export type AppealCreateManyViolationInput = {
   adminNotes?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  needsInfoRequestedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -700,9 +836,11 @@ export type AppealUpdateWithoutViolationInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAppealsNestedInput
+  events?: Prisma.AppealEventUpdateManyWithoutAppealNestedInput
 }
 
 export type AppealUncheckedUpdateWithoutViolationInput = {
@@ -713,8 +851,10 @@ export type AppealUncheckedUpdateWithoutViolationInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.AppealEventUncheckedUpdateManyWithoutAppealNestedInput
 }
 
 export type AppealUncheckedUpdateManyWithoutViolationInput = {
@@ -725,10 +865,40 @@ export type AppealUncheckedUpdateManyWithoutViolationInput = {
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  needsInfoRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type AppealCountOutputType
+ */
+
+export type AppealCountOutputType = {
+  events: number
+}
+
+export type AppealCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  events?: boolean | AppealCountOutputTypeCountEventsArgs
+}
+
+/**
+ * AppealCountOutputType without action
+ */
+export type AppealCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AppealCountOutputType
+   */
+  select?: Prisma.AppealCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AppealCountOutputType without action
+ */
+export type AppealCountOutputTypeCountEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AppealEventWhereInput
+}
 
 
 export type AppealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -740,10 +910,13 @@ export type AppealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   adminNotes?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  needsInfoRequestedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   violation?: boolean | Prisma.AccountViolationDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  events?: boolean | Prisma.Appeal$eventsArgs<ExtArgs>
+  _count?: boolean | Prisma.AppealCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appeal"]>
 
 export type AppealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -755,6 +928,7 @@ export type AppealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   adminNotes?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  needsInfoRequestedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   violation?: boolean | Prisma.AccountViolationDefaultArgs<ExtArgs>
@@ -770,6 +944,7 @@ export type AppealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   adminNotes?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  needsInfoRequestedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   violation?: boolean | Prisma.AccountViolationDefaultArgs<ExtArgs>
@@ -785,14 +960,17 @@ export type AppealSelectScalar = {
   adminNotes?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  needsInfoRequestedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AppealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "violationId" | "userId" | "status" | "appealText" | "adminNotes" | "reviewedById" | "reviewedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["appeal"]>
+export type AppealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "violationId" | "userId" | "status" | "appealText" | "adminNotes" | "reviewedById" | "reviewedAt" | "needsInfoRequestedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["appeal"]>
 export type AppealInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   violation?: boolean | Prisma.AccountViolationDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  events?: boolean | Prisma.Appeal$eventsArgs<ExtArgs>
+  _count?: boolean | Prisma.AppealCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AppealIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   violation?: boolean | Prisma.AccountViolationDefaultArgs<ExtArgs>
@@ -808,6 +986,7 @@ export type $AppealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     violation: Prisma.$AccountViolationPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
+    events: Prisma.$AppealEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -815,9 +994,19 @@ export type $AppealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     userId: string
     status: $Enums.AppealStatus
     appealText: string
+    /**
+     * *
+     *    * STAFF-ONLY. Never selected into any user read model (asserted in tests).
+     */
     adminNotes: string | null
     reviewedById: string | null
     reviewedAt: Date | null
+    /**
+     * *
+     *    * Set when staff moved the appeal to NEEDS_INFO; drives the 14-day
+     *    * auto-expiry sweep. Cleared when the user responds.
+     */
+    needsInfoRequestedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["appeal"]>
@@ -1216,6 +1405,7 @@ export interface Prisma__AppealClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   violation<T extends Prisma.AccountViolationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountViolationDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountViolationClient<runtime.Types.Result.GetResult<Prisma.$AccountViolationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  events<T extends Prisma.Appeal$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Appeal$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppealEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1253,6 +1443,7 @@ export interface AppealFieldRefs {
   readonly adminNotes: Prisma.FieldRef<"Appeal", 'String'>
   readonly reviewedById: Prisma.FieldRef<"Appeal", 'String'>
   readonly reviewedAt: Prisma.FieldRef<"Appeal", 'DateTime'>
+  readonly needsInfoRequestedAt: Prisma.FieldRef<"Appeal", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Appeal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Appeal", 'DateTime'>
 }
@@ -1653,6 +1844,30 @@ export type AppealDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Appeals to delete.
    */
   limit?: number
+}
+
+/**
+ * Appeal.events
+ */
+export type Appeal$eventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AppealEvent
+   */
+  select?: Prisma.AppealEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AppealEvent
+   */
+  omit?: Prisma.AppealEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppealEventInclude<ExtArgs> | null
+  where?: Prisma.AppealEventWhereInput
+  orderBy?: Prisma.AppealEventOrderByWithRelationInput | Prisma.AppealEventOrderByWithRelationInput[]
+  cursor?: Prisma.AppealEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AppealEventScalarFieldEnum | Prisma.AppealEventScalarFieldEnum[]
 }
 
 /**

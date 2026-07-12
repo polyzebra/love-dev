@@ -279,7 +279,9 @@ export const DeliveryStatus = {
   DELIVERED: 'DELIVERED',
   FAILED: 'FAILED',
   DEAD: 'DEAD',
-  SUPPRESSED: 'SUPPRESSED'
+  SUPPRESSED: 'SUPPRESSED',
+  BOUNCED: 'BOUNCED',
+  COMPLAINED: 'COMPLAINED'
 } as const
 
 export type DeliveryStatus = (typeof DeliveryStatus)[keyof typeof DeliveryStatus]
@@ -397,11 +399,24 @@ export type EnforcementAction = (typeof EnforcementAction)[keyof typeof Enforcem
 export const AppealStatus = {
   SUBMITTED: 'SUBMITTED',
   PENDING_REVIEW: 'PENDING_REVIEW',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  NEEDS_INFO: 'NEEDS_INFO',
   APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  WITHDRAWN: 'WITHDRAWN'
 } as const
 
 export type AppealStatus = (typeof AppealStatus)[keyof typeof AppealStatus]
+
+
+export const AppealActorRole = {
+  USER: 'USER',
+  STAFF: 'STAFF',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type AppealActorRole = (typeof AppealActorRole)[keyof typeof AppealActorRole]
 
 
 export const BannedCredentialKind = {

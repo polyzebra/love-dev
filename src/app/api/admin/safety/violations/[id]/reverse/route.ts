@@ -4,6 +4,7 @@ import { audit } from "@/lib/audit";
 import { db } from "@/lib/db";
 import { reverseViolation } from "@/lib/services/trust-safety";
 import { recomputeTrustForEvent } from "@/lib/services/trust-engine";
+import { sendSafetyNotice } from "@/lib/services/safety-notices";
 
 const reverseSchema = z
   .object({
@@ -54,6 +55,11 @@ export async function POST(req: Request, { params }: Params) {
     },
   });
   await recomputeTrustForEvent(violation.userId, "appeal_decided");
+  // Tell the user the restriction was lifted (staff reversal outside the
+  // appeal flow - the appeal path sends appeal_approved instead).
+  await sendSafetyNotice(violation.userId, "restriction_lifted", `violation:${id}:reversed`, {
+    violationId: id,
+  });
 
   return ok({
     violationId: id,

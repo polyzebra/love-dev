@@ -125,6 +125,43 @@ export async function assertUploadAllowed(userId: string): Promise<UploadGate> {
 // ---------------------------------------------------------------------------
 
 const SEVERITY_RANK: Record<CaseSeverity, number> = { LOW: 0, MEDIUM: 1, HIGH: 2, CRITICAL: 3 };
+const SEVERITY_BY_RANK: CaseSeverity[] = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+
+// ---------------------------------------------------------------------------
+// SLA policy (the single place the deadlines live)
+// ---------------------------------------------------------------------------
+
+/** Hours until a case of this PRIORITY must see a first staff response. */
+export const CASE_SLA_HOURS: Record<CaseSeverity, number> = {
+  CRITICAL: 4,
+  HIGH: 24,
+  MEDIUM: 72,
+  LOW: 7 * 24,
+};
+
+/** Default priority for a new case = its severity. */
+export function priorityForSeverity(severity: CaseSeverity): CaseSeverity {
+  return severity;
+}
+
+export function slaDueAtFor(priority: CaseSeverity, from: Date): Date {
+  return new Date(from.getTime() + CASE_SLA_HOURS[priority] * 3600 * 1000);
+}
+
+/** One rung up (CRITICAL stays CRITICAL). Used by the overdue escalation. */
+export function bumpPriority(priority: CaseSeverity): CaseSeverity {
+  return SEVERITY_BY_RANK[Math.min(SEVERITY_RANK[priority] + 1, SEVERITY_RANK.CRITICAL)];
+}
+
+/** A case still awaiting resolution counts as overdue past its slaDueAt. */
+export function isCaseOverdue(
+  c: { status: string; slaDueAt: Date | null; resolvedAt: Date | null },
+  now: Date = new Date(),
+): boolean {
+  if (c.resolvedAt) return false;
+  if (c.status !== "OPEN" && c.status !== "UNDER_REVIEW" && c.status !== "APPEALED") return false;
+  return !!c.slaDueAt && c.slaDueAt.getTime() < now.getTime();
+}
 
 export type OpenCaseInput = {
   userId: string;
@@ -160,7 +197,7 @@ export async function openModerationCase(
         status: { in: ["OPEN", "UNDER_REVIEW"] },
       },
       orderBy: { createdAt: "desc" },
-      select: { id: true, severity: true, evidence: true },
+      select: { id: true, severity: true, priority: true, evidence: true },
     });
     if (existing) {
       const prior = Array.isArray(existing.evidence) ? existing.evidence : [existing.evidence ?? {}];
@@ -169,6 +206,12 @@ export async function openModerationCase(
         where: { id: existing.id },
         data: {
           ...(escalate ? { severity: input.severity } : {}),
+          // Priority follows an escalating severity when it is still below
+          // it (a manual/overdue bump above severity is never undone).
+          ...(escalate && SEVERITY_RANK[input.severity] > SEVERITY_RANK[existing.priority]
+            ? { priority: input.severity }
+            : {}),
+          lastActivityAt: new Date(),
           ...(input.confidence != null ? { confidence: input.confidence } : {}),
           evidence: [
             ...prior,
@@ -184,6 +227,8 @@ export async function openModerationCase(
       });
       return { caseId: existing.id, deduped: true };
     }
+    const now = new Date();
+    const priority = priorityForSeverity(input.severity);
     const created = await tx.moderationCase.create({
       data: {
         userId: input.userId,
@@ -192,6 +237,9 @@ export async function openModerationCase(
         source: input.source,
         summary: input.summary,
         confidence: input.confidence ?? null,
+        priority,
+        slaDueAt: slaDueAtFor(priority, now),
+        lastActivityAt: now,
         evidence: [
           {
             at: new Date().toISOString(),
@@ -228,6 +276,185 @@ export async function resolveCasesForDeletedPhoto(photoId: string): Promise<numb
     },
   });
   return result.count;
+}
+
+// ---------------------------------------------------------------------------
+// Case assignment + workflow stamps (SLA)
+// ---------------------------------------------------------------------------
+
+export type CaseAssignResult =
+  | { ok: true; caseId: string; assignedToId: string | null }
+  | { ok: false; code: "case_not_found" | "assignee_not_staff" | "case_closed" | "already_assigned"; message: string };
+
+const OPEN_CASE_STATUSES = ["OPEN", "UNDER_REVIEW", "APPEALED"] as const;
+
+/**
+ * Assign a case to a staff member (or yourself - "claim"). The assignee
+ * must hold a staff role; assigning also stamps firstResponseAt (someone
+ * is now on it) and bumps lastActivityAt. Callers own the AdminLog entry.
+ */
+export async function assignCase(
+  caseId: string,
+  assigneeId: string,
+  opts: { now?: Date } = {},
+): Promise<CaseAssignResult> {
+  const now = opts.now ?? new Date();
+  const [existing, assignee] = await Promise.all([
+    db.moderationCase.findUnique({
+      where: { id: caseId },
+      select: { id: true, status: true, firstResponseAt: true },
+    }),
+    db.user.findUnique({ where: { id: assigneeId }, select: { role: true } }),
+  ]);
+  if (!existing) return { ok: false, code: "case_not_found", message: "Case not found." };
+  if (!(OPEN_CASE_STATUSES as readonly string[]).includes(existing.status)) {
+    return { ok: false, code: "case_closed", message: "A closed case cannot be assigned." };
+  }
+  if (!assignee || assignee.role === "USER") {
+    return { ok: false, code: "assignee_not_staff", message: "Cases can only be assigned to staff." };
+  }
+  await db.moderationCase.update({
+    where: { id: caseId },
+    data: {
+      assignedToId: assigneeId,
+      lastActivityAt: now,
+      ...(existing.firstResponseAt ? {} : { firstResponseAt: now }),
+    },
+  });
+  return { ok: true, caseId, assignedToId: assigneeId };
+}
+
+/**
+ * Claim = assign to yourself, but only when nobody else holds it (a plain
+ * assign may reassign deliberately; a claim must not steal). Atomic CAS.
+ */
+export async function claimCase(
+  caseId: string,
+  actorId: string,
+  opts: { now?: Date } = {},
+): Promise<CaseAssignResult> {
+  const now = opts.now ?? new Date();
+  const claimed = await db.moderationCase.updateMany({
+    where: {
+      id: caseId,
+      status: { in: [...OPEN_CASE_STATUSES] },
+      OR: [{ assignedToId: null }, { assignedToId: actorId }],
+    },
+    data: { assignedToId: actorId, lastActivityAt: now },
+  });
+  if (claimed.count === 0) {
+    const existing = await db.moderationCase.findUnique({
+      where: { id: caseId },
+      select: { id: true, status: true, assignedToId: true },
+    });
+    if (!existing) return { ok: false, code: "case_not_found", message: "Case not found." };
+    if (!(OPEN_CASE_STATUSES as readonly string[]).includes(existing.status)) {
+      return { ok: false, code: "case_closed", message: "A closed case cannot be claimed." };
+    }
+    return { ok: false, code: "already_assigned", message: "Someone else already holds this case." };
+  }
+  await db.moderationCase.updateMany({
+    where: { id: caseId, firstResponseAt: null },
+    data: { firstResponseAt: now },
+  });
+  return { ok: true, caseId, assignedToId: actorId };
+}
+
+export async function unassignCase(
+  caseId: string,
+  opts: { now?: Date } = {},
+): Promise<CaseAssignResult> {
+  const now = opts.now ?? new Date();
+  const existing = await db.moderationCase.findUnique({
+    where: { id: caseId },
+    select: { id: true },
+  });
+  if (!existing) return { ok: false, code: "case_not_found", message: "Case not found." };
+  await db.moderationCase.update({
+    where: { id: caseId },
+    data: { assignedToId: null, lastActivityAt: now },
+  });
+  return { ok: true, caseId, assignedToId: null };
+}
+
+/**
+ * Workflow stamps for the review actions (single place so the review route
+ * and any future action path agree): every staff action bumps
+ * lastActivityAt and stamps firstResponseAt once; terminal decisions stamp
+ * resolvedAt, and reopening (back to under_review) clears it.
+ */
+export function caseWorkflowStamps(
+  action: "under_review" | "take_action" | "dismiss",
+  existing: { firstResponseAt: Date | null },
+  now: Date = new Date(),
+): { firstResponseAt?: Date; resolvedAt: Date | null; lastActivityAt: Date } {
+  return {
+    ...(existing.firstResponseAt ? {} : { firstResponseAt: now }),
+    resolvedAt: action === "under_review" ? null : now,
+    lastActivityAt: now,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Overdue escalation (cron + lazy sweep)
+// ---------------------------------------------------------------------------
+
+export type EscalationSummary = { scanned: number; escalated: number };
+
+/**
+ * Overdue UNASSIGNED cases get one priority bump + a staff notification
+ * through the outbox (honest channels - in-app always, push/email per each
+ * staff member's account preferences). One escalation per case
+ * (escalatedAt); the SLA deadline itself does not move - the case simply
+ * sits higher in the queue and staff got pinged.
+ */
+export async function escalateOverdueCases(now: Date = new Date()): Promise<EscalationSummary> {
+  const overdue = await db.moderationCase.findMany({
+    where: {
+      status: { in: ["OPEN", "UNDER_REVIEW"] },
+      assignedToId: null,
+      escalatedAt: null,
+      resolvedAt: null,
+      slaDueAt: { lt: now },
+    },
+    orderBy: { slaDueAt: "asc" },
+    take: 50,
+    select: { id: true, priority: true, caseType: true, severity: true },
+  });
+  if (overdue.length === 0) return { scanned: 0, escalated: 0 };
+
+  const staff = await db.user.findMany({
+    where: { role: { in: ["MODERATOR", "ADMIN", "SUPER_ADMIN"] }, status: "ACTIVE" },
+    select: { id: true },
+    take: 50,
+  });
+
+  let escalated = 0;
+  for (const c of overdue) {
+    const bumped = await db.moderationCase.updateMany({
+      where: { id: c.id, escalatedAt: null },
+      data: { priority: bumpPriority(c.priority), escalatedAt: now, lastActivityAt: now },
+    });
+    if (bumped.count === 0) continue; // another sweep won the race
+    escalated += 1;
+    await recordAuthEvent({
+      type: "case_sla_escalated",
+      metadata: { caseId: c.id, caseType: c.caseType, from: c.priority, to: bumpPriority(c.priority) },
+    });
+    for (const s of staff) {
+      const { notifyUser } = await import("@/lib/services/notify");
+      await notifyUser({
+        userId: s.id,
+        type: "SYSTEM",
+        title: "Moderation case is past its SLA",
+        body: `An unassigned ${c.severity.toLowerCase()} ${c.caseType.toLowerCase().replace(/_/g, " ")} case is overdue and was escalated.`,
+        url: `/admin/moderation-cases/${c.id}`,
+        dedupeKey: `case:${c.id}:sla-escalated:${s.id}`,
+        data: { caseId: c.id },
+      });
+    }
+  }
+  return { scanned: overdue.length, escalated };
 }
 
 // ---------------------------------------------------------------------------
@@ -464,7 +691,20 @@ export async function applyDirectAction(input: DirectActionInput): Promise<Enfor
       ? new Date(now.getTime() + RESTRICTION_DAYS.LIMITED * 24 * 3600 * 1000)
       : null;
 
-  const violation = await db.$transaction(async (tx) => {
+  const { violation, extendsExisting } = await db.$transaction(async (tx) => {
+    // A LIMITED applied while an unexpired LIMITED is already in force is
+    // an EXTENSION of the restriction - the notice copy says so honestly.
+    const activeSame =
+      input.action === "LIMITED"
+        ? await tx.accountViolation.count({
+            where: {
+              userId: input.userId,
+              actionTaken: "LIMITED",
+              reversedAt: null,
+              OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+            },
+          })
+        : 0;
     const row = await tx.accountViolation.create({
       data: {
         userId: input.userId,
@@ -492,10 +732,10 @@ export async function applyDirectAction(input: DirectActionInput): Promise<Enfor
     if (input.moderationCaseId) {
       await tx.moderationCase.update({
         where: { id: input.moderationCaseId },
-        data: { status: "ACTION_TAKEN", reviewedAt: now },
+        data: { status: "ACTION_TAKEN", reviewedAt: now, resolvedAt: now, lastActivityAt: now },
       });
     }
-    return row;
+    return { violation: row, extendsExisting: activeSame > 0 };
   });
 
   if (input.action === "BANNED") {
@@ -503,7 +743,7 @@ export async function applyDirectAction(input: DirectActionInput): Promise<Enfor
   }
   await sendSafetyNotice(
     input.userId,
-    NOTICE_FOR_ACTION[input.action],
+    extendsExisting ? "restriction_extended" : NOTICE_FOR_ACTION[input.action],
     `violation:${violation.id}:notice`,
     { violationId: violation.id },
   );
@@ -627,7 +867,7 @@ export async function reverseViolation(
     if (violation.moderationCaseId) {
       await tx.moderationCase.update({
         where: { id: violation.moderationCaseId },
-        data: { status: "REVERSED", reviewedAt: now },
+        data: { status: "REVERSED", reviewedAt: now, resolvedAt: now, lastActivityAt: now },
       });
     }
 

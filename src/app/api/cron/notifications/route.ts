@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import {
+  processPendingEmail,
   processPendingPush,
   prunePresence,
   revokeStaleSubscriptions,
 } from "@/lib/services/notify";
+import { expireStaleNeedsInfo } from "@/lib/services/appeals";
+import { escalateOverdueCases } from "@/lib/services/trust-safety";
 
 export const dynamic = "force-dynamic";
 
@@ -26,13 +29,23 @@ export async function GET(req: Request) {
   }
 
   const push = await processPendingPush(200);
+  const email = await processPendingEmail(200);
   const revoked = await revokeStaleSubscriptions();
   const presencePruned = await prunePresence();
+  // Trust & safety sweeps ride the same 5-minute cron: SLA escalation for
+  // overdue unassigned cases + auto-expiry of stale NEEDS_INFO appeals.
+  const escalation = await escalateOverdueCases();
+  const appealsExpired = await expireStaleNeedsInfo();
 
   console.info(
     `[cron:notifications] push claimed=${push.claimed} sent=${push.sent} ` +
       `retrying=${push.retrying} dead=${push.dead}; ` +
-      `revoked ${revoked} stale subscription(s), pruned ${presencePruned} presence row(s)`,
+      `email claimed=${email.claimed} sent=${email.sent} ` +
+      `retrying=${email.retrying} dead=${email.dead}; ` +
+      `revoked ${revoked} stale subscription(s), pruned ${presencePruned} presence row(s); ` +
+      `escalated ${escalation.escalated} overdue case(s), expired ${appealsExpired} stale appeal(s)`,
   );
-  return NextResponse.json({ data: { push, revoked, presencePruned } });
+  return NextResponse.json({
+    data: { push, email, revoked, presencePruned, escalation, appealsExpired },
+  });
 }

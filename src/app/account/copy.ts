@@ -36,8 +36,12 @@ export const ACTION_LABEL: Record<EnforcementAction, string> = {
 export const APPEAL_STATUS_LABEL: Record<AppealStatus, string> = {
   SUBMITTED: "Pending review",
   PENDING_REVIEW: "Pending review",
+  UNDER_REVIEW: "Being reviewed",
+  NEEDS_INFO: "Waiting for your reply",
   APPROVED: "Approved",
   REJECTED: "Reviewed - decision upheld",
+  EXPIRED: "Closed - no reply received",
+  WITHDRAWN: "Withdrawn by you",
 };
 
 /** Copy shown next to the right-to-appeal section on the violation page. */

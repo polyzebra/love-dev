@@ -25,6 +25,9 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 
 process.env.AUTH_HASH_SALT = process.env.AUTH_HASH_SALT || "test-salt";
+// Zero real emails from tests: the email outbox worker must see "not
+// configured" even when the local .env carries a real RESEND_API_KEY.
+process.env.RESEND_API_KEY = "";
 // Deterministic mock moderation for the pipeline tests.
 process.env.MODERATION_PROVIDER = "mock";
 process.env.VERIFICATION_PROVIDER = "mock";

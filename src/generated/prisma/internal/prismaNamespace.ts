@@ -404,6 +404,7 @@ export const ModelName = {
   PhotoModerationResult: 'PhotoModerationResult',
   AccountViolation: 'AccountViolation',
   Appeal: 'Appeal',
+  AppealEvent: 'AppealEvent',
   BannedCredential: 'BannedCredential',
   Block: 'Block',
   Subscription: 'Subscription',
@@ -411,6 +412,8 @@ export const ModelName = {
   Notification: 'Notification',
   PushSubscription: 'PushSubscription',
   NotificationDelivery: 'NotificationDelivery',
+  SuppressedEmail: 'SuppressedEmail',
+  ProviderHealth: 'ProviderHealth',
   ConversationPresence: 'ConversationPresence',
   AdminLog: 'AdminLog',
   FeatureFlag: 'FeatureFlag',
@@ -436,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "bannedCredential" | "block" | "subscription" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1920,6 +1923,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AppealEvent: {
+      payload: Prisma.$AppealEventPayload<ExtArgs>
+      fields: Prisma.AppealEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AppealEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AppealEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>
+        }
+        findFirst: {
+          args: Prisma.AppealEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AppealEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>
+        }
+        findMany: {
+          args: Prisma.AppealEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>[]
+        }
+        create: {
+          args: Prisma.AppealEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>
+        }
+        createMany: {
+          args: Prisma.AppealEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AppealEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>[]
+        }
+        delete: {
+          args: Prisma.AppealEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>
+        }
+        update: {
+          args: Prisma.AppealEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.AppealEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AppealEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AppealEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.AppealEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppealEventPayload>
+        }
+        aggregate: {
+          args: Prisma.AppealEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAppealEvent>
+        }
+        groupBy: {
+          args: Prisma.AppealEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AppealEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AppealEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AppealEventCountAggregateOutputType> | number
+        }
+      }
+    }
     BannedCredential: {
       payload: Prisma.$BannedCredentialPayload<ExtArgs>
       fields: Prisma.BannedCredentialFieldRefs
@@ -2435,6 +2512,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NotificationDeliveryCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NotificationDeliveryCountAggregateOutputType> | number
+        }
+      }
+    }
+    SuppressedEmail: {
+      payload: Prisma.$SuppressedEmailPayload<ExtArgs>
+      fields: Prisma.SuppressedEmailFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SuppressedEmailFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SuppressedEmailFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>
+        }
+        findFirst: {
+          args: Prisma.SuppressedEmailFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SuppressedEmailFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>
+        }
+        findMany: {
+          args: Prisma.SuppressedEmailFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>[]
+        }
+        create: {
+          args: Prisma.SuppressedEmailCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>
+        }
+        createMany: {
+          args: Prisma.SuppressedEmailCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SuppressedEmailCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>[]
+        }
+        delete: {
+          args: Prisma.SuppressedEmailDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>
+        }
+        update: {
+          args: Prisma.SuppressedEmailUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>
+        }
+        deleteMany: {
+          args: Prisma.SuppressedEmailDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SuppressedEmailUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SuppressedEmailUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>[]
+        }
+        upsert: {
+          args: Prisma.SuppressedEmailUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SuppressedEmailPayload>
+        }
+        aggregate: {
+          args: Prisma.SuppressedEmailAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSuppressedEmail>
+        }
+        groupBy: {
+          args: Prisma.SuppressedEmailGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SuppressedEmailGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SuppressedEmailCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SuppressedEmailCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProviderHealth: {
+      payload: Prisma.$ProviderHealthPayload<ExtArgs>
+      fields: Prisma.ProviderHealthFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderHealthFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderHealthFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderHealthFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderHealthFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>
+        }
+        findMany: {
+          args: Prisma.ProviderHealthFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>[]
+        }
+        create: {
+          args: Prisma.ProviderHealthCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>
+        }
+        createMany: {
+          args: Prisma.ProviderHealthCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProviderHealthCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderHealthDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>
+        }
+        update: {
+          args: Prisma.ProviderHealthUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderHealthDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderHealthUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderHealthUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProviderHealthUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderHealthPayload>
+        }
+        aggregate: {
+          args: Prisma.ProviderHealthAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderHealth>
+        }
+        groupBy: {
+          args: Prisma.ProviderHealthGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderHealthGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderHealthCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderHealthCountAggregateOutputType> | number
         }
       }
     }
@@ -3541,6 +3766,13 @@ export const ModerationCaseScalarFieldEnum = {
   reviewedById: 'reviewedById',
   reviewedAt: 'reviewedAt',
   decisionReason: 'decisionReason',
+  priority: 'priority',
+  slaDueAt: 'slaDueAt',
+  assignedToId: 'assignedToId',
+  firstResponseAt: 'firstResponseAt',
+  resolvedAt: 'resolvedAt',
+  lastActivityAt: 'lastActivityAt',
+  escalatedAt: 'escalatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3597,11 +3829,24 @@ export const AppealScalarFieldEnum = {
   adminNotes: 'adminNotes',
   reviewedById: 'reviewedById',
   reviewedAt: 'reviewedAt',
+  needsInfoRequestedAt: 'needsInfoRequestedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type AppealScalarFieldEnum = (typeof AppealScalarFieldEnum)[keyof typeof AppealScalarFieldEnum]
+
+
+export const AppealEventScalarFieldEnum = {
+  id: 'id',
+  appealId: 'appealId',
+  type: 'type',
+  actorRole: 'actorRole',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type AppealEventScalarFieldEnum = (typeof AppealEventScalarFieldEnum)[keyof typeof AppealEventScalarFieldEnum]
 
 
 export const BannedCredentialScalarFieldEnum = {
@@ -3717,6 +3962,32 @@ export const NotificationDeliveryScalarFieldEnum = {
 } as const
 
 export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
+
+
+export const SuppressedEmailScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  reason: 'reason',
+  sourceMessageId: 'sourceMessageId',
+  createdAt: 'createdAt'
+} as const
+
+export type SuppressedEmailScalarFieldEnum = (typeof SuppressedEmailScalarFieldEnum)[keyof typeof SuppressedEmailScalarFieldEnum]
+
+
+export const ProviderHealthScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  consecutiveFailures: 'consecutiveFailures',
+  totalFailures: 'totalFailures',
+  totalSuccesses: 'totalSuccesses',
+  lastError: 'lastError',
+  lastErrorAt: 'lastErrorAt',
+  lastSuccessAt: 'lastSuccessAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderHealthScalarFieldEnum = (typeof ProviderHealthScalarFieldEnum)[keyof typeof ProviderHealthScalarFieldEnum]
 
 
 export const ConversationPresenceScalarFieldEnum = {
@@ -4437,6 +4708,20 @@ export type ListEnumAppealStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'AppealActorRole'
+ */
+export type EnumAppealActorRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppealActorRole'>
+    
+
+
+/**
+ * Reference to a field of type 'AppealActorRole[]'
+ */
+export type ListEnumAppealActorRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppealActorRole[]'>
+    
+
+
+/**
  * Reference to a field of type 'BannedCredentialKind'
  */
 export type EnumBannedCredentialKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BannedCredentialKind'>
@@ -4705,6 +4990,7 @@ export type GlobalOmitConfig = {
   photoModerationResult?: Prisma.PhotoModerationResultOmit
   accountViolation?: Prisma.AccountViolationOmit
   appeal?: Prisma.AppealOmit
+  appealEvent?: Prisma.AppealEventOmit
   bannedCredential?: Prisma.BannedCredentialOmit
   block?: Prisma.BlockOmit
   subscription?: Prisma.SubscriptionOmit
@@ -4712,6 +4998,8 @@ export type GlobalOmitConfig = {
   notification?: Prisma.NotificationOmit
   pushSubscription?: Prisma.PushSubscriptionOmit
   notificationDelivery?: Prisma.NotificationDeliveryOmit
+  suppressedEmail?: Prisma.SuppressedEmailOmit
+  providerHealth?: Prisma.ProviderHealthOmit
   conversationPresence?: Prisma.ConversationPresenceOmit
   adminLog?: Prisma.AdminLogOmit
   featureFlag?: Prisma.FeatureFlagOmit

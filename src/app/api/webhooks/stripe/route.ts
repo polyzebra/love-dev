@@ -1,12 +1,17 @@
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
+import { verifyStripeSignature } from "@/lib/webhook-signatures";
 import type { PlanTier, SubscriptionStatus } from "@/generated/prisma/enums";
 
 /**
  * Stripe webhook receiver.
  *
- * Signature verification uses the raw body + STRIPE_WEBHOOK_SECRET. The
- * official `stripe` SDK slot-in: `stripe.webhooks.constructEvent(raw, sig, secret)`.
+ * Signature verification (T&S security audit 2026-07-11): the
+ * Stripe-Signature header is verified over the RAW body with
+ * STRIPE_WEBHOOK_SECRET before ANY event is processed - previously this
+ * was a TODO and unsigned payloads could upsert subscriptions. Stripe's
+ * scheme is plain HMAC (header "t=<ts>,v1=<hex>", signed payload
+ * "<ts>.<raw>"), so no SDK is needed - see lib/webhook-signatures.ts.
  * Until keys are configured the endpoint acknowledges but does nothing.
  */
 
@@ -56,12 +61,17 @@ export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
   const raw = await req.text();
 
-  if (!env.STRIPE_WEBHOOK_SECRET || !signature) {
-    // Not configured - acknowledge so Stripe CLI testing doesn't retry-spam
+  if (!env.STRIPE_WEBHOOK_SECRET) {
+    // Not configured - acknowledge so Stripe CLI testing doesn't retry-spam,
+    // and process NOTHING.
     return Response.json({ received: true, configured: false });
   }
+  if (!signature || !verifyStripeSignature(raw, signature, env.STRIPE_WEBHOOK_SECRET)) {
+    // Configured = signatures are mandatory. Unsigned/bad/replayed
+    // deliveries change nothing.
+    return new Response("Invalid signature", { status: 400 });
+  }
 
-  // TODO(payments): verify with stripe.webhooks.constructEvent(raw, signature, secret)
   let event: StripeEvent;
   try {
     event = JSON.parse(raw) as StripeEvent;

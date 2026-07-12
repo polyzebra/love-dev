@@ -414,7 +414,7 @@ export async function syncPhotoVerificationState(
             const { sendSafetyNotice } = await import("@/lib/services/safety-notices");
             await sendSafetyNotice(
               result.userId,
-              "verification_required",
+              "verification_rejected",
               `verification:${row.providerSessionId}:rejected`,
             );
           }

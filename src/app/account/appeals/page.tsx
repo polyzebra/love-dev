@@ -15,8 +15,12 @@ export const dynamic = "force-dynamic";
 const APPEAL_ICON: Record<AppealStatus, { icon: LucideIcon; className: string }> = {
   SUBMITTED: { icon: Hourglass, className: "text-gold" },
   PENDING_REVIEW: { icon: Hourglass, className: "text-gold" },
+  UNDER_REVIEW: { icon: Hourglass, className: "text-gold" },
+  NEEDS_INFO: { icon: Hourglass, className: "text-gold" },
   APPROVED: { icon: CheckCircle2, className: "text-success" },
   REJECTED: { icon: XCircle, className: "text-muted-foreground" },
+  EXPIRED: { icon: XCircle, className: "text-muted-foreground" },
+  WITHDRAWN: { icon: XCircle, className: "text-muted-foreground" },
 };
 
 export default async function AccountAppealsPage() {

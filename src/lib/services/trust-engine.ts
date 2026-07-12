@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import type { SafetyRecommendedAction } from "@/generated/prisma/enums";
 import { isDisposableEmail } from "@/lib/auth/disposable-domains";
 import { RISK_THRESHOLD } from "@/lib/auth/risk";
+import { collectFraudSignals } from "@/lib/services/fraud-signals";
 import { getVerificationState } from "@/lib/services/verification";
 
 /**
@@ -93,15 +94,17 @@ export async function computeTrustProfile(userId: string): Promise<TrustProfile 
     select: {
       id: true,
       email: true,
+      phoneE164: true,
       riskScore: true,
       riskReason: true,
       scamScore: true,
       lastDeviceHash: true,
+      lastLoginIpHash: true,
     },
   });
   if (!user) return null;
 
-  const [rejectedPhotos, reporters, violations, refundedPayments, verification] =
+  const [rejectedPhotos, reporters, violations, refundedPayments, verification, fraudSignals] =
     await Promise.all([
       db.photo.count({ where: { userId, moderation: "REJECTED" } }),
       db.report.findMany({
@@ -112,28 +115,21 @@ export async function computeTrustProfile(userId: string): Promise<TrustProfile 
       db.accountViolation.count({ where: { userId, reversedAt: null } }),
       db.payment.count({ where: { userId, status: "REFUNDED" } }),
       getVerificationState(userId),
+      // Fraud plane (fraud-signals.ts): device reuse tiers, signup/login
+      // velocity, email alias reuse, verification failures, banned-phone
+      // match, VPN/TOR (real intel only), fake-profile scoring. The old
+      // inline device_multi_account check lives there now (same signal
+      // name at the 2-account tier).
+      collectFraudSignals({
+        id: userId,
+        email: user.email,
+        phoneE164: user.phoneE164,
+        riskReason: user.riskReason,
+        lastLoginIpHash: user.lastLoginIpHash,
+      }),
     ]);
 
-  // Device multi-account: any of MY device fingerprints seen on another
-  // account (the fingerprint is already a salted hash - see device.ts).
-  let sharedDevice = false;
-  const myDevices = await db.device.findMany({
-    where: { userId },
-    select: { fingerprint: true },
-    take: 20,
-  });
-  if (myDevices.length > 0) {
-    const other = await db.device.findFirst({
-      where: {
-        fingerprint: { in: myDevices.map((d) => d.fingerprint) },
-        userId: { not: userId },
-      },
-      select: { id: true },
-    });
-    sharedDevice = !!other;
-  }
-
-  const signals: TrustSignal[] = [];
+  const signals: TrustSignal[] = [...fraudSignals];
   const add = (name: string, points: number) => {
     if (points > 0) signals.push({ name, points });
   };
@@ -151,7 +147,6 @@ export async function computeTrustProfile(userId: string): Promise<TrustProfile 
   if (violations > 0) {
     add(`violation_x${violations}`, Math.min(violations * w.violation, w.violation_cap));
   }
-  if (sharedDevice) add("device_multi_account", w.device_multi_account);
   if (isDisposableEmail(user.email)) add("disposable_email", w.disposable_email);
   if (user.riskScore >= RISK_THRESHOLD) add("login_risk_high", w.login_risk_high);
   if (user.riskReason?.startsWith("admin:")) add("admin_flagged", w.admin_flagged);

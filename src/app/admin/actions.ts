@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { hasPermission, type Permission } from "@/lib/rbac";
+import { sendSafetyNotice } from "@/lib/services/safety-notices";
 
 async function requireActor(permission: Permission) {
   const session = await auth();
@@ -78,16 +79,14 @@ export async function reviewVerification(verificationId: string, approve: boolea
     }
     return row;
   });
-  if (approve) {
-    await db.notification.create({
-      data: {
-        userId: verification.userId,
-        type: "PROFILE_VERIFIED",
-        title: "You're verified!",
-        body: "Your verification was approved. Your badge is now live.",
-      },
-    });
-  }
+  // Notify through the outbox (in-app + push + email per prefs) - a bare
+  // Notification row would silently skip email/push delivery.
+  await sendSafetyNotice(
+    verification.userId,
+    approve ? "verification_approved" : "verification_rejected",
+    `verification:${verificationId}:${approve ? "approved" : "rejected"}:staff`,
+    { verificationId },
+  );
   await audit({
     actorId: actor.id,
     action: `verification.${approve ? "approve" : "reject"}`,

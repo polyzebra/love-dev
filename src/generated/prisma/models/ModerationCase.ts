@@ -48,6 +48,13 @@ export type ModerationCaseMinAggregateOutputType = {
   reviewedById: string | null
   reviewedAt: Date | null
   decisionReason: string | null
+  priority: $Enums.CaseSeverity | null
+  slaDueAt: Date | null
+  assignedToId: string | null
+  firstResponseAt: Date | null
+  resolvedAt: Date | null
+  lastActivityAt: Date | null
+  escalatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +73,13 @@ export type ModerationCaseMaxAggregateOutputType = {
   reviewedById: string | null
   reviewedAt: Date | null
   decisionReason: string | null
+  priority: $Enums.CaseSeverity | null
+  slaDueAt: Date | null
+  assignedToId: string | null
+  firstResponseAt: Date | null
+  resolvedAt: Date | null
+  lastActivityAt: Date | null
+  escalatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -85,6 +99,13 @@ export type ModerationCaseCountAggregateOutputType = {
   reviewedById: number
   reviewedAt: number
   decisionReason: number
+  priority: number
+  slaDueAt: number
+  assignedToId: number
+  firstResponseAt: number
+  resolvedAt: number
+  lastActivityAt: number
+  escalatedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -113,6 +134,13 @@ export type ModerationCaseMinAggregateInputType = {
   reviewedById?: true
   reviewedAt?: true
   decisionReason?: true
+  priority?: true
+  slaDueAt?: true
+  assignedToId?: true
+  firstResponseAt?: true
+  resolvedAt?: true
+  lastActivityAt?: true
+  escalatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -131,6 +159,13 @@ export type ModerationCaseMaxAggregateInputType = {
   reviewedById?: true
   reviewedAt?: true
   decisionReason?: true
+  priority?: true
+  slaDueAt?: true
+  assignedToId?: true
+  firstResponseAt?: true
+  resolvedAt?: true
+  lastActivityAt?: true
+  escalatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -150,6 +185,13 @@ export type ModerationCaseCountAggregateInputType = {
   reviewedById?: true
   reviewedAt?: true
   decisionReason?: true
+  priority?: true
+  slaDueAt?: true
+  assignedToId?: true
+  firstResponseAt?: true
+  resolvedAt?: true
+  lastActivityAt?: true
+  escalatedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -256,6 +298,13 @@ export type ModerationCaseGroupByOutputType = {
   reviewedById: string | null
   reviewedAt: Date | null
   decisionReason: string | null
+  priority: $Enums.CaseSeverity
+  slaDueAt: Date | null
+  assignedToId: string | null
+  firstResponseAt: Date | null
+  resolvedAt: Date | null
+  lastActivityAt: Date
+  escalatedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ModerationCaseCountAggregateOutputType | null
@@ -298,6 +347,13 @@ export type ModerationCaseWhereInput = {
   reviewedById?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
   decisionReason?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
+  priority?: Prisma.EnumCaseSeverityFilter<"ModerationCase"> | $Enums.CaseSeverity
+  slaDueAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  assignedToId?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
+  escalatedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -319,6 +375,13 @@ export type ModerationCaseOrderByWithRelationInput = {
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   decisionReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  slaDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  escalatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -343,6 +406,13 @@ export type ModerationCaseWhereUniqueInput = Prisma.AtLeast<{
   reviewedById?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
   decisionReason?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
+  priority?: Prisma.EnumCaseSeverityFilter<"ModerationCase"> | $Enums.CaseSeverity
+  slaDueAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  assignedToId?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
+  escalatedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -364,6 +434,13 @@ export type ModerationCaseOrderByWithAggregationInput = {
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   decisionReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  slaDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  escalatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ModerationCaseCountOrderByAggregateInput
@@ -391,6 +468,13 @@ export type ModerationCaseScalarWhereWithAggregatesInput = {
   reviewedById?: Prisma.StringNullableWithAggregatesFilter<"ModerationCase"> | string | null
   reviewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ModerationCase"> | Date | string | null
   decisionReason?: Prisma.StringNullableWithAggregatesFilter<"ModerationCase"> | string | null
+  priority?: Prisma.EnumCaseSeverityWithAggregatesFilter<"ModerationCase"> | $Enums.CaseSeverity
+  slaDueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ModerationCase"> | Date | string | null
+  assignedToId?: Prisma.StringNullableWithAggregatesFilter<"ModerationCase"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ModerationCase"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ModerationCase"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeWithAggregatesFilter<"ModerationCase"> | Date | string
+  escalatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ModerationCase"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ModerationCase"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ModerationCase"> | Date | string
 }
@@ -409,6 +493,13 @@ export type ModerationCaseCreateInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutModerationCasesInput
@@ -430,6 +521,13 @@ export type ModerationCaseUncheckedCreateInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutModerationCaseInput
@@ -449,6 +547,13 @@ export type ModerationCaseUpdateInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutModerationCasesNestedInput
@@ -470,6 +575,13 @@ export type ModerationCaseUncheckedUpdateInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutModerationCaseNestedInput
@@ -490,6 +602,13 @@ export type ModerationCaseCreateManyInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -508,6 +627,13 @@ export type ModerationCaseUpdateManyMutationInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -527,6 +653,13 @@ export type ModerationCaseUncheckedUpdateManyInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -556,6 +689,13 @@ export type ModerationCaseCountOrderByAggregateInput = {
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
   decisionReason?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  slaDueAt?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  escalatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -578,6 +718,13 @@ export type ModerationCaseMaxOrderByAggregateInput = {
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
   decisionReason?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  slaDueAt?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  escalatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -596,6 +743,13 @@ export type ModerationCaseMinOrderByAggregateInput = {
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
   decisionReason?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  slaDueAt?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrder
+  firstResponseAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  escalatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -697,6 +851,13 @@ export type ModerationCaseCreateWithoutUserInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   violations?: Prisma.AccountViolationCreateNestedManyWithoutModerationCaseInput
@@ -716,6 +877,13 @@ export type ModerationCaseUncheckedCreateWithoutUserInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutModerationCaseInput
@@ -765,6 +933,13 @@ export type ModerationCaseScalarWhereInput = {
   reviewedById?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
   decisionReason?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
+  priority?: Prisma.EnumCaseSeverityFilter<"ModerationCase"> | $Enums.CaseSeverity
+  slaDueAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  assignedToId?: Prisma.StringNullableFilter<"ModerationCase"> | string | null
+  firstResponseAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  resolvedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
+  escalatedAt?: Prisma.DateTimeNullableFilter<"ModerationCase"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ModerationCase"> | Date | string
 }
@@ -783,6 +958,13 @@ export type ModerationCaseCreateWithoutViolationsInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutModerationCasesInput
@@ -803,6 +985,13 @@ export type ModerationCaseUncheckedCreateWithoutViolationsInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -837,6 +1026,13 @@ export type ModerationCaseUpdateWithoutViolationsInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutModerationCasesNestedInput
@@ -857,6 +1053,13 @@ export type ModerationCaseUncheckedUpdateWithoutViolationsInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -875,6 +1078,13 @@ export type ModerationCaseCreateManyUserInput = {
   reviewedById?: string | null
   reviewedAt?: Date | string | null
   decisionReason?: string | null
+  priority?: $Enums.CaseSeverity
+  slaDueAt?: Date | string | null
+  assignedToId?: string | null
+  firstResponseAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  lastActivityAt?: Date | string
+  escalatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -893,6 +1103,13 @@ export type ModerationCaseUpdateWithoutUserInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   violations?: Prisma.AccountViolationUpdateManyWithoutModerationCaseNestedInput
@@ -912,6 +1129,13 @@ export type ModerationCaseUncheckedUpdateWithoutUserInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutModerationCaseNestedInput
@@ -931,6 +1155,13 @@ export type ModerationCaseUncheckedUpdateManyWithoutUserInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priority?: Prisma.EnumCaseSeverityFieldUpdateOperationsInput | $Enums.CaseSeverity
+  slaDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstResponseAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  escalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -981,6 +1212,13 @@ export type ModerationCaseSelect<ExtArgs extends runtime.Types.Extensions.Intern
   reviewedById?: boolean
   reviewedAt?: boolean
   decisionReason?: boolean
+  priority?: boolean
+  slaDueAt?: boolean
+  assignedToId?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
+  escalatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1003,6 +1241,13 @@ export type ModerationCaseSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   reviewedById?: boolean
   reviewedAt?: boolean
   decisionReason?: boolean
+  priority?: boolean
+  slaDueAt?: boolean
+  assignedToId?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
+  escalatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1023,6 +1268,13 @@ export type ModerationCaseSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   reviewedById?: boolean
   reviewedAt?: boolean
   decisionReason?: boolean
+  priority?: boolean
+  slaDueAt?: boolean
+  assignedToId?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
+  escalatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1043,11 +1295,18 @@ export type ModerationCaseSelectScalar = {
   reviewedById?: boolean
   reviewedAt?: boolean
   decisionReason?: boolean
+  priority?: boolean
+  slaDueAt?: boolean
+  assignedToId?: boolean
+  firstResponseAt?: boolean
+  resolvedAt?: boolean
+  lastActivityAt?: boolean
+  escalatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ModerationCaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "caseType" | "status" | "severity" | "source" | "confidence" | "summary" | "evidence" | "photoId" | "reportId" | "reviewedById" | "reviewedAt" | "decisionReason" | "createdAt" | "updatedAt", ExtArgs["result"]["moderationCase"]>
+export type ModerationCaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "caseType" | "status" | "severity" | "source" | "confidence" | "summary" | "evidence" | "photoId" | "reportId" | "reviewedById" | "reviewedAt" | "decisionReason" | "priority" | "slaDueAt" | "assignedToId" | "firstResponseAt" | "resolvedAt" | "lastActivityAt" | "escalatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["moderationCase"]>
 export type ModerationCaseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   violations?: boolean | Prisma.ModerationCase$violationsArgs<ExtArgs>
@@ -1089,6 +1348,13 @@ export type $ModerationCasePayload<ExtArgs extends runtime.Types.Extensions.Inte
     reviewedById: string | null
     reviewedAt: Date | null
     decisionReason: string | null
+    priority: $Enums.CaseSeverity
+    slaDueAt: Date | null
+    assignedToId: string | null
+    firstResponseAt: Date | null
+    resolvedAt: Date | null
+    lastActivityAt: Date
+    escalatedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["moderationCase"]>
@@ -1530,6 +1796,13 @@ export interface ModerationCaseFieldRefs {
   readonly reviewedById: Prisma.FieldRef<"ModerationCase", 'String'>
   readonly reviewedAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
   readonly decisionReason: Prisma.FieldRef<"ModerationCase", 'String'>
+  readonly priority: Prisma.FieldRef<"ModerationCase", 'CaseSeverity'>
+  readonly slaDueAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
+  readonly assignedToId: Prisma.FieldRef<"ModerationCase", 'String'>
+  readonly firstResponseAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
+  readonly resolvedAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
+  readonly lastActivityAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
+  readonly escalatedAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ModerationCase", 'DateTime'>
 }
