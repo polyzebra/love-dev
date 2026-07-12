@@ -32,8 +32,16 @@ export type SubscriptionMinAggregateOutputType = {
   provider: $Enums.PaymentProvider | null
   providerCustomerId: string | null
   providerSubId: string | null
+  stripePriceId: string | null
+  currentPeriodStart: Date | null
   currentPeriodEnd: Date | null
   cancelAtPeriodEnd: boolean | null
+  canceledAt: Date | null
+  trialStart: Date | null
+  trialEnd: Date | null
+  checkoutSessionId: string | null
+  lastStripeEventId: string | null
+  syncedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,8 +54,16 @@ export type SubscriptionMaxAggregateOutputType = {
   provider: $Enums.PaymentProvider | null
   providerCustomerId: string | null
   providerSubId: string | null
+  stripePriceId: string | null
+  currentPeriodStart: Date | null
   currentPeriodEnd: Date | null
   cancelAtPeriodEnd: boolean | null
+  canceledAt: Date | null
+  trialStart: Date | null
+  trialEnd: Date | null
+  checkoutSessionId: string | null
+  lastStripeEventId: string | null
+  syncedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,8 +76,16 @@ export type SubscriptionCountAggregateOutputType = {
   provider: number
   providerCustomerId: number
   providerSubId: number
+  stripePriceId: number
+  currentPeriodStart: number
   currentPeriodEnd: number
   cancelAtPeriodEnd: number
+  canceledAt: number
+  trialStart: number
+  trialEnd: number
+  checkoutSessionId: number
+  lastStripeEventId: number
+  syncedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -76,8 +100,16 @@ export type SubscriptionMinAggregateInputType = {
   provider?: true
   providerCustomerId?: true
   providerSubId?: true
+  stripePriceId?: true
+  currentPeriodStart?: true
   currentPeriodEnd?: true
   cancelAtPeriodEnd?: true
+  canceledAt?: true
+  trialStart?: true
+  trialEnd?: true
+  checkoutSessionId?: true
+  lastStripeEventId?: true
+  syncedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -90,8 +122,16 @@ export type SubscriptionMaxAggregateInputType = {
   provider?: true
   providerCustomerId?: true
   providerSubId?: true
+  stripePriceId?: true
+  currentPeriodStart?: true
   currentPeriodEnd?: true
   cancelAtPeriodEnd?: true
+  canceledAt?: true
+  trialStart?: true
+  trialEnd?: true
+  checkoutSessionId?: true
+  lastStripeEventId?: true
+  syncedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -104,8 +144,16 @@ export type SubscriptionCountAggregateInputType = {
   provider?: true
   providerCustomerId?: true
   providerSubId?: true
+  stripePriceId?: true
+  currentPeriodStart?: true
   currentPeriodEnd?: true
   cancelAtPeriodEnd?: true
+  canceledAt?: true
+  trialStart?: true
+  trialEnd?: true
+  checkoutSessionId?: true
+  lastStripeEventId?: true
+  syncedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -191,8 +239,16 @@ export type SubscriptionGroupByOutputType = {
   provider: $Enums.PaymentProvider
   providerCustomerId: string | null
   providerSubId: string | null
+  stripePriceId: string | null
+  currentPeriodStart: Date | null
   currentPeriodEnd: Date | null
   cancelAtPeriodEnd: boolean
+  canceledAt: Date | null
+  trialStart: Date | null
+  trialEnd: Date | null
+  checkoutSessionId: string | null
+  lastStripeEventId: string | null
+  syncedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: SubscriptionCountAggregateOutputType | null
@@ -226,8 +282,16 @@ export type SubscriptionWhereInput = {
   provider?: Prisma.EnumPaymentProviderFilter<"Subscription"> | $Enums.PaymentProvider
   providerCustomerId?: Prisma.StringNullableFilter<"Subscription"> | string | null
   providerSubId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  stripePriceId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  currentPeriodStart?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   currentPeriodEnd?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFilter<"Subscription"> | boolean
+  canceledAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  trialStart?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  trialEnd?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  checkoutSessionId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  lastStripeEventId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  syncedAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Subscription"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Subscription"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -241,8 +305,16 @@ export type SubscriptionOrderByWithRelationInput = {
   provider?: Prisma.SortOrder
   providerCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   providerSubId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentPeriodStart?: Prisma.SortOrderInput | Prisma.SortOrder
   currentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
   cancelAtPeriodEnd?: Prisma.SortOrder
+  canceledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialStart?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  checkoutSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrderInput | Prisma.SortOrder
+  syncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -251,6 +323,7 @@ export type SubscriptionOrderByWithRelationInput = {
 export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   userId?: string
+  providerCustomerId?: string
   providerSubId?: string
   AND?: Prisma.SubscriptionWhereInput | Prisma.SubscriptionWhereInput[]
   OR?: Prisma.SubscriptionWhereInput[]
@@ -258,13 +331,20 @@ export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
   tier?: Prisma.EnumPlanTierFilter<"Subscription"> | $Enums.PlanTier
   status?: Prisma.EnumSubscriptionStatusFilter<"Subscription"> | $Enums.SubscriptionStatus
   provider?: Prisma.EnumPaymentProviderFilter<"Subscription"> | $Enums.PaymentProvider
-  providerCustomerId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  stripePriceId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  currentPeriodStart?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   currentPeriodEnd?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFilter<"Subscription"> | boolean
+  canceledAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  trialStart?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  trialEnd?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  checkoutSessionId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  lastStripeEventId?: Prisma.StringNullableFilter<"Subscription"> | string | null
+  syncedAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Subscription"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Subscription"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "userId" | "providerSubId">
+}, "id" | "userId" | "providerCustomerId" | "providerSubId">
 
 export type SubscriptionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -274,8 +354,16 @@ export type SubscriptionOrderByWithAggregationInput = {
   provider?: Prisma.SortOrder
   providerCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   providerSubId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentPeriodStart?: Prisma.SortOrderInput | Prisma.SortOrder
   currentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
   cancelAtPeriodEnd?: Prisma.SortOrder
+  canceledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialStart?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  checkoutSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrderInput | Prisma.SortOrder
+  syncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SubscriptionCountOrderByAggregateInput
@@ -294,8 +382,16 @@ export type SubscriptionScalarWhereWithAggregatesInput = {
   provider?: Prisma.EnumPaymentProviderWithAggregatesFilter<"Subscription"> | $Enums.PaymentProvider
   providerCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
   providerSubId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
+  stripePriceId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
+  currentPeriodStart?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   currentPeriodEnd?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolWithAggregatesFilter<"Subscription"> | boolean
+  canceledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
+  trialStart?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
+  trialEnd?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
+  checkoutSessionId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
+  lastStripeEventId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
+  syncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Subscription"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Subscription"> | Date | string
 }
@@ -307,8 +403,16 @@ export type SubscriptionCreateInput = {
   provider?: $Enums.PaymentProvider
   providerCustomerId?: string | null
   providerSubId?: string | null
+  stripePriceId?: string | null
+  currentPeriodStart?: Date | string | null
   currentPeriodEnd?: Date | string | null
   cancelAtPeriodEnd?: boolean
+  canceledAt?: Date | string | null
+  trialStart?: Date | string | null
+  trialEnd?: Date | string | null
+  checkoutSessionId?: string | null
+  lastStripeEventId?: string | null
+  syncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSubscriptionInput
@@ -322,8 +426,16 @@ export type SubscriptionUncheckedCreateInput = {
   provider?: $Enums.PaymentProvider
   providerCustomerId?: string | null
   providerSubId?: string | null
+  stripePriceId?: string | null
+  currentPeriodStart?: Date | string | null
   currentPeriodEnd?: Date | string | null
   cancelAtPeriodEnd?: boolean
+  canceledAt?: Date | string | null
+  trialStart?: Date | string | null
+  trialEnd?: Date | string | null
+  checkoutSessionId?: string | null
+  lastStripeEventId?: string | null
+  syncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -335,8 +447,16 @@ export type SubscriptionUpdateInput = {
   provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
   providerCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSubscriptionNestedInput
@@ -350,8 +470,16 @@ export type SubscriptionUncheckedUpdateInput = {
   provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
   providerCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -364,8 +492,16 @@ export type SubscriptionCreateManyInput = {
   provider?: $Enums.PaymentProvider
   providerCustomerId?: string | null
   providerSubId?: string | null
+  stripePriceId?: string | null
+  currentPeriodStart?: Date | string | null
   currentPeriodEnd?: Date | string | null
   cancelAtPeriodEnd?: boolean
+  canceledAt?: Date | string | null
+  trialStart?: Date | string | null
+  trialEnd?: Date | string | null
+  checkoutSessionId?: string | null
+  lastStripeEventId?: string | null
+  syncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -377,8 +513,16 @@ export type SubscriptionUpdateManyMutationInput = {
   provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
   providerCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -391,8 +535,16 @@ export type SubscriptionUncheckedUpdateManyInput = {
   provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
   providerCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -410,8 +562,16 @@ export type SubscriptionCountOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerCustomerId?: Prisma.SortOrder
   providerSubId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  currentPeriodStart?: Prisma.SortOrder
   currentPeriodEnd?: Prisma.SortOrder
   cancelAtPeriodEnd?: Prisma.SortOrder
+  canceledAt?: Prisma.SortOrder
+  trialStart?: Prisma.SortOrder
+  trialEnd?: Prisma.SortOrder
+  checkoutSessionId?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
+  syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -424,8 +584,16 @@ export type SubscriptionMaxOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerCustomerId?: Prisma.SortOrder
   providerSubId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  currentPeriodStart?: Prisma.SortOrder
   currentPeriodEnd?: Prisma.SortOrder
   cancelAtPeriodEnd?: Prisma.SortOrder
+  canceledAt?: Prisma.SortOrder
+  trialStart?: Prisma.SortOrder
+  trialEnd?: Prisma.SortOrder
+  checkoutSessionId?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
+  syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -438,8 +606,16 @@ export type SubscriptionMinOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerCustomerId?: Prisma.SortOrder
   providerSubId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  currentPeriodStart?: Prisma.SortOrder
   currentPeriodEnd?: Prisma.SortOrder
   cancelAtPeriodEnd?: Prisma.SortOrder
+  canceledAt?: Prisma.SortOrder
+  trialStart?: Prisma.SortOrder
+  trialEnd?: Prisma.SortOrder
+  checkoutSessionId?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
+  syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -495,8 +671,16 @@ export type SubscriptionCreateWithoutUserInput = {
   provider?: $Enums.PaymentProvider
   providerCustomerId?: string | null
   providerSubId?: string | null
+  stripePriceId?: string | null
+  currentPeriodStart?: Date | string | null
   currentPeriodEnd?: Date | string | null
   cancelAtPeriodEnd?: boolean
+  canceledAt?: Date | string | null
+  trialStart?: Date | string | null
+  trialEnd?: Date | string | null
+  checkoutSessionId?: string | null
+  lastStripeEventId?: string | null
+  syncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -508,8 +692,16 @@ export type SubscriptionUncheckedCreateWithoutUserInput = {
   provider?: $Enums.PaymentProvider
   providerCustomerId?: string | null
   providerSubId?: string | null
+  stripePriceId?: string | null
+  currentPeriodStart?: Date | string | null
   currentPeriodEnd?: Date | string | null
   cancelAtPeriodEnd?: boolean
+  canceledAt?: Date | string | null
+  trialStart?: Date | string | null
+  trialEnd?: Date | string | null
+  checkoutSessionId?: string | null
+  lastStripeEventId?: string | null
+  syncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -537,8 +729,16 @@ export type SubscriptionUpdateWithoutUserInput = {
   provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
   providerCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -550,8 +750,16 @@ export type SubscriptionUncheckedUpdateWithoutUserInput = {
   provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
   providerCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelAtPeriodEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -566,8 +774,16 @@ export type SubscriptionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   provider?: boolean
   providerCustomerId?: boolean
   providerSubId?: boolean
+  stripePriceId?: boolean
+  currentPeriodStart?: boolean
   currentPeriodEnd?: boolean
   cancelAtPeriodEnd?: boolean
+  canceledAt?: boolean
+  trialStart?: boolean
+  trialEnd?: boolean
+  checkoutSessionId?: boolean
+  lastStripeEventId?: boolean
+  syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -581,8 +797,16 @@ export type SubscriptionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   provider?: boolean
   providerCustomerId?: boolean
   providerSubId?: boolean
+  stripePriceId?: boolean
+  currentPeriodStart?: boolean
   currentPeriodEnd?: boolean
   cancelAtPeriodEnd?: boolean
+  canceledAt?: boolean
+  trialStart?: boolean
+  trialEnd?: boolean
+  checkoutSessionId?: boolean
+  lastStripeEventId?: boolean
+  syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -596,8 +820,16 @@ export type SubscriptionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   provider?: boolean
   providerCustomerId?: boolean
   providerSubId?: boolean
+  stripePriceId?: boolean
+  currentPeriodStart?: boolean
   currentPeriodEnd?: boolean
   cancelAtPeriodEnd?: boolean
+  canceledAt?: boolean
+  trialStart?: boolean
+  trialEnd?: boolean
+  checkoutSessionId?: boolean
+  lastStripeEventId?: boolean
+  syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -611,13 +843,21 @@ export type SubscriptionSelectScalar = {
   provider?: boolean
   providerCustomerId?: boolean
   providerSubId?: boolean
+  stripePriceId?: boolean
+  currentPeriodStart?: boolean
   currentPeriodEnd?: boolean
   cancelAtPeriodEnd?: boolean
+  canceledAt?: boolean
+  trialStart?: boolean
+  trialEnd?: boolean
+  checkoutSessionId?: boolean
+  lastStripeEventId?: boolean
+  syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SubscriptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tier" | "status" | "provider" | "providerCustomerId" | "providerSubId" | "currentPeriodEnd" | "cancelAtPeriodEnd" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
+export type SubscriptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tier" | "status" | "provider" | "providerCustomerId" | "providerSubId" | "stripePriceId" | "currentPeriodStart" | "currentPeriodEnd" | "cancelAtPeriodEnd" | "canceledAt" | "trialStart" | "trialEnd" | "checkoutSessionId" | "lastStripeEventId" | "syncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
 export type SubscriptionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -641,8 +881,25 @@ export type $SubscriptionPayload<ExtArgs extends runtime.Types.Extensions.Intern
     provider: $Enums.PaymentProvider
     providerCustomerId: string | null
     providerSubId: string | null
+    /**
+     * Stripe price id currently subscribed to - tier is derived from this via the trusted env price map.
+     */
+    stripePriceId: string | null
+    currentPeriodStart: Date | null
     currentPeriodEnd: Date | null
     cancelAtPeriodEnd: boolean
+    canceledAt: Date | null
+    trialStart: Date | null
+    trialEnd: Date | null
+    /**
+     * Latest Checkout Session created for this user (CHECKOUT_PENDING bookkeeping).
+     */
+    checkoutSessionId: string | null
+    /**
+     * Stripe event id that produced the last sync - diagnostics only (sync always refetches latest).
+     */
+    lastStripeEventId: string | null
+    syncedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["subscription"]>
@@ -1076,8 +1333,16 @@ export interface SubscriptionFieldRefs {
   readonly provider: Prisma.FieldRef<"Subscription", 'PaymentProvider'>
   readonly providerCustomerId: Prisma.FieldRef<"Subscription", 'String'>
   readonly providerSubId: Prisma.FieldRef<"Subscription", 'String'>
+  readonly stripePriceId: Prisma.FieldRef<"Subscription", 'String'>
+  readonly currentPeriodStart: Prisma.FieldRef<"Subscription", 'DateTime'>
   readonly currentPeriodEnd: Prisma.FieldRef<"Subscription", 'DateTime'>
   readonly cancelAtPeriodEnd: Prisma.FieldRef<"Subscription", 'Boolean'>
+  readonly canceledAt: Prisma.FieldRef<"Subscription", 'DateTime'>
+  readonly trialStart: Prisma.FieldRef<"Subscription", 'DateTime'>
+  readonly trialEnd: Prisma.FieldRef<"Subscription", 'DateTime'>
+  readonly checkoutSessionId: Prisma.FieldRef<"Subscription", 'String'>
+  readonly lastStripeEventId: Prisma.FieldRef<"Subscription", 'String'>
+  readonly syncedAt: Prisma.FieldRef<"Subscription", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Subscription", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Subscription", 'DateTime'>
 }

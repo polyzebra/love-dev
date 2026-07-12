@@ -68,4 +68,7 @@ export const RATE_LIMITS = {
   pushSubscribe: { limit: 10, windowMs: 60_000 },
   pushTest: { limit: 3, windowMs: 60 * 60_000 },
   presenceHeartbeat: { limit: 1, windowMs: 10_000 },
+  // Checkout/status/portal share one budget: generous enough for a
+  // confirm-page poll, tight enough to blunt session-id probing.
+  billing: { limit: 30, windowMs: 60_000 },
 } as const;

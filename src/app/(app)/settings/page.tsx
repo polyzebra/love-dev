@@ -73,7 +73,7 @@ export default async function SettingsPage() {
         description={user.email}
         actions={
           <Badge variant={tier === "FREE" ? "secondary" : "default"} className="rounded-full px-3">
-            {tier === "FREE" ? "Free plan" : tier === "PLUS" ? "Plus" : "Premium"}
+            {tier === "FREE" ? "Free plan" : tier === "PLUS" ? "Plus" : "Gold"}
           </Badge>
         }
       />

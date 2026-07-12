@@ -162,6 +162,11 @@ export type Block = Prisma.BlockModel
  */
 export type Subscription = Prisma.SubscriptionModel
 /**
+ * Model StripeEvent
+ * 
+ */
+export type StripeEvent = Prisma.StripeEventModel
+/**
  * Model Payment
  * 
  */

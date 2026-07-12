@@ -75,6 +75,7 @@ export const ModelName = {
   BannedCredential: 'BannedCredential',
   Block: 'Block',
   Subscription: 'Subscription',
+  StripeEvent: 'StripeEvent',
   Payment: 'Payment',
   Notification: 'Notification',
   PushSubscription: 'PushSubscription',
@@ -547,13 +548,31 @@ export const SubscriptionScalarFieldEnum = {
   provider: 'provider',
   providerCustomerId: 'providerCustomerId',
   providerSubId: 'providerSubId',
+  stripePriceId: 'stripePriceId',
+  currentPeriodStart: 'currentPeriodStart',
   currentPeriodEnd: 'currentPeriodEnd',
   cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  trialStart: 'trialStart',
+  trialEnd: 'trialEnd',
+  checkoutSessionId: 'checkoutSessionId',
+  lastStripeEventId: 'lastStripeEventId',
+  syncedAt: 'syncedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const StripeEventScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  receivedAt: 'receivedAt',
+  processedAt: 'processedAt'
+} as const
+
+export type StripeEventScalarFieldEnum = (typeof StripeEventScalarFieldEnum)[keyof typeof StripeEventScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {

@@ -408,6 +408,7 @@ export const ModelName = {
   BannedCredential: 'BannedCredential',
   Block: 'Block',
   Subscription: 'Subscription',
+  StripeEvent: 'StripeEvent',
   Payment: 'Payment',
   Notification: 'Notification',
   PushSubscription: 'PushSubscription',
@@ -439,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2219,6 +2220,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StripeEvent: {
+      payload: Prisma.$StripeEventPayload<ExtArgs>
+      fields: Prisma.StripeEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StripeEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StripeEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>
+        }
+        findFirst: {
+          args: Prisma.StripeEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StripeEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>
+        }
+        findMany: {
+          args: Prisma.StripeEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>[]
+        }
+        create: {
+          args: Prisma.StripeEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>
+        }
+        createMany: {
+          args: Prisma.StripeEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StripeEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>[]
+        }
+        delete: {
+          args: Prisma.StripeEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>
+        }
+        update: {
+          args: Prisma.StripeEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.StripeEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StripeEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StripeEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.StripeEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeEventPayload>
+        }
+        aggregate: {
+          args: Prisma.StripeEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStripeEvent>
+        }
+        groupBy: {
+          args: Prisma.StripeEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StripeEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StripeEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StripeEventCountAggregateOutputType> | number
+        }
+      }
+    }
     Payment: {
       payload: Prisma.$PaymentPayload<ExtArgs>
       fields: Prisma.PaymentFieldRefs
@@ -3880,13 +3955,31 @@ export const SubscriptionScalarFieldEnum = {
   provider: 'provider',
   providerCustomerId: 'providerCustomerId',
   providerSubId: 'providerSubId',
+  stripePriceId: 'stripePriceId',
+  currentPeriodStart: 'currentPeriodStart',
   currentPeriodEnd: 'currentPeriodEnd',
   cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  trialStart: 'trialStart',
+  trialEnd: 'trialEnd',
+  checkoutSessionId: 'checkoutSessionId',
+  lastStripeEventId: 'lastStripeEventId',
+  syncedAt: 'syncedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const StripeEventScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  receivedAt: 'receivedAt',
+  processedAt: 'processedAt'
+} as const
+
+export type StripeEventScalarFieldEnum = (typeof StripeEventScalarFieldEnum)[keyof typeof StripeEventScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -4994,6 +5087,7 @@ export type GlobalOmitConfig = {
   bannedCredential?: Prisma.BannedCredentialOmit
   block?: Prisma.BlockOmit
   subscription?: Prisma.SubscriptionOmit
+  stripeEvent?: Prisma.StripeEventOmit
   payment?: Prisma.PaymentOmit
   notification?: Prisma.NotificationOmit
   pushSubscription?: Prisma.PushSubscriptionOmit

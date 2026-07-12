@@ -213,7 +213,7 @@ export type ReportStatus = (typeof ReportStatus)[keyof typeof ReportStatus]
 export const PlanTier = {
   FREE: 'FREE',
   PLUS: 'PLUS',
-  PREMIUM: 'PREMIUM'
+  GOLD: 'GOLD'
 } as const
 
 export type PlanTier = (typeof PlanTier)[keyof typeof PlanTier]
@@ -225,6 +225,10 @@ export const SubscriptionStatus = {
   PAST_DUE: 'PAST_DUE',
   CANCELED: 'CANCELED',
   INCOMPLETE: 'INCOMPLETE',
+  INCOMPLETE_EXPIRED: 'INCOMPLETE_EXPIRED',
+  UNPAID: 'UNPAID',
+  PAUSED: 'PAUSED',
+  CHECKOUT_PENDING: 'CHECKOUT_PENDING',
   EXPIRED: 'EXPIRED'
 } as const
 

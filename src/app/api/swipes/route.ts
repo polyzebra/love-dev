@@ -60,14 +60,14 @@ export async function POST(req: Request) {
   return ok(outcome);
 }
 
-/** DELETE = undo last swipe (Plus/Premium). */
+/** DELETE = undo last swipe (Plus/Gold). */
 export async function DELETE() {
   const { user, response } = await requireSession();
   if (response) return response;
 
   const tier = await planTierOf(user.id);
   if (!SWIPE_LIMITS[tier].undo) {
-    return apiError(402, "upgrade_required", "Undo is available on Plus and Premium.");
+    return apiError(402, "upgrade_required", "Undo is available on Plus and Gold.");
   }
 
   const undone = await undoLastSwipe(user.id);

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { SWIPE_LIMITS } from "@/lib/constants";
 import { notifyUser } from "@/lib/services/notify";
+import { effectiveTierOf } from "@/lib/services/entitlements";
 import type { PlanTier, SwipeAction } from "@/generated/prisma/enums";
 
 /** Canonical ordering so a user pair maps to exactly one Match row. */
@@ -8,10 +9,15 @@ export function orderPair(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
 }
 
+/**
+ * Effective plan for gating - delegates to the canonical entitlements
+ * service so every premium gate shares ONE status policy (TRIALING
+ * counts, cancel-at-period-end keeps access until Stripe ends it,
+ * PAST_DUE gets a short dunning grace). Kept as a re-export because the
+ * swipe and first-message gates already call it by this name.
+ */
 export async function planTierOf(userId: string): Promise<PlanTier> {
-  const sub = await db.subscription.findUnique({ where: { userId } });
-  if (!sub || sub.status !== "ACTIVE") return "FREE";
-  return sub.tier;
+  return effectiveTierOf(userId);
 }
 
 export async function swipesRemainingToday(userId: string, tier: PlanTier) {

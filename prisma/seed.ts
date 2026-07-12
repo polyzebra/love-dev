@@ -53,7 +53,7 @@ async function main() {
       role: "ADMIN",
       emailVerified: new Date(),
       onboardingDone: true,
-      subscription: { create: { tier: "PREMIUM" } },
+      subscription: { create: { tier: "GOLD" } },
     },
     update: { role: "ADMIN" },
   });

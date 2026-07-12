@@ -13,18 +13,20 @@ export const PHOTO_LIMITS = { min: 2, max: 10, maxSizeMb: 10 } as const;
 export const BIO_MAX_LENGTH = 500;
 export const MESSAGE_MAX_LENGTH = 2000;
 
-/** Free-tier daily budgets; enforced server-side. */
+/** Free-tier daily budgets; enforced server-side. NOTE: boostsPerMonth is
+ * aspirational pricing copy - no boost mechanism exists in the product
+ * yet, so it is NOT exposed through entitlements (honesty rule). */
 export const SWIPE_LIMITS = {
   FREE: { likesPerDay: 25, superLikesPerDay: 1, undo: false, boostsPerMonth: 0 },
   PLUS: { likesPerDay: Infinity, superLikesPerDay: 5, undo: true, boostsPerMonth: 1 },
-  PREMIUM: { likesPerDay: Infinity, superLikesPerDay: 10, undo: true, boostsPerMonth: 4 },
+  GOLD: { likesPerDay: Infinity, superLikesPerDay: 10, undo: true, boostsPerMonth: 4 },
 } as const;
 
 /** "Message before match" first messages per day, by plan tier. */
 export const FIRST_MESSAGE_LIMITS = {
   FREE: 3,
   PLUS: 10,
-  PREMIUM: 25,
+  GOLD: 25,
 } as const;
 
 export const FIRST_MESSAGE_MAX_LENGTH = 280;
@@ -60,7 +62,7 @@ export const PLANS = [
     ],
   },
   {
-    tier: "PREMIUM",
+    tier: "GOLD",
     name: "Tirvea Gold",
     priceMonthlyCents: 2999,
     tagline: "The full experience",

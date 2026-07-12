@@ -21,7 +21,7 @@ export default async function AdminPaymentsPage() {
   if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
   const monthAgo = daysAgo(30);
 
-  const [payments, revenueAgg, plusCount, premiumCount] = await Promise.all([
+  const [payments, revenueAgg, plusCount, goldCount] = await Promise.all([
     db.payment.findMany({
       include: { user: { select: { email: true, profile: { select: { displayName: true } } } } },
       orderBy: { createdAt: "desc" },
@@ -32,10 +32,10 @@ export default async function AdminPaymentsPage() {
       _sum: { amountCents: true },
     }),
     db.subscription.count({ where: { tier: "PLUS", status: "ACTIVE" } }),
-    db.subscription.count({ where: { tier: "PREMIUM", status: "ACTIVE" } }),
+    db.subscription.count({ where: { tier: "GOLD", status: "ACTIVE" } }),
   ]);
 
-  const mrrApprox = (plusCount * 1499 + premiumCount * 2999) / 100;
+  const mrrApprox = (plusCount * 1499 + goldCount * 2999) / 100;
 
   return (
     <>
@@ -72,10 +72,10 @@ export default async function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <p className="font-display text-3xl font-semibold tabular-nums">
-              {plusCount + premiumCount}
+              {plusCount + goldCount}
             </p>
             <p className="text-xs text-muted-foreground">
-              {plusCount} Plus · {premiumCount} Premium
+              {plusCount} Plus · {goldCount} Gold
             </p>
           </CardContent>
         </Card>

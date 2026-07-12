@@ -1,9 +1,10 @@
 import { db } from "@/lib/db";
+import { validateStripeEnvStatic } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/health -> { status, database, config, timestamp }
+ * GET /api/health -> { status, database, config, billing, timestamp }
  *
  * Liveness + configuration probe. `config.missing` lists the NAMES of
  * production-critical env vars that are absent (never their values) -
@@ -34,10 +35,24 @@ export async function GET() {
       ? REQUIRED_IN_PRODUCTION.filter((name) => !process.env[name]?.trim())
       : [];
 
+  // Billing degrades independently: a broken Stripe config is NAMED here
+  // (variable names and problem descriptions only, never values) without
+  // taking the rest of the app down - payments simply answer 503.
+  const stripe = validateStripeEnvStatic();
+  const billing = !stripe.configured
+    ? "unconfigured"
+    : stripe.problems.length === 0
+      ? "ok"
+      : { problems: stripe.problems };
+  const billingDegraded =
+    process.env.NODE_ENV === "production" && stripe.configured && stripe.problems.length > 0;
+
   return Response.json({
-    status: database === "ok" && missing.length === 0 ? "healthy" : "degraded",
+    status:
+      database === "ok" && missing.length === 0 && !billingDegraded ? "healthy" : "degraded",
     database,
     config: missing.length === 0 ? "ok" : { missing },
+    billing,
     timestamp: new Date().toISOString(),
   });
 }

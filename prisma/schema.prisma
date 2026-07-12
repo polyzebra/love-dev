@@ -174,18 +174,30 @@ enum ReportStatus {
   DISMISSED
 }
 
+// GOLD was named PREMIUM before the canonical Stripe lifecycle (2026-07-11);
+// the enum value was renamed in place, existing rows carried over.
 enum PlanTier {
   FREE
   PLUS
-  PREMIUM
+  GOLD
 }
 
+// Mirrors Stripe subscription statuses one-to-one, plus CHECKOUT_PENDING
+// (a Checkout Session was created but Stripe has not confirmed anything
+// yet - grants NOTHING). FREE is implicit: tier FREE + status ACTIVE.
+// "Cancels later" is NOT a status - it is cancelAtPeriodEnd on an ACTIVE
+// row, exactly how Stripe models it. EXPIRED is legacy (pre-lifecycle
+// rows only); nothing writes it anymore.
 enum SubscriptionStatus {
   ACTIVE
   TRIALING
   PAST_DUE
   CANCELED
   INCOMPLETE
+  INCOMPLETE_EXPIRED
+  UNPAID
+  PAUSED
+  CHECKOUT_PENDING
   EXPIRED
 }
 
@@ -1061,22 +1073,51 @@ model Block {
 // Billing
 // ---------------------------------------------------------------------------
 
+// One row per user; the SINGLE server-side source of truth for plan and
+// entitlements. Every field below is written only from verified Stripe
+// state (webhook or authenticated server-side reconciliation) - never
+// from anything the browser sends. providerCustomerId is UNIQUE: one
+// Stripe customer maps to exactly one user, ever.
 model Subscription {
   id                 String             @id @default(cuid())
   userId             String             @unique
   tier               PlanTier           @default(FREE)
   status             SubscriptionStatus @default(ACTIVE)
   provider           PaymentProvider    @default(STRIPE)
-  providerCustomerId String?
+  providerCustomerId String?            @unique
   providerSubId      String?            @unique
+  /// Stripe price id currently subscribed to - tier is derived from this via the trusted env price map.
+  stripePriceId      String?
+  currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
   cancelAtPeriodEnd  Boolean            @default(false)
+  canceledAt         DateTime?
+  trialStart         DateTime?
+  trialEnd           DateTime?
+  /// Latest Checkout Session created for this user (CHECKOUT_PENDING bookkeeping).
+  checkoutSessionId  String?
+  /// Stripe event id that produced the last sync - diagnostics only (sync always refetches latest).
+  lastStripeEventId  String?
+  syncedAt           DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status, currentPeriodEnd])
+}
+
+// Durable webhook idempotency ledger: one row per Stripe event id.
+// processedAt stays NULL until the handler finished successfully, so a
+// crash mid-processing lets the Stripe retry reprocess the event, while
+// an already-processed duplicate delivery is acknowledged without work.
+model StripeEvent {
+  id          String    @id
+  type        String
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([type, receivedAt])
 }
 
 model Payment {

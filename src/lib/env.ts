@@ -22,6 +22,9 @@ const serverSchema = z.object({
   ),
   STRIPE_SECRET_KEY: optionalStr,
   STRIPE_WEBHOOK_SECRET: optionalStr,
+  // Server-only price catalogue - the browser NEVER supplies a price id.
+  STRIPE_PLUS_MONTHLY_PRICE_ID: optionalStr,
+  STRIPE_GOLD_MONTHLY_PRICE_ID: optionalStr,
   RESEND_API_KEY: optionalStr,
   EMAIL_FROM: z.string().default("Tirvea <hello@tirvea.app>"),
   UPSTASH_REDIS_REST_URL: optionalStr,
