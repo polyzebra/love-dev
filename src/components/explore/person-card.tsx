@@ -56,9 +56,11 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
       >
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
           <p className="flex items-center gap-1.5 text-sm font-semibold text-white">
-            {person.displayName}, {person.age}
+            <span className="truncate" title={`${person.displayName}, ${person.age}`}>
+              {person.displayName}, {person.age}
+            </span>
             {person.isVerified && <BadgeCheck className="size-4 shrink-0 fill-sky-400 text-black/40" aria-label="Photo verified" />}
-            <OnlineDot online={person.isOnline} className="ml-auto" />
+            <OnlineDot online={person.isOnline} className="ml-auto shrink-0" />
           </p>
           {person.sharedInterests > 0 && (
             <p className="mt-0.5 flex items-center gap-1 text-[11px] text-white/80">

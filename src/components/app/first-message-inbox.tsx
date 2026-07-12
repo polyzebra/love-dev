@@ -133,7 +133,10 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
                 </div>
 
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <p className="truncate text-base font-semibold">
+                  <p
+                    className="truncate text-base font-semibold"
+                    title={`${card.senderName}${card.senderAge != null ? `, ${card.senderAge}` : ""}`}
+                  >
                     {card.senderName}
                     {card.senderAge != null ? `, ${card.senderAge}` : ""}
                     {card.senderCity && (

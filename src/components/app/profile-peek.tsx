@@ -100,7 +100,10 @@ export function ProfilePeek({
                 )}
                 {profile.isVerified && (
                   <li className="text-muted-foreground">
-                    {profile.displayName} passed photo verification
+                    {/* Explicit string: the compiler strips the leading space
+                        of JSX text following an expression at a line end. */}
+                    {profile.displayName}
+                    {" passed photo verification"}
                   </li>
                 )}
               </ul>

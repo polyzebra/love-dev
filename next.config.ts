@@ -25,6 +25,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      // The app nav labels /matches "Likes" and the route allowlist
+      // reserves /likes - alias the guessable URL instead of 404ing it.
+      { source: "/likes", destination: "/matches", permanent: false },
+    ];
+  },
   poweredByHeader: false,
 };
 

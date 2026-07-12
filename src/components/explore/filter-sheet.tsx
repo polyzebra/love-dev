@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger,
+  Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -39,7 +39,9 @@ export function ExploreFilterSheet() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline" className="rounded-full" aria-label="Filters">
+        {/* No aria-label override: it hid the visible "· on" active state
+            from screen readers. The visible text IS the accessible name. */}
+        <Button variant="outline" className="rounded-full">
           <SlidersHorizontal className="size-4" aria-hidden="true" />
           Filters{active ? " · on" : ""}
         </Button>
@@ -47,6 +49,9 @@ export function ExploreFilterSheet() {
       <DrawerContent className="border-border bg-popover/95 backdrop-blur-2xl">
         <DrawerHeader>
           <DrawerTitle className="font-display text-2xl font-medium">Refine</DrawerTitle>
+          <DrawerDescription className="sr-only">
+            Filter people by age range, country and photo verification.
+          </DrawerDescription>
         </DrawerHeader>
         <div className="space-y-7 px-6 pb-2">
           <div className="space-y-3">

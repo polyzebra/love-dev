@@ -160,7 +160,7 @@ export default async function MatchesPage() {
         <EmptyState
           icon={HeartOff}
           title="No matches yet"
-          description="Your future match is probably in Discover right now. Keep an open mind - and a complete profile gets up to 3× more likes."
+          description="Your future match is probably in Discover right now. Keep an open mind - and a complete profile makes it easier for the right people to find you."
           action={
             <Button className="rounded-full" asChild>
               <Link href="/discover">Go to Discover</Link>
@@ -216,11 +216,11 @@ export default async function MatchesPage() {
                   )}
                 </PhotoFrame>
                 <div className="flex items-center gap-2 p-3">
-                  <p className="truncate text-sm font-medium">
+                  <p className="truncate text-sm font-medium" title={age ? `${name}, ${age}` : name}>
                     {name}
                     {age ? `, ${age}` : ""}
                   </p>
-                  <OnlineDot online={online} />
+                  <OnlineDot online={online} className="shrink-0" />
                 </div>
               </Link>
             </li>

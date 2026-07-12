@@ -8,6 +8,7 @@ import {
   motion,
   useMotionTemplate,
   useMotionValue,
+  useReducedMotion,
   useTransform,
 } from "motion/react";
 import { toast } from "sonner";
@@ -40,7 +41,7 @@ import {
 import { PhotoFrame } from "@/components/shared/photo-frame";
 import { HeartBurst } from "@/components/fx/heart-burst";
 import { emitInteraction } from "@/lib/interaction-events";
-import { SPRING } from "@/lib/motion";
+import { SPRING, softSpring } from "@/lib/motion";
 import { useDominantColor, type RGB } from "@/hooks/use-dominant-color";
 import type { DiscoverProfile } from "@/lib/services/discovery";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
@@ -230,6 +231,9 @@ function TopCard({
   const light = useMotionTemplate`radial-gradient(26rem 26rem at ${lx}% ${ly}%, rgba(255,255,255,0.09), transparent 60%)`;
 
   const [grabbed, setGrabbed] = useState(false);
+  // MotionConfig reducedMotion="user" only gates motion COMPONENTS - the
+  // standalone animate() calls below must self-gate (see lib/motion.ts).
+  const reducedMotion = useReducedMotion();
   const leaving = useRef(false);
   const suppressTap = useRef(false); // a drag must never read as a photo tap
   const photos = profile.photos;
@@ -239,6 +243,12 @@ function TopCard({
     (action: SwipeAction, velocity = 0) => {
       if (leaving.current) return;
       leaving.current = true;
+      // Reduced motion: no spatial fly-out - the AnimatePresence exit fade
+      // (opacity-only) is the whole departure. The decision is identical.
+      if (reducedMotion) {
+        onDecide(action);
+        return;
+      }
       const dir = action === "PASS" ? -1 : 1;
       const targetX = dir * (typeof window !== "undefined" ? window.innerWidth : 600) * 1.1;
       const speed = Math.max(Math.abs(velocity), 900);
@@ -252,7 +262,7 @@ function TopCard({
       // Hand off to the deck slightly before the spring settles
       window.setTimeout(() => onDecide(action), 240);
     },
-    [onDecide, x, y],
+    [onDecide, x, y, reducedMotion],
   );
 
   // Let the action bar drive the same physics as a gesture
@@ -331,7 +341,7 @@ function TopCard({
             <button
               type="button"
               aria-label="Previous photo"
-              className="h-full w-1/2 outline-none"
+              className="h-full w-1/2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60"
               onClick={() => {
                 if (!suppressTap.current) onCyclePhoto(-1);
               }}
@@ -339,7 +349,7 @@ function TopCard({
             <button
               type="button"
               aria-label="Next photo"
-              className="h-full w-1/2 outline-none"
+              className="h-full w-1/2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60"
               onClick={() => {
                 if (!suppressTap.current) onCyclePhoto(1);
               }}
@@ -387,7 +397,10 @@ function TopCard({
         {/* Compatibility, demoted: a quiet pill under the stage controls */}
         <div className="absolute right-4 top-[calc(var(--safe-top)+4.5rem)] z-10">
           <span
-            className="flex items-center gap-1 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white/75"
+            role="img"
+            // Sits over UNSCRIMMED photo: black-tinted glass so it stays
+            // legible on bright photos (white/10 washed out against sky)
+            className="flex items-center gap-1 rounded-full border border-white/20 bg-black/25 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white/90"
             aria-label={`${profile.compatibility} percent match`}
           >
             <Heart className="size-3 fill-current text-rose-300/90" aria-hidden="true" />
@@ -397,17 +410,25 @@ function TopCard({
 
         {/* Story-first identity, riding the bottom scrim - clears the action row */}
         <div className="relative z-10 space-y-2 px-5 pb-[calc(max(1rem,var(--safe-bottom))+10.5rem)] sm:px-6 lg:pb-[calc(var(--safe-bottom)+7.75rem)]">
-          <h2 className="font-display text-4xl font-medium tracking-tight text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl">
-            {profile.displayName}, {profile.age}
+          {/* Long-name stress: the NAME truncates, the age never disappears;
+              the full name stays reachable via title. */}
+          <h2
+            className="flex items-baseline font-display text-4xl font-medium tracking-tight text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl"
+            title={`${profile.displayName}, ${profile.age}`}
+          >
+            <span className="truncate">{profile.displayName}</span>
+            <span className="shrink-0">{`, ${profile.age}`}</span>
           </h2>
           {profile.goalLine && (
             <p className="text-sm font-medium text-rose-200/95">{profile.goalLine}</p>
           )}
           {story &&
             (story.kind === "reason" ? (
-              <p className="text-sm/relaxed text-white/90">{story.text}</p>
+              <p className="line-clamp-3 text-sm/relaxed text-white/90" title={story.text}>
+                {story.text}
+              </p>
             ) : (
-              <p className="text-sm/relaxed text-white/90">
+              <p className="line-clamp-3 text-sm/relaxed text-white/90" title={story.answer}>
                 <span className="italic">&ldquo;{story.answer}&rdquo;</span>
                 <span className="text-white/65"> - {lowerLabel(story.label)}</span>
               </p>
@@ -587,6 +608,45 @@ export function SwipeDeck({
     if (deciderRef.current) deciderRef.current(action);
   }, []);
 
+  const undo = useCallback(async () => {
+    const res = await fetch("/api/swipes", { method: "DELETE" });
+    if (res.status === 402) {
+      toast("Undo is a Plus feature.", {
+        action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
+      });
+      return;
+    }
+    if (res.ok) {
+      emitInteraction("undo");
+      toast.success("Last swipe undone. Refresh to see them again.");
+    } else toast("Nothing to undo yet.");
+  }, []);
+
+  // Desktop keyboard parity - no action is gesture-only. Left arrow =
+  // pass, right arrow = like, U = undo (documented on the action buttons
+  // via aria-keyshortcuts). Held keys never repeat-swipe, and dialogs,
+  // sheets and form fields keep the keyboard to themselves.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (composeOpen || matchedWith || !deck[0]) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        act("PASS");
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        act("LIKE");
+      } else if (e.key === "u" || e.key === "U") {
+        e.preventDefault();
+        void undo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [act, undo, composeOpen, matchedWith, deck]);
+
   // ONE emotional line for the composer header - first human server
   // reason, else the goal line. Real data only, like the card itself.
   const composeReason = composeFor
@@ -618,20 +678,6 @@ export function SwipeDeck({
     [composeFor],
   );
 
-  const undo = useCallback(async () => {
-    const res = await fetch("/api/swipes", { method: "DELETE" });
-    if (res.status === 402) {
-      toast("Undo is a Plus feature.", {
-        action: { label: "Upgrade", onClick: () => (window.location.href = "/pricing") },
-      });
-      return;
-    }
-    if (res.ok) {
-      emitInteraction("undo");
-      toast.success("Last swipe undone. Refresh to see them again.");
-    } else toast("Nothing to undo yet.");
-  }, []);
-
   // Stage chrome circles: photo material over a card, house glass otherwise
   const chromeCircle = cn(
     "pointer-events-auto flex size-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2",
@@ -652,6 +698,10 @@ export function SwipeDeck({
           role="group"
           aria-label="Profile cards"
         >
+          <p className="sr-only">
+            Keyboard: press the right arrow to like, the left arrow to pass, and U to undo your
+            last swipe.
+          </p>
           {/* Next card peek - ~4% visible at the edges, waiting underneath */}
           {next && (
             <motion.div
@@ -738,6 +788,7 @@ export function SwipeDeck({
                   type="button"
                   whileTap={{ scale: 0.85 }}
                   aria-label="Undo last swipe"
+                  aria-keyshortcuts="u"
                   className={cn(PHOTO_GLASS_BUTTON, "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
                   onClick={undo}
                 >
@@ -748,6 +799,7 @@ export function SwipeDeck({
                   whileTap={{ scale: 0.85 }}
                   whileHover={{ scale: 1.06 }}
                   aria-label="Pass"
+                  aria-keyshortcuts="ArrowLeft"
                   className={cn(PHOTO_GLASS_BUTTON, "size-14 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
                   onClick={() => act("PASS")}
                 >
@@ -758,6 +810,7 @@ export function SwipeDeck({
                   whileTap={{ scale: 0.85 }}
                   whileHover={{ scale: 1.08 }}
                   aria-label="Like"
+                  aria-keyshortcuts="ArrowRight"
                   className="pointer-events-auto flex size-[4.5rem] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_32px_color-mix(in_srgb,var(--primary)_50%,transparent),0_18px_44px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                   onClick={() => act("LIKE")}
                 >
@@ -829,80 +882,93 @@ export function SwipeDeck({
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>
         <DialogContent className="overflow-hidden rounded-2xl border-border text-center sm:max-w-sm">
           {matchedWith && <HeartBurst />}
-          <DialogHeader className="relative items-center space-y-3">
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ ...SPRING.bounce, delay: 0.1 }}
-              className="flex size-16 items-center justify-center rounded-full bg-accent shadow-glow"
-            >
-              <Heart className="size-8 fill-primary text-primary" aria-hidden="true" />
-            </motion.span>
-            <DialogTitle className="font-display text-3xl font-medium">It&apos;s a match</DialogTitle>
-            <DialogDescription>
-              You and {matchedWith?.displayName} liked each other. Break the ice while it&apos;s warm.
-            </DialogDescription>
-          </DialogHeader>
-          {matchedWith && (
-            <div className="relative pb-1">
-              {matchChips.length > 0 ? (
-                <motion.ul
-                  initial="hidden"
-                  animate="show"
-                  variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.25 } } }}
-                  className="flex flex-wrap justify-center gap-1.5"
-                  aria-label="What you share"
-                >
-                  {matchChips.map((chip) => (
-                    <motion.li
-                      key={chip}
-                      variants={{
-                        hidden: { opacity: 0, y: 10, scale: 0.92 },
-                        show: { opacity: 1, y: 0, scale: 1, transition: SPRING.snappy },
-                      }}
-                      className="rounded-full border border-primary/30 bg-primary/15 px-3 py-1 text-xs font-medium text-foreground"
-                    >
-                      {chip}
-                    </motion.li>
-                  ))}
-                </motion.ul>
-              ) : matchedWith.promptTease ? (
-                <p className="text-sm text-muted-foreground">
-                  <span className="italic">&ldquo;{matchedWith.promptTease.answer}&rdquo;</span>
-                  {" - "}their {lowerLabel(matchedWith.promptTease.label)}
-                </p>
-              ) : matchedWith.goalLine ? (
-                <p className="text-sm text-muted-foreground">{matchedWith.goalLine}</p>
+          {/* Gentle rise on top of the dialog's CSS fade - softSpring so the
+              moment settles softly. MotionConfig reducedMotion="user" strips
+              the translate and keeps the opacity crossfade. */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0, transition: softSpring }}
+            className="grid gap-4"
+          >
+            <DialogHeader className="relative items-center space-y-3">
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ ...SPRING.bounce, delay: 0.1 }}
+                className="flex size-16 items-center justify-center rounded-full bg-accent shadow-glow"
+              >
+                <Heart className="size-8 fill-primary text-primary" aria-hidden="true" />
+              </motion.span>
+              <DialogTitle className="font-display text-3xl font-medium">It&apos;s a match</DialogTitle>
+              <DialogDescription>
+                {/* Explicit string child: this Next build's compiler strips
+                    the leading space of JSX text that follows an expression
+                    and runs to the line end ("Sadhbhliked" before). */}
+                You and {matchedWith?.displayName}
+                {" liked each other. Break the ice while it's warm."}
+              </DialogDescription>
+            </DialogHeader>
+            {matchedWith && (
+              <div className="relative pb-1">
+                {matchChips.length > 0 ? (
+                  <motion.ul
+                    initial="hidden"
+                    animate="show"
+                    variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.25 } } }}
+                    className="flex flex-wrap justify-center gap-1.5"
+                    aria-label="What you share"
+                  >
+                    {matchChips.map((chip) => (
+                      <motion.li
+                        key={chip}
+                        variants={{
+                          hidden: { opacity: 0, y: 10, scale: 0.92 },
+                          show: { opacity: 1, y: 0, scale: 1, transition: SPRING.snappy },
+                        }}
+                        className="rounded-full border border-primary/30 bg-primary/15 px-3 py-1 text-xs font-medium text-foreground"
+                      >
+                        {chip}
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                ) : matchedWith.promptTease ? (
+                  <p className="text-sm text-muted-foreground">
+                    <span className="italic">&ldquo;{matchedWith.promptTease.answer}&rdquo;</span>
+                    {" - "}their {lowerLabel(matchedWith.promptTease.label)}
+                  </p>
+                ) : matchedWith.goalLine ? (
+                  <p className="text-sm text-muted-foreground">{matchedWith.goalLine}</p>
+                ) : null}
+              </div>
+            )}
+            <div className="relative grid gap-2">
+              <Button className="h-12 rounded-full" asChild>
+                <Link href={matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}>Say hello</Link>
+              </Button>
+              {opener ? (
+                <Button variant="outline" className="h-11 rounded-full" asChild>
+                  <Link
+                    href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(opener.send)}`}
+                  >
+                    {opener.label}
+                  </Link>
+                </Button>
+              ) : firstSharedInterest ? (
+                <Button variant="outline" className="h-11 rounded-full" asChild>
+                  <Link
+                    href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(
+                      `We both picked ${firstSharedInterest.toLowerCase()} - I have to ask, what's your favourite?`,
+                    )}`}
+                  >
+                    Ask about {firstSharedInterest.toLowerCase()}
+                  </Link>
+                </Button>
               ) : null}
+              <Button variant="ghost" className="rounded-full" onClick={() => setMatchedWith(null)}>
+                Keep swiping
+              </Button>
             </div>
-          )}
-          <div className="relative grid gap-2">
-            <Button className="h-12 rounded-full" asChild>
-              <Link href={matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}>Say hello</Link>
-            </Button>
-            {opener ? (
-              <Button variant="outline" className="h-11 rounded-full" asChild>
-                <Link
-                  href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(opener.send)}`}
-                >
-                  {opener.label}
-                </Link>
-              </Button>
-            ) : firstSharedInterest ? (
-              <Button variant="outline" className="h-11 rounded-full" asChild>
-                <Link
-                  href={`${matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}?suggest=${encodeURIComponent(
-                    `We both picked ${firstSharedInterest.toLowerCase()} - I have to ask, what's your favourite?`,
-                  )}`}
-                >
-                  Ask about {firstSharedInterest.toLowerCase()}
-                </Link>
-              </Button>
-            ) : null}
-            <Button variant="ghost" className="rounded-full" onClick={() => setMatchedWith(null)}>
-              Keep swiping
-            </Button>
-          </div>
+          </motion.div>
         </DialogContent>
       </Dialog>
     </div>

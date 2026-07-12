@@ -9,6 +9,7 @@ import { BadgeCheck, Heart, MapPin, MessageCircle, Quote, RotateCcw, Sparkles, S
 import { Button } from "@/components/ui/button";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { PhotoFrame } from "@/components/shared/photo-frame";
+import { SafetyMenu } from "@/components/shared/safety-menu";
 import { emitInteraction } from "@/lib/interaction-events";
 import { SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -279,7 +280,12 @@ export function ExploreProfileViewer({
             <div className="absolute inset-x-0 top-[22%] px-7">
               <Quote className="size-6 text-white/40" aria-hidden="true" />
               <p className="mt-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/65">{page.label}</p>
-              <p className="mt-3 font-display text-3xl font-medium leading-snug tracking-tight text-white">
+              {/* Clamp: a very long answer must never run under the identity
+                  block; the full text stays available via title. */}
+              <p
+                className="mt-3 line-clamp-[8] font-display text-3xl font-medium leading-snug tracking-tight text-white"
+                title={page.answer}
+              >
                 {page.answer}
               </p>
             </div>
@@ -287,39 +293,55 @@ export function ExploreProfileViewer({
 
           {/* Story progress bars - photos and prompts alike */}
           {pages.length > 1 && (
-            <div className="absolute inset-x-3 top-3 flex gap-1.5" aria-label={`Section ${pageIndex + 1} of ${pages.length}`}>
+            // drop-shadow keeps the bars readable over bright, unscrimmed skies
+            <div className="absolute inset-x-3 top-3 flex gap-1.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]" aria-label={`Section ${pageIndex + 1} of ${pages.length}`}>
               {pages.map((_, i) => (
-                <span key={i} className={cn("h-1 flex-1 rounded-full transition-colors", i <= pageIndex ? "bg-white/90" : "bg-white/25")} />
+                <span key={i} className={cn("h-1 flex-1 rounded-full transition-colors", i <= pageIndex ? "bg-white/90" : "bg-white/30")} />
               ))}
             </div>
           )}
 
           {/* Tap zones for story navigation */}
-          <button type="button" aria-label="Previous" className="absolute inset-y-0 left-0 w-1/3" onClick={() => changePage(-1)} />
-          <button type="button" aria-label="Next" className="absolute inset-y-0 right-0 w-1/3" onClick={() => changePage(1)} />
+          <button type="button" aria-label="Previous" className="absolute inset-y-0 left-0 w-1/3 rounded-[30px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60" onClick={() => changePage(-1)} />
+          <button type="button" aria-label="Next" className="absolute inset-y-0 right-0 w-1/3 rounded-[30px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60" onClick={() => changePage(1)} />
 
           {/* Verdict stamps while dragging */}
           <motion.span style={{ opacity: likeOpacity }} aria-hidden="true" className="absolute left-6 top-12 -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-emerald-400">Like</motion.span>
           <motion.span style={{ opacity: passOpacity }} aria-hidden="true" className="absolute right-6 top-12 rotate-12 rounded-2xl border-4 border-white/85 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-white/85">Pass</motion.span>
 
-          {/* Close / super */}
+          {/* Close / safety / super. Black-tinted glass: white/10 washed out
+              over bright photos (the viewer has no top scrim). */}
           <div className="absolute inset-x-3 top-7 flex items-start justify-between">
-            <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md hover:bg-white/20" aria-label="Close profile" onClick={close}>
+            <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40" aria-label="Close profile" onClick={close}>
               <X className="size-5" />
             </Button>
-            <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md hover:bg-white/20" aria-label="Super Like" disabled={busy} onClick={() => decide("SUPER_LIKE")}>
-              <Star className="size-5 fill-sky-400 text-sky-400" />
-            </Button>
+            <div className="flex items-start gap-2">
+              {/* Report/block - present but secondary, behind one quiet trigger */}
+              <SafetyMenu
+                userId={profile.userId}
+                name={profile.displayName.split(" ")[0] || profile.displayName}
+                triggerClassName="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40"
+                onBlocked={() => {
+                  router.replace(`/explore/${slug}`, { scroll: false });
+                  router.refresh();
+                }}
+              />
+              <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40" aria-label="Super Like" disabled={busy} onClick={() => decide("SUPER_LIKE")}>
+                <Star className="size-5 fill-sky-400 text-sky-400" />
+              </Button>
+            </div>
           </div>
 
           {/* Why write to them - intent and honest reply behaviour, up top */}
+          {/* Same black-tinted glass as the top controls - these ride the
+              unscrimmed top of the photo and must survive bright skies. */}
           <div className="pointer-events-none absolute left-3 top-[5.25rem] flex flex-col items-start gap-1.5">
-            <span className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
+            <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
               <Heart className="size-3 fill-current text-rose-300" aria-hidden="true" />
               {GOAL_LABELS[profile.relationshipGoal] ?? "Open to connection"}
             </span>
             {profile.replySignal && (
-              <span className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
+              <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
                 <MessageCircle className="size-3 text-emerald-300" aria-hidden="true" />
                 {profile.replySignal}
               </span>
@@ -328,8 +350,10 @@ export function ExploreProfileViewer({
 
           {/* Identity */}
           <div className="absolute inset-x-0 bottom-0 space-y-2.5 p-5 pb-6">
-            <p className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-white">
-              {profile.displayName}, {profile.age}
+            <p className="flex flex-wrap items-center gap-2 text-3xl font-semibold tracking-tight text-white">
+              <span className="[overflow-wrap:anywhere]">
+                {profile.displayName}, {profile.age}
+              </span>
               {profile.isVerified && (
                 <span role="img" aria-label="Photo verified" className="relative flex items-center justify-center">
                   <span className="absolute size-6 animate-ping-soft rounded-full bg-sky-400/25" />

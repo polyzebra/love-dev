@@ -96,8 +96,8 @@ export function ExploreCard({ card }: { card: ExploreCardData }) {
           />
         </div>
         <div className="pointer-events-none relative space-y-1 p-4 pt-3">
-          <p className="truncate text-base font-semibold tracking-tight">{card.title}</p>
-          {card.description && <p className="truncate text-xs text-muted-foreground">{card.description}</p>}
+          <p className="truncate text-base font-semibold tracking-tight" title={card.title}>{card.title}</p>
+          {card.description && <p className="truncate text-xs text-muted-foreground" title={card.description}>{card.description}</p>}
           <div className="flex items-end justify-between gap-3 pt-2">
             {empty ? (
               <span className="flex min-w-0 flex-col text-xs">
