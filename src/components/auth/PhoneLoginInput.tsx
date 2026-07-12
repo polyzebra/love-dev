@@ -53,6 +53,22 @@ function readRememberedIso(): string | null {
   }
 }
 
+function readStoredPhone(): string | null {
+  try {
+    return sessionStorage.getItem(LOGIN_PHONE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function digitsOf(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+function formatNational(digits: string, c: Country): string {
+  return digits ? new AsYouType(c.iso).input(digits) : "";
+}
+
 export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
   const router = useRouter();
 
@@ -71,10 +87,27 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
   const rememberedIso = useSyncExternalStore(subscribeNever, readRememberedIso, () => null);
   const [pickedCountry, setPickedCountry] = useState<Country | null>(null);
   const remembered = allowedCountries.find((c) => c.iso === countryByIso(rememberedIso)?.iso);
-  const country = pickedCountry ?? remembered ?? fallbackCountry;
+
+  // Coming back from the code screen ("Change number") re-seeds the
+  // number that was sent - values entered in a multi-step flow survive
+  // back navigation. Hydration-safe (null on the server); anything the
+  // user types or picks this session wins over the stored send.
+  const storedPhone = useSyncExternalStore(subscribeNever, readStoredPhone, () => null);
+  const seeded = useMemo(() => {
+    const parsed = storedPhone ? parsePhoneNumberFromString(storedPhone) : null;
+    const seededCountry = parsed && allowedCountries.find((c) => c.iso === parsed.country);
+    return parsed && seededCountry
+      ? { display: formatNational(String(parsed.nationalNumber), seededCountry), country: seededCountry }
+      : null;
+  }, [storedPhone, allowedCountries]);
+
+  // The seeded number's country outranks the remembered one - the
+  // pre-filled digits are only valid under their own dial code.
+  const country = pickedCountry ?? seeded?.country ?? remembered ?? fallbackCountry;
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [display, setDisplay] = useState("");
+  const [typedDisplay, setTypedDisplay] = useState<string | null>(null);
+  const display = typedDisplay ?? seeded?.display ?? "";
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [conflict, setConflict] = useState<string | null>(null);
@@ -87,16 +120,8 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
     try {
       localStorage.setItem(PHONE_COUNTRY_KEY, next.iso);
     } catch {}
-    setDisplay((prev) => formatNational(digitsOf(prev), next));
+    setTypedDisplay(formatNational(digitsOf(display), next));
     inputRef.current?.focus();
-  }
-
-  function digitsOf(value: string): string {
-    return value.replace(/\D/g, "");
-  }
-
-  function formatNational(digits: string, c: Country): string {
-    return digits ? new AsYouType(c.iso).input(digits) : "";
   }
 
   function onPhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -108,7 +133,7 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
     if (raw.length < display.length && digits === digitsOf(display)) {
       digits = digits.slice(0, -1);
     }
-    setDisplay(formatNational(digits, country));
+    setTypedDisplay(formatNational(digits, country));
     // Editing clears every error layer - after a 409 the form stays
     // right here and must feel immediately usable again.
     if (fieldError) setFieldError(null);

@@ -2,23 +2,36 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { toast } from "sonner";
 import { Loader2, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { InlineFieldError } from "@/components/ui/field-error";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { authRedirectUrl } from "@/lib/auth/url";
+
+/** Same good-faith shape check as the email sign-in step. */
+function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
 
 export default function ForgotPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submitting) return;
     const form = new FormData(e.currentTarget);
+    const email = String(form.get("email")).trim().toLowerCase();
+    if (!looksLikeEmail(email)) {
+      setFieldError("Enter a valid email address.");
+      return;
+    }
+    setFieldError(null);
     setSubmitting(true);
-    await supabaseBrowser().auth.resetPasswordForEmail(String(form.get("email")), {
+    await supabaseBrowser().auth.resetPasswordForEmail(email, {
       redirectTo: `${authRedirectUrl("/auth/callback")}?next=/reset-password`,
     });
     setSubmitting(false);
@@ -33,7 +46,7 @@ export default function ForgotPasswordPage() {
         <p className="mx-auto max-w-sm leading-relaxed text-muted-foreground">
           If that email is registered, a reset link is on its way. It expires in 30 minutes.
         </p>
-        <Button variant="outline" className="rounded-full" asChild>
+        <Button variant="outline" className="h-12 rounded-full px-6" asChild>
           <Link href="/login">Back to sign in</Link>
         </Button>
       </div>
@@ -59,8 +72,14 @@ export default function ForgotPasswordPage() {
             inputMode="email"
             required
             placeholder="you@example.com"
-            className="h-12 rounded-2xl"
+            onChange={() => {
+              if (fieldError) setFieldError(null);
+            }}
+            aria-invalid={fieldError ? true : undefined}
+            aria-describedby={fieldError ? "email-error" : undefined}
+            className="h-12"
           />
+          <InlineFieldError id="email-error" message={fieldError} />
         </div>
         <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
           {submitting ? <Loader2 className="size-4 animate-spin" /> : null}

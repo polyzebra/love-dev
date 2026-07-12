@@ -70,11 +70,8 @@ export default function LandingPage() {
               Photo-verified members
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="relative flex size-2" aria-hidden="true">
-                <span className="absolute h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
-                <span className="relative size-2 rounded-full bg-emerald-400" />
-              </span>
-              Conversations happening now
+              <ShieldCheck className="size-4 text-success" aria-hidden="true" />
+              Human-reviewed reports
             </span>
             <span>Free to join · No ads</span>
           </>
@@ -110,9 +107,11 @@ export default function LandingPage() {
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <figcaption className="absolute bottom-5 left-5 right-5 font-display text-xl italic text-white/95">
-                  “We matched on a Tuesday. Coffee by Friday.”
-                </figcaption>
+                {/* Aspirational copy in the product's voice - never a
+                    fabricated member quote. */}
+                <p className="absolute bottom-5 left-5 right-5 font-display text-xl italic text-white/95">
+                  From first hello to first coffee.
+                </p>
               </div>
             </TiltCard>
           </Reveal>
@@ -209,7 +208,7 @@ export default function LandingPage() {
                     reviewed by humans, blocking is instant and absolute, and your exact location
                     is never shown to anyone.
                   </p>
-                  <Button variant="outline" className="rounded-full px-6" asChild>
+                  <Button variant="outline" className="h-12 rounded-full px-6" asChild>
                     <Link href="/safety">
                       Visit the Safety Centre
                       <ArrowRight className="size-4" aria-hidden="true" />

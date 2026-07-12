@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,9 +29,26 @@ function looksLikeEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 }
 
+/** sessionStorage never notifies - subscribe to nothing. */
+const subscribeNever = () => () => {};
+
+function readStoredEmail(): string | null {
+  try {
+    return sessionStorage.getItem(AUTH_EMAIL_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export function EmailInputStep() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  // Coming back from the code screen ("Change email") re-seeds the
+  // address that was sent - values entered in a multi-step flow survive
+  // back navigation. Hydration-safe (null on the server); an edit this
+  // session wins over the stored value.
+  const storedEmail = useSyncExternalStore(subscribeNever, readStoredEmail, () => null);
+  const [typedEmail, setTypedEmail] = useState<string | null>(null);
+  const email = typedEmail ?? storedEmail ?? "";
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -86,7 +103,7 @@ export function EmailInputStep() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value);
+                setTypedEmail(e.target.value);
                 if (fieldError) setFieldError(null);
               }}
               disabled={pending}

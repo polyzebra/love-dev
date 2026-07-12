@@ -5,10 +5,20 @@ import { ScrollProgress } from "@/components/fx/scroll-progress";
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background">
+      {/* First focusable on the page - lets keyboard/SR users jump past
+          the floating navbar. Visible only while focused. */}
+      <a
+        href="#main-content"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[60] focus-visible:rounded-full focus-visible:bg-surface-elevated focus-visible:px-5 focus-visible:py-3 focus-visible:text-sm focus-visible:font-medium focus-visible:text-foreground focus-visible:shadow-float focus-visible:ring-2 focus-visible:ring-foreground/20"
+      >
+        Skip to content
+      </a>
       <ScrollProgress />
       <MarketingNavbar />
       {/* Navbar floats - heroes own their top spacing */}
-      <main className="flex-1">{children}</main>
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+        {children}
+      </main>
       <MarketingFooter />
     </div>
   );

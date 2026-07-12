@@ -539,7 +539,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         <motion.span
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 14 }}
+          transition={SPRING.bounce}
           className="flex size-20 items-center justify-center rounded-full bg-accent shadow-[0_0_60px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
         >
           <Heart className="size-9 fill-primary text-primary" aria-hidden="true" />
@@ -548,14 +548,14 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.7, ease: EASE_LUXE }}
-          className="font-display text-4xl font-medium tracking-tight"
+          className="max-w-full break-words px-5 font-display text-4xl font-medium tracking-tight"
         >
           You&apos;re in, {data.displayName.split(" ")[0]}.
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
+          transition={{ delay: 0.5, duration: 0.6, ease: EASE_LUXE }}
           className="max-w-xs text-muted-foreground"
         >
           Your profile is live. Let&apos;s find someone worth your evening.
@@ -641,6 +641,8 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   onChange={(e) => set("displayName", e.target.value)}
                   maxLength={30}
                   placeholder="Your first name"
+                  autoComplete="given-name"
+                  enterKeyHint="next"
                   className="h-12 rounded-2xl"
                 />
               </div>
@@ -651,10 +653,18 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   type="date"
                   value={data.birthDate}
                   onChange={(e) => set("birthDate", e.target.value)}
+                  autoComplete="bday"
                   className="h-12 rounded-2xl"
+                  aria-invalid={age !== null && age < 18 ? true : undefined}
                   aria-describedby="age-hint"
                 />
-                <p id="age-hint" className="text-xs text-muted-foreground">
+                <p
+                  id="age-hint"
+                  className={cn(
+                    "text-xs",
+                    age !== null && age < 18 ? "text-destructive" : "text-muted-foreground",
+                  )}
+                >
                   {age !== null && age < 18
                     ? "You must be 18 or older to use Tirvea."
                     : "Your age is shown on your profile - never your birthday."}
@@ -702,7 +712,10 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   One honest answer - it leads to better matches.
                 </p>
               </div>
-              <div className="grid gap-2.5" role="radiogroup" aria-label="I'm looking for">
+              {/* The cards are aria-pressed toggle buttons, so no
+                  radiogroup role here - it would announce contradictory
+                  semantics. Group + label carry the context instead. */}
+              <div className="grid gap-2.5" role="group" aria-label="I'm looking for">
                 {INTENTION_CATS.map((cat, i) => (
                   <CategoryCard
                     key={cat.id}
@@ -913,6 +926,8 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   onChange={(e) => set("city", e.target.value)}
                   placeholder="Or type your town…"
                   maxLength={80}
+                  autoComplete="address-level2"
+                  enterKeyHint="done"
                   className="h-12 rounded-2xl"
                   aria-label="Other town or city"
                 />
@@ -950,10 +965,12 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
       {/* Navigation */}
       <div className="glass safe-bottom fixed inset-x-0 bottom-0 border-t">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-5 py-3">
+          {/* h-12: step navigation is a primary flow control - it must
+              clear the 44px touch target (size="lg" alone is 40px). */}
           <Button
             variant="ghost"
             size="lg"
-            className="rounded-full"
+            className="h-12 rounded-full"
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0 || submitting}
           >
@@ -962,7 +979,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           {step < STEPS.length - 1 ? (
             <Button
               size="lg"
-              className="rounded-full px-8"
+              className="h-12 rounded-full px-8"
               onClick={() => {
                 setValueNote(STEP_VALUE[step] ?? null);
                 emitInteraction("step-complete");
@@ -975,7 +992,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           ) : (
             <Button
               size="lg"
-              className="rounded-full px-8"
+              className="h-12 rounded-full px-8"
               onClick={submit}
               disabled={!stepValid || submitting}
             >

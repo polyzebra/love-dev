@@ -146,9 +146,12 @@ export function LoginEntry({
   async function startOAuth(provider: "google" | "apple") {
     if (pending) return;
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      toast.error(
-        "Sign-in isn't configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (see .env.example).",
+      // Plain language for the visitor; the env-var detail belongs in
+      // the console, not the UI.
+      console.error(
+        "Sign-in is not configured: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (see .env.example).",
       );
+      toast.error("Sign-in isn't available right now. Please try again later.");
       return;
     }
     setPending(provider);

@@ -114,7 +114,7 @@ export default function SafetyPage() {
         <p className="mx-auto mt-3 max-w-md text-muted-foreground">
           Clear rules, consistently enforced. Know what we expect from every member.
         </p>
-        <Button size="lg" className="mt-6 rounded-full px-8" asChild>
+        <Button size="lg" className="mt-6 h-12 rounded-full px-8" asChild>
           <Link href="/legal/community-guidelines">Community Guidelines</Link>
         </Button>
       </section>

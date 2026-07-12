@@ -1,4 +1,8 @@
-import { cn } from "@/lib/utils"
+"use client";
+
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { DURATIONS, EASE_LUXE } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 /**
  * Inline field-level error text - the ONLY sanctioned companion to a
@@ -7,22 +11,38 @@ import { cn } from "@/lib/utils"
  *
  *   <Input aria-invalid={!!error} aria-describedby={error ? id : undefined} />
  *   <InlineFieldError id={id} message={error} />
+ *
+ * The message eases in (height + opacity, house curve) so the content
+ * below settles instead of jumping; reduced motion swaps it instantly.
  */
 function InlineFieldError({
   message,
   id,
   className,
 }: {
-  message?: string | null
-  id?: string
-  className?: string
+  message?: string | null;
+  id?: string;
+  className?: string;
 }) {
-  if (!message) return null
+  const reduced = useReducedMotion();
   return (
-    <p id={id} role="alert" className={cn("text-xs text-destructive", className)}>
-      {message}
-    </p>
-  )
+    <AnimatePresence initial={false}>
+      {message && (
+        <motion.p
+          key="field-error"
+          initial={reduced ? false : { height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
+          transition={{ duration: DURATIONS.standard, ease: EASE_LUXE }}
+          id={id}
+          role="alert"
+          className={cn("overflow-hidden text-xs text-destructive", className)}
+        >
+          {message}
+        </motion.p>
+      )}
+    </AnimatePresence>
+  );
 }
 
 export { InlineFieldError }

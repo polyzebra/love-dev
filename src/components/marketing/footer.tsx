@@ -40,9 +40,11 @@ export function MarketingFooter() {
         </div>
         {GROUPS.map((group) => (
           <nav key={group.title} aria-label={group.title}>
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            {/* h2, not h3: pages like /pricing have no body h2, and an
+                h1->h3 jump breaks the heading outline. */}
+            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               {group.title}
-            </h3>
+            </h2>
             <ul className="space-y-3">
               {group.links.map((link) => (
                 <li key={link.href}>

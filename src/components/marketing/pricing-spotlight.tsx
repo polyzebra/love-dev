@@ -56,10 +56,24 @@ export function PricingSpotlight({
         )}
       />
 
-      {/* Plan selector */}
+      {/* Plan selector - a complete tabs pattern: roving tabindex +
+          arrow keys on the list, tabs wired to the stage tabpanel. */}
       <div
         role="tablist"
         aria-label="Choose a plan"
+        onKeyDown={(e) => {
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+          e.preventDefault();
+          const index = plans.findIndex((p) => p.tier === tier);
+          const next =
+            e.key === "Home"
+              ? 0
+              : e.key === "End"
+                ? plans.length - 1
+                : (index + (e.key === "ArrowRight" ? 1 : -1) + plans.length) % plans.length;
+          setTier(plans[next].tier);
+          e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+        }}
         className="glass-chip relative mx-auto mb-10 flex w-fit max-w-full rounded-full p-1"
       >
         {plans.map((p) => {
@@ -68,7 +82,10 @@ export function PricingSpotlight({
             <button
               key={p.tier}
               role="tab"
+              id={`plan-tab-${p.tier}`}
               aria-selected={active}
+              aria-controls="plan-panel"
+              tabIndex={active ? 0 : -1}
               onClick={() => setTier(p.tier)}
               className={cn(
                 "tap-target relative whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition-colors sm:px-8",
@@ -89,7 +106,12 @@ export function PricingSpotlight({
       </div>
 
       {/* Stage */}
-      <div className="relative grid items-start gap-10 md:grid-cols-[1fr_1.2fr] md:gap-16">
+      <div
+        role="tabpanel"
+        id="plan-panel"
+        aria-labelledby={`plan-tab-${tier}`}
+        className="relative grid items-start gap-10 md:grid-cols-[1fr_1.2fr] md:gap-16"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={tier}
