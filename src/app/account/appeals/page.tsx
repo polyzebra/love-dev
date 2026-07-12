@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, CheckCircle2, ChevronRight, FileText, Hourglass, XCircle, type LucideIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ChevronRight,
+  FileText,
+  Hourglass,
+  MessageCircleQuestion,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { RESTRICTED_ACCOUNT_ROUTE } from "@/lib/auth/gate";
 import { getAccountStatusView } from "@/lib/services/appeals";
@@ -16,7 +25,7 @@ const APPEAL_ICON: Record<AppealStatus, { icon: LucideIcon; className: string }>
   SUBMITTED: { icon: Hourglass, className: "text-gold" },
   PENDING_REVIEW: { icon: Hourglass, className: "text-gold" },
   UNDER_REVIEW: { icon: Hourglass, className: "text-gold" },
-  NEEDS_INFO: { icon: Hourglass, className: "text-gold" },
+  NEEDS_INFO: { icon: MessageCircleQuestion, className: "text-gold" },
   APPROVED: { icon: CheckCircle2, className: "text-success" },
   REJECTED: { icon: XCircle, className: "text-muted-foreground" },
   EXPIRED: { icon: XCircle, className: "text-muted-foreground" },

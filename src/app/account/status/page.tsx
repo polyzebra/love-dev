@@ -54,11 +54,15 @@ function ViolationRow({ violation, first }: { violation: ViolationView; first: b
   const chip =
     violation.tab === "expired"
       ? "No longer active"
-      : violation.appeal
-        ? APPEAL_STATUS_LABEL[violation.appeal.status]
-        : violation.canAppeal
-          ? "You can appeal"
+      : violation.canAppeal
+        ? violation.appeal
+          ? "You can appeal again"
+          : "You can appeal"
+        : violation.appeal
+          ? APPEAL_STATUS_LABEL[violation.appeal.status]
           : null;
+  // The one state that asks something OF the user gets a quiet highlight.
+  const needsReply = violation.appeal?.status === "NEEDS_INFO";
   return (
     <Link
       href={`/account/appeals/${violation.id}`}
@@ -75,7 +79,11 @@ function ViolationRow({ violation, first }: { violation: ViolationView; first: b
           {VIOLATION_TYPE_LABEL[violation.violationType]} · {formatDate(violation.createdAt)}
         </span>
         {chip && (
-          <span className="mt-1 inline-flex rounded-full bg-foreground/5 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+          <span
+            className={`mt-1 inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              needsReply ? "bg-gold/15 text-gold" : "bg-foreground/5 text-muted-foreground"
+            }`}
+          >
             {chip}
           </span>
         )}

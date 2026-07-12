@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Scale } from "lucide-react";
 import { requireAdminPage } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { listAppeals } from "@/lib/services/appeals";
+import { OPEN_APPEAL_STATUSES, listAppeals } from "@/lib/services/appeals";
 import type { AppealStatus } from "@/generated/prisma/enums";
-import { cn, formatRelativeTime } from "@/lib/utils";
+import { cn, formatAgo } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -20,14 +20,59 @@ import { AppealActions } from "./appeal-actions";
 export const metadata: Metadata = { title: "Appeals" };
 export const dynamic = "force-dynamic";
 
+const ALL_STATUSES: AppealStatus[] = [
+  "SUBMITTED",
+  "PENDING_REVIEW",
+  "UNDER_REVIEW",
+  "NEEDS_INFO",
+  "APPROVED",
+  "REJECTED",
+  "EXPIRED",
+  "WITHDRAWN",
+];
+
 const FILTERS = [
-  { key: "open", label: "Needs decision" },
-  { key: "APPROVED", label: "Approved" },
-  { key: "REJECTED", label: "Rejected" },
+  { key: "open", label: "Open" },
+  ...ALL_STATUSES.map((s) => ({ key: s, label: pretty(s) })),
   { key: "all", label: "All" },
 ] as const;
 
 type FilterKey = (typeof FILTERS)[number]["key"];
+
+const EVENT_LABEL: Record<string, string> = {
+  submitted: "submitted",
+  under_review: "review started",
+  needs_info_requested: "asked for info",
+  user_responded: "user replied",
+  approved: "approved",
+  rejected: "rejected",
+  withdrawn: "withdrawn by user",
+  expired: "expired (no reply)",
+};
+
+function Timeline({
+  events,
+}: {
+  events: { type: string; actorRole: string; note: string | null; createdAt: Date }[];
+}) {
+  if (events.length === 0) return null;
+  return (
+    <ol aria-label="Appeal timeline" className="mt-3 space-y-1.5 border-l pl-4">
+      {events.map((e, i) => (
+        <li key={`${e.type}-${i}`} className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">{EVENT_LABEL[e.type] ?? e.type}</span>
+          {" · "}
+          {e.actorRole.toLowerCase()} · {formatAgo(e.createdAt)}
+          {e.note && (
+            <span className="mt-0.5 block rounded-xl bg-muted px-3 py-1.5 text-xs leading-relaxed text-foreground">
+              {e.note}
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 export default async function AdminAppealsPage({
   searchParams,
@@ -40,19 +85,11 @@ export default async function AdminAppealsPage({
     ? (rawStatus as FilterKey)
     : "open";
 
-  // "Needs decision" = SUBMITTED + PENDING_REVIEW; the service filters one
-  // status at a time, so the open queue merges both (oldest first, as the
-  // service orders).
+  // "Open" = everything still awaiting an outcome (submitted, under
+  // review, waiting on the user) - the service orders oldest first.
   const appeals =
     filter === "open"
-      ? (
-          await Promise.all([
-            listAppeals({ status: "SUBMITTED" }),
-            listAppeals({ status: "PENDING_REVIEW" }),
-          ])
-        )
-          .flat()
-          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      ? await listAppeals({ statuses: [...OPEN_APPEAL_STATUSES] })
       : filter === "all"
         ? await listAppeals({})
         : await listAppeals({ status: filter as AppealStatus });
@@ -74,11 +111,12 @@ export default async function AdminAppealsPage({
     <>
       <PageHeader title="Appeals" description={`${appeals.length} shown · oldest first`} />
 
-      <div className="mb-5 flex flex-wrap gap-1.5">
+      <div className="mb-5 flex flex-wrap gap-1.5" aria-label="Filter appeals by status">
         {FILTERS.map((f) => (
           <Link
             key={f.key}
             href={f.key === "open" ? "/admin/appeals" : `/admin/appeals?status=${f.key}`}
+            aria-current={f.key === filter ? "true" : undefined}
             className={cn(
               "flex min-h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
               f.key === filter
@@ -100,7 +138,7 @@ export default async function AdminAppealsPage({
       ) : (
         <div className="space-y-3">
           {appeals.map((appeal) => {
-            const open = appeal.status === "SUBMITTED" || appeal.status === "PENDING_REVIEW";
+            const open = (OPEN_APPEAL_STATUSES as readonly string[]).includes(appeal.status);
             return (
               <div key={appeal.id} className="rounded-3xl border bg-card p-5">
                 <div className="flex flex-wrap items-center gap-2">
@@ -120,7 +158,7 @@ export default async function AdminAppealsPage({
                     {pretty(appeal.violation.violationType)}
                   </span>
                   <span className="ml-auto text-xs text-muted-foreground">
-                    submitted {formatRelativeTime(appeal.createdAt)} ago
+                    submitted {formatAgo(appeal.createdAt)}
                   </span>
                 </div>
 
@@ -158,14 +196,21 @@ export default async function AdminAppealsPage({
                   )}
                   {appeal.adminNotes && (
                     <div>
-                      <dt className="inline font-semibold">Decision notes: </dt>
+                      <dt className="inline font-semibold">Decision notes (staff-only): </dt>
                       <dd className="inline">{appeal.adminNotes}</dd>
                     </div>
                   )}
                 </dl>
 
+                <Timeline events={appeal.events} />
+
                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {open && <AppealActions appealId={appeal.id} />}
+                  {open && <AppealActions appealId={appeal.id} status={appeal.status} />}
+                  {appeal.status === "NEEDS_INFO" && (
+                    <span className="text-xs text-muted-foreground">
+                      Waiting on the user&apos;s reply - it can still be decided now.
+                    </span>
+                  )}
                   {appeal.violation.moderationCaseId &&
                     caseExists.has(appeal.violation.moderationCaseId) && (
                       <Link

@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, CircleDashed } from "lucide-react";
 import { requireAdminPage } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { calculateAge, formatRelativeTime } from "@/lib/utils";
+import { hasPermission } from "@/lib/rbac";
+import { isCaseOverdue } from "@/lib/services/trust-safety";
+import { calculateAge, formatAgo, formatRelativeTime } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +17,7 @@ import {
   SEVERITY_BADGE,
   pretty,
 } from "../../safety-badges";
+import { AssignControl } from "./assign-control";
 import { CaseActions } from "./case-actions";
 
 export const metadata: Metadata = { title: "Case detail" };
@@ -57,13 +60,24 @@ function score(value: number | null | undefined): string {
   return value == null ? "-" : value.toFixed(2);
 }
 
+/** "3h" / "2d 4h" for SLA spans (formatRelativeTime is past-only). */
+function formatSpan(ms: number): string {
+  const totalHours = Math.max(0, Math.round(Math.abs(ms) / 3_600_000));
+  if (totalHours < 1) return "under 1h";
+  if (totalHours < 48) return `${totalHours}h`;
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+  return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+}
+
 export default async function ModerationCaseDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
+  const admin = await requireAdminPage();
+  if (!admin) return null; // layout renders AccessDenied; keep segment payload empty
 
   const kase = await db.moderationCase.findUnique({
     where: { id },
@@ -121,7 +135,7 @@ export default async function ModerationCaseDetailPage({
   });
   if (!kase) notFound();
 
-  const [report, moderationResult] = await Promise.all([
+  const [report, moderationResult, staff, assignee] = await Promise.all([
     kase.reportId
       ? db.report.findUnique({
           where: { id: kase.reportId },
@@ -134,8 +148,19 @@ export default async function ModerationCaseDetailPage({
           orderBy: { createdAt: "desc" },
         })
       : null,
+    // Staff picker options for the assignment control - small by nature.
+    db.user.findMany({
+      where: { role: { in: ["MODERATOR", "ADMIN", "SUPER_ADMIN"] }, status: "ACTIVE" },
+      orderBy: { email: "asc" },
+      take: 50,
+      select: { id: true, email: true, role: true },
+    }),
+    kase.assignedToId
+      ? db.user.findUnique({ where: { id: kase.assignedToId }, select: { email: true } })
+      : null,
   ]);
 
+  const nowMs = new Date().getTime();
   const user = kase.user;
   const casePhoto = kase.photoId ? user.photos.find((p) => p.id === kase.photoId) : null;
   const caseViolations = user.violations.filter((v) => v.moderationCaseId === kase.id);
@@ -156,7 +181,7 @@ export default async function ModerationCaseDetailPage({
       </Link>
       <PageHeader
         title={`${pretty(kase.caseType)} case`}
-        description={`id ${kase.id} · opened ${formatRelativeTime(kase.createdAt)} ago`}
+        description={`id ${kase.id} · opened ${formatAgo(kase.createdAt)}`}
       />
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
@@ -166,6 +191,16 @@ export default async function ModerationCaseDetailPage({
         <Badge variant={CASE_STATUS_BADGE[kase.status] ?? "outline"} className="rounded-full">
           {pretty(kase.status)}
         </Badge>
+        {kase.priority !== kase.severity && (
+          <Badge variant={SEVERITY_BADGE[kase.priority] ?? "outline"} className="rounded-full">
+            priority {pretty(kase.priority)}
+          </Badge>
+        )}
+        {isCaseOverdue(kase) && (
+          <Badge variant="destructive" className="rounded-full">
+            OVERDUE
+          </Badge>
+        )}
         <Badge variant="outline" className="rounded-full">
           source: {pretty(kase.source)}
         </Badge>
@@ -190,12 +225,70 @@ export default async function ModerationCaseDetailPage({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <Section title="Assignment">
+          <AssignControl
+            caseId={kase.id}
+            assignedToId={kase.assignedToId}
+            assigneeEmail={assignee?.email ?? null}
+            meId={admin.id}
+            staff={staff}
+            canManage={hasPermission(admin.role, "safety:manage")}
+            caseOpen={
+              kase.status === "OPEN" || kase.status === "UNDER_REVIEW" || kase.status === "APPEALED"
+            }
+          />
+        </Section>
+
+        <Section title="SLA">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-3">
+            <Field label="Opened">{formatAgo(kase.createdAt)}</Field>
+            <Field label="Response due">
+              {kase.slaDueAt ? (
+                <>
+                  {kase.slaDueAt.getTime() < nowMs
+                    ? `${formatSpan(nowMs - kase.slaDueAt.getTime())} ago`
+                    : `in ${formatSpan(kase.slaDueAt.getTime() - nowMs)}`}
+                  {isCaseOverdue(kase) && (
+                    <Badge variant="destructive" className="ml-2 rounded-full align-middle">
+                      overdue
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <span className="text-muted-foreground">no deadline recorded</span>
+              )}
+            </Field>
+            <Field label="First response">
+              {kase.firstResponseAt ? (
+                `${formatAgo(kase.firstResponseAt)}`
+              ) : (
+                <span className="text-muted-foreground">not yet</span>
+              )}
+            </Field>
+            <Field label="Resolved">
+              {kase.resolvedAt ? (
+                `${formatAgo(kase.resolvedAt)}`
+              ) : (
+                <span className="text-muted-foreground">open</span>
+              )}
+            </Field>
+            <Field label="Escalated">
+              {kase.escalatedAt ? (
+                `${formatAgo(kase.escalatedAt)} (priority bumped)`
+              ) : (
+                <span className="text-muted-foreground">never</span>
+              )}
+            </Field>
+            <Field label="Last activity">{formatAgo(kase.lastActivityAt)}</Field>
+          </dl>
+        </Section>
+
         <Section title="Case">
           <dl className="space-y-3">
             <Field label="Summary">{kase.summary}</Field>
             {kase.decisionReason && <Field label="Decision reason">{kase.decisionReason}</Field>}
             {kase.reviewedAt && (
-              <Field label="Reviewed">{formatRelativeTime(kase.reviewedAt)} ago</Field>
+              <Field label="Reviewed">{formatAgo(kase.reviewedAt)}</Field>
             )}
           </dl>
         </Section>
@@ -225,7 +318,7 @@ export default async function ModerationCaseDetailPage({
             </Field>
             <Field label="History">
               member {formatRelativeTime(user.createdAt)} · last active{" "}
-              {user.lastActiveAt ? `${formatRelativeTime(user.lastActiveAt)} ago` : "-"} ·{" "}
+              {user.lastActiveAt ? `${formatAgo(user.lastActiveAt)}` : "-"} ·{" "}
               {user.reportsReceived.length} recent report
               {user.reportsReceived.length === 1 ? "" : "s"}
             </Field>
@@ -241,7 +334,7 @@ export default async function ModerationCaseDetailPage({
               <span className="text-muted-foreground"> / 100</span>
               {user.safetyRiskUpdatedAt && (
                 <span className="ml-2 text-xs text-muted-foreground">
-                  updated {formatRelativeTime(user.safetyRiskUpdatedAt)} ago
+                  updated {formatAgo(user.safetyRiskUpdatedAt)}
                 </span>
               )}
             </Field>
@@ -348,7 +441,7 @@ export default async function ModerationCaseDetailPage({
                   </p>
                   {report.details && <p className="mt-1 italic">&ldquo;{report.details}&rdquo;</p>}
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {formatRelativeTime(report.createdAt)} ago
+                    {formatAgo(report.createdAt)}
                   </p>
                 </li>
               )}
@@ -361,7 +454,7 @@ export default async function ModerationCaseDetailPage({
                       <span className="text-muted-foreground">{pretty(r.status)}</span>
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatRelativeTime(r.createdAt)} ago
+                      {formatAgo(r.createdAt)}
                     </p>
                   </li>
                 ))}
@@ -399,7 +492,7 @@ export default async function ModerationCaseDetailPage({
                     </Badge>
                   )}
                   <span className="ml-auto text-xs text-muted-foreground">
-                    {formatRelativeTime(v.createdAt)} ago
+                    {formatAgo(v.createdAt)}
                   </span>
                 </li>
               ))}

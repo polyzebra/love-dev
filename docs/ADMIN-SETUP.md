@@ -110,3 +110,9 @@ normalized email, role, status, session/linked providers,
 `auth.users.last_sign_in_at`, `NODE_ENV`, and whether
 `SUPABASE_SERVICE_ROLE_KEY` is configured - by name only, never values.
 Every view writes an `AdminLog` row (`admin.diagnostics.view`).
+
+## Trust & Safety operations
+
+The moderation queues, SLA policy, appeals handling, provider runbooks and
+the full T&S environment-variable reference live in
+[docs/TRUST-SAFETY.md](./TRUST-SAFETY.md).

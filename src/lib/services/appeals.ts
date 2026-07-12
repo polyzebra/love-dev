@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import type { Prisma } from "@/generated/prisma/client";
 import type {
   AppealStatus,
   EnforcementAction,
@@ -705,9 +706,15 @@ export async function getAccountStatusView(userId: string): Promise<AccountStatu
 // Staff list read models (phase-2 admin dashboard)
 // ---------------------------------------------------------------------------
 
-export async function listAppeals(filter: { status?: AppealStatus; take?: number } = {}) {
+export async function listAppeals(
+  filter: { status?: AppealStatus; statuses?: AppealStatus[]; take?: number } = {},
+) {
   return db.appeal.findMany({
-    where: filter.status ? { status: filter.status } : undefined,
+    where: filter.status
+      ? { status: filter.status }
+      : filter.statuses?.length
+        ? { status: { in: filter.statuses } }
+        : undefined,
     orderBy: { createdAt: "asc" },
     take: Math.min(filter.take ?? 50, 200),
     include: {
@@ -733,34 +740,60 @@ export async function listAppeals(filter: { status?: AppealStatus; take?: number
   });
 }
 
-export async function listModerationCases(
-  filter: {
-    status?: "OPEN" | "UNDER_REVIEW" | "ACTION_TAKEN" | "DISMISSED" | "APPEALED" | "REVERSED";
-    severity?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-    /** "me:{userId}" filters to one assignee; "unassigned" to nobody. */
-    assignedToId?: string | "unassigned";
-    overdueOnly?: boolean;
-    take?: number;
-  } = {},
-) {
+export type ModerationCaseFilter = {
+  status?: "OPEN" | "UNDER_REVIEW" | "ACTION_TAKEN" | "DISMISSED" | "APPEALED" | "REVERSED";
+  severity?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  priority?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  /** "me:{userId}" filters to one assignee; "unassigned" to nobody. */
+  assignedToId?: string | "unassigned";
+  overdueOnly?: boolean;
+  /**
+   * Server-side text search: exact case id / user id match, or a
+   * case-insensitive contains on the user email. Index-friendly: the id
+   * arms hit primary keys; the email arm is a bounded ILIKE on User.email
+   * (unique-indexed column, small staff-facing result sets).
+   */
+  search?: string;
+  take?: number;
+};
+
+function moderationCaseWhere(
+  filter: ModerationCaseFilter,
+  now: Date,
+): Prisma.ModerationCaseWhereInput {
+  const search = filter.search?.trim();
+  return {
+    ...(filter.status ? { status: filter.status } : {}),
+    ...(filter.severity ? { severity: filter.severity } : {}),
+    ...(filter.priority ? { priority: filter.priority } : {}),
+    ...(filter.assignedToId === "unassigned"
+      ? { assignedToId: null }
+      : filter.assignedToId
+        ? { assignedToId: filter.assignedToId }
+        : {}),
+    ...(filter.overdueOnly
+      ? {
+          resolvedAt: null,
+          slaDueAt: { lt: now },
+          status: filter.status ?? { in: ["OPEN", "UNDER_REVIEW", "APPEALED"] },
+        }
+      : {}),
+    ...(search
+      ? {
+          OR: [
+            { id: search },
+            { userId: search },
+            { user: { email: { contains: search, mode: "insensitive" as const } } },
+          ],
+        }
+      : {}),
+  };
+}
+
+export async function listModerationCases(filter: ModerationCaseFilter = {}) {
   const now = new Date();
   const rows = await db.moderationCase.findMany({
-    where: {
-      ...(filter.status ? { status: filter.status } : {}),
-      ...(filter.severity ? { severity: filter.severity } : {}),
-      ...(filter.assignedToId === "unassigned"
-        ? { assignedToId: null }
-        : filter.assignedToId
-          ? { assignedToId: filter.assignedToId }
-          : {}),
-      ...(filter.overdueOnly
-        ? {
-            resolvedAt: null,
-            slaDueAt: { lt: now },
-            status: filter.status ?? { in: ["OPEN", "UNDER_REVIEW", "APPEALED"] },
-          }
-        : {}),
-    },
+    where: moderationCaseWhere(filter, now),
     // Most urgent first (queue priority, not raw severity), oldest first
     // within a priority tier.
     orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
@@ -780,6 +813,13 @@ export async function listModerationCases(
   });
   // isOverdue is derived (single definition in trust-safety.isCaseOverdue).
   return rows.map((c) => ({ ...c, isOverdue: isCaseOverdue(c, now) }));
+}
+
+/** Honest total for the current filter (the list itself is take-limited). */
+export async function countModerationCases(
+  filter: Omit<ModerationCaseFilter, "take"> = {},
+): Promise<number> {
+  return db.moderationCase.count({ where: moderationCaseWhere(filter, new Date()) });
 }
 
 /** Staff read model: provider health of the moderation fallback chain. */

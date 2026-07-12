@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Gavel } from "lucide-react";
+import { Gavel, Search } from "lucide-react";
 import { requireAdminPage } from "@/lib/auth/require-user";
-import { listModerationCases } from "@/lib/services/appeals";
-import { cn, formatRelativeTime } from "@/lib/utils";
+import { db } from "@/lib/db";
+import {
+  countModerationCases,
+  listModerationCases,
+  type ModerationCaseFilter,
+} from "@/lib/services/appeals";
+import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/empty-state";
+import { Input } from "@/components/ui/input";
+import { pretty } from "../safety-badges";
+import { CaseList, type CaseRow } from "./case-list";
 
 export const metadata: Metadata = { title: "Moderation cases" };
 export const dynamic = "force-dynamic";
@@ -17,129 +24,216 @@ const SEVERITIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const;
 type CaseStatus = (typeof STATUSES)[number];
 type Severity = (typeof SEVERITIES)[number];
 
-const SEVERITY_BADGE: Record<Severity, "destructive" | "default" | "secondary" | "outline"> = {
-  CRITICAL: "destructive",
-  HIGH: "default",
-  MEDIUM: "secondary",
-  LOW: "outline",
+type Filters = {
+  status: CaseStatus | null;
+  severity: Severity | null;
+  priority: Severity | null;
+  assigned: "me" | "unassigned" | null;
+  overdue: boolean;
+  q: string;
 };
 
-const STATUS_BADGE: Record<CaseStatus, "destructive" | "default" | "secondary" | "outline"> = {
-  OPEN: "default",
-  UNDER_REVIEW: "secondary",
-  APPEALED: "destructive",
-  ACTION_TAKEN: "outline",
-  DISMISSED: "outline",
-  REVERSED: "outline",
-};
-
-function pretty(value: string): string {
-  return value.toLowerCase().replace(/_/g, " ");
-}
-
-function filterHref(status: CaseStatus | null, severity: Severity | null): string {
+function filterHref(f: Filters): string {
   const params = new URLSearchParams();
-  if (status) params.set("status", status);
-  if (severity) params.set("severity", severity);
+  if (f.status) params.set("status", f.status);
+  if (f.severity) params.set("severity", f.severity);
+  if (f.priority) params.set("priority", f.priority);
+  if (f.assigned) params.set("assigned", f.assigned);
+  if (f.overdue) params.set("overdue", "1");
+  if (f.q) params.set("q", f.q);
   const qs = params.toString();
   return qs ? `/admin/moderation-cases?${qs}` : "/admin/moderation-cases";
+}
+
+function Chip({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "true" : undefined}
+      className={cn(
+        "flex min-h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
+        active
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+      )}
+    >
+      {children}
+    </Link>
+  );
 }
 
 export default async function ModerationCasesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; severity?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    severity?: string;
+    priority?: string;
+    assigned?: string;
+    overdue?: string;
+    q?: string;
+  }>;
 }) {
-  if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
-  const { status: rawStatus, severity: rawSeverity } = await searchParams;
+  const admin = await requireAdminPage();
+  if (!admin) return null; // layout renders AccessDenied; keep segment payload empty
+  const raw = await searchParams;
 
-  const status = STATUSES.find((s) => s === rawStatus) ?? null;
-  const severity = SEVERITIES.find((s) => s === rawSeverity) ?? null;
+  const filters: Filters = {
+    status: STATUSES.find((s) => s === raw.status) ?? null,
+    severity: SEVERITIES.find((s) => s === raw.severity) ?? null,
+    priority: SEVERITIES.find((s) => s === raw.priority) ?? null,
+    assigned: raw.assigned === "me" || raw.assigned === "unassigned" ? raw.assigned : null,
+    overdue: raw.overdue === "1",
+    q: raw.q?.trim().slice(0, 200) ?? "",
+  };
 
-  const cases = await listModerationCases({
-    ...(status ? { status } : {}),
-    ...(severity ? { severity } : {}),
-    take: 100,
-  });
+  const serviceFilter: ModerationCaseFilter = {
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.severity ? { severity: filters.severity } : {}),
+    ...(filters.priority ? { priority: filters.priority } : {}),
+    ...(filters.assigned === "me"
+      ? { assignedToId: admin.id }
+      : filters.assigned === "unassigned"
+        ? { assignedToId: "unassigned" as const }
+        : {}),
+    ...(filters.overdue ? { overdueOnly: true } : {}),
+    ...(filters.q ? { search: filters.q } : {}),
+  };
+
+  const [cases, total] = await Promise.all([
+    listModerationCases({ ...serviceFilter, take: 100 }),
+    countModerationCases(serviceFilter),
+  ]);
+
+  // Assignee chips need emails - one bounded lookup for the ids on screen.
+  const assigneeIds = [...new Set(cases.map((c) => c.assignedToId).filter((id): id is string => !!id))];
+  const assignees =
+    assigneeIds.length > 0
+      ? await db.user.findMany({
+          where: { id: { in: assigneeIds } },
+          select: { id: true, email: true },
+        })
+      : [];
+  const assigneeEmail = new Map(assignees.map((u) => [u.id, u.email]));
+
+  const rows: CaseRow[] = cases.map((c) => ({
+    id: c.id,
+    caseType: c.caseType,
+    status: c.status,
+    severity: c.severity,
+    priority: c.priority,
+    source: c.source,
+    summary: c.summary,
+    createdAt: c.createdAt,
+    slaDueAt: c.slaDueAt,
+    resolvedAt: c.resolvedAt,
+    isOverdue: c.isOverdue,
+    assignedToId: c.assignedToId,
+    assigneeEmail: c.assignedToId ? (assigneeEmail.get(c.assignedToId) ?? null) : null,
+    violationCount: c.violations.length,
+    user: {
+      id: c.user.id,
+      email: c.user.email,
+      status: c.user.status,
+      safetyRiskScore: c.user.safetyRiskScore,
+    },
+  }));
 
   return (
     <>
       <PageHeader
         title="Moderation cases"
-        description={`${cases.length} shown · most urgent first`}
+        description={
+          total > cases.length
+            ? `Showing ${cases.length} of ${total} matching · most urgent first`
+            : `${total} matching · most urgent first`
+        }
       />
 
-      <div className="mb-2 flex flex-wrap gap-1.5">
-        {[null, ...STATUSES].map((s) => (
+      {/* Search: user email, user id or case id - server-side. */}
+      <form action="/admin/moderation-cases" method="GET" role="search" className="mb-4 flex max-w-md gap-2">
+        {filters.status && <input type="hidden" name="status" value={filters.status} />}
+        {filters.severity && <input type="hidden" name="severity" value={filters.severity} />}
+        {filters.priority && <input type="hidden" name="priority" value={filters.priority} />}
+        {filters.assigned && <input type="hidden" name="assigned" value={filters.assigned} />}
+        {filters.overdue && <input type="hidden" name="overdue" value="1" />}
+        <div className="relative flex-1">
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <Input
+            type="search"
+            name="q"
+            defaultValue={filters.q}
+            placeholder="Search user email, user id or case id"
+            aria-label="Search cases by user email, user id or case id"
+            className="h-11 rounded-full pl-10"
+          />
+        </div>
+        {filters.q && (
           <Link
-            key={s ?? "all"}
-            href={filterHref(s, severity)}
-            className={cn(
-              "flex min-h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
-              s === status
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
+            href={filterHref({ ...filters, q: "" })}
+            className="flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
           >
-            {s ? pretty(s) : "All statuses"}
+            Clear
           </Link>
+        )}
+      </form>
+
+      <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Filter by status">
+        {[null, ...STATUSES].map((s) => (
+          <Chip key={s ?? "all"} href={filterHref({ ...filters, status: s })} active={s === filters.status}>
+            {s ? pretty(s) : "All statuses"}
+          </Chip>
         ))}
       </div>
-      <div className="mb-5 flex flex-wrap gap-1.5">
+      <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Filter by severity">
         {[null, ...SEVERITIES].map((s) => (
-          <Link
-            key={s ?? "all"}
-            href={filterHref(status, s)}
-            className={cn(
-              "flex min-h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
-              s === severity
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
+          <Chip key={s ?? "all"} href={filterHref({ ...filters, severity: s })} active={s === filters.severity}>
             {s ? pretty(s) : "All severities"}
-          </Link>
+          </Chip>
         ))}
+      </div>
+      <div className="mb-5 flex flex-wrap gap-1.5" aria-label="Filter by priority, assignment and SLA">
+        {[null, ...SEVERITIES].map((p) => (
+          <Chip key={p ?? "all"} href={filterHref({ ...filters, priority: p })} active={p === filters.priority}>
+            {p ? `prio ${pretty(p)}` : "All priorities"}
+          </Chip>
+        ))}
+        <span aria-hidden="true" className="my-1.5 w-px self-stretch bg-border/60" />
+        <Chip
+          href={filterHref({ ...filters, assigned: filters.assigned === "me" ? null : "me" })}
+          active={filters.assigned === "me"}
+        >
+          Assigned to me
+        </Chip>
+        <Chip
+          href={filterHref({
+            ...filters,
+            assigned: filters.assigned === "unassigned" ? null : "unassigned",
+          })}
+          active={filters.assigned === "unassigned"}
+        >
+          Unassigned
+        </Chip>
+        <Chip href={filterHref({ ...filters, overdue: !filters.overdue })} active={filters.overdue}>
+          Overdue only
+        </Chip>
       </div>
 
-      {cases.length === 0 ? (
+      {rows.length === 0 ? (
         <EmptyState
           icon={Gavel}
           title="Queue clear"
-          description="No moderation cases match these filters."
+          description={
+            filters.q
+              ? `No cases match "${filters.q}" with these filters.`
+              : "No moderation cases match these filters."
+          }
         />
       ) : (
-        <div className="space-y-3">
-          {cases.map((c) => (
-            <Link key={c.id} href={`/admin/moderation-cases/${c.id}`} className="block">
-              <div className="rounded-3xl border bg-card p-5 transition-shadow hover:shadow-float">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={SEVERITY_BADGE[c.severity]} className="rounded-full">
-                    {pretty(c.severity)}
-                  </Badge>
-                  <Badge variant={STATUS_BADGE[c.status]} className="rounded-full">
-                    {pretty(c.status)}
-                  </Badge>
-                  <span className="text-sm font-medium">{pretty(c.caseType)}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {formatRelativeTime(c.createdAt)} ago · {pretty(c.source)}
-                  </span>
-                </div>
-                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{c.summary}</p>
-                <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span className="truncate font-medium text-foreground">{c.user.email}</span>
-                  <span>account {pretty(c.user.status)}</span>
-                  <span>risk {c.user.safetyRiskScore}</span>
-                  {c.violations.length > 0 && (
-                    <span>
-                      {c.violations.length} linked action{c.violations.length === 1 ? "" : "s"}
-                    </span>
-                  )}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <CaseList rows={rows} meId={admin.id} now={new Date()} />
       )}
     </>
   );

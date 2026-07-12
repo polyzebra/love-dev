@@ -20,6 +20,12 @@ export function formatRelativeTime(date: Date | string): string {
   return d.toLocaleDateString("en-IE", { day: "numeric", month: "short" });
 }
 
+/** "just now" / "3h ago" - use instead of hand-appending " ago". */
+export function formatAgo(date: Date | string): string {
+  const rel = formatRelativeTime(date);
+  return rel === "now" ? "just now" : `${rel} ago`;
+}
+
 export function calculateAge(birthDate: Date | string): number {
   const d = typeof birthDate === "string" ? new Date(birthDate) : birthDate;
   const today = new Date();

@@ -34,8 +34,12 @@ export const ENFORCEMENT_BADGE: Record<string, BadgeVariant> = {
 export const APPEAL_STATUS_BADGE: Record<string, BadgeVariant> = {
   SUBMITTED: "default",
   PENDING_REVIEW: "secondary",
+  UNDER_REVIEW: "secondary",
+  NEEDS_INFO: "default",
   APPROVED: "outline",
   REJECTED: "outline",
+  EXPIRED: "outline",
+  WITHDRAWN: "outline",
 };
 
 export const ACCOUNT_STATUS_BADGE: Record<string, BadgeVariant> = {
