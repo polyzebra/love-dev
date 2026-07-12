@@ -27,10 +27,23 @@ export const metadata: Metadata = {
   description:
     "Tirvea is a premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
   keywords: ["dating", "relationships", "verified dating", "premium dating"],
-  // Home-screen icon for iOS - required alongside the manifest for a
-  // proper "Add to Home Screen" install (and therefore iOS Web Push).
+  // Installable PWA manifest - required for iOS Web Push (Safari only
+  // exposes the Notification/Push APIs to Home Screen apps).
+  manifest: "/site.webmanifest",
   icons: {
-    apple: "/icons/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icons/favicon-64.png", sizes: "64x64", type: "image/png" },
+      { url: "/icons/favicon-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/logo.svg", type: "image/svg+xml", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+    // Home-screen icon for iOS - required alongside the manifest for a
+    // proper "Add to Home Screen" install.
+    apple: "/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,
@@ -43,11 +56,13 @@ export const metadata: Metadata = {
       "A premium dating platform. Verified profiles, thoughtful matching and conversations that go somewhere.",
     type: "website",
     siteName: "Tirvea",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Tirvea" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Tirvea - Dating, designed with intention",
     description: "A premium dating platform. Verified profiles, real intentions.",
+    images: ["/og.png"],
   },
 };
 

@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+/** Intrinsic dimensions per size, derived from the wordmark's 1084:259
+ *  viewBox so the browser reserves the exact box - no layout shift. */
+const SIZES = {
+  sm: { width: 67, height: 16, className: "h-4" },
+  md: { width: 84, height: 20, className: "h-5" },
+  lg: { width: 134, height: 32, className: "h-8" },
+} as const;
+
 export function Logo({
   className,
   href = "/",
@@ -10,26 +18,24 @@ export function Logo({
   href?: string;
   size?: "sm" | "md" | "lg";
 }) {
-  const sizes = { sm: "text-lg", md: "text-xl", lg: "text-3xl" };
+  const s = SIZES[size];
   return (
     <Link
       href={href}
-      className={cn(
-        "inline-flex items-center gap-2 font-display font-semibold tracking-tight",
-        sizes[size],
-        className,
-      )}
+      className={cn("inline-flex items-center", className)}
       aria-label="Tirvea - home"
     >
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        className={cn("text-primary", size === "lg" ? "size-8" : "size-6")}
-        fill="currentColor"
-      >
-        <path d="M12 21.35c-.32 0-.64-.1-.9-.3C6.6 17.7 2 13.9 2 9.3 2 6.4 4.3 4 7.2 4c1.9 0 3.6 1 4.8 2.6C13.2 5 14.9 4 16.8 4 19.7 4 22 6.4 22 9.3c0 4.6-4.6 8.4-9.1 11.75-.26.2-.58.3-.9.3Z" />
-      </svg>
-      <span>Tirvea</span>
+      {/* Static SVG wordmark: plain <img> on purpose - next/image would
+          route it through the optimizer, which rejects SVG by default. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo-web.svg"
+        alt=""
+        width={s.width}
+        height={s.height}
+        className={cn("w-auto select-none", s.className)}
+        draggable={false}
+      />
     </Link>
   );
 }

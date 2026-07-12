@@ -31,7 +31,15 @@ export function MarketingFooter() {
     <footer className="relative overflow-hidden border-t border-border">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-10">
         <div className="space-y-4">
-          <p className="font-display text-3xl font-semibold tracking-tight">Tirvea</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-web.svg"
+            alt="Tirvea"
+            width={134}
+            height={32}
+            className="h-8 w-auto select-none"
+            draggable={false}
+          />
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
             Dating, designed with intention.
             <br />
