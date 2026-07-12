@@ -29,7 +29,7 @@ export default async function AdminExplorePage() {
               <p className="flex items-center gap-2 font-medium">
                 {c.title}
                 <Badge variant="secondary" className="rounded-full text-[10px]">{c.group.toLowerCase()}</Badge>
-                {!c.isActive && <Badge variant="destructive" className="rounded-full text-[10px]">inactive</Badge>}
+                {!c.isActive && <Badge variant="outline" className="rounded-full text-[10px]">inactive</Badge>}
               </p>
               <p className="truncate text-xs text-muted-foreground">/{c.slug} · {c._count.preferences} saved · order {c.sortOrder}</p>
             </div>

@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialogOpener } from "../../use-dialog-opener";
 
 async function readErrorMessage(res: Response, fallback: string): Promise<string> {
   try {
@@ -82,8 +83,14 @@ export function CaseActions({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [decision, setDecision] = useState<Decision | null>(null);
+  const [decision, setDecisionState] = useState<Decision | null>(null);
   const [reason, setReason] = useState("");
+  // Controlled dialog (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
+  const setDecision = (next: Decision | null) => {
+    if (next) capture();
+    setDecisionState(next);
+  };
 
   const closed = caseStatus === "REVERSED";
 
@@ -407,7 +414,7 @@ export function CaseActions({
           }
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>{decision?.title}</DialogTitle>
             <DialogDescription>{decision?.description}</DialogDescription>

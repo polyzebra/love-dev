@@ -10,7 +10,7 @@ import { countryByIso } from "@/lib/auth/countries";
 import { maskPhone } from "@/lib/phone-mask";
 import { computeScamScore } from "@/lib/services/scam";
 import { toVerificationState } from "@/lib/services/verification";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatAgo } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -26,8 +26,11 @@ import {
   APPEAL_STATUS_BADGE,
   CASE_STATUS_BADGE,
   ENFORCEMENT_BADGE,
+  PHONE_SYNC_BADGE,
   SEVERITY_BADGE,
+  VERIFICATION_STATUS_BADGE,
   pretty,
+  shortId,
 } from "../../safety-badges";
 import { TrustActions } from "./trust-actions";
 import { SafetyActions } from "./safety-actions";
@@ -41,7 +44,7 @@ function shortHash(hash: string | null): string {
 }
 
 function stampDate(date: Date | null): string {
-  return date ? `${formatRelativeTime(date)} ago` : "-";
+  return date ? formatAgo(date) : "-";
 }
 
 function VerifiedStamp({ verifiedAt, label }: { verifiedAt: Date | null; label: string }) {
@@ -54,23 +57,17 @@ function VerifiedStamp({ verifiedAt, label }: { verifiedAt: Date | null; label: 
       )}
       <span className={verifiedAt ? "" : "text-muted-foreground"}>
         {label}
-        {verifiedAt ? ` · ${formatRelativeTime(verifiedAt)} ago` : ""}
+        {verifiedAt ? ` · ${formatAgo(verifiedAt)}` : ""}
       </span>
     </span>
   );
 }
 
-const SYNC_BADGE: Record<string, "secondary" | "outline" | "destructive"> = {
-  SYNCED: "secondary",
-  PENDING: "outline",
-  FAILED: "destructive",
-};
-
 /** auth.users.phone mirror disposition - "-" when no verified phone. */
 function PhoneSyncBadge({ status }: { status: string | null }) {
   if (!status) return <span className="text-muted-foreground">sync -</span>;
   return (
-    <Badge variant={SYNC_BADGE[status] ?? "outline"} className="rounded-full">
+    <Badge variant={PHONE_SYNC_BADGE[status] ?? "outline"} className="rounded-full">
       sync {status.toLowerCase()}
     </Badge>
   );
@@ -202,17 +199,23 @@ export default async function AdminUserDetailPage({
       </Link>
 
       <PageHeader
+        className="flex-wrap"
         title={user.profile?.displayName ?? user.name ?? user.email}
-        description={`${user.email} · id ${user.id}`}
+        description={user.email}
+        actions={
+          <span className="font-mono text-xs text-muted-foreground" title={user.id}>
+            id {shortId(user.id)}
+          </span>
+        }
       />
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <Badge variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"} className="rounded-full">
-          {user.status.toLowerCase().replace(/_/g, " ")}
+          {pretty(user.status)}
         </Badge>
         {banned && (
           <Badge variant="destructive" className="rounded-full">
-            banned {user.bannedAt ? `${formatRelativeTime(user.bannedAt)} ago` : ""}
+            banned {user.bannedAt ? formatAgo(user.bannedAt) : ""}
           </Badge>
         )}
         {emailBlock && (
@@ -326,7 +329,7 @@ export default async function AdminUserDetailPage({
               <span className="tabular-nums">{otpFails}</span> failed
             </Field>
             <Field label="Ban state">
-              {banned ? `Banned ${user.bannedAt ? `${formatRelativeTime(user.bannedAt)} ago` : ""}` : "Not banned"}
+              {banned ? `Banned ${user.bannedAt ? formatAgo(user.bannedAt) : ""}` : "Not banned"}
             </Field>
             <Field label="Ban reason">{user.banReason ?? "-"}</Field>
           </dl>
@@ -340,7 +343,7 @@ export default async function AdminUserDetailPage({
               </span>
               {user.safetyRiskUpdatedAt && (
                 <span className="ml-1.5 text-xs text-muted-foreground">
-                  updated {formatRelativeTime(user.safetyRiskUpdatedAt)} ago
+                  updated {formatAgo(user.safetyRiskUpdatedAt)}
                 </span>
               )}
             </Field>
@@ -410,7 +413,7 @@ export default async function AdminUserDetailPage({
                       </Link>
                     )}
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {formatRelativeTime(v.createdAt)} ago
+                      {formatAgo(v.createdAt)}
                     </span>
                   </li>
                 ))}
@@ -439,7 +442,7 @@ export default async function AdminUserDetailPage({
                       {pretty(c.caseType)}
                     </Link>
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {formatRelativeTime(c.createdAt)} ago
+                      {formatAgo(c.createdAt)}
                     </span>
                   </li>
                 ))}
@@ -516,10 +519,10 @@ export default async function AdminUserDetailPage({
                     <TableCell className="text-sm">{v.type}</TableCell>
                     <TableCell>
                       <Badge
-                        variant={v.status === "APPROVED" ? "secondary" : "outline"}
+                        variant={VERIFICATION_STATUS_BADGE[v.status] ?? "outline"}
                         className="rounded-full"
                       >
-                        {v.status.toLowerCase().replace(/_/g, " ")}
+                        {pretty(v.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">{v.provider ?? "-"}</TableCell>
@@ -542,7 +545,7 @@ export default async function AdminUserDetailPage({
                 <li key={event.id} className="text-sm">
                   <span className="font-medium">{event.type}</span>
                   <span className="ml-1.5 text-xs text-muted-foreground">
-                    {formatRelativeTime(event.createdAt)} ago
+                    {formatAgo(event.createdAt)}
                     {event.phoneE164 ? ` · ${event.phoneE164}` : ""}
                     {event.ipHash ? ` · ip ${shortHash(event.ipHash)}` : ""}
                   </span>

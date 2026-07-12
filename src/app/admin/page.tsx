@@ -113,7 +113,11 @@ export default async function AdminDashboardPage() {
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {accountStats.map(({ label, value, sub, icon: Icon, href }) => (
-          <Link key={label} href={href}>
+          <Link
+            key={label}
+            href={href}
+            className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+          >
             <Card className="h-full rounded-3xl transition-shadow hover:shadow-float">
               <CardHeader className="flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
@@ -151,9 +155,15 @@ export default async function AdminDashboardPage() {
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {queues.map(({ href, label, value, urgent, icon: Icon }) => (
-          <Link key={href} href={href}>
+          <Link
+            key={href}
+            href={href}
+            className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+          >
             <Card className="rounded-3xl transition-shadow hover:shadow-float">
-              <CardContent className="flex items-center gap-4 py-5">
+              {/* flex-wrap: the urgency badge drops below on very narrow
+                  screens (320px) instead of forcing page-level overflow. */}
+              <CardContent className="flex flex-wrap items-center gap-4 py-5">
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
                   <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
                 </span>

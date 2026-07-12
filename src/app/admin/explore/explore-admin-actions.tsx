@@ -14,10 +14,10 @@ export function ExploreRowActions({ id, isActive }: { id: string; isActive: bool
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" className="rounded-full" aria-label="Move up" disabled={pending} onClick={() => run(() => moveExploreCategory(id, "up"))}>
+      <Button variant="ghost" size="icon" className="size-11 rounded-full md:size-9" aria-label="Move up" disabled={pending} onClick={() => run(() => moveExploreCategory(id, "up"))}>
         <ArrowUp className="size-4" />
       </Button>
-      <Button variant="ghost" size="icon" className="rounded-full" aria-label="Move down" disabled={pending} onClick={() => run(() => moveExploreCategory(id, "down"))}>
+      <Button variant="ghost" size="icon" className="size-11 rounded-full md:size-9" aria-label="Move down" disabled={pending} onClick={() => run(() => moveExploreCategory(id, "down"))}>
         <ArrowDown className="size-4" />
       </Button>
       <Switch checked={isActive} disabled={pending} onCheckedChange={(v) => run(() => toggleExploreCategory(id, v))} aria-label="Active" />

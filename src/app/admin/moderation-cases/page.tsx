@@ -51,7 +51,7 @@ function Chip({ href, active, children }: { href: string; active: boolean; child
       href={href}
       aria-current={active ? "true" : undefined}
       className={cn(
-        "flex min-h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
+        "flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 md:min-h-9",
         active
           ? "bg-primary text-primary-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -174,7 +174,7 @@ export default async function ModerationCasesPage({
         {filters.q && (
           <Link
             href={filterHref({ ...filters, q: "" })}
-            className="flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
           >
             Clear
           </Link>
@@ -230,6 +230,21 @@ export default async function ModerationCasesPage({
             filters.q
               ? `No cases match "${filters.q}" with these filters.`
               : "No moderation cases match these filters."
+          }
+          action={
+            (filters.q ||
+              filters.status ||
+              filters.severity ||
+              filters.priority ||
+              filters.assigned ||
+              filters.overdue) && (
+              <Link
+                href="/admin/moderation-cases"
+                className="flex min-h-11 items-center rounded-full border px-5 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+              >
+                Clear search and filters
+              </Link>
+            )
           }
         />
       ) : (

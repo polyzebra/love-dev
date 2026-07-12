@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { VerificationActions } from "./verification-actions";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatAgo } from "@/lib/utils";
 import { requireAdminPage } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = { title: "Verification queue" };
@@ -54,7 +54,7 @@ export default async function AdminVerificationPage() {
                   {item.type === "PHOTO" ? "Photo verification" : "ID verification"}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
-                  requested {formatRelativeTime(item.createdAt)} ago
+                  requested {formatAgo(item.createdAt)}
                 </span>
               </div>
               <p className="text-sm">

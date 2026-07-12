@@ -20,7 +20,13 @@ import { formatAgo } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ENFORCEMENT_BADGE, SEVERITY_BADGE } from "../safety-badges";
+import {
+  ENFORCEMENT_BADGE,
+  SEVERITY_BADGE,
+  humanizeAdminAction,
+  pretty,
+  shortId,
+} from "../safety-badges";
 
 export const metadata: Metadata = { title: "Trust & safety" };
 export const dynamic = "force-dynamic";
@@ -289,9 +295,13 @@ export default async function TrustSafetyOverviewPage() {
         </h2>
         <div className="grid gap-4 lg:grid-cols-3">
           {queues.map(({ href, label, value, urgent, icon: Icon }) => (
-            <Link key={href} href={href}>
+            <Link
+              key={href}
+              href={href}
+              className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            >
               <Card className="rounded-3xl transition-shadow hover:shadow-float">
-                <CardContent className="flex items-center gap-4 py-5">
+                <CardContent className="flex flex-wrap items-center gap-4 py-5">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
                     <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
                   </span>
@@ -554,7 +564,11 @@ export default async function TrustSafetyOverviewPage() {
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SEVERITIES.map((severity, i) => (
-            <Link key={severity} href={`/admin/moderation-cases?severity=${severity}`}>
+            <Link
+              key={severity}
+              href={`/admin/moderation-cases?severity=${severity}`}
+              className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            >
               <Card className="h-full rounded-3xl transition-shadow hover:shadow-float">
                 <CardContent className="py-5">
                   <div className="flex items-center justify-between">
@@ -610,17 +624,18 @@ export default async function TrustSafetyOverviewPage() {
               {recentViolations.map((v) => (
                 <li key={v.id} className="flex items-center gap-3 py-2.5">
                   <Badge variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"} className="rounded-full">
-                    {v.actionTaken.toLowerCase().replace(/_/g, " ")}
+                    {pretty(v.actionTaken)}
                   </Badge>
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/admin/users/${v.userId}`}
-                      className="block truncate text-sm font-medium hover:underline"
+                      title={v.user.email}
+                      className="block truncate text-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
                     >
                       {v.user.email}
                     </Link>
                     <p className="text-xs text-muted-foreground">
-                      {v.violationType.toLowerCase().replace(/_/g, " ")} ·{" "}
+                      {pretty(v.violationType)} ·{" "}
                       {formatAgo(v.createdAt)}
                       {v.reversedAt ? " · reversed" : ""}
                     </p>
@@ -641,9 +656,12 @@ export default async function TrustSafetyOverviewPage() {
             <ul className="divide-y">
               {recentDecisions.map((entry) => (
                 <li key={entry.id} className="py-2.5">
-                  <p className="text-sm font-medium">{entry.action}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {entry.targetType ?? "target"} {entry.targetId ? `· ${entry.targetId}` : ""} ·{" "}
+                  <p className="text-sm font-medium" title={entry.action}>
+                    {humanizeAdminAction(entry.action)}
+                  </p>
+                  <p className="text-xs text-muted-foreground" title={entry.targetId ?? undefined}>
+                    {entry.targetType ?? "target"}{" "}
+                    {entry.targetId ? `· ${shortId(entry.targetId)} ` : ""}·{" "}
                     {formatAgo(entry.createdAt)}
                   </p>
                 </li>

@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialogOpener } from "../use-dialog-opener";
 
 async function readErrorMessage(res: Response, fallback: string): Promise<string> {
   try {
@@ -41,6 +42,8 @@ export function PhotoActions({
   const [rejectOpen, setRejectOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reason, setReason] = useState("");
+  // Controlled dialogs (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
 
   function run(request: () => Promise<Response>, success: string, fallback: string) {
     startTransition(async () => {
@@ -85,7 +88,10 @@ export function PhotoActions({
           variant="outline"
           className="rounded-full"
           disabled={pending}
-          onClick={() => setRejectOpen(true)}
+          onClick={() => {
+            capture();
+            setRejectOpen(true);
+          }}
         >
           <X className="size-4" /> Reject
         </Button>
@@ -95,13 +101,16 @@ export function PhotoActions({
         variant="destructive"
         className="rounded-full"
         disabled={pending}
-        onClick={() => setDeleteOpen(true)}
+        onClick={() => {
+          capture();
+          setDeleteOpen(true);
+        }}
       >
         <Trash2 className="size-4" /> Delete
       </Button>
 
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Reject photo</DialogTitle>
             <DialogDescription>
@@ -144,7 +153,7 @@ export function PhotoActions({
       </Dialog>
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Delete photo permanently</DialogTitle>
             <DialogDescription>

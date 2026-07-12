@@ -118,7 +118,7 @@ export default async function AdminAppealsPage({
             href={f.key === "open" ? "/admin/appeals" : `/admin/appeals?status=${f.key}`}
             aria-current={f.key === filter ? "true" : undefined}
             className={cn(
-              "flex min-h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
+              "flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 md:min-h-9",
               f.key === filter
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",

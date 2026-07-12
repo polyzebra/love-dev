@@ -24,6 +24,7 @@ import {
   SEVERITY_BADGE,
   pretty,
 } from "../safety-badges";
+import { useDialogOpener } from "../use-dialog-opener";
 
 /**
  * Interactive moderation-case queue: row selection + bulk bar (assign to
@@ -105,6 +106,8 @@ export function CaseList({
   const [dismissOpen, setDismissOpen] = useState(false);
   const [dismissReason, setDismissReason] = useState("");
   const [pending, startTransition] = useTransition();
+  // Controlled dialog (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
 
   // Only rows a bulk action can touch are selectable (open-ish cases).
   const selectableIds = useMemo(
@@ -213,7 +216,10 @@ export function CaseList({
             variant="outline"
             className="rounded-full"
             disabled={pending}
-            onClick={() => setDismissOpen(true)}
+            onClick={() => {
+              capture();
+              setDismissOpen(true);
+            }}
           >
             <CircleSlash className="size-4" /> Dismiss…
           </Button>
@@ -247,7 +253,10 @@ export function CaseList({
               className="mt-1"
             />
             <div className="min-w-0 flex-1">
-              <Link href={`/admin/moderation-cases/${row.id}`} className="block">
+              <Link
+                href={`/admin/moderation-cases/${row.id}`}
+                className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+              >
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant={SEVERITY_BADGE[row.severity] ?? "outline"} className="rounded-full">
                     {pretty(row.severity)}
@@ -268,7 +277,9 @@ export function CaseList({
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{row.summary}</p>
                 <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span className="truncate font-medium text-foreground">{row.user.email}</span>
+                  <span className="truncate font-medium text-foreground" title={row.user.email}>
+                    {row.user.email}
+                  </span>
                   <Badge
                     variant={ACCOUNT_STATUS_BADGE[row.user.status] ?? "outline"}
                     className="rounded-full"
@@ -321,7 +332,7 @@ export function CaseList({
           }
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>
               Dismiss {selectedIds.length} case{selectedIds.length === 1 ? "" : "s"}?

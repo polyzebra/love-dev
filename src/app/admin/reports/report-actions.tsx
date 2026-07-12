@@ -1,10 +1,19 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Ban, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { resolveReport, setUserStatus } from "../actions";
+import { useDialogOpener } from "../use-dialog-opener";
 
 export function ReportActions({
   reportId,
@@ -14,12 +23,16 @@ export function ReportActions({
   reportedUserId: string;
 }) {
   const [pending, startTransition] = useTransition();
+  const [suspendOpen, setSuspendOpen] = useState(false);
+  // Controlled dialog (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
 
   function run(fn: () => Promise<void>, message: string) {
     startTransition(async () => {
       try {
         await fn();
         toast.success(message);
+        setSuspendOpen(false);
       } catch {
         toast.error("Action failed - you may not have permission.");
       }
@@ -33,12 +46,10 @@ export function ReportActions({
         variant="destructive"
         className="rounded-full"
         disabled={pending}
-        onClick={() =>
-          run(async () => {
-            await setUserStatus(reportedUserId, "SUSPENDED");
-            await resolveReport(reportId, "ACTION_TAKEN", "User suspended");
-          }, "User suspended and report closed.")
-        }
+        onClick={() => {
+          capture();
+          setSuspendOpen(true);
+        }}
       >
         <Ban className="size-4" /> Suspend user
       </Button>
@@ -65,6 +76,37 @@ export function ReportActions({
       >
         <X className="size-4" /> Dismiss
       </Button>
+
+      <Dialog open={suspendOpen} onOpenChange={setSuspendOpen}>
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
+          <DialogHeader>
+            <DialogTitle>Suspend this account?</DialogTitle>
+            <DialogDescription>
+              The reported account loses app access immediately and the report closes as action
+              taken. Both changes are recorded in the audit log. This is a serious, user-visible
+              action.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" className="rounded-full" onClick={() => setSuspendOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="rounded-full"
+              disabled={pending}
+              onClick={() =>
+                run(async () => {
+                  await setUserStatus(reportedUserId, "SUSPENDED");
+                  await resolveReport(reportId, "ACTION_TAKEN", "User suspended");
+                }, "User suspended and report closed.")
+              }
+            >
+              Suspend account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

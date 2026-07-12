@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialogOpener } from "../../use-dialog-opener";
 
 async function readErrorMessage(res: Response, fallback: string): Promise<string> {
   try {
@@ -67,7 +68,13 @@ export function TrustActions({
   const [banReason, setBanReason] = useState("");
   const [releaseDeletedOpen, setReleaseDeletedOpen] = useState(false);
   const [releaseDeletedReason, setReleaseDeletedReason] = useState("");
-  const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
+  const [confirm, setConfirmState] = useState<ConfirmAction | null>(null);
+  // Controlled dialogs (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
+  const setConfirm = (next: ConfirmAction | null) => {
+    if (next) capture();
+    setConfirmState(next);
+  };
 
   function post(endpoint: string, success: string, body?: unknown) {
     startTransition(async () => {
@@ -124,7 +131,10 @@ export function TrustActions({
           variant="destructive"
           className="rounded-full"
           disabled={pending}
-          onClick={() => setBanOpen(true)}
+          onClick={() => {
+            capture();
+            setBanOpen(true);
+          }}
         >
           <Ban className="size-4" /> Ban
         </Button>
@@ -158,7 +168,10 @@ export function TrustActions({
           variant="destructive"
           className="rounded-full"
           disabled={pending}
-          onClick={() => setReleaseDeletedOpen(true)}
+          onClick={() => {
+            capture();
+            setReleaseDeletedOpen(true);
+          }}
         >
           <PhoneOff className="size-4" /> Release phone (deleted account)
         </Button>
@@ -251,7 +264,7 @@ export function TrustActions({
       )}
 
       <Dialog open={banOpen} onOpenChange={setBanOpen}>
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Ban this account</DialogTitle>
             <DialogDescription>
@@ -283,7 +296,7 @@ export function TrustActions({
       </Dialog>
 
       <Dialog open={releaseDeletedOpen} onOpenChange={setReleaseDeletedOpen}>
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Release phone from deleted account</DialogTitle>
             <DialogDescription>
@@ -325,7 +338,7 @@ export function TrustActions({
       </Dialog>
 
       <Dialog open={confirm !== null} onOpenChange={(open) => !open && setConfirm(null)}>
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>{confirm?.title}</DialogTitle>
             <DialogDescription>{confirm?.description}</DialogDescription>

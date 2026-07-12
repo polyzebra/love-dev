@@ -74,7 +74,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <li key={href}>
                 <Link
                   href={href}
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
                 >
                   <Icon className="size-4.5" aria-hidden="true" />
                   {label}
@@ -87,7 +87,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="border-t px-3 py-2">
           <Link
             href="/discover"
-            className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
           >
             <ArrowLeft className="size-4.5" aria-hidden="true" />
             Back to Tirvea
@@ -107,7 +107,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link
             key={href}
             href={href}
-            className="flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
           >
             {label}
           </Link>
@@ -115,7 +115,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <span aria-hidden="true" className="my-2.5 w-px shrink-0 self-stretch bg-border/50" />
         <Link
           href="/discover"
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back to Tirvea

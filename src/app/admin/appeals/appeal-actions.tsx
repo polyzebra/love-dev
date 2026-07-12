@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialogOpener } from "../use-dialog-opener";
 
 async function readErrorMessage(res: Response, fallback: string): Promise<string> {
   try {
@@ -43,10 +44,16 @@ export function AppealActions({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [decision, setDecision] = useState<"approve" | "reject" | null>(null);
+  const [decision, setDecisionState] = useState<"approve" | "reject" | null>(null);
   const [notes, setNotes] = useState("");
   const [askOpen, setAskOpen] = useState(false);
   const [question, setQuestion] = useState("");
+  // Controlled dialogs (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
+  const setDecision = (next: "approve" | "reject" | null) => {
+    if (next) capture();
+    setDecisionState(next);
+  };
 
   const submitted = status === "SUBMITTED" || status === "PENDING_REVIEW";
   // Any pre-decision state may be decided; NEEDS_INFO cannot be re-asked.
@@ -141,7 +148,10 @@ export function AppealActions({
           variant="outline"
           className="rounded-full"
           disabled={pending}
-          onClick={() => setAskOpen(true)}
+          onClick={() => {
+            capture();
+            setAskOpen(true);
+          }}
         >
           <MessageCircleQuestion className="size-4" /> Ask for info
         </Button>
@@ -173,7 +183,7 @@ export function AppealActions({
           }
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>Ask the user for more information</DialogTitle>
             <DialogDescription>
@@ -223,7 +233,7 @@ export function AppealActions({
           }
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>
               {decision === "approve" ? "Approve this appeal?" : "Reject this appeal?"}

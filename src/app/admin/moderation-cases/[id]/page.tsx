@@ -16,6 +16,7 @@ import {
   ENFORCEMENT_BADGE,
   SEVERITY_BADGE,
   pretty,
+  shortId,
 } from "../../safety-badges";
 import { AssignControl } from "./assign-control";
 import { CaseActions } from "./case-actions";
@@ -180,8 +181,14 @@ export default async function ModerationCaseDetailPage({
         <ArrowLeft className="size-4" aria-hidden="true" /> Moderation cases
       </Link>
       <PageHeader
+        className="flex-wrap"
         title={`${pretty(kase.caseType)} case`}
-        description={`id ${kase.id} · opened ${formatAgo(kase.createdAt)}`}
+        description={`opened ${formatAgo(kase.createdAt)}`}
+        actions={
+          <span className="font-mono text-xs text-muted-foreground" title={kase.id}>
+            id {shortId(kase.id)}
+          </span>
+        }
       />
 
       <div className="mb-5 flex flex-wrap items-center gap-2">

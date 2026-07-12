@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PAYMENT_STATUS_BADGE, pretty } from "../safety-badges";
 
 export const metadata: Metadata = { title: "Payments" };
 export const dynamic = "force-dynamic";
@@ -87,29 +88,45 @@ export default async function AdminPaymentsPage() {
             <TableRow>
               <TableHead>Member</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Amount</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {payments.map((p) => (
               <TableRow key={p.id}>
-                <TableCell>
-                  <p className="font-medium">{p.user.profile?.displayName ?? "-"}</p>
-                  <p className="text-xs text-muted-foreground">{p.user.email}</p>
+                <TableCell className="max-w-56">
+                  <p
+                    className="truncate font-medium"
+                    title={p.user.profile?.displayName ?? undefined}
+                  >
+                    {p.user.profile?.displayName ?? "-"}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground" title={p.user.email}>
+                    {p.user.email}
+                  </p>
                 </TableCell>
-                <TableCell className="text-sm">{p.description ?? "Subscription"}</TableCell>
-                <TableCell className="tabular-nums">€{(p.amountCents / 100).toFixed(2)}</TableCell>
+                <TableCell className="max-w-64">
+                  <span className="block truncate text-sm" title={p.description ?? "Subscription"}>
+                    {p.description ?? "Subscription"}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  €{(p.amountCents / 100).toFixed(2)}
+                </TableCell>
                 <TableCell>
                   <Badge
-                    variant={p.status === "SUCCEEDED" ? "secondary" : "destructive"}
+                    variant={PAYMENT_STATUS_BADGE[p.status] ?? "outline"}
                     className="rounded-full"
                   >
-                    {p.status.toLowerCase()}
+                    {pretty(p.status)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell
+                  className="text-right text-sm tabular-nums text-muted-foreground"
+                  title={p.createdAt.toLocaleString("en-IE")}
+                >
                   {p.createdAt.toLocaleDateString("en-IE")}
                 </TableCell>
               </TableRow>

@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialogOpener } from "../../use-dialog-opener";
 
 async function readErrorMessage(res: Response, fallback: string): Promise<string> {
   try {
@@ -44,8 +45,14 @@ type PendingAction = {
 export function SafetyActions({ userId, userStatus }: { userId: string; userStatus: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [action, setAction] = useState<PendingAction | null>(null);
+  const [action, setActionState] = useState<PendingAction | null>(null);
   const [reason, setReason] = useState("");
+  // Controlled dialog (no DialogTrigger): send focus back to the opener.
+  const { capture, restoreFocus } = useDialogOpener();
+  const setAction = (next: PendingAction | null) => {
+    if (next) capture();
+    setActionState(next);
+  };
 
   function run(a: PendingAction, text: string) {
     startTransition(async () => {
@@ -219,7 +226,7 @@ export function SafetyActions({ userId, userStatus }: { userId: string; userStat
           }
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="rounded-3xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
             <DialogTitle>{action?.title}</DialogTitle>
             <DialogDescription>{action?.description}</DialogDescription>

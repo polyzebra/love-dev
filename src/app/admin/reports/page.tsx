@@ -6,8 +6,9 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReportActions } from "./report-actions";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatAgo } from "@/lib/utils";
 import { requireAdminPage } from "@/lib/auth/require-user";
+import { ACCOUNT_STATUS_BADGE, pretty } from "../safety-badges";
 
 export const metadata: Metadata = { title: "Reports" };
 export const dynamic = "force-dynamic";
@@ -74,7 +75,7 @@ export default async function AdminReportsPage() {
                   {REASON_LABELS[report.reason]}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
-                  {formatRelativeTime(report.createdAt)} ago
+                  {formatAgo(report.createdAt)}
                 </span>
                 {report.reported._count.reportsReceived > 1 && (
                   <Badge variant="outline" className="rounded-full">
@@ -89,7 +90,12 @@ export default async function AdminReportsPage() {
                   <span className="font-medium">
                     {report.reported.profile?.displayName ?? report.reported.email}
                   </span>{" "}
-                  <span className="text-muted-foreground">({report.reported.status.toLowerCase()})</span>
+                  <Badge
+                    variant={ACCOUNT_STATUS_BADGE[report.reported.status] ?? "outline"}
+                    className="rounded-full align-middle"
+                  >
+                    {pretty(report.reported.status)}
+                  </Badge>
                 </p>
                 <p>
                   <span className="text-muted-foreground">By: </span>

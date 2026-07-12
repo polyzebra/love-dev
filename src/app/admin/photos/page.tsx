@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ImageIcon } from "lucide-react";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
-import { cn, formatRelativeTime } from "@/lib/utils";
+import { cn, formatAgo } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
@@ -112,11 +112,12 @@ export default async function AdminPhotosPage({
             key={t.key}
             href={`/admin/photos?tab=${t.key}`}
             className={cn(
-              "flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              "flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 md:min-h-9",
               t.key === tab
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
+            aria-current={t.key === tab ? "true" : undefined}
           >
             {t.label}
             <span className="text-xs tabular-nums opacity-70">{counts[i]}</span>
@@ -139,7 +140,7 @@ export default async function AdminPhotosPage({
                 <TableHead>Owner</TableHead>
                 <TableHead>Uploaded</TableHead>
                 <TableHead>File</TableHead>
-                <TableHead>AI score</TableHead>
+                <TableHead className="text-right">AI score</TableHead>
                 <TableHead>Face</TableHead>
                 <TableHead>History</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -167,14 +168,19 @@ export default async function AdminPhotosPage({
                   <TableCell>
                     <Link
                       href={`/admin/users?q=${encodeURIComponent(photo.user.email)}`}
-                      className="font-medium hover:underline"
+                      className="font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
                     >
                       {photo.user.profile?.displayName ?? photo.user.name ?? "-"}
                     </Link>
-                    <p className="text-xs text-muted-foreground">{photo.user.email}</p>
+                    <p className="max-w-48 truncate text-xs text-muted-foreground" title={photo.user.email}>
+                      {photo.user.email}
+                    </p>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatRelativeTime(photo.createdAt)} ago
+                  <TableCell
+                    className="text-sm text-muted-foreground"
+                    title={photo.createdAt.toLocaleString("en-IE")}
+                  >
+                    {formatAgo(photo.createdAt)}
                   </TableCell>
                   <TableCell>
                     <p className="text-sm">{photo.mimeType ?? "-"}</p>
@@ -190,7 +196,7 @@ export default async function AdminPhotosPage({
                       {photo.dominantColor ?? "-"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm tabular-nums">
+                  <TableCell className="text-right text-sm tabular-nums">
                     {/* null = no provider scored it. Never show a made-up number. */}
                     {photo.aiScore != null ? photo.aiScore.toFixed(2) : "-"}
                   </TableCell>
@@ -215,7 +221,7 @@ export default async function AdminPhotosPage({
                               <p className="font-medium">
                                 {event.action}
                                 <span className="ml-1.5 font-normal text-muted-foreground">
-                                  {formatRelativeTime(event.createdAt)} ago ·{" "}
+                                  {formatAgo(event.createdAt)} ·{" "}
                                   {event.actorId
                                     ? (actorEmail.get(event.actorId) ?? event.actorId)
                                     : "automated"}

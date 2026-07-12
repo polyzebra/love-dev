@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireAdminPage } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
+import { formatAgo } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import {
   Table,
@@ -10,9 +11,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { humanizeAdminAction, shortId } from "../safety-badges";
 
 export const metadata: Metadata = { title: "Audit log" };
 export const dynamic = "force-dynamic";
+
+/** Forensic record: absolute timestamp, relative form in the tooltip. */
+function stamp(date: Date): string {
+  return date.toLocaleString("en-IE", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default async function AdminAuditPage() {
   if (!(await requireAdminPage())) return null; // layout renders AccessDenied; keep segment payload empty
@@ -26,37 +39,61 @@ export default async function AdminAuditPage() {
     <>
       <PageHeader
         title="Audit log"
-        description="Append-only record of privileged and safety-relevant actions."
+        description="Append-only record of privileged and safety-relevant actions. Newest first."
       />
       <div className="overflow-x-auto rounded-3xl border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>When</TableHead>
+              {/* Reading order mirrors the sentence: actor did action to target, when. */}
               <TableHead>Actor</TableHead>
               <TableHead>Action</TableHead>
               <TableHead>Target</TableHead>
+              <TableHead className="text-right">When</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {entries.map((entry) => (
               <TableRow key={entry.id}>
-                <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                  {entry.createdAt.toLocaleString("en-IE")}
+                <TableCell className="max-w-56">
+                  <span className="block truncate text-sm" title={entry.actor.email}>
+                    {entry.actor.email}
+                  </span>
                 </TableCell>
-                <TableCell className="text-sm">{entry.actor.email}</TableCell>
                 <TableCell>
-                  <code className="rounded-md bg-muted px-2 py-0.5 text-xs">{entry.action}</code>
+                  {/* Humanized for scanning; the raw code stays one hover away. */}
+                  <span className="text-sm font-medium" title={entry.action}>
+                    {humanizeAdminAction(entry.action)}
+                  </span>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {entry.targetType ? `${entry.targetType}:${entry.targetId ?? "-"}` : "-"}
+                  {entry.targetType ? (
+                    <span title={entry.targetId ?? undefined}>
+                      {entry.targetType}{" "}
+                      {entry.targetId ? (
+                        <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs">
+                          {shortId(entry.targetId)}
+                        </code>
+                      ) : (
+                        "-"
+                      )}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell
+                  className="whitespace-nowrap text-right text-sm tabular-nums text-muted-foreground"
+                  title={formatAgo(entry.createdAt)}
+                >
+                  {stamp(entry.createdAt)}
                 </TableCell>
               </TableRow>
             ))}
             {entries.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} className="py-10 text-center text-muted-foreground">
-                  No audit entries yet.
+                  No audit entries yet. Privileged actions are recorded here as they happen.
                 </TableCell>
               </TableRow>
             )}
