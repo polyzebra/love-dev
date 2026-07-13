@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { PROFILE_PROMPTS } from "@/config/prompts";
 import { GROUP_LABELS, TAXONOMY } from "@/lib/discovery/taxonomy";
 import type { OnboardingInput } from "@/lib/validators/profile";
 
@@ -106,4 +107,42 @@ export async function completeOnboarding(userId: string, input: OnboardingInput)
 
     return profile;
   });
+}
+
+/**
+ * Replace the user's prompt answers with the submitted set. Answers are
+ * re-ordered to the curated PROFILE_PROMPTS order (sortOrder), so the
+ * profile and the explore viewer render them in a stable sequence
+ * regardless of submission order. Returns null when the user has no
+ * profile yet (callers send them through onboarding).
+ */
+export async function replaceProfilePrompts(
+  userId: string,
+  prompts: Array<{ key: string; answer: string }>,
+): Promise<{ count: number } | null> {
+  const profile = await db.profile.findUnique({ where: { userId }, select: { id: true } });
+  if (!profile) return null;
+
+  const order = new Map(PROFILE_PROMPTS.map((p, i) => [p.key as string, i]));
+  const ordered = [...prompts].sort(
+    (a, b) =>
+      (order.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.key) ?? Number.MAX_SAFE_INTEGER),
+  );
+
+  await db.$transaction([
+    db.profilePrompt.deleteMany({ where: { profileId: profile.id } }),
+    ...(ordered.length > 0
+      ? [
+          db.profilePrompt.createMany({
+            data: ordered.map((p, i) => ({
+              profileId: profile.id,
+              promptKey: p.key,
+              answer: p.answer,
+              sortOrder: i,
+            })),
+          }),
+        ]
+      : []),
+  ]);
+  return { count: ordered.length };
 }

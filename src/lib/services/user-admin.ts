@@ -482,3 +482,36 @@ export async function resetOnboarding(opts: {
     metadata: { actorId: opts.actorId },
   });
 }
+
+/**
+ * Direct status set from the admin users list (reinstate / suspend /
+ * shadow ban). Distinct from banUser: no violation row, no credential
+ * snapshot - it is the lightweight moderation ladder step. Same module
+ * contract as every action here: User fields + AdminLog + an
+ * AuthVerificationEvent on the account's own timeline.
+ */
+export async function setUserStatus(opts: {
+  actorId: string;
+  userId: string;
+  status: "ACTIVE" | "SUSPENDED" | "SHADOW_BANNED";
+  req?: Request;
+}): Promise<void> {
+  const user = await db.user.update({
+    where: { id: opts.userId },
+    data: { status: opts.status },
+    select: { email: true },
+  });
+  await audit({
+    actorId: opts.actorId,
+    action: `user.status.${opts.status.toLowerCase()}`,
+    targetType: "user",
+    targetId: opts.userId,
+  });
+  await recordAuthEvent({
+    type: `admin_status_${opts.status.toLowerCase()}`,
+    userId: opts.userId,
+    email: user.email,
+    req: opts.req,
+    metadata: { actorId: opts.actorId },
+  });
+}

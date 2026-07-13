@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { audit } from "@/lib/audit";
+import { sendSafetyNotice } from "@/lib/services/safety-notices";
 import type { Prisma } from "@/generated/prisma/client";
 import type { VerificationStatus, VerificationType } from "@/generated/prisma/enums";
 
@@ -115,4 +117,49 @@ export async function getVerificationState(userId: string): Promise<Verification
     select: VERIFICATION_USER_SELECT,
   });
   return user ? toVerificationState(user) : null;
+}
+
+/**
+ * Staff verdict on a verification request (admin review queue). Routes
+ * own the permission checks (requirePermission) - this owns the mutation.
+ * The verdict lives on User columns (see above): a PHOTO review must
+ * stamp/clear User.photoVerifiedAt atomically with the row update or the
+ * badge surfaces and the review queue would disagree. The owner is
+ * notified through the notification outbox (in-app + push + email per
+ * prefs) and the decision lands in AdminLog.
+ */
+export async function reviewVerification(opts: {
+  actorId: string;
+  verificationId: string;
+  approve: boolean;
+}): Promise<{ userId: string; type: VerificationType; status: VerificationStatus }> {
+  const verification = await db.$transaction(async (tx) => {
+    const row = await tx.verification.update({
+      where: { id: opts.verificationId },
+      data: {
+        status: opts.approve ? "APPROVED" : "REJECTED",
+        reviewedById: opts.actorId,
+      },
+    });
+    if (row.type === "PHOTO") {
+      await tx.user.update({
+        where: { id: row.userId },
+        data: { photoVerifiedAt: opts.approve ? new Date() : null },
+      });
+    }
+    return row;
+  });
+  await sendSafetyNotice(
+    verification.userId,
+    opts.approve ? "verification_approved" : "verification_rejected",
+    `verification:${opts.verificationId}:${opts.approve ? "approved" : "rejected"}:staff`,
+    { verificationId: opts.verificationId },
+  );
+  await audit({
+    actorId: opts.actorId,
+    action: `verification.${opts.approve ? "approve" : "reject"}`,
+    targetType: "verification",
+    targetId: opts.verificationId,
+  });
+  return { userId: verification.userId, type: verification.type, status: verification.status };
 }

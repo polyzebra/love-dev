@@ -1327,3 +1327,25 @@ async function recordCheckoutPayment(
     update: {},
   });
 }
+
+/**
+ * Honest "restore purchases": reads what the database actually holds for
+ * the user and reports it verbatim. Never mutates anything and never
+ * claims a restore succeeded - with no store-mediated purchase flow the
+ * truthful answer is whatever the payment/subscription records say.
+ */
+export async function getPurchaseRecords(userId: string): Promise<{
+  /** Number of successful payment records on this account. */
+  payments: number;
+  /** Paid tier on record, or null when there is nothing to restore. */
+  subscriptionTier: string | null;
+}> {
+  const [payments, subscription] = await Promise.all([
+    db.payment.count({ where: { userId, status: "SUCCEEDED" } }),
+    db.subscription.findUnique({ where: { userId }, select: { tier: true } }),
+  ]);
+  return {
+    payments,
+    subscriptionTier: subscription && subscription.tier !== "FREE" ? subscription.tier : null,
+  };
+}

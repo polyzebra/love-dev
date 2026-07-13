@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { audit } from "@/lib/audit";
 import { DISCOVERABLE_USER_WHERE } from "@/lib/services/trust-safety";
 import { calculateAge } from "@/lib/utils";
 import { promptLabel } from "@/config/prompts";
@@ -373,4 +374,78 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
       shared: mySlugs.has(i.interest.slug),
     })),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Admin curation (routes own the permission checks - flags:manage)
+// ---------------------------------------------------------------------------
+
+/** Show/hide a category on the public explore surface. */
+export async function toggleExploreCategory(opts: {
+  actorId: string;
+  id: string;
+  isActive: boolean;
+}): Promise<void> {
+  await db.exploreCategory.update({ where: { id: opts.id }, data: { isActive: opts.isActive } });
+  await audit({
+    actorId: opts.actorId,
+    action: "explore.toggle",
+    targetType: "exploreCategory",
+    targetId: opts.id,
+    metadata: { isActive: opts.isActive },
+  });
+}
+
+/**
+ * Swap sort positions with the nearest neighbour in the same group.
+ * Returns false when the category is already at the edge (no-op).
+ */
+export async function moveExploreCategory(opts: {
+  actorId: string;
+  id: string;
+  direction: "up" | "down";
+}): Promise<boolean> {
+  const cat = await db.exploreCategory.findUniqueOrThrow({ where: { id: opts.id } });
+  const neighbour = await db.exploreCategory.findFirst({
+    where: {
+      group: cat.group,
+      sortOrder: opts.direction === "up" ? { lt: cat.sortOrder } : { gt: cat.sortOrder },
+    },
+    orderBy: { sortOrder: opts.direction === "up" ? "desc" : "asc" },
+  });
+  if (!neighbour) return false;
+  await db.$transaction([
+    db.exploreCategory.update({ where: { id: cat.id }, data: { sortOrder: neighbour.sortOrder } }),
+    db.exploreCategory.update({ where: { id: neighbour.id }, data: { sortOrder: cat.sortOrder } }),
+  ]);
+  await audit({
+    actorId: opts.actorId,
+    action: "explore.reorder",
+    targetType: "exploreCategory",
+    targetId: opts.id,
+  });
+  return true;
+}
+
+/** Edit a category's presentation fields (title, copy, gradient, art). */
+export async function updateExploreCategory(opts: {
+  actorId: string;
+  id: string;
+  data: {
+    title?: string;
+    description?: string;
+    gradientFrom?: string;
+    gradientTo?: string;
+    iconKey?: string;
+    imageUrl?: string | null;
+  };
+}): Promise<void> {
+  await db.exploreCategory.update({ where: { id: opts.id }, data: opts.data });
+  await audit({
+    actorId: opts.actorId,
+    action: "explore.update",
+    targetType: "exploreCategory",
+    targetId: opts.id,
+    metadata: opts.data,
+  });
 }
