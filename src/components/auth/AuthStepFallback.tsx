@@ -17,6 +17,7 @@ export function AuthStepFallback({
 }) {
   return (
     <div
+      data-debug="auth-fallback"
       role="status"
       aria-live="polite"
       // 26rem ≈ the real auth steps' content height (login entry ~453px,

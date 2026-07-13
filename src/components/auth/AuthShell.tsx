@@ -75,6 +75,7 @@ export function AuthShell({
 
       <AnimatePresence mode="wait">
         <motion.div
+          data-debug="auth-motion-shell"
           key={stepKey ?? "step"}
           // Slide ONLY - the freshly routed step must be readable from its
           // first committed frame; an opacity fade re-blanks the card

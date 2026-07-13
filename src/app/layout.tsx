@@ -4,6 +4,8 @@ import { MotionProvider } from "@/components/fx/motion-provider";
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthDebugPanel } from "@/components/debug/auth-debug-panel";
+import { BUILD_ID } from "@/lib/build-id";
 import "./globals.css";
 
 const inter = Inter({
@@ -93,6 +95,8 @@ export default function RootLayout({
         <ThemeSync />
         <MotionProvider>{children}</MotionProvider>
         <Toaster position="top-center" richColors theme="system" />
+        {/* TEMPORARY: auth-transition diagnostics, active only with ?authdebug=1 */}
+        <AuthDebugPanel buildId={BUILD_ID} />
       </body>
     </html>
   );

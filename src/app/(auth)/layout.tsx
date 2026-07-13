@@ -6,13 +6,13 @@ import { AuthStepFallback } from "@/components/auth/AuthStepFallback";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="noise relative flex min-h-dvh flex-col overflow-hidden bg-background">
+    <div data-debug="auth-layout" className="noise relative flex min-h-dvh flex-col overflow-hidden bg-background">
       <Aurora fixed />
       <header className="safe-top relative mx-auto w-full max-w-6xl px-6 py-6 md:px-10">
         <Logo />
       </header>
       <main className="relative flex flex-1 items-center justify-center px-4 pb-16">
-        <div className="glass w-full max-w-md rounded-2xl p-7 sm:p-10">
+        <div data-debug="auth-card" className="glass w-full max-w-md rounded-2xl p-7 sm:p-10">
           {/* The card's loading state is ITS OWN child, not a separate
               loading.tsx segment: card and fallback travel in the same
               flight rows / adjacent HTML bytes, so no chunk boundary can

@@ -174,6 +174,7 @@ export function LoginEntry({
 
   return (
     <motion.div
+      data-debug="login-page"
       // Slide-and-settle ONLY - never opacity: the sign-in choices must
       // be readable from the very first committed frame (a fade from 0
       // re-blanks the card right after the loading fallback unmounts).
@@ -194,7 +195,7 @@ export function LoginEntry({
         </div>
       </div>
 
-      <div className="grid gap-3">
+      <div data-debug="login-form" className="grid gap-3">
         {appleEnabled && (
           <ProviderActionButton
             pending={pending === "apple"}
