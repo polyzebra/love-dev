@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Ban, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { resolveReport, setUserStatus } from "../actions";
 import { useDialogOpener } from "../use-dialog-opener";
+
+/** POST helper for the admin mutation routes; throws on any non-2xx. */
+async function postJson(path: string, body: unknown): Promise<void> {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error();
+}
 
 export function ReportActions({
   reportId,
@@ -22,6 +32,7 @@ export function ReportActions({
   reportId: string;
   reportedUserId: string;
 }) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [suspendOpen, setSuspendOpen] = useState(false);
   // Controlled dialog (no DialogTrigger): send focus back to the opener.
@@ -33,6 +44,7 @@ export function ReportActions({
         await fn();
         toast.success(message);
         setSuspendOpen(false);
+        router.refresh();
       } catch {
         toast.error("Action failed - you may not have permission.");
       }
@@ -60,7 +72,11 @@ export function ReportActions({
         disabled={pending}
         onClick={() =>
           run(
-            () => resolveReport(reportId, "ACTION_TAKEN", "Warning issued"),
+            () =>
+              postJson(`/api/admin/reports/${reportId}/resolve`, {
+                outcome: "ACTION_TAKEN",
+                resolution: "Warning issued",
+              }),
             "Marked as actioned.",
           )
         }
@@ -72,7 +88,12 @@ export function ReportActions({
         variant="ghost"
         className="rounded-full"
         disabled={pending}
-        onClick={() => run(() => resolveReport(reportId, "DISMISSED"), "Report dismissed.")}
+        onClick={() =>
+          run(
+            () => postJson(`/api/admin/reports/${reportId}/resolve`, { outcome: "DISMISSED" }),
+            "Report dismissed.",
+          )
+        }
       >
         <X className="size-4" /> Dismiss
       </Button>
@@ -97,8 +118,13 @@ export function ReportActions({
               disabled={pending}
               onClick={() =>
                 run(async () => {
-                  await setUserStatus(reportedUserId, "SUSPENDED");
-                  await resolveReport(reportId, "ACTION_TAKEN", "User suspended");
+                  await postJson(`/api/admin/users/${reportedUserId}/status`, {
+                    status: "SUSPENDED",
+                  });
+                  await postJson(`/api/admin/reports/${reportId}/resolve`, {
+                    outcome: "ACTION_TAKEN",
+                    resolution: "User suspended",
+                  });
                 }, "User suspended and report closed.")
               }
             >

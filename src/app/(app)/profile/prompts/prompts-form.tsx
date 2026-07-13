@@ -1,30 +1,58 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { PROFILE_PROMPTS } from "@/config/prompts";
 import { PROMPT_ANSWER_MAX_LENGTH } from "@/lib/validators/profile";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RevealGroup, RevealItem } from "@/components/fx/reveal";
 import { cn } from "@/lib/utils";
-import { saveProfilePrompts, type SavePromptsState } from "./actions";
+import { api } from "@/lib/api-client/browser";
 
 const MAX_ANSWERED = 4;
 
 export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string, string> }) {
-  const [state, formAction, pending] = useActionState<SavePromptsState, FormData>(
-    saveProfilePrompts,
-    { error: null },
-  );
+  const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>(initialAnswers);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   const answeredCount = PROFILE_PROMPTS.filter(
     (p) => (answers[p.key] ?? "").trim().length > 0,
   ).length;
   const overLimit = answeredCount > MAX_ANSWERED;
 
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+
+    const answered = PROFILE_PROMPTS.map((p) => ({
+      key: p.key as string,
+      answer: (answers[p.key] ?? "").trim(),
+    })).filter((p) => p.answer.length > 0);
+
+    const result = await api.profile.savePrompts(answered);
+    if (!result.ok) {
+      setPending(false);
+      if (result.status === 404) {
+        // No profile yet - finish onboarding first (same as the old action).
+        router.push("/onboarding");
+        return;
+      }
+      const fieldMessage = result.error.fields
+        ? Object.values(result.error.fields).flat()[0]
+        : undefined;
+      setError(fieldMessage ?? result.error.message);
+      return;
+    }
+    router.push("/profile");
+    router.refresh();
+  }
+
   return (
-    <form action={formAction} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <p
           className={cn(
@@ -34,9 +62,9 @@ export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string,
         >
           {answeredCount}/{MAX_ANSWERED} answered
         </p>
-        {(state.error || overLimit) && (
+        {(error || overLimit) && (
           <p className="text-warning text-xs" role="alert">
-            {overLimit ? `Answer at most ${MAX_ANSWERED} prompts` : state.error}
+            {overLimit ? `Answer at most ${MAX_ANSWERED} prompts` : error}
           </p>
         )}
       </div>

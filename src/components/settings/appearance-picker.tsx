@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 import { Check, Moon, MonitorSmartphone, Sun } from "lucide-react";
 import { toast } from "sonner";
-import { saveSettings } from "@/app/(app)/settings/actions";
+import { api } from "@/lib/api-client/browser";
 import { SPRING } from "@/lib/motion";
 import { applyAppearance, type AppearanceMode } from "@/lib/theme";
 
@@ -28,7 +28,7 @@ const OPTIONS: {
 /**
  * Appearance preference as selectable glass cards. The theme applies
  * to the whole app instantly (250ms token cross-fade, no reload),
- * persists via saveSettings, and reverts - visually too - with a
+ * persists via PATCH /api/v1/me/settings, and reverts - visually too - with a
  * toast if the save fails.
  */
 export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
@@ -42,13 +42,13 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
     applyAppearance(next);
     setPending(true);
 
-    const result = await saveSettings({ appearance: next });
+    const result = await api.settings.update({ appearance: next });
 
     setPending(false);
     if (!result.ok) {
       setValue(previous);
       applyAppearance(previous);
-      toast.error(result.error);
+      toast.error(result.error.message);
     }
   }
 

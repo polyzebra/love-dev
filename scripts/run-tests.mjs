@@ -23,6 +23,7 @@ const LIVE = new Set([
   "phone-sync.test.ts",
   "bearer-live.test.ts",
   "api-v1.test.ts",
+  "api-0e.test.ts",
 ]);
 
 const UNIT = new Set([

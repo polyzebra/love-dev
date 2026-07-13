@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, LogOut, RotateCcw } from "lucide-react";
-import { restorePurchases } from "@/app/(app)/settings/support-actions";
+import { api } from "@/lib/api-client/browser";
 import { signOutEverywhere } from "@/components/auth/sign-out";
 
 /**
@@ -20,14 +20,14 @@ export function RestorePurchasesRow() {
 
   async function handleRestore() {
     setBusy(true);
-    const result = await restorePurchases();
+    const result = await api.billing.restorePurchases();
     setBusy(false);
 
     if (!result.ok) {
-      toast.error(result.error);
+      toast.error(result.error.message);
       return;
     }
-    if (result.payments === 0 && !result.subscriptionTier) {
+    if (result.data.payments === 0 && !result.data.subscriptionTier) {
       const message = "No previous purchases found for this account.";
       setHint(message);
       toast.info(message);
@@ -36,11 +36,11 @@ export function RestorePurchasesRow() {
     // Records exist (e.g. seeded data). Report them honestly - nothing is
     // mutated, so point at where the plan is already reflected.
     const parts: string[] = [];
-    if (result.subscriptionTier) {
-      parts.push(`a ${result.subscriptionTier.toLowerCase()} subscription record`);
+    if (result.data.subscriptionTier) {
+      parts.push(`a ${result.data.subscriptionTier.toLowerCase()} subscription record`);
     }
-    if (result.payments > 0) {
-      parts.push(`${result.payments} payment record${result.payments === 1 ? "" : "s"}`);
+    if (result.data.payments > 0) {
+      parts.push(`${result.data.payments} payment record${result.data.payments === 1 ? "" : "s"}`);
     }
     const message = `Found ${parts.join(" and ")}. Your plan is shown under Subscription & billing.`;
     setHint(message);

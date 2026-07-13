@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { saveSettings } from "@/app/(app)/settings/actions";
+import { api } from "@/lib/api-client/browser";
 import type { SettingsPatch } from "@/lib/services/settings";
 import { SPRING } from "@/lib/motion";
 
@@ -47,7 +47,7 @@ export function SettingsToggleList({
     setValues((v) => ({ ...v, [field]: next }));
     setPending((p) => new Set(p).add(field));
 
-    const result = await saveSettings({ [field]: next });
+    const result = await api.settings.update({ [field]: next });
 
     setPending((p) => {
       const rest = new Set(p);
@@ -56,7 +56,7 @@ export function SettingsToggleList({
     });
     if (!result.ok) {
       setValues((v) => ({ ...v, [field]: previous }));
-      toast.error(result.error);
+      toast.error(result.error.message);
     }
   }
 

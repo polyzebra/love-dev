@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Ban, EllipsisVertical, EyeOff, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setUserStatus } from "../actions";
 
 type Status = "ACTIVE" | "SUSPENDED" | "SHADOW_BANNED";
 
@@ -60,6 +60,7 @@ const CONFIRMS: Record<
 };
 
 export function UserRowActions({ userId, status }: { userId: string; status: string }) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [confirm, setConfirm] = useState<Status | null>(null);
   // The dialog opens from a dropdown ITEM that unmounts with the menu, so
@@ -73,9 +74,15 @@ export function UserRowActions({ userId, status }: { userId: string; status: str
   function update(next: Status) {
     startTransition(async () => {
       try {
-        await setUserStatus(userId, next);
+        const res = await fetch(`/api/admin/users/${userId}/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: next }),
+        });
+        if (!res.ok) throw new Error();
         toast.success(CONFIRMS[next].success);
         setConfirm(null);
+        router.refresh();
       } catch {
         toast.error("Action failed - you may not have permission.");
       }
