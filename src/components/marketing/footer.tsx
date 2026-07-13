@@ -4,7 +4,6 @@ const GROUPS = [
   {
     title: "Product",
     links: [
-      { href: "/pricing", label: "Pricing" },
       { href: "/safety", label: "Safety Centre" },
       { href: "/login", label: "Create account" },
     ],
@@ -69,23 +68,19 @@ export function MarketingFooter() {
         ))}
       </div>
 
-      {/* Giant editorial wordmark sinking below the fold (decorative) */}
-      <svg
+      {/* Giant brand watermark sinking below the fold (decorative).
+          The real logo asset; explicit intrinsic dimensions keep the
+          box stable before the SVG loads - no layout shift. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo-web.svg"
+        alt=""
         aria-hidden="true"
-        viewBox="0 0 600 150"
-        className="pointer-events-none mx-auto -mb-[2%] block w-full max-w-6xl select-none px-6"
-      >
-        <text
-          x="50%"
-          y="115"
-          textAnchor="middle"
-          className="font-display fill-foreground/5"
-          fontSize="150"
-          fontWeight="600"
-        >
-          Tirvea
-        </text>
-      </svg>
+        width={1084}
+        height={259}
+        draggable={false}
+        className="pointer-events-none mx-auto -mb-[2%] block w-full max-w-6xl select-none px-6 opacity-5"
+      />
 
       <div className="border-t border-border">
         <p className="mx-auto max-w-6xl px-6 py-6 text-xs text-muted-foreground md:px-10">
