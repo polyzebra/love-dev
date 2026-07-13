@@ -4,7 +4,7 @@ import {
   IDEMPOTENCY_HEADER,
   pageSchema,
   type ErrorEnvelope,
-} from "@/lib/api-contract";
+} from "../api-contract";
 
 /**
  * Typed Tirvea API v1 client - framework-free (no Next.js, no React, no

@@ -165,4 +165,58 @@ check("rate limiting: store interface + injectable limiter factory", () => {
   assert.ok(rl.includes("export function createRateLimiter"));
 });
 
+console.log("future package boundaries (Phase 0L - extraction readiness)");
+
+/** Import specifiers of one file (comment-stripped). */
+function importsOf(file: string): string[] {
+  return [...codeOf(file).matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]);
+}
+
+/** Assert every import of every file under dir matches one allowed pattern. */
+function pinBoundary(name: string, dir: string, allowed: RegExp[], except: string[] = []) {
+  const offenders: string[] = [];
+  for (const file of filesUnder(dir)) {
+    if (except.some((e) => file.endsWith(e))) continue;
+    for (const spec of importsOf(file)) {
+      if (!allowed.some((re) => re.test(spec))) offenders.push(`${rel(file)} -> ${spec}`);
+    }
+  }
+  assert.deepEqual(offenders, [], `${name} must only use portable imports`);
+}
+
+check("packages/api-contract: zod + relative imports only", () => {
+  pinBoundary("api-contract", path.join(SRC, "lib", "api-contract"), [/^zod$/, /^\.\.?\//]);
+});
+
+check("packages/api-client: zod + relative + sibling contract only", () => {
+  // browser.ts is the WEB APP's singleton glue - it stays behind in
+  // apps/web when the client extracts, so it is exempt here.
+  pinBoundary(
+    "api-client",
+    path.join(SRC, "lib", "api-client"),
+    [/^zod$/, /^\.\.?\//],
+    ["browser.ts"],
+  );
+});
+
+check("packages/core (chat/thread-store, auth/transport): dependency-free", () => {
+  pinBoundary("chat", path.join(SRC, "lib", "chat"), [/^\.\.?\//]);
+  assert.deepEqual(importsOf(path.join(SRC, "lib", "auth", "transport.ts")), []);
+});
+
+check("packages/validation: zod + the documented core edges, nothing app-layer", () => {
+  // The known extraction edges (MONOREPO-PLAN.md): product config,
+  // taxonomy, constants and the generated Prisma enums move to (or are
+  // re-exported by) packages/core. Anything OUTSIDE this list creeping
+  // in would silently deepen the coupling - fail loudly instead.
+  pinBoundary("validators", path.join(SRC, "lib", "validators"), [
+    /^zod$/,
+    /^\.\.?\//,
+    /^@\/config\/prompts$/,
+    /^@\/lib\/discovery\/taxonomy$/,
+    /^@\/lib\/constants$/,
+    /^@\/generated\/prisma\/enums$/,
+  ]);
+});
+
 console.log(`\n${passed} checks passed`);
