@@ -32,6 +32,16 @@ const nextConfig: NextConfig = {
       { source: "/likes", destination: "/matches", permanent: false },
     ];
   },
+  async rewrites() {
+    return [
+      // /api/v1 is the CANONICAL versioned surface (Phase 0D): a
+      // transparent rewrite onto the existing handlers - the transport
+      // contract is versioned, the implementation is not duplicated.
+      // Bare /api/* remains the legacy alias for the current web client
+      // during migration (deprecation rules: docs/API-CONTRACT.md).
+      { source: "/api/v1/:path*", destination: "/api/:path*" },
+    ];
+  },
   poweredByHeader: false,
 };
 

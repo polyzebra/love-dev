@@ -63,7 +63,26 @@ function legacyAuthRedirect(request: NextRequest): NextResponse | null {
  * still-valid JWT passes here but is signed out there, and once its
  * refresh fails this middleware purges the cookies.
  */
+/** Client-supplied correlation ids are honored when well-formed. */
+const REQUEST_ID_SHAPE = /^[A-Za-z0-9._-]{8,64}$/;
+
 export default async function proxy(request: NextRequest) {
+  // ---- API paths: correlation stamp ONLY --------------------------------
+  // The matcher now includes /api solely so every API request/response
+  // carries an X-Request-Id (client-supplied when well-formed, generated
+  // otherwise). No auth, cookie or redirect logic runs for API paths -
+  // API authentication stays in the route handlers (lib/api.ts), exactly
+  // as before this branch existed.
+  if (request.nextUrl.pathname.startsWith("/api")) {
+    const supplied = request.headers.get("x-request-id");
+    const id = supplied && REQUEST_ID_SHAPE.test(supplied) ? supplied : crypto.randomUUID();
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-request-id", id);
+    const apiResponse = NextResponse.next({ request: { headers: requestHeaders } });
+    apiResponse.headers.set("x-request-id", id);
+    return apiResponse;
+  }
+
   const legacy = legacyAuthRedirect(request);
   if (legacy) return legacy;
 
@@ -144,7 +163,9 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
+  // /api is INCLUDED for the correlation-id stamp branch above (which
+  // returns before any auth logic); pages keep the full session flow.
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|avif|ico)).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|avif|ico)).*)",
   ],
 };
