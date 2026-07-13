@@ -424,7 +424,8 @@ export const ModelName = {
   BlockedIdentity: 'BlockedIdentity',
   AuthVerificationEvent: 'AuthVerificationEvent',
   ProfilePrompt: 'ProfilePrompt',
-  UserSettings: 'UserSettings'
+  UserSettings: 'UserSettings',
+  ApiIdempotencyKey: 'ApiIdempotencyKey'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -440,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3478,6 +3479,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ApiIdempotencyKey: {
+      payload: Prisma.$ApiIdempotencyKeyPayload<ExtArgs>
+      fields: Prisma.ApiIdempotencyKeyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ApiIdempotencyKeyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ApiIdempotencyKeyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>
+        }
+        findFirst: {
+          args: Prisma.ApiIdempotencyKeyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ApiIdempotencyKeyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>
+        }
+        findMany: {
+          args: Prisma.ApiIdempotencyKeyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>[]
+        }
+        create: {
+          args: Prisma.ApiIdempotencyKeyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>
+        }
+        createMany: {
+          args: Prisma.ApiIdempotencyKeyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ApiIdempotencyKeyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>[]
+        }
+        delete: {
+          args: Prisma.ApiIdempotencyKeyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>
+        }
+        update: {
+          args: Prisma.ApiIdempotencyKeyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>
+        }
+        deleteMany: {
+          args: Prisma.ApiIdempotencyKeyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ApiIdempotencyKeyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ApiIdempotencyKeyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>[]
+        }
+        upsert: {
+          args: Prisma.ApiIdempotencyKeyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiIdempotencyKeyPayload>
+        }
+        aggregate: {
+          args: Prisma.ApiIdempotencyKeyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateApiIdempotencyKey>
+        }
+        groupBy: {
+          args: Prisma.ApiIdempotencyKeyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApiIdempotencyKeyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ApiIdempotencyKeyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApiIdempotencyKeyCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4233,6 +4308,19 @@ export const UserSettingsScalarFieldEnum = {
 } as const
 
 export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
+
+
+export const ApiIdempotencyKeyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  scope: 'scope',
+  key: 'key',
+  status: 'status',
+  response: 'response',
+  createdAt: 'createdAt'
+} as const
+
+export type ApiIdempotencyKeyScalarFieldEnum = (typeof ApiIdempotencyKeyScalarFieldEnum)[keyof typeof ApiIdempotencyKeyScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5104,6 +5192,7 @@ export type GlobalOmitConfig = {
   authVerificationEvent?: Prisma.AuthVerificationEventOmit
   profilePrompt?: Prisma.ProfilePromptOmit
   userSettings?: Prisma.UserSettingsOmit
+  apiIdempotencyKey?: Prisma.ApiIdempotencyKeyOmit
 }
 
 /* Types for Logging */

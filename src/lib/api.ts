@@ -117,6 +117,102 @@ export function clientIp(req: Request): string {
   return fwd?.split(",")[0]?.trim() ?? "unknown";
 }
 
+/** 500 with the standard envelope and nothing internal leaked. */
+export const internalError = () =>
+  apiError(500, "internal_error", "Something went wrong on our side. Please try again.");
+
+// ---------------------------------------------------------------------------
+// Idempotency (v1 contract - lib/api-contract/idempotency.ts)
+// ---------------------------------------------------------------------------
+
+import { db } from "@/lib/db";
+import {
+  IDEMPOTENCY_HEADER,
+  IDEMPOTENCY_REPLAYED_HEADER,
+  idempotencyKeySchema,
+} from "@/lib/api-contract/idempotency";
+
+/**
+ * Opt-in idempotency for unsafe mutations: when the request carries a
+ * well-formed Idempotency-Key, the first execution's response is stored
+ * per (user, scope, key) and replayed on duplicates. Only non-5xx
+ * responses are stored (a 5xx retries for real). A concurrent same-key
+ * race is resolved by the unique constraint: the loser replays the
+ * winner's stored response. Requests without the header are untouched.
+ */
+export async function withIdempotency(
+  userId: string,
+  scope: string,
+  req: Request,
+  exec: () => Promise<NextResponse>,
+): Promise<NextResponse> {
+  const raw = req.headers.get(IDEMPOTENCY_HEADER);
+  if (!raw) return exec();
+  const key = idempotencyKeySchema.safeParse(raw);
+  if (!key.success) {
+    return apiError(422, "validation_error", "Idempotency-Key is malformed.");
+  }
+
+  const replay = (stored: { status: number; response: unknown }) =>
+    NextResponse.json(stored.response, {
+      status: stored.status,
+      headers: { [IDEMPOTENCY_REPLAYED_HEADER]: "true" },
+    });
+
+  const where = { userId_scope_key: { userId, scope, key: key.data } };
+  const existing = await db.apiIdempotencyKey.findUnique({ where });
+  if (existing) return replay(existing);
+
+  const res = await exec();
+  if (res.status < 500) {
+    const body = await res
+      .clone()
+      .json()
+      .catch(() => null);
+    if (body !== null) {
+      try {
+        await db.apiIdempotencyKey.create({
+          data: { userId, scope, key: key.data, status: res.status, response: body },
+        });
+      } catch {
+        // Unique-constraint race: someone stored first - replay theirs so
+        // both callers observe ONE canonical outcome.
+        const winner = await db.apiIdempotencyKey.findUnique({ where });
+        if (winner) return replay(winner);
+      }
+    }
+  }
+  return res;
+}
+
+// ---------------------------------------------------------------------------
+// Auth-funnel envelopes (Phase 0D migration)
+//
+// The OTP send/verify routes historically answered `{ ok, retryAfter }`
+// / `{ ok: false, error: "<string>" }` - the one divergence from the
+// standard `{ data }` / `{ error: { code, message } }` contract. These
+// helpers emit the STANDARD envelope while mirroring the legacy keys
+// (`ok`, top-level success fields, top-level `code`) so cached bundles
+// keep working. The legacy mirrors are DEPRECATED and removed with the
+// bare /api/* alias (docs/API-CONTRACT.md).
+// ---------------------------------------------------------------------------
+
+export function authOk(fields: Record<string, unknown>, init?: ResponseInit) {
+  return NextResponse.json({ ok: true, ...fields, data: fields }, init);
+}
+
+export function authError(
+  status: number,
+  code: string,
+  message: string,
+  extra?: Record<string, unknown>,
+) {
+  return NextResponse.json(
+    { ok: false, code, ...extra, error: { code, message, ...extra } },
+    { status },
+  );
+}
+
 /**
  * Wrap an auth-funnel handler so an infrastructure failure (database
  * unreachable, required env missing) answers a clear 503 with neutral
@@ -133,7 +229,7 @@ export function withUnavailableGuard(
       return await handler(req);
     } catch (error) {
       console.error(`[${label}] unavailable:`, error);
-      return NextResponse.json({ ok: false, error: message }, { status: 503 });
+      return authError(503, "auth_unavailable", message);
     }
   };
 }

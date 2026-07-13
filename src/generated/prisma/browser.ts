@@ -222,3 +222,8 @@ export type ProfilePrompt = Prisma.ProfilePromptModel
  * 
  */
 export type UserSettings = Prisma.UserSettingsModel
+/**
+ * Model ApiIdempotencyKey
+ * 
+ */
+export type ApiIdempotencyKey = Prisma.ApiIdempotencyKeyModel

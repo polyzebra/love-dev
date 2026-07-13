@@ -413,6 +413,7 @@ model User {
   payments             Payment[]
   notifications        Notification[]
   pushSubscriptions    PushSubscription[]
+  apiIdempotencyKeys   ApiIdempotencyKey[]
   conversationPresence ConversationPresence[]
   explorePreferences   UserExplorePreference[]
   adminLogs            AdminLog[]              @relation("AdminActor")
@@ -1466,4 +1467,26 @@ model UserSettings {
   updatedAt  DateTime       @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Server-side idempotency for unsafe mutations (Phase 0D, v1 contract:
+// docs/API-CONTRACT.md). One row per (user, endpoint scope, client key);
+// a replayed key returns the stored response instead of re-executing.
+// Only non-5xx responses are stored, so a failed attempt may be retried
+// with the same key. Rows older than 24h are prunable (createdAt index).
+model ApiIdempotencyKey {
+  id        String   @id @default(cuid())
+  userId    String
+  /// Endpoint scope, e.g. "messages:send:<conversationId>".
+  scope     String
+  /// Client-generated key (Idempotency-Key header).
+  key       String
+  status    Int
+  response  Json
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scope, key])
+  @@index([createdAt])
 }

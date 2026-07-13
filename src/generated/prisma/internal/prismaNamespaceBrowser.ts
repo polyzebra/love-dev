@@ -91,7 +91,8 @@ export const ModelName = {
   BlockedIdentity: 'BlockedIdentity',
   AuthVerificationEvent: 'AuthVerificationEvent',
   ProfilePrompt: 'ProfilePrompt',
-  UserSettings: 'UserSettings'
+  UserSettings: 'UserSettings',
+  ApiIdempotencyKey: 'ApiIdempotencyKey'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -826,6 +827,19 @@ export const UserSettingsScalarFieldEnum = {
 } as const
 
 export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
+
+
+export const ApiIdempotencyKeyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  scope: 'scope',
+  key: 'key',
+  status: 'status',
+  response: 'response',
+  createdAt: 'createdAt'
+} as const
+
+export type ApiIdempotencyKeyScalarFieldEnum = (typeof ApiIdempotencyKeyScalarFieldEnum)[keyof typeof ApiIdempotencyKeyScalarFieldEnum]
 
 
 export const SortOrder = {
