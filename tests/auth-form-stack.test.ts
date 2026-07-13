@@ -13,7 +13,7 @@
  * 3. The spec'd footnotes exist ("We only use your email...", SMS rates).
  */
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const AUTH_DIR = join(import.meta.dirname, "..", "src", "components", "auth");
@@ -154,13 +154,19 @@ check("routed auth Suspense boundaries always render a meaningful fallback", () 
   assert.match(fallback, /Opening verification\.\.\./);
 });
 
-check("the (auth) segment has a branded loading state - route entries never show an empty card", () => {
-  const loading = readFileSync(
-    join(import.meta.dirname, "..", "src", "app", "(auth)", "loading.tsx"),
+check("the auth card carries its OWN loading fallback - no separate segment boundary", () => {
+  // Card and fallback must be atomic (same flight rows / adjacent HTML
+  // bytes): a separate loading.tsx segment could commit AFTER the layout
+  // on slow radios, painting the empty card as a blank white bar.
+  const layout = readFileSync(
+    join(import.meta.dirname, "..", "src", "app", "(auth)", "layout.tsx"),
     "utf8",
   );
-  assert.match(loading, /AuthStepFallback/);
-  assert.match(loading, /Opening sign in\.\.\./);
+  assert.match(layout, /<Suspense fallback=\{<AuthStepFallback label="Opening sign in\.\.\."/);
+  assert.ok(
+    !existsSync(join(import.meta.dirname, "..", "src", "app", "(auth)", "loading.tsx")),
+    "exactly one loading layer: the layout's own Suspense fallback",
+  );
   // Every routed auth surface must be readable from its first committed
   // frame - motion may translate it, never hide it. (The "empty white
   // card with blank bars" bug was LoginStepShell fading in from 0.)
