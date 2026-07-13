@@ -1,9 +1,16 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
 import { Aurora } from "@/components/fx/aurora";
-import { AuthStepFallback } from "@/components/auth/AuthStepFallback";
 
+/**
+ * Auth chrome ONLY: aurora, wordmark, legal footer, centring. The glass
+ * card deliberately does NOT live here - the router can commit this
+ * layout while the child segment is still streaming (real-iPhone debug
+ * logs showed the child slot as null with no fallback), and a card
+ * drawn around an unresolved slot paints as an empty white bar. Cards
+ * are owned by the content: AuthCard wraps every step shell, the login
+ * entry, the segment loading state and each route-level fallback.
+ */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div data-debug="auth-layout" className="noise relative flex min-h-dvh flex-col overflow-hidden bg-background">
@@ -12,18 +19,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <Logo />
       </header>
       <main className="relative flex flex-1 items-center justify-center px-4 pb-16">
-        <div data-debug="auth-card" className="glass w-full max-w-md rounded-2xl p-7 sm:p-10">
-          {/* The card's loading state is ITS OWN child, not a separate
-              loading.tsx segment: card and fallback travel in the same
-              flight rows / adjacent HTML bytes, so no chunk boundary can
-              ever paint the card empty (the "blank white bar" frame on
-              slow radios). Entering the segment shows this fallback;
-              in-segment step navigations keep the previous step visible
-              until the next one is ready (transition semantics). */}
-          <Suspense fallback={<AuthStepFallback label="Opening sign in..." />}>
-            {children}
-          </Suspense>
-        </div>
+        {children}
       </main>
       <footer className="safe-bottom relative pb-6 text-center text-xs text-muted-foreground">
         By continuing you agree to our{" "}

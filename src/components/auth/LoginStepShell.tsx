@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthCard } from "./AuthCard";
 import { BackButton } from "./BackButton";
 import { AnimatePresence, motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
@@ -40,7 +41,7 @@ export function LoginStepShell({
   // animates for post-hydration mounts (client navs, step swaps).
   const animatable = useEntranceAnimatable();
   return (
-    <div>
+    <AuthCard>
       <div className="mb-8 flex items-center">
         {backHref ? (
           <BackButton href={backHref} label={backLabel} />
@@ -70,6 +71,6 @@ export function LoginStepShell({
           {children}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </AuthCard>
   );
 }

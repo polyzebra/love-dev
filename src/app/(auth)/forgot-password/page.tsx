@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { authRedirectUrl } from "@/lib/auth/url";
+import { AuthCard } from "@/components/auth/AuthCard";
 
 /** Same good-faith shape check as the email sign-in step. */
 function looksLikeEmail(value: string): boolean {
@@ -40,6 +41,7 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
+      <AuthCard>
       <div className="space-y-4 text-center">
         <MailCheck className="mx-auto size-12 text-success" aria-hidden="true" />
         <h1 className="font-display text-3xl font-semibold tracking-tight">Check your inbox</h1>
@@ -50,10 +52,12 @@ export default function ForgotPasswordPage() {
           <Link href="/login">Back to sign in</Link>
         </Button>
       </div>
+      </AuthCard>
     );
   }
 
   return (
+    <AuthCard>
     <div className="space-y-8">
       <div className="space-y-2 text-center">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Reset your password</h1>
@@ -93,5 +97,6 @@ export default function ForgotPasswordPage() {
         </Link>
       </p>
     </div>
+    </AuthCard>
   );
 }

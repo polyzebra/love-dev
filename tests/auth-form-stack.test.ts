@@ -147,26 +147,32 @@ check("routed auth Suspense boundaries always render a meaningful fallback", () 
     join(APP, "auth", "phone-code", "page.tsx"),
   ]) {
     const src = readFileSync(page, "utf8");
-    assert.match(src, /<Suspense fallback=\{<AuthStepFallback/, page);
+    assert.match(src, /<Suspense fallback=\{<AuthCard><AuthStepFallback/, page);
   }
   const fallback = read("AuthStepFallback.tsx");
   assert.match(fallback, /animate-spin/);
   assert.match(fallback, /Opening verification\.\.\./);
 });
 
-check("the auth card carries its OWN loading fallback - no separate segment boundary", () => {
-  // Card and fallback must be atomic (same flight rows / adjacent HTML
-  // bytes): a separate loading.tsx segment could commit AFTER the layout
-  // on slow radios, painting the empty card as a blank white bar.
-  const layout = readFileSync(
-    join(import.meta.dirname, "..", "src", "app", "(auth)", "layout.tsx"),
-    "utf8",
-  );
-  assert.match(layout, /<Suspense fallback=\{<AuthStepFallback label="Opening sign in\.\.\."/);
+check("the glass card is owned by CONTENT, never by the layout (no empty-card frame)", () => {
+  // Real-iPhone debug logs (build 83f4616) proved the router can commit
+  // the layout with a NULL child slot - a Suspense there renders nothing
+  // (fallbacks require a SUSPENDING subtree), so a layout-owned card
+  // painted visibly empty. The card must be constructed WITH its content.
+  const APP_AUTH = join(import.meta.dirname, "..", "src", "app", "(auth)");
+  const layout = readFileSync(join(APP_AUTH, "layout.tsx"), "utf8");
   assert.ok(
-    !existsSync(join(import.meta.dirname, "..", "src", "app", "(auth)", "loading.tsx")),
-    "exactly one loading layer: the layout's own Suspense fallback",
+    !/glass w-full max-w-md/.test(layout),
+    "the layout must not draw the card around the child slot",
   );
+  const loading = readFileSync(join(APP_AUTH, "loading.tsx"), "utf8");
+  assert.match(loading, /<AuthCard>/, "the segment loading state owns a complete card");
+  assert.match(loading, /AuthStepFallback/);
+  assert.match(loading, /Opening sign in\.\.\./);
+  for (const file of ["LoginStepShell.tsx", "AuthShell.tsx", "LoginEntry.tsx"]) {
+    assert.match(read(file), /<AuthCard>/, `${file} must own its card`);
+  }
+  assert.ok(existsSync(join(AUTH_DIR, "AuthCard.tsx")), "canonical card component exists");
   // Every routed auth surface must be readable from its first committed
   // frame - motion may translate it, never hide it. (The "empty white
   // card with blank bars" bug was LoginStepShell fading in from 0.)

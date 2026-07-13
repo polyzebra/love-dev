@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { InlineFieldError } from "@/components/ui/field-error";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { AuthCard } from "@/components/auth/AuthCard";
 
 /**
  * Arrived via the Supabase recovery link (/auth/callback exchanged the
@@ -53,6 +54,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
+    <AuthCard>
     <div className="space-y-8">
       <div className="space-y-2 text-center">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Set a new password</h1>
@@ -106,5 +108,6 @@ export default function ResetPasswordPage() {
         </Button>
       </form>
     </div>
+    </AuthCard>
   );
 }

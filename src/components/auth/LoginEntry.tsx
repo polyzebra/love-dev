@@ -7,6 +7,7 @@ import { Loader2, Mail, Smartphone } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
+import { AuthCard } from "@/components/auth/AuthCard";
 import { EASE_LUXE } from "@/lib/motion";
 import { useEntranceAnimatable } from "@/components/fx/use-entrance";
 import { appleLoginEnabled } from "@/lib/auth/apple";
@@ -173,6 +174,7 @@ export function LoginEntry({
   }
 
   return (
+    <AuthCard>
     <motion.div
       data-debug="login-page"
       // Slide-and-settle ONLY - never opacity: the sign-in choices must
@@ -251,5 +253,6 @@ export function LoginEntry({
         .
       </p>
     </motion.div>
+    </AuthCard>
   );
 }

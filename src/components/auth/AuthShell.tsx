@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthCard } from "./AuthCard";
 import { BackButton } from "./BackButton";
 import { AnimatePresence, motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
@@ -49,7 +50,7 @@ export function AuthShell({
   // animates for post-hydration mounts (client navs, step swaps).
   const animatable = useEntranceAnimatable();
   return (
-    <div>
+    <AuthCard>
       <div className="mb-8 grid grid-cols-[2.75rem_1fr_2.75rem] items-center">
         {backHref ? (
           <BackButton href={backHref} />
@@ -94,6 +95,6 @@ export function AuthShell({
           {children}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </AuthCard>
   );
 }
