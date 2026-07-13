@@ -1,0 +1,179 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # CI never depends on a developer machine: everything below is either
+  # a public dummy (validated shapes only - no suite in the gated lanes
+  # talks to a real external service) or provided by GitHub.
+  AUTH_HASH_SALT: ci-dummy-salt-not-a-secret-0123456789
+  NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-dummy-anon-key
+
+jobs:
+  quality:
+    name: Format / Lint / Types / Public-env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run check:public-env
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npm run test:unit
+
+  prisma:
+    name: Schema / Migrations / Generated client
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: tirvea_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:ci@localhost:5432/tirvea_ci
+      DIRECT_URL: postgresql://postgres:ci@localhost:5432/tirvea_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - name: Schema is valid + committed generated client has no drift
+        run: npm run db:validate
+      - name: Migrations replay cleanly onto an empty database
+        run: npx prisma migrate deploy
+      - name: Migration history reproduces the schema exactly
+        run: >
+          npx prisma migrate diff
+          --from-schema-datasource prisma/schema.prisma
+          --to-schema-datamodel prisma/schema.prisma
+          --exit-code
+
+  integration:
+    name: Integration tests (ephemeral Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: tirvea_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:ci@localhost:5432/tirvea_ci
+      DIRECT_URL: postgresql://postgres:ci@localhost:5432/tirvea_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npx prisma db seed
+      - run: npm run test:integration
+      # The 4 live-Supabase suites run only when real credentials are
+      # configured as repo secrets; otherwise they are explicitly skipped
+      # (they still run locally against .env as before).
+      - name: Live-Supabase suites (secrets-gated)
+        if: ${{ secrets.CI_SUPABASE_SERVICE_ROLE_KEY != '' }}
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.CI_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.CI_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CI_SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run test:integration:live
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npm run build
+
+  audit:
+    name: Dependency audit (fail on high+ in prod deps)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      # Policy: production dependencies must be free of HIGH and CRITICAL
+      # advisories. Moderate findings are reported (visible in the log)
+      # but do not block; dev-only deps do not gate delivery.
+      - run: npm audit --omit=dev || true
+      - run: npm audit --omit=dev --audit-level=high
+
+  secrets:
+    name: Secret scan (working tree)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gitleaks (pinned)
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz \
+            | tar -xz gitleaks
+          sudo mv gitleaks /usr/local/bin/
+      # Filesystem scan of the checkout (deterministic; history is not
+      # rescanned on every push). --redact keeps any finding out of logs.
+      - run: gitleaks detect --no-git --redact --verbose
+
+  # ---------------------------------------------------------------------
+  # Gated production deploy. Inactive until BOTH are configured:
+  #   1. Vercel env var CI_DEPLOYS_ONLY=1 (production) - flips
+  #      vercel.json's ignoreCommand so git pushes stop auto-building.
+  #   2. Repo secrets VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID.
+  # Until then this job is a no-op notice and Vercel auto-deploy behaves
+  # exactly as before this workflow existed (behaviour preserved).
+  # ---------------------------------------------------------------------
+  deploy:
+    name: Deploy to production (checks-gated)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [quality, unit, prisma, integration, build, audit, secrets]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - name: Deploy via Vercel CLI (skips with notice if secrets absent)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::VERCEL_TOKEN not configured - CI-gated deploys inactive; Vercel git auto-deploy remains the delivery path. See docs/CI.md."
+            exit 0
+          fi
+          npm i -g vercel@latest
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+          vercel build --prod --token "$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"
