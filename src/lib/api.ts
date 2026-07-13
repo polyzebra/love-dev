@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError, type ZodSchema } from "zod";
 import { auth } from "@/lib/auth";
 import { hasPermission, type Permission } from "@/lib/rbac";
-import { rateLimit, type RateLimitResult } from "@/lib/rate-limit";
+import { rateLimit, type RateLimitPreset, type RateLimitResult } from "@/lib/rate-limit";
 
 /**
  * API layer conventions:
@@ -33,11 +33,18 @@ export const forbidden = () =>
 export const notFound = (what = "Resource") => apiError(404, "not_found", `${what} not found.`);
 
 export function tooManyRequests(rl: RateLimitResult) {
+  const retryAfter = Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000));
   return NextResponse.json(
-    { error: { code: "rate_limited", message: "Too many requests. Please slow down." } },
+    {
+      error: {
+        code: "rate_limited",
+        message: "Too many requests. Please slow down.",
+        retryAfter,
+      },
+    },
     {
       status: 429,
-      headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) },
+      headers: { "Retry-After": String(retryAfter) },
     },
   );
 }
@@ -105,8 +112,12 @@ export async function requirePermission(permission: Permission) {
   return { user, response: null } as const;
 }
 
-/** Per-user or per-IP rate limit guard. */
-export async function guardRate(key: string, preset: { limit: number; windowMs: number }) {
+/**
+ * Per-user or per-IP-hash rate limit guard. Key format `action:principal`;
+ * IP principals must be HASHES (ipHashFrom), never raw addresses. Every
+ * preset carries an explicit failMode (docs/RATE-LIMITING.md).
+ */
+export async function guardRate(key: string, preset: RateLimitPreset) {
   const rl = await rateLimit(key, preset);
   if (!rl.ok) return tooManyRequests(rl);
   return null;

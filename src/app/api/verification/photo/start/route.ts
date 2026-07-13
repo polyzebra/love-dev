@@ -22,6 +22,8 @@ export async function POST(req: Request) {
   const limited = await guardRate(`verification:photo:${user.id}`, {
     limit: 5,
     windowMs: 60 * 60 * 1000,
+    // Fail-closed: each start can hit a paid provider - never unmetered.
+    failMode: "closed",
   });
   if (limited) return limited;
 

@@ -22,7 +22,12 @@ export async function POST(req: Request) {
   const { user, response } = await requireSession({ allowRestricted: true });
   if (response) return response;
 
-  const limited = await guardRate(`appeal:${user.id}`, { limit: 5, windowMs: 60 * 60_000 });
+  const limited = await guardRate(`appeal:${user.id}`, {
+    limit: 5,
+    windowMs: 60 * 60_000,
+    // Fail-closed: appeal spam floods the safety queue; retry is cheap.
+    failMode: "closed",
+  });
   if (limited) return limited;
 
   const { data, response: invalid } = await parseBody(req, appealSchema);

@@ -1,5 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { apiError, clientIp, guardRate, ok } from "@/lib/api";
+import { apiError, guardRate, ok } from "@/lib/api";
+import { ipHashFrom } from "@/lib/auth/audit";
 import { bootstrapSuperAdmin } from "@/lib/services/admin-bootstrap";
 
 export const dynamic = "force-dynamic";
@@ -29,9 +30,12 @@ function secretMatches(provided: string | null, expected: string | undefined): b
 
 export async function POST(req: Request) {
   // Small IP window to make secret guessing pointless.
-  const limited = await guardRate(`admin-bootstrap:${clientIp(req)}`, {
+  const limited = await guardRate(`admin-bootstrap:${ipHashFrom(req) ?? "unknown"}`, {
     limit: 5,
     windowMs: 10 * 60_000,
+    // Fail-closed: this route mints the owner account; unprotected is
+    // never acceptable, and a brief outage rejection costs nothing.
+    failMode: "closed",
   });
   if (limited) return limited;
 

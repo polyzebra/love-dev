@@ -22,7 +22,12 @@ export async function POST(req: Request, { params }: Params) {
   const { user, response } = await requireSession({ allowRestricted: true });
   if (response) return response;
 
-  const limited = await guardRate(`appeal-manage:${user.id}`, { limit: 10, windowMs: 60 * 60_000 });
+  const limited = await guardRate(`appeal-manage:${user.id}`, {
+    limit: 10,
+    windowMs: 60 * 60_000,
+    // Fail-open: managing an EXISTING appeal must survive a store outage.
+    failMode: "open",
+  });
   if (limited) return limited;
 
   const { data, response: invalid } = await parseBody(req, respondSchema);

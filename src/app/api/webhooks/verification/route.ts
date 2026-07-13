@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { clientIp, guardRate } from "@/lib/api";
-import { recordAuthEvent } from "@/lib/auth/audit";
+import { guardRate } from "@/lib/api";
+import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
 import {
   applyVerificationOutcome,
   getPhotoVerificationProvider,
@@ -25,9 +25,12 @@ import { sendSafetyNotice } from "@/lib/services/safety-notices";
  */
 export async function POST(req: Request) {
   // Coarse flood guard in front of the crypto work (audit 2026-07-11).
-  const limited = await guardRate(`webhook-verification:${clientIp(req)}`, {
+  const limited = await guardRate(`webhook-verification:${ipHashFrom(req) ?? "unknown"}`, {
     limit: 300,
     windowMs: 60_000,
+    // Fail-open: a store outage must NEVER reject provider webhooks -
+    // signature verification below is the real gate.
+    failMode: "open",
   });
   if (limited) return limited;
 

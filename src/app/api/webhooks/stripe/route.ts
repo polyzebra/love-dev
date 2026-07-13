@@ -1,4 +1,5 @@
-import { clientIp, guardRate } from "@/lib/api";
+import { guardRate } from "@/lib/api";
+import { ipHashFrom } from "@/lib/auth/audit";
 import { env } from "@/lib/env";
 import { verifyStripeSignature } from "@/lib/webhook-signatures";
 import { stripeConfigured } from "@/lib/stripe";
@@ -25,9 +26,12 @@ import { processStripeEvent, type StripeWebhookEvent } from "@/lib/services/bill
  *     answers 503 so Stripe retries once the deployment is fixed.
  */
 export async function POST(req: Request) {
-  const limited = await guardRate(`webhook-stripe:${clientIp(req)}`, {
+  const limited = await guardRate(`webhook-stripe:${ipHashFrom(req) ?? "unknown"}`, {
     limit: 300,
     windowMs: 60_000,
+    // Fail-open: a store outage must NEVER reject provider webhooks -
+    // signature verification below is the real gate.
+    failMode: "open",
   });
   if (limited) return limited;
 

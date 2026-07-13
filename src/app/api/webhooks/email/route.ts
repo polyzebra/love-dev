@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { clientIp, guardRate } from "@/lib/api";
+import { guardRate } from "@/lib/api";
+import { ipHashFrom } from "@/lib/auth/audit";
 import { verifyEmailWebhookSignature } from "@/lib/services/email";
 import { applyEmailProviderEvent } from "@/lib/services/notify";
 
@@ -24,9 +25,12 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   // Coarse flood guard in front of the crypto work. Keyed per IP; generous
   // enough for legitimate provider bursts.
-  const limited = await guardRate(`webhook-email:${clientIp(req)}`, {
+  const limited = await guardRate(`webhook-email:${ipHashFrom(req) ?? "unknown"}`, {
     limit: 300,
     windowMs: 60_000,
+    // Fail-open: a store outage must NEVER reject provider webhooks -
+    // signature verification below is the real gate.
+    failMode: "open",
   });
   if (limited) return limited;
 
