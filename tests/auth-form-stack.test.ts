@@ -154,6 +154,21 @@ check("routed auth Suspense boundaries always render a meaningful fallback", () 
   assert.match(fallback, /Opening verification\.\.\./);
 });
 
+check("the (auth) segment has a branded loading state - route entries never show an empty card", () => {
+  const loading = readFileSync(
+    join(import.meta.dirname, "..", "src", "app", "(auth)", "loading.tsx"),
+    "utf8",
+  );
+  assert.match(loading, /AuthStepFallback/);
+  assert.match(loading, /Opening sign in\.\.\./);
+  // The /login entry must be readable from its first committed frame -
+  // motion may translate it, never hide it.
+  assert.ok(
+    !/initial=\{animatable \? \{ opacity/.test(read("LoginEntry.tsx")),
+    "LoginEntry entrance must not start at opacity 0",
+  );
+});
+
 check("entrance animations are hydration-gated - SSR HTML never hides step content", () => {
   // framer-motion serializes `initial` into server HTML: a hard load of
   // /login painted the card with opacity:0 content until the JS bundle

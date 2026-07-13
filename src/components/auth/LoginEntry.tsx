@@ -174,7 +174,10 @@ export function LoginEntry({
 
   return (
     <motion.div
-      initial={animatable ? { opacity: 0, y: 12 } : false}
+      // Slide-and-settle ONLY - never opacity: the sign-in choices must
+      // be readable from the very first committed frame (a fade from 0
+      // re-blanks the card right after the loading fallback unmounts).
+      initial={animatable ? { y: 12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: EASE_LUXE }}
       className="flex flex-col"
