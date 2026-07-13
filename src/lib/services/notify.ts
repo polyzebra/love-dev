@@ -196,7 +196,7 @@ export type NotifyOptions = {
   now?: Date;
 };
 
-const MAX_PUSH_ATTEMPTS = 4;
+export const MAX_PUSH_ATTEMPTS = 4;
 
 export async function notifyUser(
   input: NotifyInput,
@@ -283,8 +283,8 @@ export async function notifyUser(
   // PUSH - only when the per-type preference is on AND a device can receive.
   let pushStatus: DeliveryStatus | "skipped" = "skipped";
   if (pushPrefEnabled(settings, input.type)) {
-    const subscriptions = await client.pushSubscription.count({
-      where: { userId: input.userId, enabled: true, revokedAt: null },
+    const subscriptions = await client.notificationDevice.count({
+      where: { userId: input.userId, enabled: true, invalidatedAt: null },
     });
     if (subscriptions > 0) {
       const quiet =
@@ -453,7 +453,7 @@ export async function dispatchPushDelivery(
     notificationId: n.id,
   };
 
-  const result = await sendPushToUser(n.userId, payload);
+  const result = await sendPushToUser(n.userId, payload, { retry: attempt > 1 });
 
   if (result.attempted === 0) {
     // Every subscription is gone/disabled - retrying cannot help.
@@ -822,13 +822,13 @@ export const STALE_SUBSCRIPTION_DAYS = 90;
 
 export async function revokeStaleSubscriptions(now: Date = new Date()): Promise<number> {
   const cutoff = new Date(now.getTime() - STALE_SUBSCRIPTION_DAYS * 24 * 3600 * 1000);
-  const result = await db.pushSubscription.updateMany({
+  const result = await db.notificationDevice.updateMany({
     where: {
       enabled: true,
       lastSeenAt: { lt: cutoff },
       OR: [{ lastSuccessAt: null }, { lastSuccessAt: { lt: cutoff } }],
     },
-    data: { enabled: false, revokedAt: now },
+    data: { enabled: false, invalidatedAt: now },
   });
   return result.count;
 }

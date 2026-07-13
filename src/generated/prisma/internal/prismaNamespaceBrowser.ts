@@ -78,7 +78,7 @@ export const ModelName = {
   StripeEvent: 'StripeEvent',
   Payment: 'Payment',
   Notification: 'Notification',
-  PushSubscription: 'PushSubscription',
+  NotificationDevice: 'NotificationDevice',
   NotificationDelivery: 'NotificationDelivery',
   SuppressedEmail: 'SuppressedEmail',
   ProviderHealth: 'ProviderHealth',
@@ -607,17 +607,21 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
-export const PushSubscriptionScalarFieldEnum = {
+export const NotificationDeviceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  transport: 'transport',
   endpoint: 'endpoint',
   p256dh: 'p256dh',
   auth: 'auth',
+  token: 'token',
   userAgent: 'userAgent',
   platform: 'platform',
   browser: 'browser',
   deviceLabel: 'deviceLabel',
   installationId: 'installationId',
+  appVersion: 'appVersion',
+  environment: 'environment',
   enabled: 'enabled',
   lastSeenAt: 'lastSeenAt',
   lastSuccessAt: 'lastSuccessAt',
@@ -625,10 +629,10 @@ export const PushSubscriptionScalarFieldEnum = {
   failureCount: 'failureCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  revokedAt: 'revokedAt'
+  invalidatedAt: 'invalidatedAt'
 } as const
 
-export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+export type NotificationDeviceScalarFieldEnum = (typeof NotificationDeviceScalarFieldEnum)[keyof typeof NotificationDeviceScalarFieldEnum]
 
 
 export const NotificationDeliveryScalarFieldEnum = {

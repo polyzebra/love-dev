@@ -624,7 +624,7 @@ export type UserWhereInput = {
   settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
   payments?: Prisma.PaymentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
-  pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
+  notificationDevices?: Prisma.NotificationDeviceListRelationFilter
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyListRelationFilter
   conversationPresence?: Prisma.ConversationPresenceListRelationFilter
   explorePreferences?: Prisma.UserExplorePreferenceListRelationFilter
@@ -708,7 +708,7 @@ export type UserOrderByWithRelationInput = {
   settings?: Prisma.UserSettingsOrderByWithRelationInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
-  pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput
+  notificationDevices?: Prisma.NotificationDeviceOrderByRelationAggregateInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyOrderByRelationAggregateInput
   conversationPresence?: Prisma.ConversationPresenceOrderByRelationAggregateInput
   explorePreferences?: Prisma.UserExplorePreferenceOrderByRelationAggregateInput
@@ -795,7 +795,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
   payments?: Prisma.PaymentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
-  pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
+  notificationDevices?: Prisma.NotificationDeviceListRelationFilter
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyListRelationFilter
   conversationPresence?: Prisma.ConversationPresenceListRelationFilter
   explorePreferences?: Prisma.UserExplorePreferenceListRelationFilter
@@ -997,7 +997,7 @@ export type UserCreateInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -1081,7 +1081,7 @@ export type UserUncheckedCreateInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -1165,7 +1165,7 @@ export type UserUpdateInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -1249,7 +1249,7 @@ export type UserUncheckedUpdateInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -1966,18 +1966,18 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
-export type UserCreateNestedOneWithoutPushSubscriptionsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput
+export type UserCreateNestedOneWithoutNotificationDevicesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationDevicesInput, Prisma.UserUncheckedCreateWithoutNotificationDevicesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationDevicesInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutPushSubscriptionsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput
-  upsert?: Prisma.UserUpsertWithoutPushSubscriptionsInput
+export type UserUpdateOneRequiredWithoutNotificationDevicesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationDevicesInput, Prisma.UserUncheckedCreateWithoutNotificationDevicesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationDevicesInput
+  upsert?: Prisma.UserUpsertWithoutNotificationDevicesInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPushSubscriptionsInput, Prisma.UserUpdateWithoutPushSubscriptionsInput>, Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationDevicesInput, Prisma.UserUpdateWithoutNotificationDevicesInput>, Prisma.UserUncheckedUpdateWithoutNotificationDevicesInput>
 }
 
 export type UserCreateNestedOneWithoutConversationPresenceInput = {
@@ -2138,7 +2138,7 @@ export type UserCreateWithoutDevicesInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -2221,7 +2221,7 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -2320,7 +2320,7 @@ export type UserUpdateWithoutDevicesInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -2403,7 +2403,7 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -2486,7 +2486,7 @@ export type UserCreateWithoutProfileInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -2569,7 +2569,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -2668,7 +2668,7 @@ export type UserUpdateWithoutProfileInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -2751,7 +2751,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -2834,7 +2834,7 @@ export type UserCreateWithoutPhotosInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -2917,7 +2917,7 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -3016,7 +3016,7 @@ export type UserUpdateWithoutPhotosInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -3099,7 +3099,7 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -3182,7 +3182,7 @@ export type UserCreateWithoutVerificationsInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -3265,7 +3265,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -3364,7 +3364,7 @@ export type UserUpdateWithoutVerificationsInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -3447,7 +3447,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -3530,7 +3530,7 @@ export type UserCreateWithoutLikesSentInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -3613,7 +3613,7 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -3701,7 +3701,7 @@ export type UserCreateWithoutLikesReceivedInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -3784,7 +3784,7 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -3883,7 +3883,7 @@ export type UserUpdateWithoutLikesSentInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -3966,7 +3966,7 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -4060,7 +4060,7 @@ export type UserUpdateWithoutLikesReceivedInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -4143,7 +4143,7 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -4226,7 +4226,7 @@ export type UserCreateWithoutMatchesAsAInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -4309,7 +4309,7 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -4397,7 +4397,7 @@ export type UserCreateWithoutMatchesAsBInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -4480,7 +4480,7 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -4579,7 +4579,7 @@ export type UserUpdateWithoutMatchesAsAInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -4662,7 +4662,7 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -4756,7 +4756,7 @@ export type UserUpdateWithoutMatchesAsBInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -4839,7 +4839,7 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -4922,7 +4922,7 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -5005,7 +5005,7 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -5093,7 +5093,7 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -5176,7 +5176,7 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -5275,7 +5275,7 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -5358,7 +5358,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -5452,7 +5452,7 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -5535,7 +5535,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -5618,7 +5618,7 @@ export type UserCreateWithoutParticipantsInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -5701,7 +5701,7 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -5800,7 +5800,7 @@ export type UserUpdateWithoutParticipantsInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -5883,7 +5883,7 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -5966,7 +5966,7 @@ export type UserCreateWithoutMessagesInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -6049,7 +6049,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -6148,7 +6148,7 @@ export type UserUpdateWithoutMessagesInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -6231,7 +6231,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -6314,7 +6314,7 @@ export type UserCreateWithoutReportsMadeInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -6397,7 +6397,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -6485,7 +6485,7 @@ export type UserCreateWithoutReportsReceivedInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -6568,7 +6568,7 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -6667,7 +6667,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -6750,7 +6750,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -6844,7 +6844,7 @@ export type UserUpdateWithoutReportsReceivedInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -6927,7 +6927,7 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -7011,7 +7011,7 @@ export type UserCreateWithoutModerationCasesInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -7094,7 +7094,7 @@ export type UserUncheckedCreateWithoutModerationCasesInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -7193,7 +7193,7 @@ export type UserUpdateWithoutModerationCasesInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -7276,7 +7276,7 @@ export type UserUncheckedUpdateWithoutModerationCasesInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -7359,7 +7359,7 @@ export type UserCreateWithoutViolationsInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -7442,7 +7442,7 @@ export type UserUncheckedCreateWithoutViolationsInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -7541,7 +7541,7 @@ export type UserUpdateWithoutViolationsInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -7624,7 +7624,7 @@ export type UserUncheckedUpdateWithoutViolationsInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -7707,7 +7707,7 @@ export type UserCreateWithoutAppealsInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -7790,7 +7790,7 @@ export type UserUncheckedCreateWithoutAppealsInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -7889,7 +7889,7 @@ export type UserUpdateWithoutAppealsInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -7972,7 +7972,7 @@ export type UserUncheckedUpdateWithoutAppealsInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -8054,7 +8054,7 @@ export type UserCreateWithoutBlocksMadeInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -8137,7 +8137,7 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -8225,7 +8225,7 @@ export type UserCreateWithoutBlocksReceivedInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -8308,7 +8308,7 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -8407,7 +8407,7 @@ export type UserUpdateWithoutBlocksMadeInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -8490,7 +8490,7 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -8584,7 +8584,7 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -8667,7 +8667,7 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -8750,7 +8750,7 @@ export type UserCreateWithoutSubscriptionInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -8833,7 +8833,7 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -8932,7 +8932,7 @@ export type UserUpdateWithoutSubscriptionInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -9015,7 +9015,7 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -9098,7 +9098,7 @@ export type UserCreateWithoutPaymentsInput = {
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -9181,7 +9181,7 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -9280,7 +9280,7 @@ export type UserUpdateWithoutPaymentsInput = {
   subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -9363,7 +9363,7 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -9446,7 +9446,7 @@ export type UserCreateWithoutNotificationsInput = {
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -9529,7 +9529,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -9628,7 +9628,7 @@ export type UserUpdateWithoutNotificationsInput = {
   subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -9711,7 +9711,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -9722,7 +9722,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutPushSubscriptionsInput = {
+export type UserCreateWithoutNotificationDevicesInput = {
   id?: string
   email: string
   emailVerified?: Date | string | null
@@ -9805,7 +9805,7 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
+export type UserUncheckedCreateWithoutNotificationDevicesInput = {
   id?: string
   email: string
   emailVerified?: Date | string | null
@@ -9888,23 +9888,23 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
+export type UserCreateOrConnectWithoutNotificationDevicesInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationDevicesInput, Prisma.UserUncheckedCreateWithoutNotificationDevicesInput>
 }
 
-export type UserUpsertWithoutPushSubscriptionsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutPushSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
+export type UserUpsertWithoutNotificationDevicesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationDevicesInput, Prisma.UserUncheckedUpdateWithoutNotificationDevicesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationDevicesInput, Prisma.UserUncheckedCreateWithoutNotificationDevicesInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutPushSubscriptionsInput = {
+export type UserUpdateToOneWithWhereWithoutNotificationDevicesInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutPushSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationDevicesInput, Prisma.UserUncheckedUpdateWithoutNotificationDevicesInput>
 }
 
-export type UserUpdateWithoutPushSubscriptionsInput = {
+export type UserUpdateWithoutNotificationDevicesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9987,7 +9987,7 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
+export type UserUncheckedUpdateWithoutNotificationDevicesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10143,7 +10143,7 @@ export type UserCreateWithoutConversationPresenceInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
@@ -10226,7 +10226,7 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
@@ -10325,7 +10325,7 @@ export type UserUpdateWithoutConversationPresenceInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
@@ -10408,7 +10408,7 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
@@ -10491,7 +10491,7 @@ export type UserCreateWithoutAdminLogsInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -10574,7 +10574,7 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -10673,7 +10673,7 @@ export type UserUpdateWithoutAdminLogsInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -10756,7 +10756,7 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -10839,7 +10839,7 @@ export type UserCreateWithoutExplorePreferencesInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
@@ -10922,7 +10922,7 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
@@ -11021,7 +11021,7 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
@@ -11104,7 +11104,7 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
@@ -11187,7 +11187,7 @@ export type UserCreateWithoutAuthEventsInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -11270,7 +11270,7 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -11369,7 +11369,7 @@ export type UserUpdateWithoutAuthEventsInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -11452,7 +11452,7 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -11534,7 +11534,7 @@ export type UserCreateWithoutSettingsInput = {
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
@@ -11617,7 +11617,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -11716,7 +11716,7 @@ export type UserUpdateWithoutSettingsInput = {
   subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
@@ -11799,7 +11799,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -11883,7 +11883,7 @@ export type UserCreateWithoutApiIdempotencyKeysInput = {
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
@@ -11966,7 +11966,7 @@ export type UserUncheckedCreateWithoutApiIdempotencyKeysInput = {
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
   adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
@@ -12065,7 +12065,7 @@ export type UserUpdateWithoutApiIdempotencyKeysInput = {
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
@@ -12148,7 +12148,7 @@ export type UserUncheckedUpdateWithoutApiIdempotencyKeysInput = {
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
   conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
   explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
   adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
@@ -12181,7 +12181,7 @@ export type UserCountOutputType = {
   blocksReceived: number
   payments: number
   notifications: number
-  pushSubscriptions: number
+  notificationDevices: number
   apiIdempotencyKeys: number
   conversationPresence: number
   explorePreferences: number
@@ -12210,7 +12210,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   blocksReceived?: boolean | UserCountOutputTypeCountBlocksReceivedArgs
   payments?: boolean | UserCountOutputTypeCountPaymentsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
-  pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs
+  notificationDevices?: boolean | UserCountOutputTypeCountNotificationDevicesArgs
   apiIdempotencyKeys?: boolean | UserCountOutputTypeCountApiIdempotencyKeysArgs
   conversationPresence?: boolean | UserCountOutputTypeCountConversationPresenceArgs
   explorePreferences?: boolean | UserCountOutputTypeCountExplorePreferencesArgs
@@ -12353,8 +12353,8 @@ export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Ty
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountPushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PushSubscriptionWhereInput
+export type UserCountOutputTypeCountNotificationDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationDeviceWhereInput
 }
 
 /**
@@ -12487,7 +12487,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
-  pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>
+  notificationDevices?: boolean | Prisma.User$notificationDevicesArgs<ExtArgs>
   apiIdempotencyKeys?: boolean | Prisma.User$apiIdempotencyKeysArgs<ExtArgs>
   conversationPresence?: boolean | Prisma.User$conversationPresenceArgs<ExtArgs>
   explorePreferences?: boolean | Prisma.User$explorePreferencesArgs<ExtArgs>
@@ -12686,7 +12686,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
-  pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>
+  notificationDevices?: boolean | Prisma.User$notificationDevicesArgs<ExtArgs>
   apiIdempotencyKeys?: boolean | Prisma.User$apiIdempotencyKeysArgs<ExtArgs>
   conversationPresence?: boolean | Prisma.User$conversationPresenceArgs<ExtArgs>
   explorePreferences?: boolean | Prisma.User$explorePreferencesArgs<ExtArgs>
@@ -12723,7 +12723,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     settings: Prisma.$UserSettingsPayload<ExtArgs> | null
     payments: Prisma.$PaymentPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
-    pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[]
+    notificationDevices: Prisma.$NotificationDevicePayload<ExtArgs>[]
     apiIdempotencyKeys: Prisma.$ApiIdempotencyKeyPayload<ExtArgs>[]
     conversationPresence: Prisma.$ConversationPresencePayload<ExtArgs>[]
     explorePreferences: Prisma.$UserExplorePreferencePayload<ExtArgs>[]
@@ -13200,7 +13200,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__UserSettingsClient<runtime.Types.Result.GetResult<Prisma.$UserSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   payments<T extends Prisma.User$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  pushSubscriptions<T extends Prisma.User$pushSubscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pushSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notificationDevices<T extends Prisma.User$notificationDevicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   apiIdempotencyKeys<T extends Prisma.User$apiIdempotencyKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apiIdempotencyKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiIdempotencyKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversationPresence<T extends Prisma.User$conversationPresenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$conversationPresenceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPresencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   explorePreferences<T extends Prisma.User$explorePreferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$explorePreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserExplorePreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14148,27 +14148,27 @@ export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * User.pushSubscriptions
+ * User.notificationDevices
  */
-export type User$pushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$notificationDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the PushSubscription
+   * Select specific fields to fetch from the NotificationDevice
    */
-  select?: Prisma.PushSubscriptionSelect<ExtArgs> | null
+  select?: Prisma.NotificationDeviceSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the PushSubscription
+   * Omit specific fields from the NotificationDevice
    */
-  omit?: Prisma.PushSubscriptionOmit<ExtArgs> | null
+  omit?: Prisma.NotificationDeviceOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.PushSubscriptionInclude<ExtArgs> | null
-  where?: Prisma.PushSubscriptionWhereInput
-  orderBy?: Prisma.PushSubscriptionOrderByWithRelationInput | Prisma.PushSubscriptionOrderByWithRelationInput[]
-  cursor?: Prisma.PushSubscriptionWhereUniqueInput
+  include?: Prisma.NotificationDeviceInclude<ExtArgs> | null
+  where?: Prisma.NotificationDeviceWhereInput
+  orderBy?: Prisma.NotificationDeviceOrderByWithRelationInput | Prisma.NotificationDeviceOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationDeviceWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.PushSubscriptionScalarFieldEnum | Prisma.PushSubscriptionScalarFieldEnum[]
+  distinct?: Prisma.NotificationDeviceScalarFieldEnum | Prisma.NotificationDeviceScalarFieldEnum[]
 }
 
 /**

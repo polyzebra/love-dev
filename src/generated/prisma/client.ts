@@ -177,10 +177,10 @@ export type Payment = Prisma.PaymentModel
  */
 export type Notification = Prisma.NotificationModel
 /**
- * Model PushSubscription
+ * Model NotificationDevice
  * 
  */
-export type PushSubscription = Prisma.PushSubscriptionModel
+export type NotificationDevice = Prisma.NotificationDeviceModel
 /**
  * Model NotificationDelivery
  * 

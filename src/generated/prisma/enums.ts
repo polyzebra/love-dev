@@ -445,6 +445,15 @@ export const SafetyRecommendedAction = {
 export type SafetyRecommendedAction = (typeof SafetyRecommendedAction)[keyof typeof SafetyRecommendedAction]
 
 
+export const NotificationTransport = {
+  WEB_PUSH: 'WEB_PUSH',
+  APNS: 'APNS',
+  FCM: 'FCM'
+} as const
+
+export type NotificationTransport = (typeof NotificationTransport)[keyof typeof NotificationTransport]
+
+
 export const ExploreGroup = {
   LIFESTYLE: 'LIFESTYLE',
   INTERESTS: 'INTERESTS',

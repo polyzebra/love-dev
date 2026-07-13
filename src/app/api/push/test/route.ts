@@ -25,8 +25,8 @@ export async function POST(req: Request) {
   const limited = await guardRate(`push-test:${user.id}`, RATE_LIMITS.pushTest);
   if (limited) return limited;
 
-  const devices = await db.pushSubscription.count({
-    where: { userId: user.id, enabled: true, revokedAt: null },
+  const devices = await db.notificationDevice.count({
+    where: { userId: user.id, enabled: true, invalidatedAt: null },
   });
   if (devices === 0) {
     return apiError(409, "no_devices", "No push-enabled devices are registered.");

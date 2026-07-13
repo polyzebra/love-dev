@@ -411,7 +411,7 @@ export const ModelName = {
   StripeEvent: 'StripeEvent',
   Payment: 'Payment',
   Notification: 'Notification',
-  PushSubscription: 'PushSubscription',
+  NotificationDevice: 'NotificationDevice',
   NotificationDelivery: 'NotificationDelivery',
   SuppressedEmail: 'SuppressedEmail',
   ProviderHealth: 'ProviderHealth',
@@ -441,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "pushSubscription" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2443,77 +2443,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    PushSubscription: {
-      payload: Prisma.$PushSubscriptionPayload<ExtArgs>
-      fields: Prisma.PushSubscriptionFieldRefs
+    NotificationDevice: {
+      payload: Prisma.$NotificationDevicePayload<ExtArgs>
+      fields: Prisma.NotificationDeviceFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.PushSubscriptionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null
+          args: Prisma.NotificationDeviceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.PushSubscriptionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+          args: Prisma.NotificationDeviceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>
         }
         findFirst: {
-          args: Prisma.PushSubscriptionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null
+          args: Prisma.NotificationDeviceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.PushSubscriptionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+          args: Prisma.NotificationDeviceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>
         }
         findMany: {
-          args: Prisma.PushSubscriptionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+          args: Prisma.NotificationDeviceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>[]
         }
         create: {
-          args: Prisma.PushSubscriptionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+          args: Prisma.NotificationDeviceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>
         }
         createMany: {
-          args: Prisma.PushSubscriptionCreateManyArgs<ExtArgs>
+          args: Prisma.NotificationDeviceCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.PushSubscriptionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+          args: Prisma.NotificationDeviceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>[]
         }
         delete: {
-          args: Prisma.PushSubscriptionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+          args: Prisma.NotificationDeviceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>
         }
         update: {
-          args: Prisma.PushSubscriptionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+          args: Prisma.NotificationDeviceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>
         }
         deleteMany: {
-          args: Prisma.PushSubscriptionDeleteManyArgs<ExtArgs>
+          args: Prisma.NotificationDeviceDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.PushSubscriptionUpdateManyArgs<ExtArgs>
+          args: Prisma.NotificationDeviceUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.PushSubscriptionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+          args: Prisma.NotificationDeviceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>[]
         }
         upsert: {
-          args: Prisma.PushSubscriptionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+          args: Prisma.NotificationDeviceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDevicePayload>
         }
         aggregate: {
-          args: Prisma.PushSubscriptionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePushSubscription>
+          args: Prisma.NotificationDeviceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotificationDevice>
         }
         groupBy: {
-          args: Prisma.PushSubscriptionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionGroupByOutputType>[]
+          args: Prisma.NotificationDeviceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationDeviceGroupByOutputType>[]
         }
         count: {
-          args: Prisma.PushSubscriptionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionCountAggregateOutputType> | number
+          args: Prisma.NotificationDeviceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationDeviceCountAggregateOutputType> | number
         }
       }
     }
@@ -4088,17 +4088,21 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
-export const PushSubscriptionScalarFieldEnum = {
+export const NotificationDeviceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  transport: 'transport',
   endpoint: 'endpoint',
   p256dh: 'p256dh',
   auth: 'auth',
+  token: 'token',
   userAgent: 'userAgent',
   platform: 'platform',
   browser: 'browser',
   deviceLabel: 'deviceLabel',
   installationId: 'installationId',
+  appVersion: 'appVersion',
+  environment: 'environment',
   enabled: 'enabled',
   lastSeenAt: 'lastSeenAt',
   lastSuccessAt: 'lastSuccessAt',
@@ -4106,10 +4110,10 @@ export const PushSubscriptionScalarFieldEnum = {
   failureCount: 'failureCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  revokedAt: 'revokedAt'
+  invalidatedAt: 'invalidatedAt'
 } as const
 
-export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+export type NotificationDeviceScalarFieldEnum = (typeof NotificationDeviceScalarFieldEnum)[keyof typeof NotificationDeviceScalarFieldEnum]
 
 
 export const NotificationDeliveryScalarFieldEnum = {
@@ -4987,6 +4991,20 @@ export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'NotificationTransport'
+ */
+export type EnumNotificationTransportFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationTransport'>
+    
+
+
+/**
+ * Reference to a field of type 'NotificationTransport[]'
+ */
+export type ListEnumNotificationTransportFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationTransport[]'>
+    
+
+
+/**
  * Reference to a field of type 'DeliveryChannel'
  */
 export type EnumDeliveryChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryChannel'>
@@ -5178,7 +5196,7 @@ export type GlobalOmitConfig = {
   stripeEvent?: Prisma.StripeEventOmit
   payment?: Prisma.PaymentOmit
   notification?: Prisma.NotificationOmit
-  pushSubscription?: Prisma.PushSubscriptionOmit
+  notificationDevice?: Prisma.NotificationDeviceOmit
   notificationDelivery?: Prisma.NotificationDeliveryOmit
   suppressedEmail?: Prisma.SuppressedEmailOmit
   providerHealth?: Prisma.ProviderHealthOmit

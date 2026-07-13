@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { recordAuthEvent } from "@/lib/auth/audit";
-import type { NotificationType } from "@/generated/prisma/enums";
+import type { NotificationTransport, NotificationType } from "@/generated/prisma/enums";
+import { adapterFor } from "@/lib/services/notification-transports";
+import { recordTransportAttempt } from "@/lib/services/notification-metrics";
 
 /**
  * Web Push transport. Wraps the `web-push` library behind a tiny injectable
@@ -127,6 +129,20 @@ function activeTransport(): PushTransport {
   return transportOverride ?? realTransport;
 }
 
+/** One raw web-push send (adapter entry point - tests inject via setPushTransport). */
+export async function sendWebPush(
+  target: PushEndpoint,
+  payload: string,
+  options: PushSendOptions,
+): Promise<{ statusCode: number }> {
+  return activeTransport()(target, payload, options);
+}
+
+/** True when web-push can actually send (real VAPID config OR a test transport). */
+export function isWebPushSendable(): boolean {
+  return transportOverride !== null || isPushConfigured();
+}
+
 // ---------------------------------------------------------------------------
 // Payload + per-type delivery policy
 // ---------------------------------------------------------------------------
@@ -174,10 +190,12 @@ export type RegisterSubscriptionInput = {
   browser?: string | null;
   deviceLabel?: string | null;
   installationId?: string | null;
+  appVersion?: string | null;
 };
 
 /**
- * Upsert a device subscription for `userId`, keyed by endpoint. An endpoint
+ * Upsert a WEB_PUSH device for `userId`, keyed by endpoint (one transport
+ * adapter's registration shape - see registerDeviceToken for APNS/FCM). An endpoint
  * currently bound to a DIFFERENT user is rebound to the caller and audited
  * (same browser profile, new account - the device changed hands): a push
  * endpoint must only ever notify the account that owns the session.
@@ -188,7 +206,7 @@ export async function registerPushSubscription(
   input: RegisterSubscriptionInput,
   req?: Request,
 ): Promise<{ id: string; rebound: boolean }> {
-  const existing = await db.pushSubscription.findUnique({
+  const existing = await db.notificationDevice.findUnique({
     where: { endpoint: input.endpoint },
     select: { id: true, userId: true },
   });
@@ -196,6 +214,7 @@ export async function registerPushSubscription(
 
   const fields = {
     userId,
+    transport: "WEB_PUSH" as const,
     p256dh: input.p256dh,
     auth: input.auth,
     userAgent: input.userAgent ?? null,
@@ -203,13 +222,14 @@ export async function registerPushSubscription(
     browser: input.browser ?? null,
     deviceLabel: input.deviceLabel ?? null,
     installationId: input.installationId ?? null,
+    appVersion: input.appVersion ?? null,
     enabled: true,
-    revokedAt: null,
+    invalidatedAt: null,
     failureCount: 0,
     lastSeenAt: new Date(),
   };
 
-  const subscription = await db.pushSubscription.upsert({
+  const subscription = await db.notificationDevice.upsert({
     where: { endpoint: input.endpoint },
     create: { endpoint: input.endpoint, ...fields },
     update: fields,
@@ -242,34 +262,144 @@ export async function revokePushSubscription(
   endpoint: string,
   req?: Request,
 ): Promise<boolean> {
-  const result = await db.pushSubscription.updateMany({
+  const result = await db.notificationDevice.updateMany({
     where: { endpoint, userId },
-    data: { enabled: false, revokedAt: new Date() },
+    data: { enabled: false, invalidatedAt: new Date() },
   });
   if (result.count === 0) return false;
   await recordAuthEvent({ type: "push_unsubscribed", userId, req });
   return true;
 }
 
-/** Active devices for the status route - endpoints truncated. */
+// ---------------------------------------------------------------------------
+// Native device tokens (APNS/FCM) - registration/rotation/revocation are
+// live NOW so the model and API are proven; sending activates when the
+// transport credentials ship (notification-transports.ts).
+// ---------------------------------------------------------------------------
+
+export type RegisterDeviceTokenInput = {
+  transport: Extract<NotificationTransport, "APNS" | "FCM">;
+  token: string;
+  installationId?: string | null;
+  platform?: string | null;
+  deviceLabel?: string | null;
+  appVersion?: string | null;
+  /** APNs sandbox vs production, FCM project flavor. */
+  environment?: "production" | "development";
+};
+
+/**
+ * Upsert a native device token, keyed by (unique) token. Rotation: when
+ * the same installation re-registers with a NEW token, every other row
+ * for that installation+transport is invalidated - exactly one live
+ * token per app install. A token bound to a DIFFERENT user is rebound to
+ * the caller and audited (device changed hands), like web endpoints.
+ */
+export async function registerDeviceToken(
+  userId: string,
+  input: RegisterDeviceTokenInput,
+  req?: Request,
+): Promise<{ id: string; rebound: boolean; rotatedOut: number }> {
+  const existing = await db.notificationDevice.findUnique({
+    where: { token: input.token },
+    select: { id: true, userId: true },
+  });
+  const rebound = !!existing && existing.userId !== userId;
+
+  const fields = {
+    userId,
+    transport: input.transport,
+    platform: input.platform ?? null,
+    deviceLabel: input.deviceLabel ?? null,
+    installationId: input.installationId ?? null,
+    appVersion: input.appVersion ?? null,
+    environment: input.environment ?? "production",
+    enabled: true,
+    invalidatedAt: null,
+    failureCount: 0,
+    lastSeenAt: new Date(),
+  };
+
+  const device = await db.notificationDevice.upsert({
+    where: { token: input.token },
+    create: { token: input.token, ...fields },
+    update: fields,
+    select: { id: true },
+  });
+
+  // Token rotation: retire this installation's other tokens on this transport.
+  let rotatedOut = 0;
+  if (input.installationId) {
+    const rotated = await db.notificationDevice.updateMany({
+      where: {
+        installationId: input.installationId,
+        transport: input.transport,
+        id: { not: device.id },
+        enabled: true,
+      },
+      data: { enabled: false, invalidatedAt: new Date() },
+    });
+    rotatedOut = rotated.count;
+  }
+
+  await recordAuthEvent({
+    type: rebound ? "push_subscription_rebound" : "push_subscribed",
+    userId,
+    req,
+    metadata: {
+      subscriptionId: device.id,
+      transport: input.transport,
+      ...(rebound && existing ? { previousUserId: existing.userId } : {}),
+      platform: input.platform ?? null,
+      ...(rotatedOut > 0 ? { rotatedOut } : {}),
+    },
+  });
+
+  return { id: device.id, rebound, rotatedOut };
+}
+
+/** Revoke the caller's own device by token. Idempotent; row kept for audit. */
+export async function revokeDeviceToken(
+  userId: string,
+  token: string,
+  req?: Request,
+): Promise<boolean> {
+  const result = await db.notificationDevice.updateMany({
+    where: { token, userId },
+    data: { enabled: false, invalidatedAt: new Date() },
+  });
+  if (result.count === 0) return false;
+  await recordAuthEvent({ type: "push_unsubscribed", userId, req });
+  return true;
+}
+
+/** Active devices for the status route - credentials truncated, never whole. */
 export async function listPushDevices(userId: string) {
-  const subscriptions = await db.pushSubscription.findMany({
-    where: { userId, enabled: true, revokedAt: null },
+  const devices = await db.notificationDevice.findMany({
+    where: { userId, enabled: true, invalidatedAt: null },
     orderBy: { createdAt: "asc" },
     select: {
       id: true,
+      transport: true,
       endpoint: true,
+      token: true,
       platform: true,
       browser: true,
       deviceLabel: true,
       installationId: true,
+      appVersion: true,
+      environment: true,
       createdAt: true,
       lastSeenAt: true,
       lastSuccessAt: true,
       failureCount: true,
     },
   });
-  return subscriptions.map((s) => ({ ...s, endpoint: truncateEndpoint(s.endpoint) }));
+  return devices.map((d) => ({
+    ...d,
+    endpoint: d.endpoint ? truncateEndpoint(d.endpoint) : null,
+    token: d.token ? truncateToken(d.token) : null,
+  }));
 }
 
 // ---------------------------------------------------------------------------
@@ -278,13 +408,14 @@ export async function listPushDevices(userId: string) {
 
 export type PushEndpointResult = {
   subscriptionId: string;
-  /** Truncated endpoint - full endpoints are capability URLs, keep them out of logs/responses. */
+  transport: NotificationTransport;
+  /** Truncated endpoint/token - credentials never leave whole. */
   endpoint: string;
   ok: boolean;
   statusCode: number | null;
-  /** true when this send caused the subscription to be revoked (404/410). */
+  /** true when this send invalidated the device (endpoint/token gone). */
   revoked: boolean;
-  /** true when repeated failures disabled the subscription. */
+  /** true when repeated failures disabled the device. */
   disabled: boolean;
   error: string | null;
 };
@@ -292,6 +423,8 @@ export type PushEndpointResult = {
 export type SendPushResult = {
   attempted: number;
   delivered: number;
+  /** Devices whose transport cannot send yet (adapter unconfigured). */
+  skipped: number;
   results: PushEndpointResult[];
 };
 
@@ -299,104 +432,153 @@ export function truncateEndpoint(endpoint: string): string {
   return endpoint.length <= 60 ? endpoint : `${endpoint.slice(0, 57)}...`;
 }
 
+/** Device tokens are credentials: only the last 6 chars ever leave the DB. */
+export function truncateToken(token: string): string {
+  return `…${token.slice(-6)}`;
+}
+
 /** Failures at or beyond this count permanently disable a subscription. */
 export const MAX_ENDPOINT_FAILURES = 5;
 
 /**
- * Sends `payload` to every enabled, unrevoked subscription the user has.
- * Per-endpoint bookkeeping:
- *  - 404/410 (endpoint gone): revokedAt + enabled=false - the browser
- *    unsubscribed or the subscription expired.
- *  - other failure: failureCount++ / lastFailureAt; at MAX_ENDPOINT_FAILURES
- *    the subscription is disabled for good.
- *  - success: lastSuccessAt, failureCount reset to 0.
+ * ONE canonical event, fanned out through the transport adapters: sends
+ * `payload` to every enabled, non-invalidated device the user has,
+ * whatever its transport. Per-device bookkeeping:
+ *  - token/endpoint gone (provider said so): invalidatedAt + enabled=false
+ *  - other failure: failureCount++ / lastFailureAt; at
+ *    MAX_ENDPOINT_FAILURES the device is disabled for good
+ *  - success: lastSuccessAt, failureCount reset to 0
+ *  - transport not configured (e.g. an FCM token before FCM credentials
+ *    ship): SKIPPED - no attempt, no failure penalty for the device
+ * Every attempt lands in the transport metrics (latency, outcome, retry).
  */
 export async function sendPushToUser(
   userId: string,
   payload: PushPayload,
+  opts: { retry?: boolean } = {},
 ): Promise<SendPushResult> {
-  const subscriptions = await db.pushSubscription.findMany({
-    where: { userId, enabled: true, revokedAt: null },
+  const devices = await db.notificationDevice.findMany({
+    where: { userId, enabled: true, invalidatedAt: null },
     orderBy: { createdAt: "asc" },
   });
 
   const policy = deliveryPolicyFor(payload.type);
   const body = JSON.stringify(payload);
-  const transport = activeTransport();
   const now = new Date();
 
   const results: PushEndpointResult[] = [];
-  for (const sub of subscriptions) {
-    const target = { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth };
-    try {
-      const res = await transport(target, body, {
-        ttl: policy.ttl,
-        urgency: policy.urgency,
-        topic: undefined,
+  let skipped = 0;
+
+  for (const device of devices) {
+    const adapter = adapterFor(device.transport);
+    const label = device.endpoint
+      ? truncateEndpoint(device.endpoint)
+      : device.token
+        ? truncateToken(device.token)
+        : "unknown";
+
+    if (!adapter.configured()) {
+      skipped += 1;
+      continue;
+    }
+
+    const startedAt = Date.now();
+    const res = await adapter.send(
+      {
+        id: device.id,
+        transport: device.transport,
+        endpoint: device.endpoint,
+        p256dh: device.p256dh,
+        auth: device.auth,
+        token: device.token,
+        environment: device.environment,
+      },
+      body,
+      { ttl: policy.ttl, urgency: policy.urgency, topic: undefined },
+    );
+    const latencyMs = Date.now() - startedAt;
+
+    if (res.ok) {
+      recordTransportAttempt({
+        transport: device.transport,
+        outcome: "delivered",
+        latencyMs,
+        retry: !!opts.retry,
       });
-      await db.pushSubscription.update({
-        where: { id: sub.id },
+      await db.notificationDevice.update({
+        where: { id: device.id },
         data: { lastSuccessAt: now, failureCount: 0 },
       });
       results.push({
-        subscriptionId: sub.id,
-        endpoint: truncateEndpoint(sub.endpoint),
+        subscriptionId: device.id,
+        transport: device.transport,
+        endpoint: label,
         ok: true,
         statusCode: res.statusCode,
         revoked: false,
         disabled: false,
         error: null,
       });
-    } catch (error) {
-      const statusCode =
-        typeof (error as { statusCode?: unknown })?.statusCode === "number"
-          ? (error as { statusCode: number }).statusCode
-          : null;
-      const message = error instanceof Error ? error.message : String(error);
+      continue;
+    }
 
-      if (statusCode === 404 || statusCode === 410) {
-        // The push service says this endpoint no longer exists.
-        await db.pushSubscription.update({
-          where: { id: sub.id },
-          data: { enabled: false, revokedAt: now, lastFailureAt: now },
-        });
-        results.push({
-          subscriptionId: sub.id,
-          endpoint: truncateEndpoint(sub.endpoint),
-          ok: false,
-          statusCode,
-          revoked: true,
-          disabled: false,
-          error: "endpoint_gone",
-        });
-        continue;
-      }
-
-      const failureCount = sub.failureCount + 1;
-      const disable = failureCount >= MAX_ENDPOINT_FAILURES;
-      await db.pushSubscription.update({
-        where: { id: sub.id },
-        data: {
-          failureCount,
-          lastFailureAt: now,
-          ...(disable ? { enabled: false } : {}),
-        },
+    if (res.tokenInvalid) {
+      // The provider says this endpoint/token no longer exists.
+      recordTransportAttempt({
+        transport: device.transport,
+        outcome: "invalid_token",
+        latencyMs,
+        retry: !!opts.retry,
+      });
+      await db.notificationDevice.update({
+        where: { id: device.id },
+        data: { enabled: false, invalidatedAt: now, lastFailureAt: now },
       });
       results.push({
-        subscriptionId: sub.id,
-        endpoint: truncateEndpoint(sub.endpoint),
+        subscriptionId: device.id,
+        transport: device.transport,
+        endpoint: label,
         ok: false,
-        statusCode,
-        revoked: false,
-        disabled: disable,
-        error: message.slice(0, 200),
+        statusCode: res.statusCode,
+        revoked: true,
+        disabled: false,
+        error: "endpoint_gone",
       });
+      continue;
     }
+
+    recordTransportAttempt({
+      transport: device.transport,
+      outcome: "failed",
+      latencyMs,
+      retry: !!opts.retry,
+    });
+    const failureCount = device.failureCount + 1;
+    const disable = failureCount >= MAX_ENDPOINT_FAILURES;
+    await db.notificationDevice.update({
+      where: { id: device.id },
+      data: {
+        failureCount,
+        lastFailureAt: now,
+        ...(disable ? { enabled: false } : {}),
+      },
+    });
+    results.push({
+      subscriptionId: device.id,
+      transport: device.transport,
+      endpoint: label,
+      ok: false,
+      statusCode: res.statusCode,
+      revoked: false,
+      disabled: disable,
+      error: res.error.slice(0, 200),
+    });
   }
 
   return {
     attempted: results.length,
     delivered: results.filter((r) => r.ok).length,
+    skipped,
     results,
   };
 }

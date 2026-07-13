@@ -412,7 +412,7 @@ model User {
   settings             UserSettings?
   payments             Payment[]
   notifications        Notification[]
-  pushSubscriptions    PushSubscription[]
+  notificationDevices     NotificationDevice[]
   apiIdempotencyKeys   ApiIdempotencyKey[]
   conversationPresence ConversationPresence[]
   explorePreferences   UserExplorePreference[]
@@ -1160,34 +1160,53 @@ model Notification {
   @@index([userId, readAt, createdAt])
 }
 
-// One browser/device push endpoint per row. Only the PUBLIC subscription
-// material lives here (endpoint + p256dh + auth from PushSubscription.toJSON)
-// - the VAPID PRIVATE key is env-only and must never be stored in the DB.
-// Rows are revoked (revokedAt + enabled=false), never deleted, so device
-// history stays auditable.
-model PushSubscription {
-  id             String    @id @default(cuid())
+// Delivery transport for one registered device (Phase 0H). WEB_PUSH is
+// live; APNS/FCM registration + storage + fan-out are ready and their
+// adapters answer transport_not_configured until native credentials ship.
+enum NotificationTransport {
+  WEB_PUSH
+  APNS
+  FCM
+}
+
+// One registered notification target per row: a browser push endpoint
+// (WEB_PUSH: endpoint + p256dh/auth public material) or an opaque device
+// token (APNS/FCM). Tokens/endpoints are delivery credentials: never log
+// them whole, never return them whole from routes. The VAPID/APNs/FCM
+// PRIVATE keys are env-only and must never be stored in the DB. Rows are
+// invalidated (invalidatedAt + enabled=false), never deleted, so device
+// history stays auditable. Mapped onto the original PushSubscription
+// table - the migration is purely additive.
+model NotificationDevice {
+  id             String                @id @default(cuid())
   userId         String
-  endpoint       String    @unique @db.Text
-  p256dh         String
-  auth           String
+  transport      NotificationTransport @default(WEB_PUSH)
+  // WEB_PUSH only - the push service capability URL + encryption keys.
+  endpoint       String?               @unique @db.Text
+  p256dh         String?
+  auth           String?
+  // APNS/FCM only - the opaque device/registration token.
+  token          String?               @unique @db.Text
   userAgent      String?
   platform       String?
   browser        String?
   deviceLabel    String?
   installationId String?
-  enabled        Boolean   @default(true)
-  lastSeenAt     DateTime  @default(now())
+  appVersion     String?
+  environment    String                @default("production")
+  enabled        Boolean               @default(true)
+  lastSeenAt     DateTime              @default(now())
   lastSuccessAt  DateTime?
   lastFailureAt  DateTime?
-  failureCount   Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  revokedAt      DateTime?
+  failureCount   Int                   @default(0)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  invalidatedAt  DateTime?             @map("revokedAt")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, enabled])
+  @@map("PushSubscription")
 }
 
 // Per-channel outbox for a Notification. IN_APP rows are written SENT
