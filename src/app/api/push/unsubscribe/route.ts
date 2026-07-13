@@ -1,7 +1,7 @@
 import { guardRate, notFound, ok, parseBody, requireSession } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pushUnsubscribeSchema } from "@/lib/validators/push";
-import { revokePushSubscription } from "@/lib/services/push";
+import { revokeDeviceToken, revokePushSubscription } from "@/lib/services/push";
 
 /**
  * POST /api/push/unsubscribe - revoke this device's subscription. Only the
@@ -18,9 +18,11 @@ export async function POST(req: Request) {
   const { data, response: invalid } = await parseBody(req, pushUnsubscribeSchema);
   if (invalid) return invalid;
 
-  // Scoped to the session user - someone else's endpoint answers exactly
-  // like a nonexistent one, never an ownership oracle.
-  const revoked = await revokePushSubscription(user.id, data.endpoint, req);
+  // Scoped to the session user - someone else's endpoint/token answers
+  // exactly like a nonexistent one, never an ownership oracle.
+  const revoked = data.endpoint
+    ? await revokePushSubscription(user.id, data.endpoint, req)
+    : await revokeDeviceToken(user.id, data.token!, req);
   if (!revoked) return notFound("Subscription");
 
   return ok({ revoked: true });

@@ -28,7 +28,57 @@ export const pushSubscribeSchema = z
 
 export type PushSubscribeInput = z.infer<typeof pushSubscribeSchema>;
 
-export const pushUnsubscribeSchema = z.object({ endpoint: z.string().min(1).max(2048) }).strict();
+export const pushUnsubscribeSchema = z
+  .object({
+    endpoint: z.string().min(1).max(2048).optional(),
+    /** APNS/FCM device token (Phase 0H) - exactly one of endpoint/token. */
+    token: z.string().min(16).max(4096).optional(),
+  })
+  .strict()
+  .refine((v) => !!v.endpoint !== !!v.token, {
+    message: "Provide exactly one of endpoint or token.",
+  });
+
+/**
+ * Transport-independent device registration (Phase 0H). WEB_PUSH carries
+ * the browser subscription payload; APNS/FCM carry an opaque device token
+ * plus install metadata. Native SDK integration comes later - the
+ * registration surface is ready now.
+ */
+export const deviceRegisterSchema = z.discriminatedUnion("transport", [
+  z
+    .object({
+      transport: z.literal("WEB_PUSH"),
+      subscription: z.object({
+        endpoint: z.string().min(1).max(2048),
+        expirationTime: z.number().nullable().optional(),
+        keys: z.object({
+          p256dh: z.string().min(1).max(512),
+          auth: z.string().min(1).max(512),
+        }),
+      }),
+      userAgent: z.string().max(512).optional(),
+      platform: z.string().max(128).optional(),
+      browser: z.string().max(128).optional(),
+      installationId: z.string().max(128).optional(),
+      deviceLabel: z.string().max(128).optional(),
+      appVersion: z.string().max(64).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      transport: z.enum(["APNS", "FCM"]),
+      token: z.string().min(16).max(4096),
+      installationId: z.string().max(128).optional(),
+      platform: z.string().max(128).optional(),
+      deviceLabel: z.string().max(128).optional(),
+      appVersion: z.string().max(64).optional(),
+      environment: z.enum(["production", "development"]).optional(),
+    })
+    .strict(),
+]);
+
+export type DeviceRegisterInput = z.infer<typeof deviceRegisterSchema>;
 
 /**
  * Hosts (exact or dot-suffix) operated by the browser vendors' push
