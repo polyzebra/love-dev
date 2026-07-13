@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
+import { loadPhoneTools, usePhoneTools, type PhoneTools } from "@/lib/auth/phone-tools";
 import { ChevronDown, MessageCircleMore } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,12 +59,16 @@ function digitsOf(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-function formatNational(digits: string, c: Country): string {
-  return digits ? new AsYouType(c.iso).input(digits) : "";
+function formatNational(digits: string, c: Country, tools: PhoneTools | null): string {
+  // Until the lazy formatter lands (~100ms) the digits pass through
+  // unformatted - same characters, no layout shift, upgraded in place.
+  if (!digits) return "";
+  return tools ? tools.formatAsYouType(digits, c.iso) : digits;
 }
 
 export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
   const router = useRouter();
+  const tools = usePhoneTools();
 
   const allowedCountries = useMemo(
     () => allowedIsos.map((iso) => countryByIso(iso)).filter((c): c is Country => c !== null),
@@ -91,15 +95,15 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
   // user types or picks this session wins over the stored send.
   const storedPhone = useSyncExternalStore(subscribeNever, readStoredPhone, () => null);
   const seeded = useMemo(() => {
-    const parsed = storedPhone ? parsePhoneNumberFromString(storedPhone) : null;
+    const parsed = storedPhone && tools ? tools.parsePhone(storedPhone) : null;
     const seededCountry = parsed && allowedCountries.find((c) => c.iso === parsed.country);
     return parsed && seededCountry
       ? {
-          display: formatNational(String(parsed.nationalNumber), seededCountry),
+          display: formatNational(String(parsed.nationalNumber), seededCountry, tools),
           country: seededCountry,
         }
       : null;
-  }, [storedPhone, allowedCountries]);
+  }, [storedPhone, allowedCountries, tools]);
 
   // The seeded number's country outranks the remembered one - the
   // pre-filled digits are only valid under their own dial code.
@@ -120,7 +124,7 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
       localStorage.setItem(PHONE_COUNTRY_KEY, next.iso);
     } catch {}
     // Reformat whatever is typed under the new country's rules.
-    setTypedDisplay(formatNational(digitsOf(display), next));
+    setTypedDisplay(formatNational(digitsOf(display), next, tools));
     inputRef.current?.focus();
   }
 
@@ -133,7 +137,7 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
     if (raw.length < display.length && digits === digitsOf(display)) {
       digits = digits.slice(0, -1);
     }
-    setTypedDisplay(formatNational(digits, country));
+    setTypedDisplay(formatNational(digits, country, tools));
     // Editing the number clears BOTH error layers - after a duplicate
     // (409) the form stays right here and must feel immediately usable.
     if (fieldError) setFieldError(null);
@@ -143,7 +147,8 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (pending) return;
-    const parsed = parsePhoneNumberFromString(digitsOf(display), country.iso);
+    const t = tools ?? (await loadPhoneTools());
+    const parsed = t.parsePhone(digitsOf(display), country.iso);
     if (!parsed?.isValid()) {
       setFieldError("Enter a valid phone number.");
       return;

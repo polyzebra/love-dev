@@ -32,7 +32,9 @@ export default function ForgotPasswordPage() {
     }
     setFieldError(null);
     setSubmitting(true);
-    await supabaseBrowser().auth.resetPasswordForEmail(email, {
+    await (
+      await supabaseBrowser()
+    ).auth.resetPasswordForEmail(email, {
       redirectTo: `${authRedirectUrl("/auth/callback")}?next=/reset-password`,
     });
     setSubmitting(false);

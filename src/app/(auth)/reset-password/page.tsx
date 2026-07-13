@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
     }
     setServerError(null);
     setSubmitting(true);
-    const { error } = await supabaseBrowser().auth.updateUser({ password });
+    const { error } = await (await supabaseBrowser()).auth.updateUser({ password });
     setSubmitting(false);
     if (error) {
       setServerError(

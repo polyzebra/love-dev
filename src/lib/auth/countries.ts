@@ -1,24 +1,17 @@
-// The "core" build with explicit metadata - same reasoning as
-// phone-flow.ts: the bundled builds (min/max) resolve their metadata
-// through an ESM/CJS interop shim that breaks under tsx (tests) while
-// working under Next. core + an explicit JSON import behaves identically
-// everywhere, which is what lets this dataset be THE one source of truth
-// for server allowlists (phone-countries.ts) and the UI alike.
-import {
-  getCountries,
-  getCountryCallingCode,
-  type CountryCode,
-  type MetadataJson,
-} from "libphonenumber-js/core";
-import metadataJson from "libphonenumber-js/metadata.min.json";
-
-const phoneMetadata = metadataJson as unknown as MetadataJson;
+// Types only from libphonenumber-js (erased at compile time - the 40 KB
+// metadata blob must NEVER enter client bundles from here, Phase 0J).
+// The ISO -> dial-code facts come from the GENERATED static table
+// (countries-data.ts, from scripts/generate-countries.mjs), which keeps
+// this dataset the one source of truth for server allowlists
+// (phone-countries.ts) and the UI alike without shipping metadata.
+import type { CountryCode } from "libphonenumber-js/core";
+import { COUNTRY_DIAL_CODES } from "@/lib/auth/countries-data";
 
 /**
- * Country metadata for the phone step - derived entirely from
- * libphonenumber-js metadata (every dialable region) + Intl.DisplayNames
- * for human names + flag emoji computed from the ISO code. Nothing is
- * hand-typed, so the list stays correct when the library updates.
+ * Country metadata for the phone step - ISO/dial codes from the generated
+ * libphonenumber table + Intl.DisplayNames for human names + flag emoji
+ * computed from the ISO code. Nothing is hand-typed; regenerate the table
+ * when the library updates.
  */
 
 export type Country = {
@@ -69,21 +62,19 @@ function nameOf(iso: string): string | null {
 }
 
 /** Every nameable country, alphabetical by English name. */
-export const COUNTRIES: Country[] = getCountries(phoneMetadata)
-  .flatMap((iso): Country[] => {
-    const name = nameOf(iso);
-    return name
-      ? [
-          {
-            iso,
-            name,
-            dialCode: `+${getCountryCallingCode(iso, phoneMetadata)}`,
-            flag: flagEmoji(iso),
-          },
-        ]
-      : [];
-  })
-  .sort((a, b) => a.name.localeCompare(b.name));
+export const COUNTRIES: Country[] = COUNTRY_DIAL_CODES.flatMap(([iso, code]): Country[] => {
+  const name = nameOf(iso);
+  return name
+    ? [
+        {
+          iso: iso as CountryCode,
+          name,
+          dialCode: `+${code}`,
+          flag: flagEmoji(iso),
+        },
+      ]
+    : [];
+}).sort((a, b) => a.name.localeCompare(b.name));
 
 const byIso = new Map(COUNTRIES.map((c) => [c.iso as string, c]));
 

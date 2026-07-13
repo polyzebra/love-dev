@@ -115,7 +115,9 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
   async function startLink(provider: OAuthProvider) {
     setBusy(provider);
     recordIdentityEvent("link_started", provider);
-    const { error } = await supabaseBrowser().auth.linkIdentity({
+    const { error } = await (
+      await supabaseBrowser()
+    ).auth.linkIdentity({
       provider,
       options: {
         redirectTo: `${authRedirectUrl("/auth/callback")}?next=${encodeURIComponent("/settings/sign-in-methods")}`,
@@ -130,7 +132,7 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
   async function confirmUnlink(provider: OAuthProvider) {
     setBusy(provider);
     try {
-      const supabase = supabaseBrowser();
+      const supabase = await supabaseBrowser();
       const { data, error } = await supabase.auth.getUserIdentities();
       const identity = data?.identities.find((i) => i.provider === provider);
       if (error || !identity) throw error ?? new Error(`no ${provider} identity`);

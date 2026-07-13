@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { loadPhoneTools, usePhoneTools, type PhoneTools } from "@/lib/auth/phone-tools";
 import { ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoginStepShell } from "@/components/auth/LoginStepShell";
@@ -59,8 +59,10 @@ function readStoredRetry(): string | null {
  * "+353 ••• ••• 333" - dial code kept, national digits masked except the
  * last three, grouped in threes from the right.
  */
-function maskPhone(e164: string): string {
-  const parsed = parsePhoneNumberFromString(e164);
+function maskPhone(e164: string, tools: PhoneTools | null): string {
+  // Without the lazy parser the fallback branch below masks the raw
+  // digits - never MORE information, only less pretty grouping.
+  const parsed = tools ? tools.parsePhone(e164) : null;
   const dial = parsed ? `+${parsed.countryCallingCode}` : "";
   const digits = (parsed ? String(parsed.nationalNumber) : e164.replace(/^\+/, "")).replace(
     /\D/g,
@@ -76,6 +78,7 @@ function maskPhone(e164: string): string {
 
 export function PhoneLoginCode() {
   const router = useRouter();
+  const tools = usePhoneTools();
   const searchParams = useSearchParams();
   const queryPhone = searchParams.get("phone");
 
@@ -107,7 +110,7 @@ export function PhoneLoginCode() {
     return () => clearInterval(t);
   }, [lockSeconds]);
 
-  const masked = useMemo(() => (phone ? maskPhone(phone) : null), [phone]);
+  const masked = useMemo(() => (phone ? maskPhone(phone, tools) : null), [phone, tools]);
 
   function clearSession() {
     try {
@@ -160,7 +163,7 @@ export function PhoneLoginCode() {
     if (!phone) return;
     setError(null);
     setExpired(false);
-    const iso = parsePhoneNumberFromString(phone)?.country;
+    const iso = (tools ?? (await loadPhoneTools())).parsePhone(phone)?.country;
     const result = await sendPhoneLoginCode({
       phoneE164: phone,
       countryIso: iso ?? "IE",

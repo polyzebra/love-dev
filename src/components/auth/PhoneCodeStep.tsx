@@ -3,7 +3,7 @@
 import { PHONE_OTP_LENGTH } from "@/lib/auth/otp";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { loadPhoneTools, usePhoneTools, type PhoneTools } from "@/lib/auth/phone-tools";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
@@ -44,6 +44,7 @@ function readStoredRetry(): string | null {
 }
 
 export function PhoneCodeStep() {
+  const tools = usePhoneTools();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryPhone = searchParams.get("phone");
@@ -69,8 +70,9 @@ export function PhoneCodeStep() {
   const otpRef = useRef<HTMLInputElement>(null);
 
   const prettyPhone = useMemo(
-    () => (phone ? (parsePhoneNumberFromString(phone)?.formatInternational() ?? phone) : null),
-    [phone],
+    // Raw E.164 until the lazy formatter lands (~100ms), then pretty.
+    () => (phone ? (tools?.parsePhone(phone)?.formatInternational() ?? phone) : null),
+    [phone, tools],
   );
 
   async function verify(value: string) {
@@ -103,7 +105,7 @@ export function PhoneCodeStep() {
     } catch {}
     const country =
       countryByIso(iso) ??
-      countryByIso(parsePhoneNumberFromString(phone)?.country) ??
+      countryByIso((tools ?? (await loadPhoneTools())).parsePhone(phone)?.country) ??
       countryByIso(DEFAULT_COUNTRY_ISO)!;
     const result = await sendPhoneCode({
       phoneE164: phone,

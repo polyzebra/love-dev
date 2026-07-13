@@ -80,7 +80,9 @@ export function RecoveryOptions({ phoneEnabled }: { phoneEnabled: boolean }) {
       return;
     }
     setPending(true);
-    const { error } = await supabaseBrowser().auth.signInWithOAuth({
+    const { error } = await (
+      await supabaseBrowser()
+    ).auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${authRedirectUrl("/auth/callback")}?next=${encodeURIComponent("/discover")}`,

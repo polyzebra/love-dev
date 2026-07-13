@@ -51,7 +51,6 @@ export function useConversationChannel(opts: {
   });
 
   useEffect(() => {
-    const supabase = supabaseBrowser();
     let channel: RealtimeChannel | null = null;
     let disposed = false;
     let attempt = 0;
@@ -76,7 +75,8 @@ export function useConversationChannel(opts: {
 
     const teardownChannel = () => {
       if (channel) {
-        void supabase.removeChannel(channel);
+        const doomed = channel;
+        void supabaseBrowser().then((s) => s.removeChannel(doomed));
         channel = null;
       }
     };
@@ -92,6 +92,8 @@ export function useConversationChannel(opts: {
     };
 
     const subscribe = async () => {
+      if (disposed) return;
+      const supabase = await supabaseBrowser();
       if (disposed) return;
       teardownChannel();
       setHealth(attempt === 0 ? "connecting" : "degraded");

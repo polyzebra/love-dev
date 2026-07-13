@@ -169,7 +169,9 @@ export function LoginEntry({
       return;
     }
     setPending(provider);
-    const { error } = await supabaseBrowser().auth.signInWithOAuth({
+    const { error } = await (
+      await supabaseBrowser()
+    ).auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${authRedirectUrl("/auth/callback")}?next=${encodeURIComponent(callbackUrl)}`,

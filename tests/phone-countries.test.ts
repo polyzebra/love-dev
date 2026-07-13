@@ -90,16 +90,13 @@ function srcFiles(dir = SRC): string[] {
 }
 
 async function main() {
-  const { getSupportedPhoneCountries, getSupportedPhoneCountrySet } = await import(
-    "../src/lib/auth/phone-countries"
-  );
-  const { COUNTRIES, POPULAR_COUNTRIES, countryByIso, matchesCountry } = await import(
-    "../src/lib/auth/countries"
-  );
+  const { getSupportedPhoneCountries, getSupportedPhoneCountrySet } =
+    await import("../src/lib/auth/phone-countries");
+  const { COUNTRIES, POPULAR_COUNTRIES, countryByIso, matchesCountry } =
+    await import("../src/lib/auth/countries");
   const { sendPhoneVerification, normalizePhone } = await import("../src/lib/auth/phone-flow");
-  const { sendPhoneLoginCode, verifyPhoneLoginCode } = await import(
-    "../src/lib/auth/phone-login-flow"
-  );
+  const { sendPhoneLoginCode, verifyPhoneLoginCode } =
+    await import("../src/lib/auth/phone-login-flow");
   const { db } = await import("../src/lib/db");
   type Provider = import("../src/lib/auth/phone").PhoneVerificationProvider;
   type AuthClient = import("../src/lib/auth/phone-login-flow").PhoneLoginAuthClient;
@@ -179,12 +176,15 @@ async function main() {
 
     // ------------------------------------------------------------ case 2
     console.log("2. SUPPORTED_PHONE_COUNTRIES - the ONE shared base");
-    await check("SUPPORTED_PHONE_COUNTRIES=IE,GB,US narrows all three workflows identically", () => {
-      setEnv({ SUPPORTED_PHONE_COUNTRIES: "IE,GB,US" });
-      for (const kind of kinds) {
-        assert.deepEqual(getSupportedPhoneCountries(kind), ["IE", "GB", "US"], kind);
-      }
-    });
+    await check(
+      "SUPPORTED_PHONE_COUNTRIES=IE,GB,US narrows all three workflows identically",
+      () => {
+        setEnv({ SUPPORTED_PHONE_COUNTRIES: "IE,GB,US" });
+        for (const kind of kinds) {
+          assert.deepEqual(getSupportedPhoneCountries(kind), ["IE", "GB", "US"], kind);
+        }
+      },
+    );
     await check("trim/uppercase/dedupe; junk ISO codes filtered via the shared dataset", () => {
       setEnv({ SUPPORTED_PHONE_COUNTRIES: " ie , gb ,GB, ZZ ,123,Q,USA,us," });
       // "US" appears once (only "us" -> US does; USA/ZZ/123/Q are junk)
@@ -201,12 +201,15 @@ async function main() {
 
     // ------------------------------------------------------------ case 3
     console.log("3. per-workflow overrides NARROW only their workflow");
-    await check("PHONE_LOGIN_COUNTRIES=IE narrows ONLY login; the others keep the full base", () => {
-      setEnv({ PHONE_LOGIN_COUNTRIES: "IE" });
-      assert.deepEqual(getSupportedPhoneCountries("login"), ["IE"]);
-      assert.deepEqual(getSupportedPhoneCountries("verification"), FULL_LIST);
-      assert.deepEqual(getSupportedPhoneCountries("change"), FULL_LIST);
-    });
+    await check(
+      "PHONE_LOGIN_COUNTRIES=IE narrows ONLY login; the others keep the full base",
+      () => {
+        setEnv({ PHONE_LOGIN_COUNTRIES: "IE" });
+        assert.deepEqual(getSupportedPhoneCountries("login"), ["IE"]);
+        assert.deepEqual(getSupportedPhoneCountries("verification"), FULL_LIST);
+        assert.deepEqual(getSupportedPhoneCountries("change"), FULL_LIST);
+      },
+    );
     await check("intersection semantics: an override code outside the base is dropped", () => {
       setEnv({ SUPPORTED_PHONE_COUNTRIES: "IE,GB", PHONE_LOGIN_COUNTRIES: "US,IE" });
       assert.deepEqual(getSupportedPhoneCountries("login"), ["IE"], "US is outside the base");
@@ -220,20 +223,27 @@ async function main() {
       setEnv({ SUPPORTED_PHONE_COUNTRIES: "IE,GB", PHONE_VERIFICATION_COUNTRIES: "US,DE" });
       assert.deepEqual(getSupportedPhoneCountries("verification"), ["IE", "GB"]);
     });
-    await check("each workflow reads exactly its own override; fresh read per call (no cache)", () => {
-      setEnv({
-        PHONE_LOGIN_COUNTRIES: "IE",
-        PHONE_VERIFICATION_COUNTRIES: "IE,GB",
-        PHONE_CHANGE_COUNTRIES: "IE,GB,US",
-      });
-      assert.deepEqual(getSupportedPhoneCountries("login"), ["IE"]);
-      assert.deepEqual(getSupportedPhoneCountries("verification"), ["IE", "GB"]);
-      assert.deepEqual(getSupportedPhoneCountries("change"), ["IE", "GB", "US"]);
-      process.env.PHONE_LOGIN_COUNTRIES = "GB";
-      assert.deepEqual(getSupportedPhoneCountries("login"), ["GB"], "no module-level cache");
-      assert.deepEqual(getSupportedPhoneCountries("change"), ["IE", "GB", "US"], "change unmoved");
-      assert.ok(getSupportedPhoneCountrySet("login").has("GB"), "set view agrees");
-    });
+    await check(
+      "each workflow reads exactly its own override; fresh read per call (no cache)",
+      () => {
+        setEnv({
+          PHONE_LOGIN_COUNTRIES: "IE",
+          PHONE_VERIFICATION_COUNTRIES: "IE,GB",
+          PHONE_CHANGE_COUNTRIES: "IE,GB,US",
+        });
+        assert.deepEqual(getSupportedPhoneCountries("login"), ["IE"]);
+        assert.deepEqual(getSupportedPhoneCountries("verification"), ["IE", "GB"]);
+        assert.deepEqual(getSupportedPhoneCountries("change"), ["IE", "GB", "US"]);
+        process.env.PHONE_LOGIN_COUNTRIES = "GB";
+        assert.deepEqual(getSupportedPhoneCountries("login"), ["GB"], "no module-level cache");
+        assert.deepEqual(
+          getSupportedPhoneCountries("change"),
+          ["IE", "GB", "US"],
+          "change unmoved",
+        );
+        assert.ok(getSupportedPhoneCountrySet("login").has("GB"), "set view agrees");
+      },
+    );
 
     // ------------------------------------------------------------ case 4
     console.log("4. server authority - full default admits, explicit narrowing rejects");
@@ -242,56 +252,68 @@ async function main() {
     await db.user.create({
       data: { id: userId, email: `phone-countries-${RUN}@example.com` },
     });
-    await check("full default: the change flow sends to a US number (spy provider - no SMS)", async () => {
-      setEnv({});
-      const spy = spyProvider();
-      const sent = await sendPhoneVerification({
-        user: sessionUser(userId),
-        phone: NUMBERS.usChange,
-        provider: spy.provider,
-      });
-      assert.equal(sent.kind, "sent", "US is supported by default now");
-      assert.deepEqual(spy.calls, [{ method: "send", phoneE164: NUMBERS.usChange }]);
-    });
-    await check("full default: the login flow sends to a US number (spy client - no SMS)", async () => {
-      setEnv({});
-      const spy = spyClient();
-      const sent = await sendPhoneLoginCode({ phone: NUMBERS.usLogin, client: spy.client });
-      assert.equal(sent.kind, "sent", "US is supported by default now");
-      assert.deepEqual(spy.calls, [{ method: "signInWithOtp" }]);
-    });
-    await check("SUPPORTED_PHONE_COUNTRIES=IE,GB: BOTH flows reject US pre-provider again", async () => {
-      setEnv({ SUPPORTED_PHONE_COUNTRIES: "IE,GB" });
-      const provider = spyProvider();
-      const change = await sendPhoneVerification({
-        user: sessionUser(userId),
-        phone: NUMBERS.usChange,
-        provider: provider.provider,
-      });
-      assert.equal(change.kind, "unsupported_country");
-      const client = spyClient();
-      const login = await sendPhoneLoginCode({ phone: NUMBERS.usLogin, client: client.client });
-      assert.equal(login.kind, "unsupported_country");
-      const verify = await verifyPhoneLoginCode({
-        phone: NUMBERS.usLogin,
-        code: "123456",
-        client: client.client,
-      });
-      assert.equal(verify.kind, "unsupported_country");
-      assert.equal(provider.calls.length, 0, "provider must never be reached - no SMS");
-      assert.equal(client.calls.length, 0, "client must never be reached");
-    });
-    await check("PHONE_LOGIN_COUNTRIES=IE narrows the login flow ONLY (change keeps GB)", async () => {
-      setEnv({ PHONE_LOGIN_COUNTRIES: "IE" });
-      const client = spyClient();
-      const login = await sendPhoneLoginCode({ phone: "+447400123456", client: client.client });
-      assert.equal(login.kind, "unsupported_country", "GB rejected under the login override");
-      assert.equal(client.calls.length, 0);
-      assert.ok(
-        getSupportedPhoneCountrySet("change").has("GB"),
-        "the change flow's list is untouched by the login override",
-      );
-    });
+    await check(
+      "full default: the change flow sends to a US number (spy provider - no SMS)",
+      async () => {
+        setEnv({});
+        const spy = spyProvider();
+        const sent = await sendPhoneVerification({
+          user: sessionUser(userId),
+          phone: NUMBERS.usChange,
+          provider: spy.provider,
+        });
+        assert.equal(sent.kind, "sent", "US is supported by default now");
+        assert.deepEqual(spy.calls, [{ method: "send", phoneE164: NUMBERS.usChange }]);
+      },
+    );
+    await check(
+      "full default: the login flow sends to a US number (spy client - no SMS)",
+      async () => {
+        setEnv({});
+        const spy = spyClient();
+        const sent = await sendPhoneLoginCode({ phone: NUMBERS.usLogin, client: spy.client });
+        assert.equal(sent.kind, "sent", "US is supported by default now");
+        assert.deepEqual(spy.calls, [{ method: "signInWithOtp" }]);
+      },
+    );
+    await check(
+      "SUPPORTED_PHONE_COUNTRIES=IE,GB: BOTH flows reject US pre-provider again",
+      async () => {
+        setEnv({ SUPPORTED_PHONE_COUNTRIES: "IE,GB" });
+        const provider = spyProvider();
+        const change = await sendPhoneVerification({
+          user: sessionUser(userId),
+          phone: NUMBERS.usChange,
+          provider: provider.provider,
+        });
+        assert.equal(change.kind, "unsupported_country");
+        const client = spyClient();
+        const login = await sendPhoneLoginCode({ phone: NUMBERS.usLogin, client: client.client });
+        assert.equal(login.kind, "unsupported_country");
+        const verify = await verifyPhoneLoginCode({
+          phone: NUMBERS.usLogin,
+          code: "123456",
+          client: client.client,
+        });
+        assert.equal(verify.kind, "unsupported_country");
+        assert.equal(provider.calls.length, 0, "provider must never be reached - no SMS");
+        assert.equal(client.calls.length, 0, "client must never be reached");
+      },
+    );
+    await check(
+      "PHONE_LOGIN_COUNTRIES=IE narrows the login flow ONLY (change keeps GB)",
+      async () => {
+        setEnv({ PHONE_LOGIN_COUNTRIES: "IE" });
+        const client = spyClient();
+        const login = await sendPhoneLoginCode({ phone: "+447400123456", client: client.client });
+        assert.equal(login.kind, "unsupported_country", "GB rejected under the login override");
+        assert.equal(client.calls.length, 0);
+        assert.ok(
+          getSupportedPhoneCountrySet("change").has("GB"),
+          "the change flow's list is untouched by the login override",
+        );
+      },
+    );
 
     // ------------------------------------------------------------ case 5
     console.log("5. E.164 normalization equivalence (also phone-verification.test.ts case 7)");
@@ -348,7 +370,8 @@ async function main() {
       const envRead =
         /process\.env(?:\.|\[\s*["'`])(SUPPORTED_PHONE_COUNTRIES|PHONE_LOGIN_COUNTRIES|PHONE_VERIFICATION_COUNTRIES|PHONE_CHANGE_COUNTRIES)/;
       const offenders = srcFiles().filter(
-        (file) => !file.endsWith(`lib${path.sep}auth${path.sep}phone-countries.ts`) &&
+        (file) =>
+          !file.endsWith(`lib${path.sep}auth${path.sep}phone-countries.ts`) &&
           envRead.test(readFileSync(file, "utf8")),
       );
       assert.deepEqual(offenders, [], "only phone-countries.ts may read the country envs");
@@ -357,13 +380,25 @@ async function main() {
         read("lib/auth/phone-countries.ts").includes("process.env[OVERRIDE_ENV[workflow]]"),
         "the shared module reads the overrides through its own table",
       );
+      // Phase 0J: the country dataset comes from the GENERATED static
+      // table (countries-data.ts via scripts/generate-countries.mjs) so
+      // the 40KB metadata blob never enters client bundles. No src file
+      // may derive it from libphonenumber at runtime any more.
       const datasetBuilders = srcFiles().filter((file) =>
         readFileSync(file, "utf8").includes("getCountries("),
       );
       assert.deepEqual(
         datasetBuilders,
-        [path.join(SRC, "lib", "auth", "countries.ts")],
-        "only countries.ts builds a country array from libphonenumber",
+        [],
+        "no src file builds a country array from libphonenumber at runtime",
+      );
+      assert.ok(
+        read("lib/auth/countries.ts").includes("COUNTRY_DIAL_CODES"),
+        "countries.ts consumes the generated table",
+      );
+      assert.ok(
+        read("lib/auth/countries-data.ts").includes("AUTO-GENERATED"),
+        "the table is generated, never hand-typed",
       );
     });
 
@@ -381,7 +416,10 @@ async function main() {
       assert.equal(pinned.length + rest.length, COUNTRIES.length, "one row per country, deduped");
       assert.equal(rest[0].iso, "AF", "the rest stays alphabetical (Afghanistan first)");
       // 245 flat rows - a plain list, virtualization deliberately not used.
-      assert.ok(pinned.length + rest.length === 245 && 245 < 1000, "list size needs no virtualization");
+      assert.ok(
+        pinned.length + rest.length === 245 && 245 < 1000,
+        "list size needs no virtualization",
+      );
     });
     await check("UI default country: IE preferred from the full list (both input steps)", () => {
       setEnv({});

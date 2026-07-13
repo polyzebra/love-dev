@@ -164,7 +164,9 @@ export function EmailAttachStep() {
   async function startOAuth(provider: "google" | "apple") {
     if (oauthPending) return;
     setOauthPending(provider);
-    const { error } = await supabaseBrowser().auth.signInWithOAuth({
+    const { error } = await (
+      await supabaseBrowser()
+    ).auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${authRedirectUrl("/auth/callback")}?next=${encodeURIComponent("/discover")}`,
