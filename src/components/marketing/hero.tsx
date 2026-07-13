@@ -17,7 +17,6 @@ export function MarketingHero({
   title,
   subtitle,
   actions,
-  proof,
   visual,
   align = "center",
   intensity,
@@ -28,8 +27,6 @@ export function MarketingHero({
   subtitle?: React.ReactNode;
   /** CTA row - compose with <HeroCta>. */
   actions?: React.ReactNode;
-  /** Small trust/proof line under the CTAs. */
-  proof?: React.ReactNode;
   /** Right-hand product visual (split layout only). */
   visual?: React.ReactNode;
   align?: "split" | "center";
@@ -95,16 +92,6 @@ export function MarketingHero({
               )}
             >
               {actions}
-            </div>
-          )}
-          {proof && (
-            <div
-              className={cn(
-                "animate-rise flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground [--rise-delay:320ms]",
-                split && "md:justify-start",
-              )}
-            >
-              {proof}
             </div>
           )}
         </div>

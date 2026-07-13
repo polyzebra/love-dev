@@ -63,19 +63,6 @@ export default function LandingPage() {
             </HeroCta>
           </>
         }
-        proof={
-          <>
-            <span className="flex items-center gap-1.5">
-              <BadgeCheck className="size-4 fill-sky-400/90 text-background" aria-hidden="true" />
-              Photo-verified members
-            </span>
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-success" aria-hidden="true" />
-              Human-reviewed reports
-            </span>
-            <span>Free to join · No ads</span>
-          </>
-        }
         visual={<HeroScene />}
       />
 
