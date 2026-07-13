@@ -1,0 +1,81 @@
+/**
+ * Test runner: sequential tsx suites with lane selection and a summary.
+ *
+ *   node scripts/run-tests.mjs            all suites (unit + integration + live)
+ *   node scripts/run-tests.mjs unit       no-DB source-contract suites
+ *   node scripts/run-tests.mjs integration DB-backed suites (Prisma only;
+ *                                          external transports injected)
+ *   node scripts/run-tests.mjs live       suites that construct real
+ *                                          Supabase clients (need live creds)
+ *
+ * Lanes are explicit so CI can gate them differently: `unit` needs no
+ * environment at all; `integration` needs a migrated Postgres and dummy
+ * provider env; `live` needs real Supabase credentials.
+ */
+import { spawnSync } from "node:child_process";
+import { readdirSync } from "node:fs";
+
+const LIVE = new Set([
+  // Construct real @supabase/supabase-js clients (auth admin API).
+  "admin-authz.test.ts",
+  "auth-cleanup.test.ts",
+  "identity-invariants.test.ts",
+  "phone-sync.test.ts",
+]);
+
+const UNIT = new Set([
+  // Pure source-contract suites - no DB import, no env needed.
+  "auth-form-stack.test.ts",
+  "auth-url.test.ts",
+  "billing-ui.test.ts",
+  "login-routes.test.ts",
+  "notifications-web-surface.test.ts",
+]);
+
+const lane = process.argv[2] ?? "all";
+const all = readdirSync("tests")
+  .filter((f) => f.endsWith(".test.ts"))
+  .sort();
+
+const selected = all.filter((f) => {
+  if (lane === "unit") return UNIT.has(f);
+  if (lane === "live") return LIVE.has(f);
+  if (lane === "integration") return !UNIT.has(f) && !LIVE.has(f);
+  return true; // all
+});
+
+if (selected.length === 0) {
+  console.error(`No suites in lane "${lane}" (valid: unit, integration, live, all)`);
+  process.exit(2);
+}
+
+let failed = 0;
+const results = [];
+for (const file of selected) {
+  const started = Date.now();
+  const run = spawnSync("npx", ["tsx", `tests/${file}`], {
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf8",
+  });
+  const ok = run.status === 0;
+  if (!ok) failed++;
+  const summary =
+    (run.stdout + run.stderr)
+      .split("\n")
+      .reverse()
+      .find((l) => /passed|FAILED|Error/.test(l))
+      ?.trim() ?? `(exit ${run.status})`;
+  results.push({ file, ok, ms: Date.now() - started, summary });
+  console.log(`${ok ? "PASS" : "FAIL"}  ${file}  (${Date.now() - started}ms)  ${summary}`);
+  if (!ok) {
+    // Full output for failures only - keeps green runs readable.
+    console.log(run.stdout);
+    console.error(run.stderr);
+  }
+}
+
+console.log(
+  `\n${lane}: ${results.length - failed}/${results.length} suites passed` +
+    (failed ? ` - ${failed} FAILED` : ""),
+);
+process.exit(failed ? 1 : 0);

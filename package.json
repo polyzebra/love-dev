@@ -11,7 +11,15 @@
     "format": "prettier --write src prisma",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "format:check": "prettier --check src prisma",
+    "test": "node scripts/run-tests.mjs",
+    "test:unit": "node scripts/run-tests.mjs unit",
+    "test:integration": "node scripts/run-tests.mjs integration",
+    "test:integration:live": "node scripts/run-tests.mjs live",
+    "db:validate": "prisma validate && prisma generate && git diff --exit-code --stat src/generated",
+    "check:public-env": "node scripts/check-public-env.mjs",
+    "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
