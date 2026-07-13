@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
 import { encode as encodeBlurhash } from "blurhash";
-import { supabaseServer } from "@/lib/supabase/server";
+import { storageClient } from "@/lib/storage";
 
 /**
  * Profile photo pipeline built around one canonical 4:5 portrait ratio.
@@ -387,7 +387,7 @@ export async function uploadProfilePhoto(
 ): Promise<UploadedPhoto> {
   assertStorageConfigured();
 
-  const supabase = await supabaseServer();
+  const supabase = await storageClient();
   const photoId = existingPhotoId ?? randomUUID();
   const paths = photoObjectPaths(userId, photoId);
 
@@ -454,7 +454,7 @@ export async function deletePhotoObjects(storagePath: string | null | undefined)
   if (!storagePath) return;
   assertStorageConfigured();
 
-  const supabase = await supabaseServer();
+  const supabase = await storageClient();
   const paths = PHOTO_VARIANT_NAMES.map((variant) => `${storagePath}/${variant}.webp`);
   await supabase.storage
     .from(PHOTOS_BUCKET)

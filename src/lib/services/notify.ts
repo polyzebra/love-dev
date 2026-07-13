@@ -1,4 +1,4 @@
-import { after } from "next/server";
+import { deferAfterResponse } from "@/lib/defer";
 import { db } from "@/lib/db";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import type { DeliveryStatus, NotificationType } from "@/generated/prisma/enums";
@@ -534,20 +534,16 @@ export async function processPendingPush(
 }
 
 /**
- * Kick the outbox after the current response finishes. Uses Next's after()
- * inside a request scope; falls back to a detached promise anywhere else
- * (tests, scripts) so callers never have to care.
+ * Kick the outbox after the current response finishes (deferAfterResponse
+ * seam - request-scoped in Next, detached promise in tests/scripts, so
+ * callers never have to care).
  */
 export function schedulePushDispatch(): void {
   const run = () =>
     processPendingPush().catch((error) => {
       console.error("[notify] push dispatch failed:", error);
     });
-  try {
-    after(run);
-  } catch {
-    void run();
-  }
+  deferAfterResponse(run);
 }
 
 /**
@@ -564,11 +560,7 @@ export function scheduleOutboxDispatch(): void {
       console.error("[notify] email dispatch failed:", error);
     });
   };
-  try {
-    after(() => void run());
-  } catch {
-    void run();
-  }
+  deferAfterResponse(run);
 }
 
 // ---------------------------------------------------------------------------

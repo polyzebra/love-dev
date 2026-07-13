@@ -1,8 +1,7 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
 import { isStaff } from "@/lib/rbac";
 import type { Role } from "@/generated/prisma/enums";
-import { supabaseServer } from "@/lib/supabase/server";
+import { storageClient, storageServiceClientOrNull } from "@/lib/storage";
 import { canViewPhoto, PHOTOS_BUCKET, type PhotoVariant } from "@/lib/services/photos";
 
 /**
@@ -85,21 +84,8 @@ export async function authorizeMediaAccess(
 }
 
 // ---------------------------------------------------------------------------
-// Storage reads
+// Storage reads (through the lib/storage adapter - Phase 0K)
 // ---------------------------------------------------------------------------
-
-let serviceClient: SupabaseClient | null = null;
-
-/** Service-role storage client (route authz is the boundary), or null. */
-function storageServiceClient(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (!url || !key) return null;
-  serviceClient ??= createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-  return serviceClient;
-}
 
 /**
  * Fetch one variant's bytes. Service-role when configured (works for
@@ -109,7 +95,7 @@ export async function downloadPhotoVariant(
   photo: Pick<MediaPhoto, "storagePath">,
   variant: PhotoVariant,
 ): Promise<Blob | null> {
-  const client = storageServiceClient() ?? (await supabaseServer());
+  const client = await storageClient();
   const { data, error } = await client.storage
     .from(PHOTOS_BUCKET)
     .download(`${photo.storagePath}/${variant}.webp`);
@@ -132,7 +118,7 @@ export async function createSignedMediaUrl(
   variant: PhotoVariant,
   ttlSeconds: number = SIGNED_MEDIA_TTL_SECONDS,
 ): Promise<SignedMediaUrl | null> {
-  const client = storageServiceClient();
+  const client = storageServiceClientOrNull();
   if (!client) return null;
   const { data, error } = await client.storage
     .from(PHOTOS_BUCKET)

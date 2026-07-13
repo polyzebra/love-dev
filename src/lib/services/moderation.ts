@@ -6,7 +6,7 @@ import {
 } from "@/lib/services/moderation-providers";
 import { PHOTOS_BUCKET } from "@/lib/services/photos";
 import { enforceGraduated, openModerationCase } from "@/lib/services/trust-safety";
-import { supabaseServer } from "@/lib/supabase/server";
+import { storageClient } from "@/lib/storage";
 
 /**
  * Photo moderation - provider architecture.
@@ -630,7 +630,7 @@ export async function moderatePhoto(photoId: string): Promise<ModeratePhotoOutco
 /** Fetches the card-variant bytes from the private bucket for the provider. */
 async function downloadCardVariant(storagePath: string | null): Promise<Buffer> {
   if (!storagePath) throw new Error("photo has no storagePath");
-  const supabase = await supabaseServer();
+  const supabase = await storageClient();
   const { data, error } = await supabase.storage
     .from(PHOTOS_BUCKET)
     .download(`${storagePath}/card.webp`);
