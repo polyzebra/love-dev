@@ -165,10 +165,15 @@ check("the glass card is owned by CONTENT, never by the layout (no empty-card fr
     !/glass w-full max-w-md/.test(layout),
     "the layout must not draw the card around the child slot",
   );
-  const loading = readFileSync(join(APP_AUTH, "loading.tsx"), "utf8");
-  assert.match(loading, /<AuthCard>/, "the segment loading state owns a complete card");
-  assert.match(loading, /AuthStepFallback/);
-  assert.match(loading, /Opening sign in\.\.\./);
+  // NO segment loading state and NO boundary in the layout: with nothing
+  // to commit early, the router holds the PREVIOUS screen until the
+  // complete login card is ready - no intermediate loading card, no
+  // cardless shell, no "Opening sign in" interstitial.
+  assert.ok(
+    !existsSync(join(APP_AUTH, "loading.tsx")),
+    "the /login entry must not have an intermediate loading card",
+  );
+  assert.ok(!/<Suspense/.test(layout), "no early-commit boundary in the auth layout");
   for (const file of ["LoginStepShell.tsx", "AuthShell.tsx", "LoginEntry.tsx"]) {
     assert.match(read(file), /<AuthCard>/, `${file} must own its card`);
   }
