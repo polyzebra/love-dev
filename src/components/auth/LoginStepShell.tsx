@@ -3,6 +3,7 @@
 import { BackButton } from "./BackButton";
 import { AnimatePresence, motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
+import { useEntranceAnimatable } from "@/components/fx/use-entrance";
 
 /**
  * Frame for LOGIN-flow steps (/login/phone, /login/phone/verify,
@@ -35,6 +36,9 @@ export function LoginStepShell({
   stepKey?: string;
   children: React.ReactNode;
 }) {
+  // Hard loads must paint the step fully visible - the entrance only
+  // animates for post-hydration mounts (client navs, step swaps).
+  const animatable = useEntranceAnimatable();
   return (
     <div>
       <div className="mb-8 flex items-center">
@@ -48,7 +52,7 @@ export function LoginStepShell({
       <AnimatePresence mode="wait">
         <motion.div
           key={stepKey ?? "step"}
-          initial={{ opacity: 0, x: 28 }}
+          initial={animatable ? { opacity: 0, x: 28 } : false}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -28 }}
           transition={{ duration: 0.5, ease: EASE_LUXE }}

@@ -154,6 +154,26 @@ check("routed auth Suspense boundaries always render a meaningful fallback", () 
   assert.match(fallback, /Opening verification\.\.\./);
 });
 
+check("entrance animations are hydration-gated - SSR HTML never hides step content", () => {
+  // framer-motion serializes `initial` into server HTML: a hard load of
+  // /login painted the card with opacity:0 content until the JS bundle
+  // hydrated (seconds on a phone). Every auth entrance must gate its
+  // initial state on useEntranceAnimatable().
+  for (const file of [
+    "LoginEntry.tsx",
+    "LoginStepShell.tsx",
+    "AuthShell.tsx",
+    "AuthErrorBanner.tsx",
+  ]) {
+    const src = read(file);
+    assert.match(src, /useEntranceAnimatable/, `${file} must gate its entrance`);
+    assert.ok(
+      !/initial=\{\{\s*opacity:\s*0/.test(src),
+      `${file} must not serialize opacity:0 into SSR HTML`,
+    );
+  }
+});
+
 check("the brand button never paints as a blank pill (solid fallback under the gradient)", () => {
   const button = readFileSync(
     join(import.meta.dirname, "..", "src", "components", "ui", "button.tsx"),

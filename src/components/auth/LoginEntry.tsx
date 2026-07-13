@@ -8,6 +8,7 @@ import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { EASE_LUXE } from "@/lib/motion";
+import { useEntranceAnimatable } from "@/components/fx/use-entrance";
 import { appleLoginEnabled } from "@/lib/auth/apple";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { authRedirectUrl } from "@/lib/auth/url";
@@ -135,6 +136,9 @@ export function LoginEntry({
 }) {
   const [pending, setPending] = useState<"google" | "apple" | null>(null);
   const appleEnabled = appleLoginEnabled();
+  // Hard loads must paint the card fully visible - the entrance only
+  // animates for post-hydration mounts (client-side navigations).
+  const animatable = useEntranceAnimatable();
 
   useEffect(() => {
     if (!errorCode) return;
@@ -170,7 +174,7 @@ export function LoginEntry({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={animatable ? { opacity: 0, y: 12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: EASE_LUXE }}
       className="flex flex-col"

@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
+import { useEntranceAnimatable } from "@/components/fx/use-entrance";
 import { cn } from "@/lib/utils";
 
 /**
@@ -20,11 +21,14 @@ export function AuthErrorBanner({
   id?: string;
   className?: string;
 }) {
+  // A server-rendered error (?error=...) must be readable on first
+  // paint - never inline-hidden until hydration.
+  const animatable = useEntranceAnimatable();
   return (
     <AnimatePresence>
       {message && (
         <motion.div
-          initial={{ opacity: 0, y: -4 }}
+          initial={animatable ? { opacity: 0, y: -4 } : false}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.25, ease: EASE_LUXE }}
