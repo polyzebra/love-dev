@@ -126,7 +126,9 @@ export async function undoLastSwipe(userId: string): Promise<boolean> {
 
   // Undo only if no match was formed from it
   const [a, b] = orderPair(userId, last.toId);
-  const match = await db.match.findUnique({ where: { userAId_userBId: { userAId: a, userBId: b } } });
+  const match = await db.match.findUnique({
+    where: { userAId_userBId: { userAId: a, userBId: b } },
+  });
   if (match?.status === "ACTIVE") return false;
 
   await db.like.delete({ where: { id: last.id } });

@@ -120,7 +120,7 @@ export function DiscoveryPreferencesForm({ initial }: { initial: DiscoveryPrefs 
             <Label htmlFor="visible" className="text-base">
               Show me in Discover
             </Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Turn off to pause new matches. Existing chats stay open.
             </p>
           </div>

@@ -1,13 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Ban,
-  EyeOff,
-  Flag,
-  MapPin,
-  PhoneCall,
-  Users,
-  Car,
-} from "lucide-react";
+import { Ban, EyeOff, Flag, MapPin, PhoneCall, Users, Car } from "lucide-react";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -70,18 +62,18 @@ export default function SafetyCentrePage() {
           <CardContent className="space-y-5">
             {MEETING_TIPS.map(({ icon: Icon, title, body }) => (
               <div key={title} className="flex items-start gap-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                  <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+                <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+                  <Icon className="text-accent-foreground size-5" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-sm font-medium">{title}</h3>
-                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+                  <p className="text-muted-foreground mt-0.5 text-sm leading-relaxed">{body}</p>
                 </div>
               </div>
             ))}
-            <p className="rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-              Keep conversations on Tirvea until you trust the person, and never send money or
-              share financial details - no genuine match will ever ask.
+            <p className="bg-muted text-muted-foreground rounded-2xl px-4 py-3 text-sm leading-relaxed">
+              Keep conversations on Tirvea until you trust the person, and never send money or share
+              financial details - no genuine match will ever ask.
             </p>
           </CardContent>
         </Card>
@@ -94,37 +86,37 @@ export default function SafetyCentrePage() {
           <CardContent className="space-y-5">
             {TOOLS.map(({ icon: Icon, title, body }) => (
               <div key={title} className="flex items-start gap-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                  <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+                <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+                  <Icon className="text-accent-foreground size-5" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-sm font-medium">{title}</h3>
-                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+                  <p className="text-muted-foreground mt-0.5 text-sm leading-relaxed">{body}</p>
                 </div>
               </div>
             ))}
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl border-destructive/30">
+        <Card className="border-destructive/30 rounded-3xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <PhoneCall className="size-4 text-destructive" aria-hidden="true" />
+              <PhoneCall className="text-destructive size-4" aria-hidden="true" />
               If you&apos;re in immediate danger
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+          <CardContent className="text-muted-foreground space-y-3 text-sm leading-relaxed">
             <p>
               Contact local emergency services first. In Ireland and the UK call{" "}
-              <span className="font-medium text-foreground">112</span> or{" "}
-              <span className="font-medium text-foreground">999</span>. Elsewhere, use your local
+              <span className="text-foreground font-medium">112</span> or{" "}
+              <span className="text-foreground font-medium">999</span>. Elsewhere, use your local
               emergency number.
             </p>
             <p>
               For anything less urgent, our safety team is at{" "}
               <a
                 href="mailto:safety@tirvea.app"
-                className="font-medium text-foreground underline underline-offset-2"
+                className="text-foreground font-medium underline underline-offset-2"
               >
                 safety@tirvea.app
               </a>

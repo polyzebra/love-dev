@@ -6,7 +6,8 @@ import { MarketingHero } from "@/components/marketing/hero";
 
 export const metadata: Metadata = {
   title: "Safety Centre",
-  description: "How Tirvea keeps dating safe: verification, moderation, privacy controls and GDPR rights.",
+  description:
+    "How Tirvea keeps dating safe: verification, moderation, privacy controls and GDPR rights.",
 };
 
 const PILLARS = [
@@ -66,39 +67,48 @@ export default function SafetyPage() {
         subtitle="How Tirvea protects you before, during and after every match."
       />
 
-      <section className="mx-auto max-w-6xl px-5 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14">
+      <section className="mx-auto max-w-6xl px-5 pt-10 pb-16 md:px-8 md:pt-14 md:pb-24">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {PILLARS.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="rounded-3xl border bg-card p-7 shadow-card">
-              <Icon className="mb-4 size-6 text-primary-soft" aria-hidden="true" />
+            <article key={title} className="bg-card shadow-card rounded-3xl border p-7">
+              <Icon className="text-primary-soft mb-4 size-6" aria-hidden="true" />
               <h2 className="mb-2 text-lg font-semibold">{title}</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="border-y bg-card">
+      <section className="bg-card border-y">
         <div className="mx-auto max-w-3xl px-5 py-16 md:px-8">
           <div className="mb-8 flex items-center gap-3">
-            <AlertTriangle className="size-6 text-warning" aria-hidden="true" />
+            <AlertTriangle className="text-warning size-6" aria-hidden="true" />
             <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
               Dating safety tips
             </h2>
           </div>
           <ul className="space-y-4">
             {TIPS.map((tip) => (
-              <li key={tip} className="flex items-start gap-3 rounded-2xl bg-background p-4 text-sm leading-relaxed">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+              <li
+                key={tip}
+                className="bg-background flex items-start gap-3 rounded-2xl p-4 text-sm leading-relaxed"
+              >
+                <span
+                  className="bg-primary mt-1.5 size-1.5 shrink-0 rounded-full"
+                  aria-hidden="true"
+                />
                 {tip}
               </li>
             ))}
           </ul>
-          <div className="mt-10 rounded-3xl bg-accent p-6">
-            <h3 className="font-semibold text-accent-foreground">In immediate danger?</h3>
-            <p className="mt-1 text-sm text-accent-foreground/80">
+          <div className="bg-accent mt-10 rounded-3xl p-6">
+            <h3 className="text-accent-foreground font-semibold">In immediate danger?</h3>
+            <p className="text-accent-foreground/80 mt-1 text-sm">
               Call 112 or your local emergency number. For non-urgent support, our safety team is at{" "}
-              <a href="mailto:safety@tirvea.app" className="font-medium underline underline-offset-2">
+              <a
+                href="mailto:safety@tirvea.app"
+                className="font-medium underline underline-offset-2"
+              >
                 safety@tirvea.app
               </a>
               .
@@ -111,7 +121,7 @@ export default function SafetyPage() {
         <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
           Read our Community Guidelines
         </h2>
-        <p className="mx-auto mt-3 max-w-md text-muted-foreground">
+        <p className="text-muted-foreground mx-auto mt-3 max-w-md">
           Clear rules, consistently enforced. Know what we expect from every member.
         </p>
         <Button size="lg" className="mt-6 h-12 rounded-full px-8" asChild>

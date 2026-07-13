@@ -24,8 +24,8 @@ export function MarketingNavbar() {
         layout
         transition={{ type: "spring", stiffness: 260, damping: 30 }}
         className={cn(
-          "glass flex w-full max-w-5xl items-center justify-between gap-3 rounded-full pl-5 pr-2",
-          condensed ? "py-1.5 shadow-float" : "py-2.5",
+          "glass flex w-full max-w-5xl items-center justify-between gap-3 rounded-full pr-2 pl-5",
+          condensed ? "shadow-float py-1.5" : "py-2.5",
         )}
       >
         <Logo size={condensed ? "sm" : "md"} className="transition-all duration-300" />
@@ -33,7 +33,9 @@ export function MarketingNavbar() {
             viewport - /login handles both new and returning people. */}
         <Magnetic strength={0.25}>
           <Button size="lg" className="h-11 rounded-full px-6" asChild>
-            <Link href="/login" aria-label="Sign in to Tirvea">Sign in</Link>
+            <Link href="/login" aria-label="Sign in to Tirvea">
+              Sign in
+            </Link>
           </Button>
         </Magnetic>
       </motion.nav>

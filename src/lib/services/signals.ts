@@ -6,11 +6,7 @@ import { db } from "@/lib/db";
  * ("New here" / "Not enough data yet") instead of guessing.
  */
 
-export type ReplySignal =
-  | "Usually replies within an hour"
-  | "Replies same day"
-  | "New here"
-  | null; // slower or unknown - we never show a negative signal
+export type ReplySignal = "Usually replies within an hour" | "Replies same day" | "New here" | null; // slower or unknown - we never show a negative signal
 
 type ReplyRow = { id: string; replies: number; mediansec: number | null };
 

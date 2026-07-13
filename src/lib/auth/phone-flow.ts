@@ -363,9 +363,7 @@ async function resolveAdminSyncClient(
     const { supabaseAdmin } = await import("@/lib/supabase/admin");
     return { ok: true, client: supabaseAdmin().auth.admin };
   } catch (error) {
-    console.warn(
-      `[auth:phone] admin client unavailable: ${String(error).slice(0, 120)}`,
-    );
+    console.warn(`[auth:phone] admin client unavailable: ${String(error).slice(0, 120)}`);
     return { ok: false, errorCode: "admin_client_unavailable" };
   }
 }
@@ -468,7 +466,9 @@ export async function confirmPhoneVerification(opts: {
   // for an out-of-allowlist number can never complete a claim).
   const normalized = normalizeForChange(opts.phone, opts.countryIso);
   if (!normalized.ok) {
-    return { kind: normalized.reason === "invalid_phone" ? "invalid_phone" : "unsupported_country" };
+    return {
+      kind: normalized.reason === "invalid_phone" ? "invalid_phone" : "unsupported_country",
+    };
   }
   const { phoneE164 } = normalized;
 
@@ -553,10 +553,7 @@ export async function confirmPhoneVerification(opts: {
 
   let checked: "approved" | "incorrect" | "expired";
   try {
-    checked = await (opts.provider ?? phoneVerificationProvider()).verifyCode(
-      phoneE164,
-      opts.code,
-    );
+    checked = await (opts.provider ?? phoneVerificationProvider()).verifyCode(phoneE164, opts.code);
   } catch (error) {
     if (error instanceof PhoneOtpNotConfiguredError) return { kind: "unavailable" };
     // Vendor-side policy rejection (e.g. Twilio 60202 - Verify's own max

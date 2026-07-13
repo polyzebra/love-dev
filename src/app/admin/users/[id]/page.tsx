@@ -51,9 +51,9 @@ function VerifiedStamp({ verifiedAt, label }: { verifiedAt: Date | null; label: 
   return (
     <span className="flex items-center gap-1.5 text-sm">
       {verifiedAt ? (
-        <BadgeCheck className="size-4 shrink-0 text-success" aria-hidden="true" />
+        <BadgeCheck className="text-success size-4 shrink-0" aria-hidden="true" />
       ) : (
-        <CircleDashed className="size-4 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+        <CircleDashed className="text-muted-foreground/40 size-4 shrink-0" aria-hidden="true" />
       )}
       <span className={verifiedAt ? "" : "text-muted-foreground"}>
         {label}
@@ -76,7 +76,7 @@ function PhoneSyncBadge({ status }: { status: string | null }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</dt>
       <dd className="mt-0.5 text-sm">{children}</dd>
     </div>
   );
@@ -84,18 +84,14 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border bg-card p-5">
+    <section className="bg-card rounded-3xl border p-5">
       <h2 className="mb-3 text-sm font-semibold">{title}</h2>
       {children}
     </section>
   );
 }
 
-export default async function AdminUserDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   // Pages gate themselves ON TOP of the layout (see requireAdminPage).
@@ -193,7 +189,7 @@ export default async function AdminUserDetailPage({
     <>
       <Link
         href="/admin/users"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm"
       >
         <ArrowLeft className="size-4" aria-hidden="true" /> All users
       </Link>
@@ -203,7 +199,7 @@ export default async function AdminUserDetailPage({
         title={user.profile?.displayName ?? user.name ?? user.email}
         description={user.email}
         actions={
-          <span className="font-mono text-xs text-muted-foreground" title={user.id}>
+          <span className="text-muted-foreground font-mono text-xs" title={user.id}>
             id {shortId(user.id)}
           </span>
         }
@@ -223,7 +219,7 @@ export default async function AdminUserDetailPage({
             email on blocklist
           </Badge>
         )}
-        <span className="text-sm text-muted-foreground">
+        <span className="text-muted-foreground text-sm">
           Plan {user.subscription?.tier ?? "FREE"}
         </span>
       </div>
@@ -250,7 +246,10 @@ export default async function AdminUserDetailPage({
           <dl className="grid gap-3 sm:grid-cols-2">
             <Field label="Email">
               <span className="break-all">{user.email}</span>
-              <VerifiedStamp verifiedAt={verification.emailVerifiedAt} label={verification.emailVerified ? "Verified" : "Unverified"} />
+              <VerifiedStamp
+                verifiedAt={verification.emailVerifiedAt}
+                label={verification.emailVerified ? "Verified" : "Unverified"}
+              />
             </Field>
             <Field label="Phone">
               {(() => {
@@ -262,11 +261,11 @@ export default async function AdminUserDetailPage({
                     <span>{maskPhone(number, user.phoneDialCode)}</span>
                     {/* Raw E.164: ADMIN eyes only - moderators get the mask. */}
                     {viewerIsAdmin && (
-                      <span className="block font-mono text-xs text-muted-foreground">
+                      <span className="text-muted-foreground block font-mono text-xs">
                         {number}
                       </span>
                     )}
-                    <span className="block text-xs text-muted-foreground">
+                    <span className="text-muted-foreground block text-xs">
                       {country?.name ?? "Unknown country"}
                       {user.phoneCountryIso ? ` (${user.phoneCountryIso})` : ""}
                       {user.phoneDialCode ? ` · ${user.phoneDialCode}` : ""}
@@ -278,7 +277,7 @@ export default async function AdminUserDetailPage({
                     <span className="mt-1 block">
                       <PhoneSyncBadge status={user.phoneSyncStatus} />
                       {user.phoneSyncStatus === "FAILED" && user.phoneSyncErrorCode && (
-                        <span className="ml-1.5 text-xs text-muted-foreground">
+                        <span className="text-muted-foreground ml-1.5 text-xs">
                           {user.phoneSyncErrorCode}
                         </span>
                       )}
@@ -288,8 +287,11 @@ export default async function AdminUserDetailPage({
               })()}
             </Field>
             <Field label="Photo verification">
-              <VerifiedStamp verifiedAt={verification.photoVerifiedAt} label={verification.photoVerified ? "Verified" : "Not verified"} />
-              <span className="text-xs text-muted-foreground">
+              <VerifiedStamp
+                verifiedAt={verification.photoVerifiedAt}
+                label={verification.photoVerified ? "Verified" : "Not verified"}
+              />
+              <span className="text-muted-foreground text-xs">
                 Provider: {user.photoVerificationProvider ?? "-"}
               </span>
             </Field>
@@ -314,7 +316,7 @@ export default async function AdminUserDetailPage({
             <Field label="Scam score (live)">
               <span className="tabular-nums">{scam ? scam.score : "-"}</span>
               {scam && scam.reasons.length > 0 && (
-                <span className="block text-xs text-muted-foreground">
+                <span className="text-muted-foreground block text-xs">
                   {scam.reasons.join(", ")}
                 </span>
               )}
@@ -342,7 +344,7 @@ export default async function AdminUserDetailPage({
                 {user.safetyRiskUpdatedAt ? user.safetyRiskScore : "-"}
               </span>
               {user.safetyRiskUpdatedAt && (
-                <span className="ml-1.5 text-xs text-muted-foreground">
+                <span className="text-muted-foreground ml-1.5 text-xs">
                   updated {formatAgo(user.safetyRiskUpdatedAt)}
                 </span>
               )}
@@ -359,7 +361,7 @@ export default async function AdminUserDetailPage({
                     .map((reason) => (
                       <span
                         key={reason}
-                        className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium"
+                        className="bg-muted rounded-full px-2.5 py-0.5 text-xs font-medium"
                       >
                         {reason}
                       </span>
@@ -371,14 +373,17 @@ export default async function AdminUserDetailPage({
             </Field>
             <Field label="Open cases">
               <span className="tabular-nums">
-                {moderationCases.filter((c) => c.status === "OPEN" || c.status === "UNDER_REVIEW").length}
+                {
+                  moderationCases.filter((c) => c.status === "OPEN" || c.status === "UNDER_REVIEW")
+                    .length
+                }
               </span>
             </Field>
           </dl>
 
           {violations.length > 0 && (
             <>
-              <h3 className="mb-1.5 mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <h3 className="text-muted-foreground mt-4 mb-1.5 text-xs font-medium tracking-wide uppercase">
                 Violations
               </h3>
               <ul className="divide-y">
@@ -407,12 +412,12 @@ export default async function AdminUserDetailPage({
                     {v.moderationCaseId && (
                       <Link
                         href={`/admin/moderation-cases/${v.moderationCaseId}`}
-                        className="text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+                        className="text-muted-foreground text-xs font-medium underline-offset-2 hover:underline"
                       >
                         case
                       </Link>
                     )}
-                    <span className="ml-auto text-xs text-muted-foreground">
+                    <span className="text-muted-foreground ml-auto text-xs">
                       {formatAgo(v.createdAt)}
                     </span>
                   </li>
@@ -423,16 +428,22 @@ export default async function AdminUserDetailPage({
 
           {moderationCases.length > 0 && (
             <>
-              <h3 className="mb-1.5 mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <h3 className="text-muted-foreground mt-4 mb-1.5 text-xs font-medium tracking-wide uppercase">
                 Moderation cases
               </h3>
               <ul className="divide-y">
                 {moderationCases.map((c) => (
                   <li key={c.id} className="flex flex-wrap items-center gap-2 py-2">
-                    <Badge variant={SEVERITY_BADGE[c.severity] ?? "outline"} className="rounded-full">
+                    <Badge
+                      variant={SEVERITY_BADGE[c.severity] ?? "outline"}
+                      className="rounded-full"
+                    >
                       {pretty(c.severity)}
                     </Badge>
-                    <Badge variant={CASE_STATUS_BADGE[c.status] ?? "outline"} className="rounded-full">
+                    <Badge
+                      variant={CASE_STATUS_BADGE[c.status] ?? "outline"}
+                      className="rounded-full"
+                    >
                       {pretty(c.status)}
                     </Badge>
                     <Link
@@ -441,7 +452,7 @@ export default async function AdminUserDetailPage({
                     >
                       {pretty(c.caseType)}
                     </Link>
-                    <span className="ml-auto text-xs text-muted-foreground">
+                    <span className="text-muted-foreground ml-auto text-xs">
                       {formatAgo(c.createdAt)}
                     </span>
                   </li>
@@ -451,7 +462,7 @@ export default async function AdminUserDetailPage({
           )}
 
           {violations.length === 0 && moderationCases.length === 0 && (
-            <p className="mt-3 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-3 text-sm">
               No violations or moderation cases on file.
             </p>
           )}
@@ -468,14 +479,14 @@ export default async function AdminUserDetailPage({
             <Field label="Country">{user.lastIpCountry ?? "-"}</Field>
             <Field label="ASN">{user.lastIpAsn ?? "-"}</Field>
           </dl>
-          <p className="mt-3 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-3 text-xs">
             Raw IPs are never stored - only salted hashes, for correlation.
           </p>
         </Section>
 
         <Section title={`Devices (${user.deviceCount})`}>
           {user.devices.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No devices recorded.</p>
+            <p className="text-muted-foreground text-sm">No devices recorded.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -489,7 +500,7 @@ export default async function AdminUserDetailPage({
                 {user.devices.map((device) => (
                   <TableRow key={device.id}>
                     <TableCell className="text-sm">{device.platform ?? "-"}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-muted-foreground text-sm">
                       {stampDate(device.lastSeenAt)}
                     </TableCell>
                     <TableCell className="text-sm">{device.trusted ? "Yes" : "No"}</TableCell>
@@ -502,7 +513,7 @@ export default async function AdminUserDetailPage({
 
         <Section title="Verification history">
           {user.verifications.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No verification records.</p>
+            <p className="text-muted-foreground text-sm">No verification records.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -526,7 +537,7 @@ export default async function AdminUserDetailPage({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">{v.provider ?? "-"}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-muted-foreground text-sm">
                       {stampDate(v.updatedAt)}
                     </TableCell>
                   </TableRow>
@@ -538,13 +549,13 @@ export default async function AdminUserDetailPage({
 
         <Section title="Auth events (newest 20)">
           {events.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No auth events recorded.</p>
+            <p className="text-muted-foreground text-sm">No auth events recorded.</p>
           ) : (
             <ul className="space-y-2">
               {events.map((event) => (
                 <li key={event.id} className="text-sm">
                   <span className="font-medium">{event.type}</span>
-                  <span className="ml-1.5 text-xs text-muted-foreground">
+                  <span className="text-muted-foreground ml-1.5 text-xs">
                     {formatAgo(event.createdAt)}
                     {event.phoneE164 ? ` · ${event.phoneE164}` : ""}
                     {event.ipHash ? ` · ip ${shortHash(event.ipHash)}` : ""}

@@ -43,10 +43,13 @@ export default async function AdminFlagsPage() {
       <Card className="rounded-3xl">
         <CardContent className="divide-y">
           {flags.map((flag) => (
-            <div key={flag.key} className="flex items-center justify-between gap-4 py-4 first:pt-2 last:pb-2">
+            <div
+              key={flag.key}
+              className="flex items-center justify-between gap-4 py-4 first:pt-2 last:pb-2"
+            >
               <div>
                 <p className="font-mono text-sm font-medium">{flag.key}</p>
-                <p className="text-sm text-muted-foreground">{flag.description}</p>
+                <p className="text-muted-foreground text-sm">{flag.description}</p>
               </div>
               <FlagToggle flagKey={flag.key} enabled={flag.enabled} />
             </div>

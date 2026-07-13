@@ -35,13 +35,7 @@ async function readErrorMessage(res: Response, fallback: string): Promise<string
  *    explicitly before the reviewer confirms. Notes are optional but
  *    encouraged; they stay staff-side (AdminLog + appeal.adminNotes).
  */
-export function AppealActions({
-  appealId,
-  status,
-}: {
-  appealId: string;
-  status: string;
-}) {
+export function AppealActions({ appealId, status }: { appealId: string; status: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [decision, setDecisionState] = useState<"approve" | "reject" | null>(null);
@@ -189,7 +183,7 @@ export function AppealActions({
             <DialogDescription>
               The appeal moves to needs-info and the user gets 14 days to send one reply before it
               closes automatically.{" "}
-              <span className="font-semibold text-destructive">
+              <span className="text-destructive font-semibold">
                 This question is shown to the user on their appeal timeline
               </span>{" "}
               - keep staff-only commentary in the decision notes instead.

@@ -5,7 +5,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { toast } from "sonner";
-import { BadgeCheck, Heart, MapPin, MessageCircle, Quote, RotateCcw, Sparkles, Star, X } from "lucide-react";
+import {
+  BadgeCheck,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Quote,
+  RotateCcw,
+  Sparkles,
+  Star,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { PhotoFrame } from "@/components/shared/photo-frame";
@@ -168,7 +178,8 @@ export function ExploreProfileViewer({
     if (pages.length < 2) return;
     setPageIndex((i) => {
       const next = Math.min(Math.max(i + dir, 0), pages.length - 1);
-      if (next !== i) sendEvent("explore_profile_photo_changed", { userId: profile.userId, index: next });
+      if (next !== i)
+        sendEvent("explore_profile_photo_changed", { userId: profile.userId, index: next });
       return next;
     });
   }
@@ -223,15 +234,25 @@ export function ExploreProfileViewer({
 
   if (exhausted) {
     return (
-      <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-5 bg-background p-8 text-center" role="dialog" aria-modal="true" aria-label="All caught up">
+      <div
+        className="bg-background fixed inset-0 z-[70] flex flex-col items-center justify-center gap-5 p-8 text-center"
+        role="dialog"
+        aria-modal="true"
+        aria-label="All caught up"
+      >
         <span className="glass-chip flex size-16 items-center justify-center rounded-full">
-          <Sparkles className="size-7 text-gold" aria-hidden="true" />
+          <Sparkles className="text-gold size-7" aria-hidden="true" />
         </span>
-        <h2 className="font-display text-3xl font-medium tracking-tight">You&apos;re all caught up</h2>
-        <p className="max-w-xs text-sm text-muted-foreground">
+        <h2 className="font-display text-3xl font-medium tracking-tight">
+          You&apos;re all caught up
+        </h2>
+        <p className="text-muted-foreground max-w-xs text-sm">
           You&apos;ve seen everyone here for now. New people join every day.
         </p>
-        <Button className="h-12 rounded-full px-8" onClick={() => router.push(`/explore/${slug}`, { scroll: false })}>
+        <Button
+          className="h-12 rounded-full px-8"
+          onClick={() => router.push(`/explore/${slug}`, { scroll: false })}
+        >
           Back to Explore
         </Button>
       </div>
@@ -251,7 +272,7 @@ export function ExploreProfileViewer({
       <div className="safe-top relative mx-auto flex h-full w-full max-w-md flex-col p-3">
         {/* Photo card */}
         <motion.div
-          className="relative flex-1 touch-none overflow-hidden rounded-[30px] border border-white/12 shadow-float"
+          className="shadow-float relative flex-1 touch-none overflow-hidden rounded-[30px] border border-white/12"
           style={{ x, rotate }}
           drag={busy ? false : "x"}
           dragConstraints={{ left: 0, right: 0 }}
@@ -270,7 +291,10 @@ export function ExploreProfileViewer({
               draggable={false}
             />
           ) : (
-            <div className="absolute inset-0" style={{ background: fallbackGradient(profile.userId) }} />
+            <div
+              className="absolute inset-0"
+              style={{ background: fallbackGradient(profile.userId) }}
+            />
           )}
           <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
           <div className="absolute inset-0 rounded-[30px] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
@@ -279,11 +303,13 @@ export function ExploreProfileViewer({
           {page?.kind === "prompt" && (
             <div className="absolute inset-x-0 top-[22%] px-7">
               <Quote className="size-6 text-white/40" aria-hidden="true" />
-              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/65">{page.label}</p>
+              <p className="mt-3 text-xs font-semibold tracking-[0.3em] text-white/65 uppercase">
+                {page.label}
+              </p>
               {/* Clamp: a very long answer must never run under the identity
                   block; the full text stays available via title. */}
               <p
-                className="mt-3 line-clamp-[8] font-display text-3xl font-medium leading-snug tracking-tight text-white"
+                className="font-display mt-3 line-clamp-[8] text-3xl leading-snug font-medium tracking-tight text-white"
                 title={page.answer}
               >
                 {page.answer}
@@ -294,25 +320,62 @@ export function ExploreProfileViewer({
           {/* Story progress bars - photos and prompts alike */}
           {pages.length > 1 && (
             // drop-shadow keeps the bars readable over bright, unscrimmed skies
-            <div className="absolute inset-x-3 top-3 flex gap-1.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]" aria-label={`Section ${pageIndex + 1} of ${pages.length}`}>
+            <div
+              className="absolute inset-x-3 top-3 flex gap-1.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+              aria-label={`Section ${pageIndex + 1} of ${pages.length}`}
+            >
               {pages.map((_, i) => (
-                <span key={i} className={cn("h-1 flex-1 rounded-full transition-colors", i <= pageIndex ? "bg-white/90" : "bg-white/30")} />
+                <span
+                  key={i}
+                  className={cn(
+                    "h-1 flex-1 rounded-full transition-colors",
+                    i <= pageIndex ? "bg-white/90" : "bg-white/30",
+                  )}
+                />
               ))}
             </div>
           )}
 
           {/* Tap zones for story navigation */}
-          <button type="button" aria-label="Previous" className="absolute inset-y-0 left-0 w-1/3 rounded-[30px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60" onClick={() => changePage(-1)} />
-          <button type="button" aria-label="Next" className="absolute inset-y-0 right-0 w-1/3 rounded-[30px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60" onClick={() => changePage(1)} />
+          <button
+            type="button"
+            aria-label="Previous"
+            className="absolute inset-y-0 left-0 w-1/3 rounded-[30px] outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-inset"
+            onClick={() => changePage(-1)}
+          />
+          <button
+            type="button"
+            aria-label="Next"
+            className="absolute inset-y-0 right-0 w-1/3 rounded-[30px] outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-inset"
+            onClick={() => changePage(1)}
+          />
 
           {/* Verdict stamps while dragging */}
-          <motion.span style={{ opacity: likeOpacity }} aria-hidden="true" className="absolute left-6 top-12 -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-emerald-400">Like</motion.span>
-          <motion.span style={{ opacity: passOpacity }} aria-hidden="true" className="absolute right-6 top-12 rotate-12 rounded-2xl border-4 border-white/85 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-white/85">Pass</motion.span>
+          <motion.span
+            style={{ opacity: likeOpacity }}
+            aria-hidden="true"
+            className="absolute top-12 left-6 -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold tracking-widest text-emerald-400 uppercase"
+          >
+            Like
+          </motion.span>
+          <motion.span
+            style={{ opacity: passOpacity }}
+            aria-hidden="true"
+            className="absolute top-12 right-6 rotate-12 rounded-2xl border-4 border-white/85 px-4 py-1 text-2xl font-extrabold tracking-widest text-white/85 uppercase"
+          >
+            Pass
+          </motion.span>
 
           {/* Close / safety / super. Black-tinted glass: white/10 washed out
               over bright photos (the viewer has no top scrim). */}
           <div className="absolute inset-x-3 top-7 flex items-start justify-between">
-            <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40" aria-label="Close profile" onClick={close}>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40"
+              aria-label="Close profile"
+              onClick={close}
+            >
               <X className="size-5" />
             </Button>
             <div className="flex items-start gap-2">
@@ -326,7 +389,14 @@ export function ExploreProfileViewer({
                   router.refresh();
                 }}
               />
-              <Button variant="secondary" size="icon" className="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40" aria-label="Super Like" disabled={busy} onClick={() => decide("SUPER_LIKE")}>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="size-11 rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-md hover:bg-black/40"
+                aria-label="Super Like"
+                disabled={busy}
+                onClick={() => decide("SUPER_LIKE")}
+              >
                 <Star className="size-5 fill-sky-400 text-sky-400" />
               </Button>
             </div>
@@ -335,13 +405,13 @@ export function ExploreProfileViewer({
           {/* Why write to them - intent and honest reply behaviour, up top */}
           {/* Same black-tinted glass as the top controls - these ride the
               unscrimmed top of the photo and must survive bright skies. */}
-          <div className="pointer-events-none absolute left-3 top-[5.25rem] flex flex-col items-start gap-1.5">
-            <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
+          <div className="pointer-events-none absolute top-[5.25rem] left-3 flex flex-col items-start gap-1.5">
+            <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
               <Heart className="size-3 fill-current text-rose-300" aria-hidden="true" />
               {GOAL_LABELS[profile.relationshipGoal] ?? "Open to connection"}
             </span>
             {profile.replySignal && (
-              <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 backdrop-blur-md px-3 py-1 text-xs font-medium text-white">
+              <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
                 <MessageCircle className="size-3 text-emerald-300" aria-hidden="true" />
                 {profile.replySignal}
               </span>
@@ -355,8 +425,12 @@ export function ExploreProfileViewer({
                 {profile.displayName}, {profile.age}
               </span>
               {profile.isVerified && (
-                <span role="img" aria-label="Photo verified" className="relative flex items-center justify-center">
-                  <span className="absolute size-6 animate-ping-soft rounded-full bg-sky-400/25" />
+                <span
+                  role="img"
+                  aria-label="Photo verified"
+                  className="relative flex items-center justify-center"
+                >
+                  <span className="animate-ping-soft absolute size-6 rounded-full bg-sky-400/25" />
                   <BadgeCheck className="relative size-6 fill-sky-400 text-white" />
                 </span>
               )}
@@ -368,37 +442,66 @@ export function ExploreProfileViewer({
                 {profile.city}, {profile.country === "IE" ? "Ireland" : "UK"}
               </p>
             )}
-            {profile.bio && <p className="line-clamp-2 text-sm/relaxed text-white/90">{profile.bio}</p>}
+            {profile.bio && (
+              <p className="line-clamp-2 text-sm/relaxed text-white/90">{profile.bio}</p>
+            )}
             {profile.interests.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.slice(0, 5).map((i) => (
-                  <span key={i.label} className={cn("rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white", i.shared && "border-rose-300/40 bg-rose-500/25")}>
-                    {i.shared && <Sparkles className="mr-1 inline size-3 text-rose-200" aria-hidden="true" />}
+                  <span
+                    key={i.label}
+                    className={cn(
+                      "rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-md",
+                      i.shared && "border-rose-300/40 bg-rose-500/25",
+                    )}
+                  >
+                    {i.shared && (
+                      <Sparkles className="mr-1 inline size-3 text-rose-200" aria-hidden="true" />
+                    )}
                     {i.label}
                   </span>
                 ))}
               </div>
             )}
             {basics.length > 0 && (
-              <p className="text-[11px] capitalize text-white/55">{basics.join(" · ")}</p>
+              <p className="text-[11px] text-white/55 capitalize">{basics.join(" · ")}</p>
             )}
           </div>
         </motion.div>
 
         {/* Floating actions */}
-        <div className="safe-bottom flex items-center justify-center gap-4 pb-2 pt-4">
+        <div className="safe-bottom flex items-center justify-center gap-4 pt-4 pb-2">
           <motion.div whileTap={{ scale: 0.85 }}>
-            <Button variant="outline" size="icon" aria-label="Undo last swipe" className="size-12 rounded-full" onClick={undo}>
-              <RotateCcw className="size-5 text-warning" />
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Undo last swipe"
+              className="size-12 rounded-full"
+              onClick={undo}
+            >
+              <RotateCcw className="text-warning size-5" />
             </Button>
           </motion.div>
           <motion.div whileTap={{ scale: 0.85 }}>
-            <Button variant="outline" size="icon" aria-label="Pass" className="size-16 rounded-full border-foreground/15" disabled={busy} onClick={() => decide("PASS")}>
-              <X className="size-7 text-muted-foreground" />
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Pass"
+              className="border-foreground/15 size-16 rounded-full"
+              disabled={busy}
+              onClick={() => decide("PASS")}
+            >
+              <X className="text-muted-foreground size-7" />
             </Button>
           </motion.div>
           <motion.div whileTap={{ scale: 0.85 }}>
-            <Button size="icon" aria-label="Like" className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_color-mix(in_srgb,var(--primary)_45%,transparent)]" disabled={busy} onClick={() => decide("LIKE")}>
+            <Button
+              size="icon"
+              aria-label="Like"
+              className="size-16 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_28px_color-mix(in_srgb,var(--primary)_45%,transparent)]"
+              disabled={busy}
+              onClick={() => decide("LIKE")}
+            >
               <Heart className="size-7 fill-current" />
             </Button>
           </motion.div>

@@ -4,7 +4,5 @@
  * never claims more than the product does.
  */
 export function SettingsNote({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mt-3 px-1 text-xs leading-relaxed text-muted-foreground/80">{children}</p>
-  );
+  return <p className="text-muted-foreground/80 mt-3 px-1 text-xs leading-relaxed">{children}</p>;
 }

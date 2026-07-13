@@ -16,7 +16,13 @@ import {
 } from "@/lib/services/photos";
 
 const MAX_BYTES = PHOTO_LIMITS.maxSizeMb * 1024 * 1024;
-const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
+const ACCEPTED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
 
 /** POST /api/photos - multipart upload of a single profile photo. */
 export async function POST(req: Request) {
@@ -36,7 +42,11 @@ export async function POST(req: Request) {
   try {
     form = await req.formData();
   } catch {
-    return apiError(400, "invalid_body", "Request must be multipart/form-data with a `file` field.");
+    return apiError(
+      400,
+      "invalid_body",
+      "Request must be multipart/form-data with a `file` field.",
+    );
   }
 
   const file = form.get("file");

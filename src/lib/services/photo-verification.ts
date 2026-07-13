@@ -25,11 +25,7 @@ import { db } from "@/lib/db";
  */
 
 export type VerificationSessionStatus =
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "expired"
-  | "manual_review";
+  "pending" | "approved" | "rejected" | "expired" | "manual_review";
 
 export type VerificationStart = {
   /** Opaque session reference on the provider side. */

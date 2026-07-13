@@ -66,14 +66,14 @@ export function SettingsToggleList({
         <div
           key={field}
           className={`flex min-h-14 items-center gap-4 px-5 py-4 ${
-            i > 0 ? "border-t border-border" : ""
+            i > 0 ? "border-border border-t" : ""
           }`}
         >
           <div className="min-w-0 flex-1 space-y-0.5">
             <Label htmlFor={`setting-${field}`} className="text-base">
               {label}
             </Label>
-            {hint ? <p className="text-sm text-muted-foreground">{hint}</p> : null}
+            {hint ? <p className="text-muted-foreground text-sm">{hint}</p> : null}
           </div>
           <motion.span
             className="shrink-0"

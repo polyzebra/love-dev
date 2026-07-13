@@ -122,8 +122,7 @@ function describeClient(): { platform: string; browser: string } {
  * Throws with a human-readable message on any failure.
  */
 export async function subscribeToPush(vapidPublicKey: string): Promise<void> {
-  const registration =
-    (await registerServiceWorker()) ?? (await getServiceWorkerRegistration());
+  const registration = (await registerServiceWorker()) ?? (await getServiceWorkerRegistration());
   if (!registration) throw new Error("Service worker could not be registered.");
 
   const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);

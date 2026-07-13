@@ -39,7 +39,7 @@ export function MarketingHero({
     <section
       className={cn(
         "noise relative overflow-x-clip",
-        split ? "flex min-h-dvh flex-col" : "pb-4 pt-36 md:pt-44",
+        split ? "flex min-h-dvh flex-col" : "pt-36 pb-4 md:pt-44",
         className,
       )}
     >
@@ -49,18 +49,20 @@ export function MarketingHero({
         className={cn(
           "relative mx-auto w-full max-w-6xl px-6 md:px-10",
           split
-            ? "grid flex-1 items-center gap-10 pb-10 pt-28 md:grid-cols-[0.95fr_1.05fr] md:gap-0"
+            ? "grid flex-1 items-center gap-10 pt-28 pb-10 md:grid-cols-[0.95fr_1.05fr] md:gap-0"
             : "max-w-5xl",
         )}
       >
         <div
           className={cn(
             "relative z-10",
-            split ? "space-y-7 text-center md:text-left" : "mx-auto max-w-2xl space-y-5 text-center",
+            split
+              ? "space-y-7 text-center md:text-left"
+              : "mx-auto max-w-2xl space-y-5 text-center",
           )}
         >
           {eyebrow && (
-            <p className="animate-rise text-xs font-semibold uppercase tracking-[0.35em] text-gold">
+            <p className="animate-rise text-gold text-xs font-semibold tracking-[0.35em] uppercase">
               {eyebrow}
             </p>
           )}
@@ -77,7 +79,7 @@ export function MarketingHero({
           {subtitle && (
             <p
               className={cn(
-                "animate-rise text-lg leading-relaxed text-muted-foreground [--rise-delay:160ms]",
+                "animate-rise text-muted-foreground text-lg leading-relaxed [--rise-delay:160ms]",
                 split ? "mx-auto max-w-md md:mx-0" : "mx-auto",
               )}
             >

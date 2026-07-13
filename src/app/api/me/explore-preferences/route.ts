@@ -3,7 +3,10 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { track } from "@/lib/services/explore";
 
-const schema = z.object({ categoryId: z.string().min(1), weight: z.number().int().min(1).max(10).optional() });
+const schema = z.object({
+  categoryId: z.string().min(1),
+  weight: z.number().int().min(1).max(10).optional(),
+});
 
 export async function POST(req: Request) {
   const { user, response } = await requireSession();

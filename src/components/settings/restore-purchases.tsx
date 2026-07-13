@@ -49,16 +49,16 @@ export function RestorePurchasesRow() {
 
   return (
     <button type="button" className={ROW_CLASS} onClick={handleRestore} disabled={busy}>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
+      <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
         {busy ? (
-          <Loader2 className="size-5 animate-spin text-accent-foreground" aria-hidden="true" />
+          <Loader2 className="text-accent-foreground size-5 animate-spin" aria-hidden="true" />
         ) : (
-          <RotateCcw className="size-5 text-accent-foreground" aria-hidden="true" />
+          <RotateCcw className="text-accent-foreground size-5" aria-hidden="true" />
         )}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-medium">Restore purchases</span>
-        <span className="block text-sm text-muted-foreground">{hint}</span>
+        <span className="text-muted-foreground block text-sm">{hint}</span>
       </span>
     </button>
   );
@@ -77,16 +77,16 @@ export function SignOutRow() {
         void signOutEverywhere("/");
       }}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
+      <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
         {busy ? (
-          <Loader2 className="size-5 animate-spin text-accent-foreground" aria-hidden="true" />
+          <Loader2 className="text-accent-foreground size-5 animate-spin" aria-hidden="true" />
         ) : (
-          <LogOut className="size-5 text-accent-foreground" aria-hidden="true" />
+          <LogOut className="text-accent-foreground size-5" aria-hidden="true" />
         )}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-medium">Sign out</span>
-        <span className="block text-sm text-muted-foreground">End your session securely</span>
+        <span className="text-muted-foreground block text-sm">End your session securely</span>
       </span>
     </button>
   );

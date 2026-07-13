@@ -43,19 +43,22 @@ export function ProfilePeek({
       <DrawerContent className="border-border bg-popover/95 backdrop-blur-2xl">
         <DrawerHeader className="items-center text-center">
           <div className="relative mx-auto mb-2">
-            <Avatar className="size-24 border-2 border-border shadow-float">
+            <Avatar className="border-border shadow-float size-24 border-2">
               <AvatarImage src={profile.photoUrl ?? undefined} alt="" />
               <AvatarFallback className="text-2xl">
                 {initialsOf(profile.displayName)}
               </AvatarFallback>
             </Avatar>
-            <OnlineDot online={profile.isOnline} className="absolute bottom-1 right-1" />
+            <OnlineDot online={profile.isOnline} className="absolute right-1 bottom-1" />
           </div>
-          <DrawerTitle className="flex items-center justify-center gap-2 font-display text-2xl font-medium">
+          <DrawerTitle className="font-display flex items-center justify-center gap-2 text-2xl font-medium">
             {profile.displayName}
             {profile.age ? `, ${profile.age}` : ""}
             {profile.isVerified && (
-              <BadgeCheck className="size-5 fill-sky-400 text-popover" aria-label="Photo verified" />
+              <BadgeCheck
+                className="text-popover size-5 fill-sky-400"
+                aria-label="Photo verified"
+              />
             )}
           </DrawerTitle>
           {profile.city && (
@@ -68,7 +71,7 @@ export function ProfilePeek({
 
         <div className="space-y-6 px-6 pb-10">
           {profile.bio && (
-            <p className="text-center font-display text-lg italic leading-relaxed text-foreground/90">
+            <p className="font-display text-foreground/90 text-center text-lg leading-relaxed italic">
               &ldquo;{profile.bio}&rdquo;
             </p>
           )}
@@ -76,10 +79,10 @@ export function ProfilePeek({
           {/* About you two - only real, shared ground */}
           {(profile.sharedInterests.length > 0 || profile.sameCity || profile.isVerified) && (
             <div className="glass rounded-3xl p-5 text-center">
-              <p className="mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+              <p className="text-gold mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold tracking-[0.2em] uppercase">
                 <Sparkles className="size-3.5" aria-hidden="true" /> About you two
               </p>
-              <ul className="space-y-2 text-sm text-foreground/90">
+              <ul className="text-foreground/90 space-y-2 text-sm">
                 {profile.sameCity && (
                   <li>
                     You&apos;re both in <span className="font-medium">{profile.sameCity}</span>
@@ -91,7 +94,7 @@ export function ProfilePeek({
                     {profile.sharedInterests.map((interest) => (
                       <span
                         key={interest}
-                        className="rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary-soft"
+                        className="bg-primary/15 text-primary-soft rounded-full px-3 py-1 text-xs font-medium"
                       >
                         {interest}
                       </span>
@@ -115,7 +118,7 @@ export function ProfilePeek({
               {profile.interests.map((interest) => (
                 <span
                   key={interest}
-                  className="glass-chip rounded-full px-3 py-1 text-xs text-foreground/85"
+                  className="glass-chip text-foreground/85 rounded-full px-3 py-1 text-xs"
                 >
                   {interest}
                 </span>

@@ -192,10 +192,10 @@ export function CaseActions({
   }
 
   return (
-    <section className="rounded-3xl border bg-card p-5">
+    <section className="bg-card rounded-3xl border p-5">
       <h2 className="mb-3 text-sm font-semibold">Decisions</h2>
       {closed && !reversibleViolationId && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           This case was reversed - the enforcement it carried is no longer in force and no further
           decisions are available here.
         </p>

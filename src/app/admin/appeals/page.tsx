@@ -59,12 +59,12 @@ function Timeline({
   return (
     <ol aria-label="Appeal timeline" className="mt-3 space-y-1.5 border-l pl-4">
       {events.map((e, i) => (
-        <li key={`${e.type}-${i}`} className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{EVENT_LABEL[e.type] ?? e.type}</span>
+        <li key={`${e.type}-${i}`} className="text-muted-foreground text-xs">
+          <span className="text-foreground font-medium">{EVENT_LABEL[e.type] ?? e.type}</span>
           {" · "}
           {e.actorRole.toLowerCase()} · {formatAgo(e.createdAt)}
           {e.note && (
-            <span className="mt-0.5 block rounded-xl bg-muted px-3 py-1.5 text-xs leading-relaxed text-foreground">
+            <span className="bg-muted text-foreground mt-0.5 block rounded-xl px-3 py-1.5 text-xs leading-relaxed">
               {e.note}
             </span>
           )}
@@ -118,7 +118,7 @@ export default async function AdminAppealsPage({
             href={f.key === "open" ? "/admin/appeals" : `/admin/appeals?status=${f.key}`}
             aria-current={f.key === filter ? "true" : undefined}
             className={cn(
-              "flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 md:min-h-9",
+              "focus-visible:ring-foreground/20 flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none md:min-h-9",
               f.key === filter
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -140,7 +140,7 @@ export default async function AdminAppealsPage({
           {appeals.map((appeal) => {
             const open = (OPEN_APPEAL_STATUSES as readonly string[]).includes(appeal.status);
             return (
-              <div key={appeal.id} className="rounded-3xl border bg-card p-5">
+              <div key={appeal.id} className="bg-card rounded-3xl border p-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge
                     variant={APPEAL_STATUS_BADGE[appeal.status] ?? "outline"}
@@ -157,22 +157,22 @@ export default async function AdminAppealsPage({
                   <span className="text-sm font-medium">
                     {pretty(appeal.violation.violationType)}
                   </span>
-                  <span className="ml-auto text-xs text-muted-foreground">
+                  <span className="text-muted-foreground ml-auto text-xs">
                     submitted {formatAgo(appeal.createdAt)}
                   </span>
                 </div>
 
-                <blockquote className="mt-3 rounded-2xl bg-muted px-4 py-3 text-sm italic">
+                <blockquote className="bg-muted mt-3 rounded-2xl px-4 py-3 text-sm italic">
                   &ldquo;{appeal.appealText}&rdquo;
                 </blockquote>
 
-                <dl className="mt-3 grid gap-x-6 gap-y-1 text-xs text-muted-foreground sm:grid-cols-2">
+                <dl className="text-muted-foreground mt-3 grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
                   <div>
                     <dt className="inline font-semibold">User: </dt>
                     <dd className="inline">
                       <Link
                         href={`/admin/users/${appeal.user.id}`}
-                        className="font-medium text-foreground hover:underline"
+                        className="text-foreground font-medium hover:underline"
                       >
                         {appeal.user.email}
                       </Link>{" "}
@@ -207,7 +207,7 @@ export default async function AdminAppealsPage({
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   {open && <AppealActions appealId={appeal.id} status={appeal.status} />}
                   {appeal.status === "NEEDS_INFO" && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">
                       Waiting on the user&apos;s reply - it can still be decided now.
                     </span>
                   )}
@@ -215,14 +215,14 @@ export default async function AdminAppealsPage({
                     caseExists.has(appeal.violation.moderationCaseId) && (
                       <Link
                         href={`/admin/moderation-cases/${appeal.violation.moderationCaseId}`}
-                        className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
+                        className="text-muted-foreground text-sm font-medium underline-offset-2 hover:underline"
                       >
                         View case
                       </Link>
                     )}
                   <Link
                     href={`/admin/users/${appeal.user.id}`}
-                    className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
+                    className="text-muted-foreground text-sm font-medium underline-offset-2 hover:underline"
                   >
                     View user
                   </Link>

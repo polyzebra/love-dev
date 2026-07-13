@@ -147,7 +147,7 @@ check("routed auth Suspense boundaries always render a meaningful fallback", () 
     join(APP, "auth", "phone-code", "page.tsx"),
   ]) {
     const src = readFileSync(page, "utf8");
-    assert.match(src, /<Suspense fallback=\{<AuthCard><AuthStepFallback/, page);
+    assert.match(src, /<Suspense\s+fallback=\{\s*<AuthCard>\s*<AuthStepFallback/, page);
   }
   const fallback = read("AuthStepFallback.tsx");
   assert.match(fallback, /animate-spin/);

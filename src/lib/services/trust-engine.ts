@@ -71,15 +71,13 @@ export const SCAM_SCORE_RATIO = 0.3;
  * graduated ladder (trust-safety.ts) or a human decision; BAN_ACCOUNT here
  * can only ever be carried out by a person.
  */
-export function recommendedActionFor(
-  score: number,
-  reasons: string[],
-): SafetyRecommendedAction {
+export function recommendedActionFor(score: number, reasons: string[]): SafetyRecommendedAction {
   const has = (prefix: string) => reasons.some((r) => r.startsWith(prefix));
   if (score >= 85) return "BAN_ACCOUNT";
   if (score >= 70) return "SUSPEND_ACCOUNT";
   if (score >= 55) return "SEND_TO_MANUAL_REVIEW";
-  if (score >= 45) return has("scam_behaviour") || has("reported") ? "LIMIT_MESSAGING" : "HIDE_PROFILE";
+  if (score >= 45)
+    return has("scam_behaviour") || has("reported") ? "LIMIT_MESSAGING" : "HIDE_PROFILE";
   if (score >= 30) return has("photo_rejected") ? "REQUIRE_PHOTO_VERIFICATION" : "SHOW_WARNING";
   if (score >= 15) return "SHOW_WARNING";
   return "NO_ACTION";
@@ -187,11 +185,7 @@ export async function computeTrustProfile(userId: string): Promise<TrustProfile 
 }
 
 export type TrustEvent =
-  | "report_created"
-  | "photo_rejected"
-  | "violation_added"
-  | "appeal_decided"
-  | "admin_recompute";
+  "report_created" | "photo_rejected" | "violation_added" | "appeal_decided" | "admin_recompute";
 
 /**
  * Event-driven recompute - fire-and-forget from the mutation paths (report

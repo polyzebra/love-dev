@@ -117,7 +117,7 @@ export function BillingActionButton({
         role="status"
         aria-live="polite"
         className={cn(
-          "max-w-xs text-sm text-muted-foreground",
+          "text-muted-foreground max-w-xs text-sm",
           !error && "sr-only",
           errorClassName,
         )}

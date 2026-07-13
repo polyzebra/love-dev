@@ -58,28 +58,39 @@ function toScoringProfile(p: {
   userId: string;
   relationshipGoal: ScoringProfile["relationshipGoal"];
   gender: ScoringProfile["gender"];
-  city: string | null; country: string;
-  latitude: number | null; longitude: number | null;
+  city: string | null;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
   languages: string[];
-  smoking: ScoringProfile["smoking"]; drinking: ScoringProfile["drinking"];
+  smoking: ScoringProfile["smoking"];
+  drinking: ScoringProfile["drinking"];
   exercise: string | null;
-  availabilityTags: string[]; communityTags: string[];
-  birthDate: Date; minAge: number; maxAge: number;
+  availabilityTags: string[];
+  communityTags: string[];
+  birthDate: Date;
+  minAge: number;
+  maxAge: number;
   interests: { interest: { slug: string; label: string } }[];
 }): ScoringProfile {
   return {
     userId: p.userId,
     relationshipGoal: p.relationshipGoal,
     gender: p.gender,
-    city: p.city, country: p.country,
-    latitude: p.latitude, longitude: p.longitude,
+    city: p.city,
+    country: p.country,
+    latitude: p.latitude,
+    longitude: p.longitude,
     languages: p.languages,
     interestSlugs: p.interests.map((i) => i.interest.slug),
     availabilityTags: p.availabilityTags,
     communityTags: p.communityTags,
-    smoking: p.smoking, drinking: p.drinking,
+    smoking: p.smoking,
+    drinking: p.drinking,
     exercise: p.exercise,
-    birthDate: p.birthDate, minAge: p.minAge, maxAge: p.maxAge,
+    birthDate: p.birthDate,
+    minAge: p.minAge,
+    maxAge: p.maxAge,
   };
 }
 
@@ -154,12 +165,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
   const createdAtById = new Map<string, Date>();
   for (const c of candidates) {
     let distanceKm: number | null = null;
-    if (
-      me.latitude != null &&
-      me.longitude != null &&
-      c.latitude != null &&
-      c.longitude != null
-    ) {
+    if (me.latitude != null && me.longitude != null && c.latitude != null && c.longitude != null) {
       distanceKm = haversineKm(me.latitude, me.longitude, c.latitude, c.longitude);
       if (distanceKm > me.maxDistanceKm) continue;
     }

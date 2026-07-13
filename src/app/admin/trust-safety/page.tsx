@@ -80,15 +80,15 @@ function Stat({
   return (
     <Card className="h-full rounded-3xl">
       <CardContent className="py-5">
-        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-muted-foreground text-sm font-medium">{label}</p>
         <p
-          className={`mt-2 font-display text-3xl font-semibold tabular-nums ${
+          className={`font-display mt-2 text-3xl font-semibold tabular-nums ${
             urgent ? "text-destructive" : ""
           }`}
         >
           {value}
         </p>
-        <p className="text-xs text-muted-foreground">{sub}</p>
+        <p className="text-muted-foreground text-xs">{sub}</p>
       </CardContent>
     </Card>
   );
@@ -232,9 +232,7 @@ export default async function TrustSafetyOverviewPage() {
   const healthByProvider = new Map(providerHealth.map((h) => [h.provider, h]));
 
   // Assignee emails for the workload list (bounded by staff size).
-  const workloadIds = workloadGroups
-    .map((g) => g.assignedToId)
-    .filter((id): id is string => !!id);
+  const workloadIds = workloadGroups.map((g) => g.assignedToId).filter((id): id is string => !!id);
   const workloadUsers =
     workloadIds.length > 0
       ? await db.user.findMany({
@@ -251,7 +249,13 @@ export default async function TrustSafetyOverviewPage() {
     }))
     .sort((a, b) => b.count - a.count);
 
-  const queues: { href: string; label: string; value: number; urgent: boolean; icon: LucideIcon }[] = [
+  const queues: {
+    href: string;
+    label: string;
+    value: number;
+    urgent: boolean;
+    icon: LucideIcon;
+  }[] = [
     {
       href: "/admin/moderation-cases?status=OPEN",
       label: "Open cases",
@@ -290,7 +294,7 @@ export default async function TrustSafetyOverviewPage() {
       />
 
       <section aria-label="Work queues" className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
           Queues
         </h2>
         <div className="grid gap-4 lg:grid-cols-3">
@@ -298,15 +302,15 @@ export default async function TrustSafetyOverviewPage() {
             <Link
               key={href}
               href={href}
-              className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+              className="focus-visible:ring-foreground/20 block rounded-3xl focus-visible:ring-2 focus-visible:outline-none"
             >
-              <Card className="rounded-3xl transition-shadow hover:shadow-float">
+              <Card className="hover:shadow-float rounded-3xl transition-shadow">
                 <CardContent className="flex flex-wrap items-center gap-4 py-5">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                    <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+                  <span className="bg-accent flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                    <Icon className="text-accent-foreground size-5" aria-hidden="true" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                    <p className="text-muted-foreground text-sm font-medium">{label}</p>
                     <p className="text-2xl font-semibold tabular-nums">{value}</p>
                   </div>
                   {urgent && (
@@ -314,7 +318,10 @@ export default async function TrustSafetyOverviewPage() {
                       Needs attention
                     </Badge>
                   )}
-                  <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <ArrowUpRight
+                    className="text-muted-foreground size-4 shrink-0"
+                    aria-hidden="true"
+                  />
                 </CardContent>
               </Card>
             </Link>
@@ -323,7 +330,7 @@ export default async function TrustSafetyOverviewPage() {
       </section>
 
       <section aria-label="Operations" className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
           Operations
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -357,7 +364,7 @@ export default async function TrustSafetyOverviewPage() {
       </section>
 
       <section aria-label="Quality, last 30 days" className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
           Quality · last 30 days
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -398,18 +405,18 @@ export default async function TrustSafetyOverviewPage() {
       </section>
 
       <div className="mb-8 grid gap-4 lg:grid-cols-2">
-        <section aria-label="Trust score distribution" className="rounded-3xl border bg-card p-5">
+        <section aria-label="Trust score distribution" className="bg-card rounded-3xl border p-5">
           <h2 className="mb-1 text-sm font-semibold">Trust-score distribution</h2>
-          <p className="mb-3 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mb-3 text-xs">
             All accounts by safety risk score (0 = no signals). Bands mirror the risk engine.
           </p>
           <ul className="space-y-2">
             {RISK_BANDS.map((band, i) => (
               <li key={band.label} className="flex items-center gap-3 text-sm">
-                <span className="w-14 shrink-0 text-xs tabular-nums text-muted-foreground">
+                <span className="text-muted-foreground w-14 shrink-0 text-xs tabular-nums">
                   {band.label}
                 </span>
-                <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
+                <span className="bg-muted h-2.5 flex-1 overflow-hidden rounded-full">
                   <span
                     className={`block h-full rounded-full ${
                       band.min >= 70 ? "bg-destructive/70" : "bg-foreground/30"
@@ -420,7 +427,7 @@ export default async function TrustSafetyOverviewPage() {
                 <span className="w-12 shrink-0 text-right text-xs tabular-nums">
                   {riskBandCounts[i]}
                 </span>
-                <span className="hidden w-28 shrink-0 text-xs text-muted-foreground sm:block">
+                <span className="text-muted-foreground hidden w-28 shrink-0 text-xs sm:block">
                   {band.hint}
                 </span>
               </li>
@@ -428,17 +435,20 @@ export default async function TrustSafetyOverviewPage() {
           </ul>
         </section>
 
-        <section aria-label="Moderator workload" className="rounded-3xl border bg-card p-5">
+        <section aria-label="Moderator workload" className="bg-card rounded-3xl border p-5">
           <h2 className="mb-1 text-sm font-semibold">Moderator workload</h2>
-          <p className="mb-3 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mb-3 text-xs">
             Open cases per assignee. Unassigned cases:{" "}
-            <Link href="/admin/moderation-cases?assigned=unassigned" className="underline underline-offset-2">
+            <Link
+              href="/admin/moderation-cases?assigned=unassigned"
+              className="underline underline-offset-2"
+            >
               view queue
             </Link>
             .
           </p>
           {workload.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
+            <p className="text-muted-foreground py-6 text-center text-sm">
               No cases are assigned right now.
             </p>
           ) : (
@@ -446,7 +456,7 @@ export default async function TrustSafetyOverviewPage() {
               {workload.map((w) => (
                 <li key={w.id} className="flex items-center gap-3 py-2.5 text-sm">
                   <span className="min-w-0 flex-1 truncate font-medium">{w.email}</span>
-                  <span className="tabular-nums text-muted-foreground">
+                  <span className="text-muted-foreground tabular-nums">
                     {w.count} open case{w.count === 1 ? "" : "s"}
                   </span>
                 </li>
@@ -456,14 +466,14 @@ export default async function TrustSafetyOverviewPage() {
         </section>
       </div>
 
-      <section aria-label="Provider health" className="mb-8 rounded-3xl border bg-card p-5">
+      <section aria-label="Provider health" className="bg-card mb-8 rounded-3xl border p-5">
         <h2 className="mb-1 text-sm font-semibold">Provider health</h2>
-        <p className="mb-3 text-xs text-muted-foreground">
+        <p className="text-muted-foreground mb-3 text-xs">
           External moderation chain and email transport - names and health only, never keys.
         </p>
         <div className="grid gap-4 lg:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
               Photo moderation
             </p>
             {moderationChain.length === 0 ? (
@@ -473,7 +483,8 @@ export default async function TrustSafetyOverviewPage() {
                 </Badge>{" "}
                 <span className="text-muted-foreground">
                   No external provider keys set - uploads queue for human review
-                  {activeModeration === "mock" ? " (mock provider active in this environment)" : ""}.
+                  {activeModeration === "mock" ? " (mock provider active in this environment)" : ""}
+                  .
                 </span>
               </p>
             ) : (
@@ -490,7 +501,7 @@ export default async function TrustSafetyOverviewPage() {
                         {i + 1}. {name}
                       </Badge>
                       {name === activeModeration && (
-                        <span className="text-xs text-muted-foreground">active</span>
+                        <span className="text-muted-foreground text-xs">active</span>
                       )}
                       {failing ? (
                         <Badge variant="destructive" className="rounded-full">
@@ -498,14 +509,14 @@ export default async function TrustSafetyOverviewPage() {
                           {h!.consecutiveFailures === 1 ? "" : "s"}
                         </Badge>
                       ) : h?.lastSuccessAt ? (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-muted-foreground text-xs">
                           ok · last success {formatAgo(h.lastSuccessAt)}
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground">no calls recorded yet</span>
+                        <span className="text-muted-foreground text-xs">no calls recorded yet</span>
                       )}
                       {failing && h?.lastError && (
-                        <span className="w-full truncate text-xs text-muted-foreground">
+                        <span className="text-muted-foreground w-full truncate text-xs">
                           last error: {h.lastError}
                         </span>
                       )}
@@ -516,7 +527,7 @@ export default async function TrustSafetyOverviewPage() {
             )}
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
               Email transport
             </p>
             <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
@@ -544,12 +555,13 @@ export default async function TrustSafetyOverviewPage() {
               return h.consecutiveFailures > 0 ? (
                 <p className="mt-2 text-sm">
                   <Badge variant="destructive" className="rounded-full">
-                    {h.consecutiveFailures} consecutive failure{h.consecutiveFailures === 1 ? "" : "s"}
+                    {h.consecutiveFailures} consecutive failure
+                    {h.consecutiveFailures === 1 ? "" : "s"}
                   </Badge>{" "}
-                  <span className="text-xs text-muted-foreground">{h.lastError}</span>
+                  <span className="text-muted-foreground text-xs">{h.lastError}</span>
                 </p>
               ) : h.lastSuccessAt ? (
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="text-muted-foreground mt-2 text-xs">
                   ok · last successful send {formatAgo(h.lastSuccessAt)}
                 </p>
               ) : null;
@@ -559,7 +571,7 @@ export default async function TrustSafetyOverviewPage() {
       </section>
 
       <section aria-label="Open cases by severity" className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
           Open cases by severity
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -567,33 +579,33 @@ export default async function TrustSafetyOverviewPage() {
             <Link
               key={severity}
               href={`/admin/moderation-cases?severity=${severity}`}
-              className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+              className="focus-visible:ring-foreground/20 block h-full rounded-3xl focus-visible:ring-2 focus-visible:outline-none"
             >
-              <Card className="h-full rounded-3xl transition-shadow hover:shadow-float">
+              <Card className="hover:shadow-float h-full rounded-3xl transition-shadow">
                 <CardContent className="py-5">
                   <div className="flex items-center justify-between">
                     <Badge variant={SEVERITY_BADGE[severity]} className="rounded-full">
                       {severity.toLowerCase()}
                     </Badge>
                   </div>
-                  <p className="mt-3 font-display text-3xl font-semibold tabular-nums">
+                  <p className="font-display mt-3 text-3xl font-semibold tabular-nums">
                     {severityCounts[i]}
                   </p>
-                  <p className="text-xs text-muted-foreground">open or under review</p>
+                  <p className="text-muted-foreground text-xs">open or under review</p>
                 </CardContent>
               </Card>
             </Link>
           ))}
         </div>
         {appealedCases > 0 && (
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-3 text-sm">
             Plus {appealedCases} case{appealedCases === 1 ? "" : "s"} currently under appeal.
           </p>
         )}
       </section>
 
       <section aria-label="Account restrictions" className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
           Accounts under restriction
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -601,11 +613,11 @@ export default async function TrustSafetyOverviewPage() {
             <Card key={label} className="h-full rounded-3xl">
               <CardContent className="py-5">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-muted-foreground">{label}</p>
-                  <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
+                  <p className="text-muted-foreground text-sm font-medium">{label}</p>
+                  <Icon className="text-muted-foreground size-4" aria-hidden="true" />
                 </div>
-                <p className="mt-2 font-display text-3xl font-semibold tabular-nums">{value}</p>
-                <p className="text-xs text-muted-foreground">{sub}</p>
+                <p className="font-display mt-2 text-3xl font-semibold tabular-nums">{value}</p>
+                <p className="text-muted-foreground text-xs">{sub}</p>
               </CardContent>
             </Card>
           ))}
@@ -613,30 +625,32 @@ export default async function TrustSafetyOverviewPage() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section aria-label="Recent enforcement" className="rounded-3xl border bg-card p-5">
+        <section aria-label="Recent enforcement" className="bg-card rounded-3xl border p-5">
           <h2 className="mb-3 text-sm font-semibold">Recent enforcement actions</h2>
           {recentViolations.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
+            <p className="text-muted-foreground py-6 text-center text-sm">
               No enforcement actions yet.
             </p>
           ) : (
             <ul className="divide-y">
               {recentViolations.map((v) => (
                 <li key={v.id} className="flex items-center gap-3 py-2.5">
-                  <Badge variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"} className="rounded-full">
+                  <Badge
+                    variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"}
+                    className="rounded-full"
+                  >
                     {pretty(v.actionTaken)}
                   </Badge>
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/admin/users/${v.userId}`}
                       title={v.user.email}
-                      className="block truncate text-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
+                      className="focus-visible:ring-foreground/20 block truncate text-sm font-medium hover:underline focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
                     >
                       {v.user.email}
                     </Link>
-                    <p className="text-xs text-muted-foreground">
-                      {pretty(v.violationType)} ·{" "}
-                      {formatAgo(v.createdAt)}
+                    <p className="text-muted-foreground text-xs">
+                      {pretty(v.violationType)} · {formatAgo(v.createdAt)}
                       {v.reversedAt ? " · reversed" : ""}
                     </p>
                   </div>
@@ -646,10 +660,10 @@ export default async function TrustSafetyOverviewPage() {
           )}
         </section>
 
-        <section aria-label="Recent staff decisions" className="rounded-3xl border bg-card p-5">
+        <section aria-label="Recent staff decisions" className="bg-card rounded-3xl border p-5">
           <h2 className="mb-3 text-sm font-semibold">Recent staff decisions</h2>
           {recentDecisions.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
+            <p className="text-muted-foreground py-6 text-center text-sm">
               No safety decisions logged yet.
             </p>
           ) : (
@@ -659,7 +673,7 @@ export default async function TrustSafetyOverviewPage() {
                   <p className="text-sm font-medium" title={entry.action}>
                     {humanizeAdminAction(entry.action)}
                   </p>
-                  <p className="text-xs text-muted-foreground" title={entry.targetId ?? undefined}>
+                  <p className="text-muted-foreground text-xs" title={entry.targetId ?? undefined}>
                     {entry.targetType ?? "target"}{" "}
                     {entry.targetId ? `· ${shortId(entry.targetId)} ` : ""}·{" "}
                     {formatAgo(entry.createdAt)}

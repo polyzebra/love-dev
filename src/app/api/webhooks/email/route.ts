@@ -36,11 +36,15 @@ export async function POST(req: Request) {
   }
 
   const rawBody = await req.text();
-  const verified = verifyEmailWebhookSignature(rawBody, {
-    svixId: req.headers.get("svix-id"),
-    svixTimestamp: req.headers.get("svix-timestamp"),
-    svixSignature: req.headers.get("svix-signature"),
-  }, secret);
+  const verified = verifyEmailWebhookSignature(
+    rawBody,
+    {
+      svixId: req.headers.get("svix-id"),
+      svixTimestamp: req.headers.get("svix-timestamp"),
+      svixSignature: req.headers.get("svix-signature"),
+    },
+    secret,
+  );
   if (!verified) {
     return NextResponse.json({ error: { code: "bad_signature" } }, { status: 401 });
   }
@@ -54,7 +58,7 @@ export async function POST(req: Request) {
   const type = typeof payload.type === "string" ? payload.type : "";
   const messageId = typeof payload.data?.email_id === "string" ? payload.data.email_id : null;
   const to = Array.isArray(payload.data?.to)
-    ? payload.data.to.find((t): t is string => typeof t === "string") ?? null
+    ? (payload.data.to.find((t): t is string => typeof t === "string") ?? null)
     : typeof payload.data?.to === "string"
       ? payload.data.to
       : null;

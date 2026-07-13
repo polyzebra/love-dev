@@ -20,7 +20,13 @@ export const dynamic = "force-dynamic";
 export default function PhoneLoginVerifyPage() {
   if (!phoneLoginEnabled()) redirect("/login");
   return (
-    <Suspense fallback={<AuthCard><AuthStepFallback /></AuthCard>}>
+    <Suspense
+      fallback={
+        <AuthCard>
+          <AuthStepFallback />
+        </AuthCard>
+      }
+    >
       <PhoneLoginCode />
     </Suspense>
   );

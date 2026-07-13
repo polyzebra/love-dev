@@ -1,8 +1,4 @@
-import type {
-  AppealStatus,
-  EnforcementAction,
-  ModerationCaseType,
-} from "@/generated/prisma/enums";
+import type { AppealStatus, EnforcementAction, ModerationCaseType } from "@/generated/prisma/enums";
 
 /**
  * User-facing vocabulary for the Appeals Centre. Calm, human words only -

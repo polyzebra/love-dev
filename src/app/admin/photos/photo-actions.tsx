@@ -114,8 +114,8 @@ export function PhotoActions({
           <DialogHeader>
             <DialogTitle>Reject photo</DialogTitle>
             <DialogDescription>
-              A reason is required - it is stored in the moderation history and audit log. The
-              photo stops being publicly served immediately.
+              A reason is required - it is stored in the moderation history and audit log. The photo
+              stops being publicly served immediately.
             </DialogDescription>
           </DialogHeader>
           <Textarea
@@ -157,8 +157,8 @@ export function PhotoActions({
           <DialogHeader>
             <DialogTitle>Delete photo permanently</DialogTitle>
             <DialogDescription>
-              Removes the storage objects and the database row. This cannot be undone; the action
-              is recorded in the admin audit log.
+              Removes the storage objects and the database row. This cannot be undone; the action is
+              recorded in the admin audit log.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

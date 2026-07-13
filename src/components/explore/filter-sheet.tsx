@@ -5,7 +5,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger,
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -19,7 +25,8 @@ export function ExploreFilterSheet() {
   const params = useSearchParams();
   const [open, setOpen] = useState(false);
   const [ages, setAges] = useState<[number, number]>([
-    Number(params.get("ageMin") ?? 18), Number(params.get("ageMax") ?? 60),
+    Number(params.get("ageMin") ?? 18),
+    Number(params.get("ageMax") ?? 60),
   ]);
   const [country, setCountry] = useState(params.get("country") ?? "");
   const [verifiedOnly, setVerifiedOnly] = useState(params.get("verifiedOnly") === "true");
@@ -57,16 +64,30 @@ export function ExploreFilterSheet() {
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <Label>Age range</Label>
-              <span className="tabular-nums text-muted-foreground">{ages[0]}-{ages[1]}</span>
+              <span className="text-muted-foreground tabular-nums">
+                {ages[0]}-{ages[1]}
+              </span>
             </div>
-            <Slider min={18} max={60} value={ages} onValueChange={(v) => setAges(v as [number, number])} aria-label="Age range" />
+            <Slider
+              min={18}
+              max={60}
+              value={ages}
+              onValueChange={(v) => setAges(v as [number, number])}
+              aria-label="Age range"
+            />
           </div>
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">Country</legend>
             <div className="flex gap-2">
-              {[["", "Anywhere"], ["IE", "Ireland"], ["GB", "United Kingdom"]].map(([value, label]) => (
+              {[
+                ["", "Anywhere"],
+                ["IE", "Ireland"],
+                ["GB", "United Kingdom"],
+              ].map(([value, label]) => (
                 <button
-                  key={label} type="button" onClick={() => setCountry(value)}
+                  key={label}
+                  type="button"
+                  onClick={() => setCountry(value)}
                   className={cn(
                     // Calm selected state: accent tint + primary text on a
                     // neutral border - selection is the fill, never a rose
@@ -88,10 +109,19 @@ export function ExploreFilterSheet() {
           </div>
         </div>
         <DrawerFooter className="flex-row gap-2 px-6 pb-8">
-          <Button variant="ghost" className="flex-1 rounded-full" onClick={() => { router.push(pathname); setOpen(false); }}>
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-full"
+            onClick={() => {
+              router.push(pathname);
+              setOpen(false);
+            }}
+          >
             Reset
           </Button>
-          <Button className="flex-1 rounded-full" onClick={apply}>Apply</Button>
+          <Button className="flex-1 rounded-full" onClick={apply}>
+            Apply
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

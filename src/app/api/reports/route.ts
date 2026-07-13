@@ -75,5 +75,8 @@ export async function POST(req: Request) {
   }
   await recomputeTrustForEvent(data.reportedId, "report_created");
 
-  return created({ reportId: report.id, message: "Thanks for letting us know. Our team will review this." });
+  return created({
+    reportId: report.id,
+    message: "Thanks for letting us know. Our team will review this.",
+  });
 }

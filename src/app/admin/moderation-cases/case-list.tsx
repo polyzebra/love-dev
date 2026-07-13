@@ -18,12 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { formatAgo } from "@/lib/utils";
-import {
-  ACCOUNT_STATUS_BADGE,
-  CASE_STATUS_BADGE,
-  SEVERITY_BADGE,
-  pretty,
-} from "../safety-badges";
+import { ACCOUNT_STATUS_BADGE, CASE_STATUS_BADGE, SEVERITY_BADGE, pretty } from "../safety-badges";
 import { useDialogOpener } from "../use-dialog-opener";
 
 /**
@@ -125,10 +120,7 @@ export function CaseList({
     });
   }
 
-  async function runBulk(
-    label: string,
-    request: (id: string) => Promise<Response>,
-  ): Promise<void> {
+  async function runBulk(label: string, request: (id: string) => Promise<Response>): Promise<void> {
     let done = 0;
     const failures: string[] = [];
     // Sequential on purpose: honest per-item results, no thundering herd.
@@ -144,9 +136,7 @@ export function CaseList({
     if (failures.length === 0) {
       toast.success(`${label}: ${done} case${done === 1 ? "" : "s"} updated.`);
     } else {
-      toast.error(
-        `${label}: ${done} updated, ${failures.length} failed - ${failures[0]}`,
-      );
+      toast.error(`${label}: ${done} updated, ${failures.length} failed - ${failures[0]}`);
     }
     setSelected(new Set());
     router.refresh();
@@ -198,17 +188,10 @@ export function CaseList({
         <div
           role="toolbar"
           aria-label="Bulk actions"
-          className="sticky top-2 z-20 flex flex-wrap items-center gap-2 rounded-full border bg-card/95 px-4 py-2 shadow-float backdrop-blur"
+          className="bg-card/95 shadow-float sticky top-2 z-20 flex flex-wrap items-center gap-2 rounded-full border px-4 py-2 backdrop-blur"
         >
-          <span className="text-sm font-medium tabular-nums">
-            {selectedIds.length} selected
-          </span>
-          <Button
-            size="sm"
-            className="rounded-full"
-            disabled={pending}
-            onClick={bulkAssignToMe}
-          >
+          <span className="text-sm font-medium tabular-nums">{selectedIds.length} selected</span>
+          <Button size="sm" className="rounded-full" disabled={pending} onClick={bulkAssignToMe}>
             <UserRoundCheck className="size-4" /> Assign to me
           </Button>
           <Button
@@ -237,13 +220,12 @@ export function CaseList({
 
       {rows.map((row) => {
         const selectable = selectableIds.has(row.id);
-        const claimable =
-          selectable && (row.assignedToId === null || row.assignedToId === meId);
+        const claimable = selectable && (row.assignedToId === null || row.assignedToId === meId);
         const mine = row.assignedToId === meId;
         return (
           <div
             key={row.id}
-            className="flex gap-3 rounded-3xl border bg-card p-5 transition-shadow hover:shadow-float"
+            className="bg-card hover:shadow-float flex gap-3 rounded-3xl border p-5 transition-shadow"
           >
             <Checkbox
               checked={selected.has(row.id)}
@@ -255,29 +237,38 @@ export function CaseList({
             <div className="min-w-0 flex-1">
               <Link
                 href={`/admin/moderation-cases/${row.id}`}
-                className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                className="focus-visible:ring-foreground/20 block rounded-xl focus-visible:ring-2 focus-visible:outline-none"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={SEVERITY_BADGE[row.severity] ?? "outline"} className="rounded-full">
+                  <Badge
+                    variant={SEVERITY_BADGE[row.severity] ?? "outline"}
+                    className="rounded-full"
+                  >
                     {pretty(row.severity)}
                   </Badge>
                   {row.priority !== row.severity && (
-                    <Badge variant={SEVERITY_BADGE[row.priority] ?? "outline"} className="rounded-full">
+                    <Badge
+                      variant={SEVERITY_BADGE[row.priority] ?? "outline"}
+                      className="rounded-full"
+                    >
                       priority {pretty(row.priority)}
                     </Badge>
                   )}
-                  <Badge variant={CASE_STATUS_BADGE[row.status] ?? "outline"} className="rounded-full">
+                  <Badge
+                    variant={CASE_STATUS_BADGE[row.status] ?? "outline"}
+                    className="rounded-full"
+                  >
                     {pretty(row.status)}
                   </Badge>
                   <SlaBadge row={row} nowMs={now.getTime()} />
                   <span className="text-sm font-medium">{pretty(row.caseType)}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
+                  <span className="text-muted-foreground ml-auto text-xs">
                     {formatAgo(row.createdAt)} · {pretty(row.source)}
                   </span>
                 </div>
-                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{row.summary}</p>
-                <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span className="truncate font-medium text-foreground" title={row.user.email}>
+                <p className="text-muted-foreground mt-2 line-clamp-2 text-sm">{row.summary}</p>
+                <p className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                  <span className="text-foreground truncate font-medium" title={row.user.email}>
                     {row.user.email}
                   </span>
                   <Badge
@@ -297,7 +288,9 @@ export function CaseList({
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {row.assignedToId ? (
                   <Badge variant={mine ? "secondary" : "outline"} className="rounded-full">
-                    {mine ? "assigned to you" : `assigned · ${row.assigneeEmail ?? row.assignedToId}`}
+                    {mine
+                      ? "assigned to you"
+                      : `assigned · ${row.assigneeEmail ?? row.assignedToId}`}
                   </Badge>
                 ) : (
                   selectable && (
@@ -338,8 +331,8 @@ export function CaseList({
               Dismiss {selectedIds.length} case{selectedIds.length === 1 ? "" : "s"}?
             </DialogTitle>
             <DialogDescription>
-              Each case closes with no action against the account. One reason is recorded on
-              every case; each dismissal is audited individually.
+              Each case closes with no action against the account. One reason is recorded on every
+              case; each dismissal is audited individually.
             </DialogDescription>
           </DialogHeader>
           <Textarea

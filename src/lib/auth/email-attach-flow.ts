@@ -321,7 +321,11 @@ export async function verifyEmailAttach(opts: {
 
   // The email_change confirmation - GoTrue stamps auth.users.email +
   // email_confirmed_at for the CURRENT auth user on success.
-  const { data, error } = await opts.client.verifyOtp({ email, token: opts.code, type: "email_change" });
+  const { data, error } = await opts.client.verifyOtp({
+    email,
+    token: opts.code,
+    type: "email_change",
+  });
   if (error || !data.user) {
     await recordAuthEvent({
       type: "email_attach_verify_fail",

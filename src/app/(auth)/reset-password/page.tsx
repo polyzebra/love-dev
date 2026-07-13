@@ -55,59 +55,64 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthCard>
-    <div className="space-y-8">
-      <div className="space-y-2 text-center">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Set a new password</h1>
-        <p className="text-muted-foreground">Choose something long - a passphrase works great.</p>
+      <div className="space-y-8">
+        <div className="space-y-2 text-center">
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Set a new password</h1>
+          <p className="text-muted-foreground">Choose something long - a passphrase works great.</p>
+        </div>
+        <form onSubmit={onSubmit} className="space-y-5" noValidate>
+          <div className="space-y-2">
+            <Label htmlFor="password">New password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={10}
+              placeholder="10+ characters"
+              onChange={() => {
+                if (passwordError) setPasswordError(null);
+                if (serverError) setServerError(null);
+              }}
+              aria-invalid={passwordError ? true : undefined}
+              aria-describedby={passwordError ? "password-error" : undefined}
+              className="h-12"
+            />
+            <InlineFieldError id="password-error" message={passwordError} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm">Confirm password</Label>
+            <Input
+              id="confirm"
+              name="confirm"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={10}
+              placeholder="Repeat your new password"
+              onChange={() => {
+                if (confirmError) setConfirmError(null);
+                if (serverError) setServerError(null);
+              }}
+              aria-invalid={confirmError ? true : undefined}
+              aria-describedby={confirmError ? "confirm-error" : undefined}
+              className="h-12"
+            />
+            <InlineFieldError id="confirm-error" message={confirmError} />
+          </div>
+          <AuthErrorBanner message={serverError} />
+          <Button
+            type="submit"
+            size="lg"
+            className="h-12 w-full rounded-full"
+            disabled={submitting}
+          >
+            {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
+            Update password
+          </Button>
+        </form>
       </div>
-      <form onSubmit={onSubmit} className="space-y-5" noValidate>
-        <div className="space-y-2">
-          <Label htmlFor="password">New password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={10}
-            placeholder="10+ characters"
-            onChange={() => {
-              if (passwordError) setPasswordError(null);
-              if (serverError) setServerError(null);
-            }}
-            aria-invalid={passwordError ? true : undefined}
-            aria-describedby={passwordError ? "password-error" : undefined}
-            className="h-12"
-          />
-          <InlineFieldError id="password-error" message={passwordError} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm">Confirm password</Label>
-          <Input
-            id="confirm"
-            name="confirm"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={10}
-            placeholder="Repeat your new password"
-            onChange={() => {
-              if (confirmError) setConfirmError(null);
-              if (serverError) setServerError(null);
-            }}
-            aria-invalid={confirmError ? true : undefined}
-            aria-describedby={confirmError ? "confirm-error" : undefined}
-            className="h-12"
-          />
-          <InlineFieldError id="confirm-error" message={confirmError} />
-        </div>
-        <AuthErrorBanner message={serverError} />
-        <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
-          {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
-          Update password
-        </Button>
-      </form>
-    </div>
     </AuthCard>
   );
 }

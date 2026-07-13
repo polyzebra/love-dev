@@ -26,12 +26,12 @@ export function BackButton({
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : undefined}
       className={cn(
-        "inline-flex size-11 aspect-square shrink-0 items-center justify-center rounded-full",
+        "inline-flex aspect-square size-11 shrink-0 items-center justify-center rounded-full",
         "text-muted-foreground outline-none",
         "transition-[background-color,opacity,transform] duration-150",
         "hover:bg-foreground/5 hover:text-foreground",
-        "active:scale-[0.98] active:bg-foreground/10",
-        "focus-visible:ring-2 focus-visible:ring-foreground/20",
+        "active:bg-foreground/10 active:scale-[0.98]",
+        "focus-visible:ring-foreground/20 focus-visible:ring-2",
         disabled && "pointer-events-none opacity-50",
         className,
       )}

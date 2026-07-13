@@ -62,7 +62,10 @@ export default async function AdminReportsPage() {
 
   return (
     <>
-      <PageHeader title="Reports" description={`${reports.length} awaiting review · oldest first`} />
+      <PageHeader
+        title="Reports"
+        description={`${reports.length} awaiting review · oldest first`}
+      />
       <div className="space-y-4">
         {reports.map((report) => (
           <Card key={report.id} className="rounded-3xl">
@@ -74,9 +77,7 @@ export default async function AdminReportsPage() {
                 >
                   {REASON_LABELS[report.reason]}
                 </Badge>
-                <span className="text-xs text-muted-foreground">
-                  {formatAgo(report.createdAt)}
-                </span>
+                <span className="text-muted-foreground text-xs">{formatAgo(report.createdAt)}</span>
                 {report.reported._count.reportsReceived > 1 && (
                   <Badge variant="outline" className="rounded-full">
                     {report.reported._count.reportsReceived} total reports on this user
@@ -104,13 +105,11 @@ export default async function AdminReportsPage() {
               </div>
 
               {report.message?.body && (
-                <blockquote className="rounded-2xl bg-muted px-4 py-3 text-sm italic">
+                <blockquote className="bg-muted rounded-2xl px-4 py-3 text-sm italic">
                   “{report.message.body}”
                 </blockquote>
               )}
-              {report.details && (
-                <p className="text-sm text-muted-foreground">{report.details}</p>
-              )}
+              {report.details && <p className="text-muted-foreground text-sm">{report.details}</p>}
 
               <ReportActions reportId={report.id} reportedUserId={report.reported.id} />
             </CardContent>

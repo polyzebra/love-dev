@@ -16,7 +16,7 @@ export function PageHeader({
       <div className="space-y-1">
         <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">{title}</h1>
         {description ? (
-          <p className="text-sm text-muted-foreground md:text-base">{description}</p>
+          <p className="text-muted-foreground text-sm md:text-base">{description}</p>
         ) : null}
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}

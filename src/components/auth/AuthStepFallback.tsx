@@ -10,11 +10,7 @@ import { Loader2 } from "lucide-react";
  * visible spinner, visible label, stable step-sized dimensions (the
  * Tirvea wordmark is already on screen from the layout header).
  */
-export function AuthStepFallback({
-  label = "Opening verification...",
-}: {
-  label?: string;
-}) {
+export function AuthStepFallback({ label = "Opening verification..." }: { label?: string }) {
   return (
     <div
       data-debug="auth-fallback"
@@ -25,8 +21,8 @@ export function AuthStepFallback({
       // the fallback is replaced by the destination UI.
       className="flex min-h-[26rem] flex-col items-center justify-center gap-3"
     >
-      <Loader2 className="size-6 animate-spin text-primary-soft" aria-hidden="true" />
-      <p className="text-sm text-muted-foreground">{label}</p>
+      <Loader2 className="text-primary-soft size-6 animate-spin" aria-hidden="true" />
+      <p className="text-muted-foreground text-sm">{label}</p>
     </div>
   );
 }

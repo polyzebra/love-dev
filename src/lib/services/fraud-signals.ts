@@ -61,7 +61,12 @@ export const FRAUD_WEIGHTS = {
 /** accountsOnDevice INCLUDES the user themselves. */
 export function deviceReuseSignals(accountsOnDevice: number): TrustSignal[] {
   if (accountsOnDevice >= 3) {
-    return [{ name: `device_many_accounts_x${accountsOnDevice}`, points: FRAUD_WEIGHTS.device_many_accounts }];
+    return [
+      {
+        name: `device_many_accounts_x${accountsOnDevice}`,
+        points: FRAUD_WEIGHTS.device_many_accounts,
+      },
+    ];
   }
   if (accountsOnDevice === 2) {
     return [{ name: "device_multi_account", points: FRAUD_WEIGHTS.device_multi_account }];
@@ -83,9 +88,15 @@ export function velocitySignals(input: {
     });
   }
   if (input.ipIdentities24h >= 6) {
-    signals.push({ name: `ip_velocity_x${input.ipIdentities24h}`, points: FRAUD_WEIGHTS.ip_velocity_6plus });
+    signals.push({
+      name: `ip_velocity_x${input.ipIdentities24h}`,
+      points: FRAUD_WEIGHTS.ip_velocity_6plus,
+    });
   } else if (input.ipIdentities24h >= 3) {
-    signals.push({ name: `ip_velocity_x${input.ipIdentities24h}`, points: FRAUD_WEIGHTS.ip_velocity_3plus });
+    signals.push({
+      name: `ip_velocity_x${input.ipIdentities24h}`,
+      points: FRAUD_WEIGHTS.ip_velocity_3plus,
+    });
   }
   return signals;
 }
@@ -160,9 +171,7 @@ export function ipIntelSignals(riskReason: string | null): TrustSignal[] {
  */
 export const IMPOSSIBLE_TRAVEL_WINDOW_MS = 2 * 3600 * 1000;
 
-export function detectImpossibleTravel(
-  sightings: Array<{ country: string; at: Date }>,
-): boolean {
+export function detectImpossibleTravel(sightings: Array<{ country: string; at: Date }>): boolean {
   const sorted = [...sightings]
     .filter((s) => s.country)
     .sort((a, b) => a.at.getTime() - b.at.getTime());
@@ -260,49 +269,56 @@ export async function collectFraudSignals(user: {
   });
   const fingerprints = myDevices.map((d) => d.fingerprint);
 
-  const [deviceUsers, deviceSignups7d, otpFails7d, rejectedVerifications, phoneBanRow, profile, photoCount] =
-    await Promise.all([
-      fingerprints.length > 0
-        ? db.device.findMany({
-            where: { fingerprint: { in: fingerprints } },
+  const [
+    deviceUsers,
+    deviceSignups7d,
+    otpFails7d,
+    rejectedVerifications,
+    phoneBanRow,
+    profile,
+    photoCount,
+  ] = await Promise.all([
+    fingerprints.length > 0
+      ? db.device.findMany({
+          where: { fingerprint: { in: fingerprints } },
+          select: { userId: true },
+          distinct: ["userId"],
+        })
+      : Promise.resolve([] as { userId: string }[]),
+    fingerprints.length > 0
+      ? db.device
+          .findMany({
+            where: {
+              fingerprint: { in: fingerprints },
+              createdAt: { gte: new Date(now - 7 * DAY_MS) },
+            },
             select: { userId: true },
             distinct: ["userId"],
           })
-        : Promise.resolve([] as { userId: string }[]),
-      fingerprints.length > 0
-        ? db.device
-            .findMany({
-              where: {
-                fingerprint: { in: fingerprints },
-                createdAt: { gte: new Date(now - 7 * DAY_MS) },
-              },
-              select: { userId: true },
-              distinct: ["userId"],
-            })
-            .then((rows) => rows.length)
-        : Promise.resolve(0),
-      db.authVerificationEvent.count({
-        where: {
-          type: "otp_verify_fail",
-          createdAt: { gte: new Date(now - 7 * DAY_MS) },
-          OR: [{ userId }, { email: user.email.toLowerCase() }],
-        },
-      }),
-      db.verification.count({
-        where: { userId, type: { in: ["PHOTO", "IDENTITY"] }, status: "REJECTED" },
-      }),
-      user.phoneE164
-        ? db.bannedCredential.findUnique({
-            where: { kind_value: { kind: "PHONE", value: user.phoneE164 } },
-            select: { sourceUserId: true },
-          })
-        : Promise.resolve(null),
-      db.profile.findUnique({
-        where: { userId },
-        select: { bio: true, completionPct: true, prompts: { select: { answer: true } } },
-      }),
-      db.photo.count({ where: { userId, status: "ACTIVE" } }),
-    ]);
+          .then((rows) => rows.length)
+      : Promise.resolve(0),
+    db.authVerificationEvent.count({
+      where: {
+        type: "otp_verify_fail",
+        createdAt: { gte: new Date(now - 7 * DAY_MS) },
+        OR: [{ userId }, { email: user.email.toLowerCase() }],
+      },
+    }),
+    db.verification.count({
+      where: { userId, type: { in: ["PHOTO", "IDENTITY"] }, status: "REJECTED" },
+    }),
+    user.phoneE164
+      ? db.bannedCredential.findUnique({
+          where: { kind_value: { kind: "PHONE", value: user.phoneE164 } },
+          select: { sourceUserId: true },
+        })
+      : Promise.resolve(null),
+    db.profile.findUnique({
+      where: { userId },
+      select: { bio: true, completionPct: true, prompts: { select: { answer: true } } },
+    }),
+    db.photo.count({ where: { userId, status: "ACTIVE" } }),
+  ]);
 
   // IP velocity: distinct identities seen from this user's last login IP
   // hash inside 24h (the audit trail records events even for rejections).

@@ -19,12 +19,7 @@ import { RESTRICTED_ACCOUNT_ROUTE } from "@/lib/auth/gate";
 import { getAccountStatusView, type ViolationView } from "@/lib/services/appeals";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ACTION_LABEL,
-  APPEAL_STATUS_LABEL,
-  VIOLATION_TYPE_LABEL,
-  formatDate,
-} from "../copy";
+import { ACTION_LABEL, APPEAL_STATUS_LABEL, VIOLATION_TYPE_LABEL, formatDate } from "../copy";
 
 export const metadata: Metadata = { title: "Account status" };
 export const dynamic = "force-dynamic";
@@ -66,16 +61,16 @@ function ViolationRow({ violation, first }: { violation: ViolationView; first: b
   return (
     <Link
       href={`/account/appeals/${violation.id}`}
-      className={`flex min-h-11 items-center gap-4 px-5 py-4 transition-colors hover:bg-muted ${
+      className={`hover:bg-muted flex min-h-11 items-center gap-4 px-5 py-4 transition-colors ${
         first ? "" : "border-t"
       }`}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-        <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+      <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+        <Icon className="text-accent-foreground size-5" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-medium">{ACTION_LABEL[violation.actionTaken]}</span>
-        <span className="block truncate text-sm text-muted-foreground">
+        <span className="text-muted-foreground block truncate text-sm">
           {VIOLATION_TYPE_LABEL[violation.violationType]} · {formatDate(violation.createdAt)}
         </span>
         {chip && (
@@ -88,21 +83,27 @@ function ViolationRow({ violation, first }: { violation: ViolationView; first: b
           </span>
         )}
       </span>
-      <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <ChevronRight className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
     </Link>
   );
 }
 
-function ViolationList({ violations, emptyCopy }: { violations: ViolationView[]; emptyCopy: string }) {
+function ViolationList({
+  violations,
+  emptyCopy,
+}: {
+  violations: ViolationView[];
+  emptyCopy: string;
+}) {
   if (violations.length === 0) {
     return (
-      <p className="rounded-3xl border border-dashed px-5 py-8 text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground rounded-3xl border border-dashed px-5 py-8 text-center text-sm">
         {emptyCopy}
       </p>
     );
   }
   return (
-    <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+    <div className="border-border bg-card/80 shadow-card overflow-hidden rounded-3xl border">
       {violations.map((v, i) => (
         <ViolationRow key={v.id} violation={v} first={i === 0} />
       ))}
@@ -132,14 +133,14 @@ export default async function AccountStatusPage() {
 
       <section aria-label="Current standing" className="glass mt-6 rounded-xl p-6">
         <div className="flex items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
+          <span className="bg-foreground/5 flex size-12 shrink-0 items-center justify-center rounded-2xl">
             <StatusIcon className={`size-6 ${statusIconClass}`} aria-hidden="true" />
           </span>
           <div className="min-w-0">
             <h2 className="font-display text-xl font-semibold tracking-tight text-balance">
               {view.statusCard.headline}
             </h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
               {view.statusCard.body}
             </p>
           </div>
@@ -154,7 +155,10 @@ export default async function AccountStatusPage() {
           className="min-h-[30dvh]"
         />
       ) : (
-        <Tabs defaultValue={byTab.active.length > 0 ? "active" : hasAppeals ? "appealed" : "expired"} className="mt-8">
+        <Tabs
+          defaultValue={byTab.active.length > 0 ? "active" : hasAppeals ? "appealed" : "expired"}
+          className="mt-8"
+        >
           <TabsList className="h-11 w-full rounded-full p-1">
             <TabsTrigger value="active" className="min-h-9 rounded-full">
               Active{byTab.active.length > 0 ? ` (${byTab.active.length})` : ""}
@@ -189,31 +193,31 @@ export default async function AccountStatusPage() {
 
       {hasAppeals && (
         <section aria-label="Appeals" className="mt-6">
-          <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+          <div className="border-border bg-card/80 shadow-card overflow-hidden rounded-3xl border">
             <Link
               href="/account/appeals"
-              className="flex min-h-11 items-center gap-4 px-5 py-4 transition-colors hover:bg-muted"
+              className="hover:bg-muted flex min-h-11 items-center gap-4 px-5 py-4 transition-colors"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                <FileText className="size-5 text-accent-foreground" aria-hidden="true" />
+              <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+                <FileText className="text-accent-foreground size-5" aria-hidden="true" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-medium">Your appeals</span>
-                <span className="block truncate text-sm text-muted-foreground">
+                <span className="text-muted-foreground block truncate text-sm">
                   Every appeal you&apos;ve submitted, with its status
                 </span>
               </span>
-              <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <ChevronRight className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
             </Link>
           </div>
         </section>
       )}
 
-      <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground mt-8 text-center text-xs leading-relaxed">
         Decisions are reviewed by people, not made automatically. Read more in our{" "}
         <Link
           href="/account/community-resources"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="hover:text-foreground underline underline-offset-2"
         >
           community resources
         </Link>

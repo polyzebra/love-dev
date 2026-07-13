@@ -42,61 +42,71 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <AuthCard>
-      <div className="space-y-4 text-center">
-        <MailCheck className="mx-auto size-12 text-success" aria-hidden="true" />
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Check your inbox</h1>
-        <p className="mx-auto max-w-sm leading-relaxed text-muted-foreground">
-          If that email is registered, a reset link is on its way. It expires in 30 minutes.
-        </p>
-        <Button variant="outline" className="h-12 rounded-full px-6" asChild>
-          <Link href="/login">Back to sign in</Link>
-        </Button>
-      </div>
+        <div className="space-y-4 text-center">
+          <MailCheck className="text-success mx-auto size-12" aria-hidden="true" />
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Check your inbox</h1>
+          <p className="text-muted-foreground mx-auto max-w-sm leading-relaxed">
+            If that email is registered, a reset link is on its way. It expires in 30 minutes.
+          </p>
+          <Button variant="outline" className="h-12 rounded-full px-6" asChild>
+            <Link href="/login">Back to sign in</Link>
+          </Button>
+        </div>
       </AuthCard>
     );
   }
 
   return (
     <AuthCard>
-    <div className="space-y-8">
-      <div className="space-y-2 text-center">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Reset your password</h1>
-        <p className="text-muted-foreground">
-          Enter your email and we&apos;ll send you a secure reset link.
+      <div className="space-y-8">
+        <div className="space-y-2 text-center">
+          <h1 className="font-display text-3xl font-semibold tracking-tight">
+            Reset your password
+          </h1>
+          <p className="text-muted-foreground">
+            Enter your email and we&apos;ll send you a secure reset link.
+          </p>
+        </div>
+        <form onSubmit={onSubmit} className="space-y-5" noValidate>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              required
+              placeholder="you@example.com"
+              onChange={() => {
+                if (fieldError) setFieldError(null);
+              }}
+              aria-invalid={fieldError ? true : undefined}
+              aria-describedby={fieldError ? "email-error" : undefined}
+              className="h-12"
+            />
+            <InlineFieldError id="email-error" message={fieldError} />
+          </div>
+          <Button
+            type="submit"
+            size="lg"
+            className="h-12 w-full rounded-full"
+            disabled={submitting}
+          >
+            {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
+            Send reset link
+          </Button>
+        </form>
+        <p className="text-muted-foreground text-center text-sm">
+          Remembered it?{" "}
+          <Link
+            href="/login"
+            className="text-primary-soft font-medium underline-offset-2 hover:underline"
+          >
+            Sign in
+          </Link>
         </p>
       </div>
-      <form onSubmit={onSubmit} className="space-y-5" noValidate>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            required
-            placeholder="you@example.com"
-            onChange={() => {
-              if (fieldError) setFieldError(null);
-            }}
-            aria-invalid={fieldError ? true : undefined}
-            aria-describedby={fieldError ? "email-error" : undefined}
-            className="h-12"
-          />
-          <InlineFieldError id="email-error" message={fieldError} />
-        </div>
-        <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={submitting}>
-          {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
-          Send reset link
-        </Button>
-      </form>
-      <p className="text-center text-sm text-muted-foreground">
-        Remembered it?{" "}
-        <Link href="/login" className="font-medium text-primary-soft underline-offset-2 hover:underline">
-          Sign in
-        </Link>
-      </p>
-    </div>
     </AuthCard>
   );
 }

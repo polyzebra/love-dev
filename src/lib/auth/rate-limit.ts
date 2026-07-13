@@ -35,9 +35,7 @@ function ladderCooldown(n: number): number {
 
 async function countEvents(
   where: { type: string | { in: string[] } } & (
-    | { email: string }
-    | { phoneE164: string }
-    | { ipHash: string }
+    { email: string } | { phoneE164: string } | { ipHash: string }
   ),
   windowMs: number,
 ): Promise<number> {

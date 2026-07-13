@@ -106,9 +106,7 @@ export default async function proxy(request: NextRequest) {
     .then(({ data }) => data?.claims ?? null)
     .catch(() => null);
   if (process.env.PERF_TRACE) {
-    console.info(
-      `[trace:mw] getClaims ${Date.now() - t0}ms path=${pathname} at=${Date.now()}`,
-    );
+    console.info(`[trace:mw] getClaims ${Date.now() - t0}ms path=${pathname} at=${Date.now()}`);
   }
 
   if (!claims) {

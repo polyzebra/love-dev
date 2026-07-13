@@ -81,7 +81,7 @@ export function HeroScene() {
       {/* Ambient key light + drifting particles */}
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 size-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_26%,transparent),transparent_70%)] blur-2xl"
+        className="absolute top-1/2 left-1/2 size-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_26%,transparent),transparent_70%)] blur-2xl"
       />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         {[
@@ -94,7 +94,7 @@ export function HeroScene() {
         ].map(([x, y, dur, delay], i) => (
           <span
             key={i}
-            className={`absolute ${x} ${y} size-1.5 animate-float-slow rounded-full bg-rose-200/40 blur-[1px] light:bg-rose-400/50`}
+            className={`absolute ${x} ${y} animate-float-slow light:bg-rose-400/50 size-1.5 rounded-full bg-rose-200/40 blur-[1px]`}
             style={{ animationDuration: dur as string, animationDelay: delay as string }}
           />
         ))}
@@ -107,10 +107,16 @@ export function HeroScene() {
         className="absolute inset-x-8 top-6 h-[440px]"
         aria-hidden="true"
       >
-        <div className="animate-float-slower absolute inset-0 -translate-x-16 rotate-[-8deg] scale-[0.86] overflow-hidden rounded-[26px] border border-white/10 opacity-60 [--float-rotate:-8deg] light:border-border">
-          <Image src={PHOTO_AMELIA.replace("w=240", "w=480")} alt="" fill sizes="300px" className="object-cover" />
+        <div className="animate-float-slower light:border-border absolute inset-0 -translate-x-16 scale-[0.86] rotate-[-8deg] overflow-hidden rounded-[26px] border border-white/10 opacity-60 [--float-rotate:-8deg]">
+          <Image
+            src={PHOTO_AMELIA.replace("w=240", "w=480")}
+            alt=""
+            fill
+            sizes="300px"
+            className="object-cover"
+          />
           <div className="absolute inset-0 bg-black/45" />
-          <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-medium text-white/90 backdrop-blur-md">
+          <span className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-medium text-white/90 backdrop-blur-md">
             <span className="size-1.5 rounded-full bg-emerald-400" /> Online
           </span>
         </div>
@@ -122,14 +128,21 @@ export function HeroScene() {
         style={{ x: midX, y: midY, rotateY: rotY }}
         className="preserve-3d absolute inset-x-8 top-6 h-[440px]"
       >
-        <div className="animate-float-slow relative h-full w-full overflow-hidden rounded-xl border border-white/12 shadow-float light:border-border">
-          <Image src={PHOTO_SAOIRSE} alt="" fill priority sizes="(max-width:768px) 80vw, 340px" className="object-cover" />
+        <div className="animate-float-slow shadow-float light:border-border relative h-full w-full overflow-hidden rounded-xl border border-white/12">
+          <Image
+            src={PHOTO_SAOIRSE}
+            alt=""
+            fill
+            priority
+            sizes="(max-width:768px) 80vw, 340px"
+            className="object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
           <div className="absolute inset-0 rounded-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" />
 
           {/* Compatibility + why */}
-          <div className="absolute left-3.5 top-3.5 space-y-1.5">
-            <span className="flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 py-1 pl-1.5 pr-3 text-xs font-semibold text-white backdrop-blur-md">
+          <div className="absolute top-3.5 left-3.5 space-y-1.5">
+            <span className="flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 py-1 pr-3 pl-1.5 text-xs font-semibold text-white backdrop-blur-md">
               <Ring value={96} delay={0.9} /> 96% match
             </span>
             {["3 shared interests", "Both in Dublin"].map((reason, i) => (
@@ -144,9 +157,9 @@ export function HeroScene() {
               </motion.span>
             ))}
           </div>
-          <span className="absolute right-3.5 top-3.5 flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-md">
+          <span className="absolute top-3.5 right-3.5 flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-md">
             <span className="relative flex size-2" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
+              <span className="animate-ping-soft absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
             </span>
             Online
@@ -164,7 +177,7 @@ export function HeroScene() {
                 transition={{ type: "spring", stiffness: 300, damping: 15, delay: 1.1 }}
                 className="relative flex items-center justify-center"
               >
-                <span className="absolute size-6 animate-ping-soft rounded-full bg-sky-400/25" />
+                <span className="animate-ping-soft absolute size-6 rounded-full bg-sky-400/25" />
                 <BadgeCheck className="relative size-5 fill-sky-400 text-white" />
               </motion.span>
             </p>
@@ -180,7 +193,9 @@ export function HeroScene() {
                   transition={{ delay: 1 + i * 0.12, type: "spring", stiffness: 350, damping: 24 }}
                   className={`rounded-full border px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-md ${i === 0 ? "border-rose-300/40 bg-rose-500/25" : "border-white/15 bg-white/10"}`}
                 >
-                  {i === 0 && <Sparkles className="mr-1 inline size-3 text-rose-200" aria-hidden="true" />}
+                  {i === 0 && (
+                    <Sparkles className="mr-1 inline size-3 text-rose-200" aria-hidden="true" />
+                  )}
                   {tag}
                 </motion.span>
               ))}
@@ -194,26 +209,34 @@ export function HeroScene() {
         {/* Live conversation */}
         <motion.div
           {...enter(!!reduced, 0.9)}
-          className="glass absolute -right-2 bottom-16 w-60 rounded-[22px] rounded-br-lg p-3.5 shadow-float sm:-right-6"
+          className="glass shadow-float absolute -right-2 bottom-16 w-60 rounded-[22px] rounded-br-lg p-3.5 sm:-right-6"
         >
           <div className="mb-2 flex items-center gap-2">
-            <span className="relative size-6 overflow-hidden rounded-full border border-foreground/20">
-              <Image src={PHOTO_SAOIRSE.replace("w=480", "w=96")} alt="" fill sizes="24px" className="object-cover" />
+            <span className="border-foreground/20 relative size-6 overflow-hidden rounded-full border">
+              <Image
+                src={PHOTO_SAOIRSE.replace("w=480", "w=96")}
+                alt=""
+                fill
+                sizes="24px"
+                className="object-cover"
+              />
             </span>
-            <p className="text-[11px] font-semibold text-foreground/90">Saoirse</p>
-            <span className="ml-auto text-[9px] uppercase tracking-widest text-muted-foreground">now</span>
+            <p className="text-foreground/90 text-[11px] font-semibold">Saoirse</p>
+            <span className="text-muted-foreground ml-auto text-[9px] tracking-widest uppercase">
+              now
+            </span>
           </div>
-          <p className="rounded-2xl rounded-bl-md bg-foreground/8 px-3 py-2 text-xs leading-snug text-foreground/85">
+          <p className="bg-foreground/8 text-foreground/85 rounded-2xl rounded-bl-md px-3 py-2 text-xs leading-snug">
             The Forty Foot at 7am - you in?
           </p>
-          <p className="ml-auto mt-1.5 w-fit rounded-2xl rounded-br-md bg-linear-160 from-[#f43f5e] to-brand-hover px-3 py-2 text-xs leading-snug text-primary-foreground shadow-[0_4px_14px_color-mix(in_srgb,var(--primary)_30%,transparent)]">
+          <p className="to-brand-hover text-primary-foreground mt-1.5 ml-auto w-fit rounded-2xl rounded-br-md bg-linear-160 from-[#f43f5e] px-3 py-2 text-xs leading-snug shadow-[0_4px_14px_color-mix(in_srgb,var(--primary)_30%,transparent)]">
             Only if breakfast follows ☕
           </p>
           <span className="mt-2 flex items-center gap-1" aria-hidden="true">
             {[0, 1, 2].map((i) => (
               <motion.span
                 key={i}
-                className="size-1.5 rounded-full bg-rose-300/80 light:bg-rose-500/80"
+                className="light:bg-rose-500/80 size-1.5 rounded-full bg-rose-300/80"
                 animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
                 transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18 }}
               />
@@ -224,7 +247,7 @@ export function HeroScene() {
             initial={reduced ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 0.6, ease: EASE_LUXE }}
-            className="mt-2 flex items-center gap-1.5 rounded-full border border-border bg-foreground/5 px-2.5 py-1 text-[10px] text-gold"
+            className="border-border bg-foreground/5 text-gold mt-2 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px]"
           >
             <Coffee className="size-3" aria-hidden="true" /> A sea swim, then breakfast?
           </motion.p>
@@ -235,16 +258,19 @@ export function HeroScene() {
           initial={reduced ? false : { opacity: 0, scale: 0.6, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 240, damping: 16, delay: 1.5 }}
-          className="glass absolute -left-3 top-1/3 flex items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-4 shadow-float sm:-left-8"
+          className="glass shadow-float absolute top-1/3 -left-3 flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 sm:-left-8"
         >
           <span className="flex -space-x-2">
             {[PHOTO_CIAN, PHOTO_AMELIA].map((p, i) => (
-              <span key={i} className="relative size-7 overflow-hidden rounded-full border-2 border-card">
+              <span
+                key={i}
+                className="border-card relative size-7 overflow-hidden rounded-full border-2"
+              >
                 <Image src={p} alt="" fill sizes="28px" className="object-cover" />
               </span>
             ))}
           </span>
-          <span className="text-xs font-semibold text-foreground">
+          <span className="text-foreground text-xs font-semibold">
             It&apos;s a match
             <motion.span
               className="ml-1.5 inline-block"
@@ -260,7 +286,7 @@ export function HeroScene() {
         {/* Verification moment */}
         <motion.div
           {...enter(!!reduced, 1.7)}
-          className="glass-chip absolute right-0 top-24 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium text-foreground sm:-right-4"
+          className="glass-chip text-foreground absolute top-24 right-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium sm:-right-4"
         >
           <span className="flex size-4 items-center justify-center rounded-full bg-sky-400">
             <Check className="size-2.5 text-white" aria-hidden="true" />
@@ -271,7 +297,7 @@ export function HeroScene() {
         {/* Premium hint */}
         <motion.div
           {...enter(!!reduced, 2.1)}
-          className="glass-chip absolute -left-2 bottom-6 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium text-gold sm:-left-6"
+          className="glass-chip text-gold absolute bottom-6 -left-2 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium sm:-left-6"
         >
           <Sparkles className="size-3.5" aria-hidden="true" />
           Premium · see who likes you

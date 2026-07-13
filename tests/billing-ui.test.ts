@@ -477,7 +477,7 @@ check("all six lifecycle states exist with their spec'd badges", () => {
 
 check("ENDING: stays-active-until hero, countdown, resume + manage, derived lose-list", () => {
   assert.match(subPage, /stays active until/);
-  assert.match(subPage, /automatically returns to Tirvea Free/);
+  assert.match(subPage, /automatically\s+returns to Tirvea Free/);
   assert.match(subPage, /days left/);
   assert.match(subPage, /<ResumeSubscriptionButton/);
   assert.match(subPage, /you will[\s\S]{0,40}lose:/);

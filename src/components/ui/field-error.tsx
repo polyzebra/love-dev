@@ -36,7 +36,7 @@ function InlineFieldError({
           transition={{ duration: DURATIONS.standard, ease: EASE_LUXE }}
           id={id}
           role="alert"
-          className={cn("overflow-hidden text-xs text-destructive", className)}
+          className={cn("text-destructive overflow-hidden text-xs", className)}
         >
           {message}
         </motion.p>
@@ -45,4 +45,4 @@ function InlineFieldError({
   );
 }
 
-export { InlineFieldError }
+export { InlineFieldError };

@@ -23,7 +23,7 @@ export function LogoutButton() {
       <Button
         variant="ghost"
         size="sm"
-        className="tap-target rounded-full text-muted-foreground hover:text-foreground"
+        className="tap-target text-muted-foreground hover:text-foreground rounded-full"
         onClick={() => setOpen(true)}
       >
         <LogOut className="size-4" aria-hidden="true" />

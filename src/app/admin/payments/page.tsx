@@ -50,7 +50,7 @@ export default async function AdminPaymentsPage() {
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card className="rounded-3xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm font-medium">
               Revenue (30 days)
             </CardTitle>
           </CardHeader>
@@ -62,7 +62,9 @@ export default async function AdminPaymentsPage() {
         </Card>
         <Card className="rounded-3xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">MRR (approx)</CardTitle>
+            <CardTitle className="text-muted-foreground text-sm font-medium">
+              MRR (approx)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="font-display text-3xl font-semibold tabular-nums">
@@ -72,7 +74,7 @@ export default async function AdminPaymentsPage() {
         </Card>
         <Card className="rounded-3xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm font-medium">
               Active subscriptions
             </CardTitle>
           </CardHeader>
@@ -80,14 +82,14 @@ export default async function AdminPaymentsPage() {
             <p className="font-display text-3xl font-semibold tabular-nums">
               {plusCount + goldCount}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {plusCount} Plus · {goldCount} Gold
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border bg-card">
+      <div className="bg-card overflow-x-auto rounded-3xl border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -108,7 +110,7 @@ export default async function AdminPaymentsPage() {
                   >
                     {p.user.profile?.displayName ?? "-"}
                   </p>
-                  <p className="truncate text-xs text-muted-foreground" title={p.user.email}>
+                  <p className="text-muted-foreground truncate text-xs" title={p.user.email}>
                     {p.user.email}
                   </p>
                 </TableCell>
@@ -129,7 +131,7 @@ export default async function AdminPaymentsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell
-                  className="text-right text-sm tabular-nums text-muted-foreground"
+                  className="text-muted-foreground text-right text-sm tabular-nums"
                   title={p.createdAt.toLocaleString("en-IE")}
                 >
                   {p.createdAt.toLocaleDateString("en-IE")}
@@ -138,7 +140,7 @@ export default async function AdminPaymentsPage() {
             ))}
             {payments.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={5} className="text-muted-foreground py-10 text-center">
                   No payments yet. They&apos;ll appear here once Stripe webhooks are configured.
                 </TableCell>
               </TableRow>

@@ -193,7 +193,9 @@ export const externalProvider: ModerationProvider = {
         typeof raw.facesCount === "number" && Number.isInteger(raw.facesCount)
           ? raw.facesCount
           : null,
-      labels: Array.isArray(raw.labels) ? raw.labels.filter((l): l is string => typeof l === "string") : [],
+      labels: Array.isArray(raw.labels)
+        ? raw.labels.filter((l): l is string => typeof l === "string")
+        : [],
       reason: typeof raw.reason === "string" ? raw.reason : undefined,
       // Per-category scores: only what the service actually returned (and
       // only sane 0-1 values) - never invented.
@@ -341,15 +343,30 @@ export function decidePhotoSafety(verdict: ModerationVerdict): PhotoSafetyDecisi
     n(s.minorRiskScore) >= t.minorCritical ||
     (labels.includes("minors") && n(s.adultScore) >= t.minorWithAdult)
   ) {
-    return { severity: "critical", action: "block", caseType: "MINOR_SAFETY", policyCritical: true };
+    return {
+      severity: "critical",
+      action: "block",
+      caseType: "MINOR_SAFETY",
+      policyCritical: true,
+    };
   }
   if (n(s.adultScore) >= t.explicitCritical) {
-    return { severity: "critical", action: "block", caseType: "EXPLICIT_CONTENT", policyCritical: true };
+    return {
+      severity: "critical",
+      action: "block",
+      caseType: "EXPLICIT_CONTENT",
+      policyCritical: true,
+    };
   }
 
   // HIGH - hide + case (graduated enforcement decides the account action).
   if (n(s.adultScore) >= t.high) {
-    return { severity: "high", action: "hide", caseType: "EXPLICIT_CONTENT", policyCritical: false };
+    return {
+      severity: "high",
+      action: "hide",
+      caseType: "EXPLICIT_CONTENT",
+      policyCritical: false,
+    };
   }
   if (n(s.duplicateMatchScore) >= t.high || n(s.reverseImageRisk) >= t.high) {
     return { severity: "high", action: "hide", caseType: "STOLEN_IMAGES", policyCritical: false };
@@ -360,13 +377,28 @@ export function decidePhotoSafety(verdict: ModerationVerdict): PhotoSafetyDecisi
 
   // MEDIUM - stays visible, needs a human look.
   if (n(s.adultScore) >= t.medium || n(s.violenceScore) >= t.medium) {
-    return { severity: "medium", action: "needs_review", caseType: "EXPLICIT_CONTENT", policyCritical: false };
+    return {
+      severity: "medium",
+      action: "needs_review",
+      caseType: "EXPLICIT_CONTENT",
+      policyCritical: false,
+    };
   }
   if (n(s.duplicateMatchScore) >= t.medium || n(s.reverseImageRisk) >= t.medium) {
-    return { severity: "medium", action: "needs_review", caseType: "STOLEN_IMAGES", policyCritical: false };
+    return {
+      severity: "medium",
+      action: "needs_review",
+      caseType: "STOLEN_IMAGES",
+      policyCritical: false,
+    };
   }
   if (n(s.aiGeneratedScore) >= t.medium) {
-    return { severity: "medium", action: "needs_review", caseType: "IMPERSONATION", policyCritical: false };
+    return {
+      severity: "medium",
+      action: "needs_review",
+      caseType: "IMPERSONATION",
+      policyCritical: false,
+    };
   }
   if (verdict.decision === "review") {
     return { severity: "medium", action: "needs_review", caseType: "OTHER", policyCritical: false };

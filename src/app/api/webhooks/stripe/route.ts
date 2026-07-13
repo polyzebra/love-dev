@@ -43,14 +43,20 @@ export async function POST(req: Request) {
   if (!stripeConfigured()) {
     // Verified delivery but no API key to refetch state with - tell
     // Stripe to retry rather than acking an event we cannot apply.
-    console.error("[billing:webhook] STRIPE_WEBHOOK_SECRET is set but STRIPE_SECRET_KEY is not - cannot process events");
+    console.error(
+      "[billing:webhook] STRIPE_WEBHOOK_SECRET is set but STRIPE_SECRET_KEY is not - cannot process events",
+    );
     return new Response("Billing not configured", { status: 503 });
   }
 
   let event: StripeWebhookEvent;
   try {
     const parsed = JSON.parse(raw) as Partial<StripeWebhookEvent>;
-    if (typeof parsed?.id !== "string" || typeof parsed?.type !== "string" || !parsed.data?.object) {
+    if (
+      typeof parsed?.id !== "string" ||
+      typeof parsed?.type !== "string" ||
+      !parsed.data?.object
+    ) {
       return new Response("Invalid payload", { status: 400 });
     }
     event = parsed as StripeWebhookEvent;

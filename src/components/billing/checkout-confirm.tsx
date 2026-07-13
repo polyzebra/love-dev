@@ -62,9 +62,7 @@ export function CheckoutConfirm({ sessionId }: { sessionId: string | null }) {
       const tick = async () => {
         if (stopped.current) return;
         let outcome:
-          | { type: "state"; state: ConfirmState }
-          | { type: "pending" }
-          | { type: "network" };
+          { type: "state"; state: ConfirmState } | { type: "pending" } | { type: "network" };
         try {
           const res = await fetch(
             `/api/billing/checkout-status?session_id=${encodeURIComponent(sessionId)}`,
@@ -162,7 +160,7 @@ export function CheckoutConfirm({ sessionId }: { sessionId: string | null }) {
         <StateBlock
           icon={
             <span className="glass-chip flex size-14 items-center justify-center rounded-full">
-              <Loader2 className="size-6 animate-spin text-foreground" aria-hidden="true" />
+              <Loader2 className="text-foreground size-6 animate-spin" aria-hidden="true" />
             </span>
           }
           title="Confirming your Tirvea membership"
@@ -178,9 +176,9 @@ export function CheckoutConfirm({ sessionId }: { sessionId: string | null }) {
               initial={{ scale: 0.4, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.6, ease: EASE_LUXE }}
-              className="flex size-14 items-center justify-center rounded-full bg-linear-160 from-brand-bright via-brand to-brand-active shadow-[0_8px_24px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
+              className="from-brand-bright via-brand to-brand-active flex size-14 items-center justify-center rounded-full bg-linear-160 shadow-[0_8px_24px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
             >
-              <Check className="size-7 text-primary-foreground" aria-hidden="true" />
+              <Check className="text-primary-foreground size-7" aria-hidden="true" />
             </motion.span>
           }
           title={`Welcome to Tirvea ${state.plan === "GOLD" ? "Gold" : "Plus"}`}
@@ -320,7 +318,7 @@ function StateBlock({
       {icon}
       <div className="space-y-2">
         <h2 className="font-display text-2xl font-medium tracking-tight">{title}</h2>
-        <p className="text-sm text-muted-foreground">{body}</p>
+        <p className="text-muted-foreground text-sm">{body}</p>
       </div>
       {actions ? (
         <div className="mt-2 flex w-full flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
@@ -335,7 +333,7 @@ function StateBlock({
 function NeutralDot() {
   return (
     <span className="glass-chip flex size-14 items-center justify-center rounded-full">
-      <span className="size-2.5 rounded-full bg-foreground/40" aria-hidden="true" />
+      <span className="bg-foreground/40 size-2.5 rounded-full" aria-hidden="true" />
     </span>
   );
 }

@@ -57,14 +57,14 @@ export function AppealForm({ violationId }: { violationId: string }) {
     return (
       <section aria-label="Appeal submitted" className="glass mt-6 rounded-xl p-6">
         <div className="flex items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
-            <Hourglass className="size-6 text-gold" aria-hidden="true" />
+          <span className="bg-foreground/5 flex size-12 shrink-0 items-center justify-center rounded-2xl">
+            <Hourglass className="text-gold size-6" aria-hidden="true" />
           </span>
           <div>
             <h2 className="font-display text-xl font-semibold tracking-tight">
               Appeal pending review
             </h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
               Our Trust &amp; Safety team will review your appeal and email you once a decision has
               been made.
             </p>
@@ -77,7 +77,7 @@ export function AppealForm({ violationId }: { violationId: string }) {
   return (
     <>
       <section aria-label="Submit an appeal" className="mt-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
           Your appeal
         </h2>
         <Textarea
@@ -96,15 +96,15 @@ export function AppealForm({ violationId }: { violationId: string }) {
         />
         <div className="mt-1.5 flex items-baseline justify-between px-1">
           {error ? (
-            <p className="text-xs text-destructive" role="alert">
+            <p className="text-destructive text-xs" role="alert">
               {error}
             </p>
           ) : (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {tooShort ? `At least ${MIN_LENGTH} characters.` : "Thanks - that helps our team."}
             </p>
           )}
-          <p className="text-xs tabular-nums text-muted-foreground">
+          <p className="text-muted-foreground text-xs tabular-nums">
             {text.trim().length}/{MAX_LENGTH}
           </p>
         </div>
@@ -113,7 +113,7 @@ export function AppealForm({ violationId }: { violationId: string }) {
       {/* Spacer so page content is never hidden behind the sticky bar. */}
       <div aria-hidden="true" className="h-24" />
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/85 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
+      <div className="border-border bg-background/85 fixed inset-x-0 bottom-0 z-30 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
         <div className="mx-auto w-full max-w-2xl px-5 py-3">
           <Button
             size="lg"

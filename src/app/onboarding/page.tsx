@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
   if (record?.onboardingDone) redirect("/discover");
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="bg-background min-h-dvh">
       <header className="safe-top mx-auto w-full max-w-2xl px-5 py-5">
         <Logo />
       </header>

@@ -54,7 +54,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
         aria-label="Primary"
         className="fixed inset-x-4 bottom-[max(1rem,var(--safe-bottom))] z-40 mx-auto max-w-md lg:hidden"
       >
-        <ul className="glass flex items-stretch justify-around rounded-full px-2 py-1.5 shadow-float">
+        <ul className="glass shadow-float flex items-stretch justify-around rounded-full px-2 py-1.5">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
@@ -71,10 +71,13 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
                     <motion.span
                       layoutId="app-nav-halo"
                       transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                      className="absolute inset-x-1 inset-y-0 rounded-full bg-primary/25 shadow-[0_0_18px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
+                      className="bg-primary/25 absolute inset-x-1 inset-y-0 rounded-full shadow-[0_0_18px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
                     />
                   )}
-                  <Icon className={cn("relative size-5", active && "fill-primary/30")} aria-hidden="true" />
+                  <Icon
+                    className={cn("relative size-5", active && "fill-primary/30")}
+                    aria-hidden="true"
+                  />
                   <span className="relative">{label}</span>
                   <NavLinkStatus />
                 </Link>
@@ -85,7 +88,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
       </nav>
 
       {/* Desktop frosted rail */}
-      <aside className="fixed bottom-4 left-4 top-4 z-40 hidden w-60 flex-col overflow-hidden rounded-xl border border-border bg-card/50 backdrop-blur-2xl lg:flex">
+      <aside className="border-border bg-card/50 fixed top-4 bottom-4 left-4 z-40 hidden w-60 flex-col overflow-hidden rounded-xl border backdrop-blur-2xl lg:flex">
         <div className="px-6 py-7">
           <Logo href="/discover" />
         </div>
@@ -96,7 +99,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
               return (
                 <Fragment key={href}>
                   {href === ADMIN_ITEM.href && (
-                    <li aria-hidden="true" className="mx-4 my-2 border-t border-border/50" />
+                    <li aria-hidden="true" className="border-border/50 mx-4 my-2 border-t" />
                   )}
                   <li>
                     <Link
@@ -116,7 +119,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
                           // Calm active tint - the old inset glass-highlight
                           // painted a near-white 1px seam across the pill top
                           // in light mode, and the outer glow is decoration.
-                          className="absolute inset-0 rounded-2xl bg-primary/15"
+                          className="bg-primary/15 absolute inset-0 rounded-2xl"
                         />
                       )}
                       <Icon className="relative size-5" aria-hidden="true" />
@@ -129,7 +132,7 @@ export function AppNav({ showAdmin = false }: { showAdmin?: boolean }) {
             })}
           </ul>
         </nav>
-        <p className="px-6 py-6 text-xs text-muted-foreground">Made with care</p>
+        <p className="text-muted-foreground px-6 py-6 text-xs">Made with care</p>
       </aside>
     </NavTransitionProvider>
   );

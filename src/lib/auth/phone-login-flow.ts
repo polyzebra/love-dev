@@ -75,11 +75,7 @@ export interface PhoneLoginAuthClient {
     phone: string;
     options?: { shouldCreateUser?: boolean };
   }): Promise<{ error: AuthClientError }>;
-  verifyOtp(params: {
-    phone: string;
-    token: string;
-    type: "sms";
-  }): Promise<{
+  verifyOtp(params: { phone: string; token: string; type: "sms" }): Promise<{
     data: { user: PhoneLoginAuthUser | null; session: object | null };
     error: AuthClientError;
   }>;
@@ -207,8 +203,7 @@ function normalizeForLogin(
   phone: string,
   countryIso?: string,
 ):
-  | { ok: true; value: NormalizedOk }
-  | { ok: false; kind: "invalid_phone" | "unsupported_country" } {
+  { ok: true; value: NormalizedOk } | { ok: false; kind: "invalid_phone" | "unsupported_country" } {
   const normalized = normalizePhone(phone, countryIso);
   if (!normalized.ok) return { ok: false, kind: normalized.reason };
   // The LOGIN list (getSupportedPhoneCountries("login")) - the shared

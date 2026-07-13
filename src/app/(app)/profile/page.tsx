@@ -104,9 +104,12 @@ export default async function ProfilePage() {
               <RevealItem key={type}>
                 <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
                   {done ? (
-                    <BadgeCheck className="size-5 shrink-0 text-success" aria-hidden="true" />
+                    <BadgeCheck className="text-success size-5 shrink-0" aria-hidden="true" />
                   ) : (
-                    <CircleDashed className="size-5 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+                    <CircleDashed
+                      className="text-muted-foreground/40 size-5 shrink-0"
+                      aria-hidden="true"
+                    />
                   )}
                   <span className={done ? "" : "text-muted-foreground"}>{label}</span>
                   {!done && (
@@ -133,8 +136,10 @@ export default async function ProfilePage() {
       {profile.bio ? (
         <Reveal>
           <section className="px-2 py-4 md:px-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">In my words</p>
-            <blockquote className="mt-3 font-display text-2xl italic leading-snug text-foreground/95 md:text-3xl">
+            <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
+              In my words
+            </p>
+            <blockquote className="font-display text-foreground/95 mt-3 text-2xl leading-snug italic md:text-3xl">
               &ldquo;{profile.bio}&rdquo;
             </blockquote>
           </section>
@@ -142,9 +147,12 @@ export default async function ProfilePage() {
       ) : (
         <Reveal>
           <section className="glass rounded-xl p-6 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               No bio yet - profiles with a story get far more matches.{" "}
-              <Link href="/settings" className="font-medium text-primary-soft underline-offset-2 hover:underline">
+              <Link
+                href="/settings"
+                className="text-primary-soft font-medium underline-offset-2 hover:underline"
+              >
                 Write yours
               </Link>
             </p>
@@ -157,7 +165,9 @@ export default async function ProfilePage() {
         <Reveal>
           <section className="glass rounded-xl p-6 md:p-8">
             <div className="mb-5 flex items-baseline justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Your prompts</p>
+              <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
+                Your prompts
+              </p>
               <Button variant="link" size="sm" className="h-auto p-0 text-xs" asChild>
                 <Link href="/profile/prompts">
                   <PenLine className="size-3.5" aria-hidden="true" />
@@ -168,10 +178,10 @@ export default async function ProfilePage() {
             <div className="space-y-6">
               {prompts.map((p) => (
                 <div key={p.promptKey}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.2em] uppercase">
                     {promptLabel(p.promptKey)}
                   </p>
-                  <p className="mt-1.5 font-display text-xl leading-snug text-foreground/95 md:text-2xl">
+                  <p className="font-display text-foreground/95 mt-1.5 text-xl leading-snug md:text-2xl">
                     {p.answer}
                   </p>
                 </div>
@@ -182,16 +192,17 @@ export default async function ProfilePage() {
       )}
       {prompts.length < 3 && (
         <Reveal>
-          <section className="glass flex flex-col items-center gap-3 rounded-xl border border-dashed border-foreground/15 p-7 text-center">
+          <section className="glass border-foreground/15 flex flex-col items-center gap-3 rounded-xl border border-dashed p-7 text-center">
             <span className="glass-chip flex size-12 items-center justify-center rounded-full">
-              <MessageSquareQuote className="size-5 text-gold" aria-hidden="true" />
+              <MessageSquareQuote className="text-gold size-5" aria-hidden="true" />
             </span>
             <div className="space-y-1">
               <p className="font-display text-xl font-medium tracking-tight">
                 {prompts.length === 0 ? "Add your first prompt" : "Answer a few more prompts"}
               </p>
-              <p className="max-w-sm text-sm text-muted-foreground">
-                Your answers become conversation starters - people reply to your words, not your stats.
+              <p className="text-muted-foreground max-w-sm text-sm">
+                Your answers become conversation starters - people reply to your words, not your
+                stats.
               </p>
             </div>
             <Button className="mt-1 rounded-full px-6" asChild>
@@ -205,15 +216,13 @@ export default async function ProfilePage() {
       {profile.interests.length > 0 && (
         <Reveal>
           <section className="glass rounded-xl p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
-              Into
-            </p>
+            <p className="text-gold mb-4 text-xs font-semibold tracking-[0.3em] uppercase">Into</p>
             <div className="flex flex-wrap items-center gap-2">
               {profile.interests.map(({ interest }, i) => (
                 <span
                   key={interest.id}
                   className={cn(
-                    "rounded-full border border-border bg-foreground/5 font-medium",
+                    "border-border bg-foreground/5 rounded-full border font-medium",
                     i % 3 === 0 ? "px-4 py-2 text-sm" : "px-3 py-1.5 text-xs",
                     i % 4 === 0 && "bg-primary/12 text-primary-soft",
                   )}
@@ -229,14 +238,20 @@ export default async function ProfilePage() {
       {/* ================= THE BASICS - demoted, collapsed ================= */}
       {basics.length > 0 && (
         <Reveal>
-          <details className="group rounded-xl border border-border bg-card/40">
-            <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground [&::-webkit-details-marker]:hidden">
+          <details className="group border-border bg-card/40 rounded-xl border">
+            <summary className="text-muted-foreground flex cursor-pointer list-none items-center justify-between px-6 py-4 text-xs font-semibold tracking-[0.3em] uppercase [&::-webkit-details-marker]:hidden">
               The basics
-              <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />
+              <ChevronDown
+                className="size-4 transition-transform group-open:rotate-180"
+                aria-hidden="true"
+              />
             </summary>
             <div className="grid gap-2.5 px-6 pb-5 sm:grid-cols-2">
               {basics.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <div
+                  key={label}
+                  className="text-muted-foreground flex items-center gap-2.5 text-sm"
+                >
                   <Icon className="size-4 shrink-0 opacity-60" aria-hidden="true" />
                   <span className="truncate capitalize">{label}</span>
                 </div>

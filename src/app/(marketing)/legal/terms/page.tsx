@@ -10,8 +10,8 @@ export default function TermsPage() {
 
       <h2>1. Who we are</h2>
       <p>
-        Tirvea is operated by Tirvea Ltd. These terms govern your use of the
-        Tirvea platform across web and mobile.
+        Tirvea is operated by Tirvea Ltd. These terms govern your use of the Tirvea platform across
+        web and mobile.
       </p>
 
       <h2>2. Eligibility</h2>

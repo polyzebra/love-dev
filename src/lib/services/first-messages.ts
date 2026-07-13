@@ -108,8 +108,7 @@ export function contentGuard(body: string): string | null {
 // ---------------------------------------------------------------------------
 
 export type SendFirstMessageResult =
-  | { id: string; matched: false }
-  | { id: string; matched: true; conversationId: string };
+  { id: string; matched: false } | { id: string; matched: true; conversationId: string };
 
 export async function firstMessagesRemainingToday(senderId: string): Promise<number> {
   const tier = await planTierOf(senderId);
@@ -195,7 +194,10 @@ export async function sendFirstMessage(
 
   const remaining = await firstMessagesRemainingToday(senderId);
   if (remaining <= 0) {
-    throw new FirstMessageError("limit_reached", "You have used all of your first messages for today.");
+    throw new FirstMessageError(
+      "limit_reached",
+      "You have used all of your first messages for today.",
+    );
   }
 
   const senderName = sender.profile.displayName;
@@ -216,7 +218,10 @@ export async function sendFirstMessage(
       select: { id: true },
     });
     if (pending) {
-      throw new FirstMessageError("already_pending", "There is already a pending message between you two.");
+      throw new FirstMessageError(
+        "already_pending",
+        "There is already a pending message between you two.",
+      );
     }
 
     // The first message always carries a Like; never duplicate or downgrade
@@ -325,9 +330,7 @@ export async function sendFirstMessage(
 // Respond
 // ---------------------------------------------------------------------------
 
-export type RespondResult =
-  | { status: "ACCEPTED"; conversationId: string }
-  | { status: "DECLINED" };
+export type RespondResult = { status: "ACCEPTED"; conversationId: string } | { status: "DECLINED" };
 
 export async function respondToFirstMessage(
   receiverId: string,

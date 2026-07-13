@@ -43,14 +43,14 @@ export default async function AccountAppealsPage() {
     <div className="animate-rise">
       <Link
         href="/account/status"
-        className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm"
       >
         <ArrowLeft className="size-4" aria-hidden="true" /> Account status
       </Link>
       <h1 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">
         Your appeals
       </h1>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
         Every appeal is reviewed by a member of our Trust &amp; Safety team. We&apos;ll email you
         when a decision has been made.
       </p>
@@ -63,7 +63,7 @@ export default async function AccountAppealsPage() {
           className="min-h-[35dvh]"
         />
       ) : (
-        <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+        <div className="border-border bg-card/80 shadow-card mt-6 overflow-hidden rounded-3xl border">
           {appealed.map((v, i) => {
             const appeal = v.appeal!;
             const { icon: Icon, className } = APPEAL_ICON[appeal.status];
@@ -71,24 +71,27 @@ export default async function AccountAppealsPage() {
               <Link
                 key={appeal.id}
                 href={`/account/appeals/${v.id}`}
-                className={`flex min-h-11 items-center gap-4 px-5 py-4 transition-colors hover:bg-muted ${
+                className={`hover:bg-muted flex min-h-11 items-center gap-4 px-5 py-4 transition-colors ${
                   i > 0 ? "border-t" : ""
                 }`}
               >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
+                <span className="bg-foreground/5 flex size-10 shrink-0 items-center justify-center rounded-2xl">
                   <Icon className={`size-5 ${className}`} aria-hidden="true" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">{APPEAL_STATUS_LABEL[appeal.status]}</span>
-                  <span className="block truncate text-sm text-muted-foreground">
+                  <span className="text-muted-foreground block truncate text-sm">
                     {ACTION_LABEL[v.actionTaken]} · {VIOLATION_TYPE_LABEL[v.violationType]}
                   </span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                  <span className="text-muted-foreground mt-0.5 block text-xs">
                     Submitted {formatDate(appeal.submittedAt)}
                     {appeal.decidedAt ? ` · Decided ${formatDate(appeal.decidedAt)}` : ""}
                   </span>
                 </span>
-                <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <ChevronRight
+                  className="text-muted-foreground size-4 shrink-0"
+                  aria-hidden="true"
+                />
               </Link>
             );
           })}

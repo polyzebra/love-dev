@@ -52,11 +52,7 @@ export function AuthShell({
   return (
     <AuthCard>
       <div className="mb-8 grid grid-cols-[2.75rem_1fr_2.75rem] items-center">
-        {backHref ? (
-          <BackButton href={backHref} />
-        ) : (
-          <span aria-hidden="true" />
-        )}
+        {backHref ? <BackButton href={backHref} /> : <span aria-hidden="true" />}
         <div
           className="flex items-center justify-center gap-1.5"
           role="img"

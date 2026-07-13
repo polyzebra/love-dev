@@ -32,8 +32,7 @@ export async function restorePurchases(): Promise<RestorePurchasesResult> {
     return {
       ok: true,
       payments,
-      subscriptionTier:
-        subscription && subscription.tier !== "FREE" ? subscription.tier : null,
+      subscriptionTier: subscription && subscription.tier !== "FREE" ? subscription.tier : null,
     };
   } catch {
     return {

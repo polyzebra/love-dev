@@ -84,7 +84,7 @@ export function AssignControl({
 
   if (!caseOpen) {
     return (
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         {assignedToId
           ? `Handled by ${assigneeEmail ?? assignedToId}.`
           : "This case closed without an assignee."}
@@ -117,7 +117,10 @@ export function AssignControl({
         {canManage && (
           <>
             <Select value={picked} onValueChange={setPicked} disabled={pending}>
-              <SelectTrigger className="h-9 w-56 rounded-full" aria-label="Assign to a staff member">
+              <SelectTrigger
+                className="h-9 w-56 rounded-full"
+                aria-label="Assign to a staff member"
+              >
                 <SelectValue placeholder="Assign to…" />
               </SelectTrigger>
               <SelectContent>

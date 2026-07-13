@@ -66,14 +66,14 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
             value={option}
             disabled={pending}
             aria-label={label}
-            className="glass flex min-h-14 w-full items-center gap-4 rounded-3xl px-5 py-4 text-left outline-none transition-colors hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-foreground/20 data-[state=checked]:bg-accent data-[disabled]:opacity-70"
+            className="glass hover:bg-foreground/5 focus-visible:ring-foreground/20 data-[state=checked]:bg-accent flex min-h-14 w-full items-center gap-4 rounded-3xl px-5 py-4 text-left transition-colors outline-none focus-visible:ring-2 data-[disabled]:opacity-70"
           >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-              <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+            <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+              <Icon className="text-accent-foreground size-5" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block font-medium">{label}</span>
-              <span className="block truncate text-sm text-muted-foreground">{hint}</span>
+              <span className="text-muted-foreground block truncate text-sm">{hint}</span>
             </span>
             <span className="flex size-6 shrink-0 items-center justify-center">
               <RadioGroupPrimitive.Indicator asChild>
@@ -81,16 +81,15 @@ export function AppearancePicker({ initial }: { initial: AppearanceMode }) {
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={SPRING.snappy}
-                  className="flex size-6 items-center justify-center rounded-full bg-primary"
+                  className="bg-primary flex size-6 items-center justify-center rounded-full"
                 >
-                  <Check className="size-3.5 text-primary-foreground" aria-hidden="true" />
+                  <Check className="text-primary-foreground size-3.5" aria-hidden="true" />
                 </motion.span>
               </RadioGroupPrimitive.Indicator>
             </span>
           </RadioGroupPrimitive.Item>
         ))}
       </RadioGroupPrimitive.Root>
-
     </div>
   );
 }

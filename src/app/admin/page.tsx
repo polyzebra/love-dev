@@ -69,17 +69,43 @@ export default async function AdminDashboardPage() {
     db.message.count({ where: { createdAt: { gte: dayAgo } } }),
     db.report.count({ where: { status: "OPEN" } }),
     db.photo.count({ where: { moderation: "PENDING", status: { not: "DELETED" } } }),
-    db.verification.count({ where: { status: { in: ["PENDING", "IN_REVIEW"] }, type: { in: ["PHOTO", "IDENTITY"] } } }),
+    db.verification.count({
+      where: { status: { in: ["PENDING", "IN_REVIEW"] }, type: { in: ["PHOTO", "IDENTITY"] } },
+    }),
     db.subscription.count({ where: { tier: { not: "FREE" }, status: "ACTIVE" } }),
     db.appeal.count({ where: { status: { in: ["SUBMITTED", "PENDING_REVIEW"] } } }),
     db.moderationCase.count({ where: { status: { in: ["OPEN", "UNDER_REVIEW"] } } }),
   ]);
 
   const accountStats = [
-    { label: "Total members", value: totalUsers, sub: `+${newUsersWeek} this week`, icon: Users, href: "/admin/users" },
-    { label: "Active", value: activeUsers, sub: "status ACTIVE", icon: UserCheck, href: "/admin/users" },
-    { label: "Verified", value: verifiedUsers, sub: "approved verification", icon: ShieldCheck, href: "/admin/verification" },
-    { label: "Suspended", value: suspendedUsers, sub: "excl. banned", icon: PauseCircle, href: "/admin/users" },
+    {
+      label: "Total members",
+      value: totalUsers,
+      sub: `+${newUsersWeek} this week`,
+      icon: Users,
+      href: "/admin/users",
+    },
+    {
+      label: "Active",
+      value: activeUsers,
+      sub: "status ACTIVE",
+      icon: UserCheck,
+      href: "/admin/users",
+    },
+    {
+      label: "Verified",
+      value: verifiedUsers,
+      sub: "approved verification",
+      icon: ShieldCheck,
+      href: "/admin/verification",
+    },
+    {
+      label: "Suspended",
+      value: suspendedUsers,
+      sub: "excl. banned",
+      icon: PauseCircle,
+      href: "/admin/users",
+    },
     { label: "Banned", value: bannedUsers, sub: "bannedAt set", icon: Ban, href: "/admin/users" },
   ];
 
@@ -91,11 +117,41 @@ export default async function AdminDashboardPage() {
   ];
 
   const queues = [
-    { href: "/admin/reports", label: "Open reports", value: openReports, urgent: openReports > 0, icon: Flag },
-    { href: "/admin/photos", label: "Photo moderation", value: pendingPhotos, urgent: pendingPhotos > 10, icon: ImageIcon },
-    { href: "/admin/verification", label: "Verification queue", value: pendingVerifications, urgent: pendingVerifications > 10, icon: BadgeCheck },
-    { href: "/admin/moderation-cases", label: "Moderation cases", value: openCases, urgent: openCases > 0, icon: Gavel },
-    { href: "/admin/appeals", label: "Appeals", value: openAppeals, urgent: openAppeals > 0, icon: Scale },
+    {
+      href: "/admin/reports",
+      label: "Open reports",
+      value: openReports,
+      urgent: openReports > 0,
+      icon: Flag,
+    },
+    {
+      href: "/admin/photos",
+      label: "Photo moderation",
+      value: pendingPhotos,
+      urgent: pendingPhotos > 10,
+      icon: ImageIcon,
+    },
+    {
+      href: "/admin/verification",
+      label: "Verification queue",
+      value: pendingVerifications,
+      urgent: pendingVerifications > 10,
+      icon: BadgeCheck,
+    },
+    {
+      href: "/admin/moderation-cases",
+      label: "Moderation cases",
+      value: openCases,
+      urgent: openCases > 0,
+      icon: Gavel,
+    },
+    {
+      href: "/admin/appeals",
+      label: "Appeals",
+      value: openAppeals,
+      urgent: openAppeals > 0,
+      icon: Scale,
+    },
   ];
 
   // Modules the product does not have yet. Rendered as inert "Not
@@ -108,7 +164,7 @@ export default async function AdminDashboardPage() {
     <>
       <PageHeader title="Dashboard" description="Platform health at a glance." />
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
         Accounts
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -116,41 +172,45 @@ export default async function AdminDashboardPage() {
           <Link
             key={label}
             href={href}
-            className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="focus-visible:ring-foreground/20 block h-full rounded-3xl focus-visible:ring-2 focus-visible:outline-none"
           >
-            <Card className="h-full rounded-3xl transition-shadow hover:shadow-float">
+            <Card className="hover:shadow-float h-full rounded-3xl transition-shadow">
               <CardHeader className="flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-                <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
+                <CardTitle className="text-muted-foreground text-sm font-medium">{label}</CardTitle>
+                <Icon className="text-muted-foreground size-4" aria-hidden="true" />
               </CardHeader>
               <CardContent>
-                <p className="font-display text-3xl font-semibold tabular-nums">{value.toLocaleString("en-IE")}</p>
-                <p className="text-xs text-muted-foreground">{sub}</p>
+                <p className="font-display text-3xl font-semibold tabular-nums">
+                  {value.toLocaleString("en-IE")}
+                </p>
+                <p className="text-muted-foreground text-xs">{sub}</p>
               </CardContent>
             </Card>
           </Link>
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="text-muted-foreground mt-8 mb-3 text-sm font-semibold tracking-wide uppercase">
         Activity
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {activityStats.map(({ label, value, sub, icon: Icon }) => (
           <Card key={label} className="rounded-3xl">
             <CardHeader className="flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-              <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
+              <CardTitle className="text-muted-foreground text-sm font-medium">{label}</CardTitle>
+              <Icon className="text-muted-foreground size-4" aria-hidden="true" />
             </CardHeader>
             <CardContent>
-              <p className="font-display text-3xl font-semibold tabular-nums">{value.toLocaleString("en-IE")}</p>
-              <p className="text-xs text-muted-foreground">{sub}</p>
+              <p className="font-display text-3xl font-semibold tabular-nums">
+                {value.toLocaleString("en-IE")}
+              </p>
+              <p className="text-muted-foreground text-xs">{sub}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="text-muted-foreground mt-8 mb-3 text-sm font-semibold tracking-wide uppercase">
         Work queues
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -158,21 +218,28 @@ export default async function AdminDashboardPage() {
           <Link
             key={href}
             href={href}
-            className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="focus-visible:ring-foreground/20 block rounded-3xl focus-visible:ring-2 focus-visible:outline-none"
           >
-            <Card className="rounded-3xl transition-shadow hover:shadow-float">
+            <Card className="hover:shadow-float rounded-3xl transition-shadow">
               {/* flex-wrap: the urgency badge drops below on very narrow
                   screens (320px) instead of forcing page-level overflow. */}
               <CardContent className="flex flex-wrap items-center gap-4 py-5">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                  <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+                <span className="bg-accent flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                  <Icon className="text-accent-foreground size-5" aria-hidden="true" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-muted-foreground">{label}</p>
+                  <p className="text-muted-foreground text-sm">{label}</p>
                   <p className="text-2xl font-semibold tabular-nums">{value}</p>
                 </div>
-                {urgent && <Badge variant="destructive" className="rounded-full">Needs attention</Badge>}
-                <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                {urgent && (
+                  <Badge variant="destructive" className="rounded-full">
+                    Needs attention
+                  </Badge>
+                )}
+                <ArrowUpRight
+                  className="text-muted-foreground size-4 shrink-0"
+                  aria-hidden="true"
+                />
               </CardContent>
             </Card>
           </Link>
@@ -180,14 +247,16 @@ export default async function AdminDashboardPage() {
         {notConfigured.map(({ label, icon: Icon }) => (
           <Card key={label} className="rounded-3xl border-dashed opacity-70">
             <CardContent className="flex items-center gap-4 py-5">
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-muted">
-                <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
+              <span className="bg-muted flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                <Icon className="text-muted-foreground size-5" aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="text-sm text-muted-foreground">Not configured</p>
+                <p className="text-muted-foreground text-sm">{label}</p>
+                <p className="text-muted-foreground text-sm">Not configured</p>
               </div>
-              <Badge variant="outline" className="rounded-full">Planned</Badge>
+              <Badge variant="outline" className="rounded-full">
+                Planned
+              </Badge>
             </CardContent>
           </Card>
         ))}

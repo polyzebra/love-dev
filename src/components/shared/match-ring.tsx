@@ -4,20 +4,21 @@ import { motion } from "motion/react";
 import { EASE_LUXE } from "@/lib/motion";
 
 /** Animated compatibility ring - fills to `value`% on mount. */
-export function MatchRing({
-  value,
-  size = "sm",
-}: {
-  value: number;
-  size?: "sm" | "md";
-}) {
+export function MatchRing({ value, size = "sm" }: { value: number; size?: "sm" | "md" }) {
   const r = 15;
   const c = 2 * Math.PI * r;
   const dims = size === "md" ? "size-8" : "size-6";
   return (
-    <span className="glass-chip flex items-center gap-2 rounded-full py-1 pl-1.5 pr-3 text-xs font-semibold text-foreground">
+    <span className="glass-chip text-foreground flex items-center gap-2 rounded-full py-1 pr-3 pl-1.5 text-xs font-semibold">
       <svg viewBox="0 0 36 36" className={`${dims} -rotate-90`} aria-hidden="true">
-        <circle cx="18" cy="18" r={r} fill="none" stroke="color-mix(in oklab, var(--foreground) 20%, transparent)" strokeWidth="3" />
+        <circle
+          cx="18"
+          cy="18"
+          r={r}
+          fill="none"
+          stroke="color-mix(in oklab, var(--foreground) 20%, transparent)"
+          strokeWidth="3"
+        />
         <motion.circle
           cx="18"
           cy="18"

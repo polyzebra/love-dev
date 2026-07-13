@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  applyAppearance,
-  storedAppearance,
-  type AppearanceMode,
-} from "@/lib/theme";
+import { applyAppearance, storedAppearance, type AppearanceMode } from "@/lib/theme";
 
 /**
  * Keeps the live theme honest:

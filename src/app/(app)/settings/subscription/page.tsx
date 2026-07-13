@@ -121,8 +121,7 @@ export default async function SubscriptionSettingsPage() {
   // Which plan the hero talks about: the held plan while any relationship
   // with Stripe is alive, Free otherwise. (effective, not row tier, keeps
   // an out-of-grace PAST_DUE honest about entitlements elsewhere.)
-  const heroTier =
-    lifecycle === "FREE" || lifecycle === "EXPIRED" ? "FREE" : subscription!.tier;
+  const heroTier = lifecycle === "FREE" || lifecycle === "EXPIRED" ? "FREE" : subscription!.tier;
   const plan = PLANS.find((p) => p.tier === heroTier) ?? PLANS[0];
   const paid = heroTier !== "FREE";
   const priorPlanName = PLANS.find((p) => p.tier === priorTier)?.name ?? null;
@@ -187,7 +186,7 @@ export default async function SubscriptionSettingsPage() {
       <Reveal y={16}>
         <section
           aria-labelledby="current-plan-heading"
-          className="border-glow noise relative overflow-hidden rounded-[36px] bg-card/60 p-6 md:p-10"
+          className="border-glow noise bg-card/60 relative overflow-hidden rounded-[36px] p-6 md:p-10"
         >
           {/* Same spotlight the pricing stage carries, centred on the plan */}
           <div
@@ -199,13 +198,13 @@ export default async function SubscriptionSettingsPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p
                 id="current-plan-heading"
-                className="text-xs font-semibold uppercase tracking-[0.3em] text-gold"
+                className="text-gold text-xs font-semibold tracking-[0.3em] uppercase"
               >
                 Current plan
               </p>
               <span
                 className={cn(
-                  "glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest",
+                  "glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold tracking-widest uppercase",
                   chip.className,
                 )}
               >
@@ -234,16 +233,16 @@ export default async function SubscriptionSettingsPage() {
             {lifecycle === "ENDING" ? (
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground md:text-base">
+                  <p className="text-muted-foreground text-sm md:text-base">
                     Your {plan.name} membership stays active until
                   </p>
-                  <p className="mt-1 font-display text-3xl font-medium tracking-tight md:text-4xl">
+                  <p className="font-display mt-1 text-3xl font-medium tracking-tight md:text-4xl">
                     {periodEnd ? formatDate(periodEnd) : "the end of your billing period"}
                   </p>
                   {periodEnd && (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {daysUntil(periodEnd)} days left. After that your account
-                      automatically returns to Tirvea Free.
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      {daysUntil(periodEnd)} days left. After that your account automatically
+                      returns to Tirvea Free.
                     </p>
                   )}
                 </div>
@@ -254,20 +253,19 @@ export default async function SubscriptionSettingsPage() {
                 {losses.length > 0 && (
                   <div className="glass rounded-2xl px-5 py-4 text-sm">
                     <p className="font-medium">
-                      After {periodEnd ? formatDate(periodEnd) : "your plan ends"} you will
-                      lose:
+                      After {periodEnd ? formatDate(periodEnd) : "your plan ends"} you will lose:
                     </p>
                     <ul className="mt-2 space-y-1.5">
                       {losses.map((loss) => (
-                        <li key={loss} className="flex items-start gap-2 text-muted-foreground">
+                        <li key={loss} className="text-muted-foreground flex items-start gap-2">
                           <Minus className="mt-1 size-3.5 shrink-0" aria-hidden="true" />
                           <span>{loss}</span>
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      Everything on Tirvea Free keeps working - your profile, matches and
-                      chats stay exactly as they are.
+                    <p className="text-muted-foreground mt-3 text-xs">
+                      Everything on Tirvea Free keeps working - your profile, matches and chats stay
+                      exactly as they are.
                     </p>
                   </div>
                 )}
@@ -275,7 +273,7 @@ export default async function SubscriptionSettingsPage() {
             ) : (
               <>
                 {statusLine && (
-                  <p className="max-w-md text-sm text-muted-foreground md:text-base">
+                  <p className="text-muted-foreground max-w-md text-sm md:text-base">
                     {statusLine}
                   </p>
                 )}
@@ -288,8 +286,7 @@ export default async function SubscriptionSettingsPage() {
                       {endedOn ? ` on ${formatDate(endedOn)}` : ""}.
                     </p>
                     <p className="text-muted-foreground">
-                      Upgrade again anytime - your profile, matches and chats never went
-                      anywhere.
+                      Upgrade again anytime - your profile, matches and chats never went anywhere.
                     </p>
                   </div>
                 )}
@@ -299,8 +296,8 @@ export default async function SubscriptionSettingsPage() {
                   <div className="glass rounded-2xl px-5 py-4 text-sm">
                     <p className="font-medium">Your last payment didn&apos;t go through.</p>
                     <p className="text-muted-foreground">
-                      Update your payment method and retry - or we&apos;ll keep retrying for
-                      a few days.{" "}
+                      Update your payment method and retry - or we&apos;ll keep retrying for a few
+                      days.{" "}
                       {effective !== "FREE"
                         ? `You keep ${plan.name} in the meantime.`
                         : `${plan.name} is paused until the payment succeeds.`}
@@ -328,7 +325,7 @@ export default async function SubscriptionSettingsPage() {
             {hasBillingProfile && (
               /* No Stripe brand asset ships in this repo - the lucide
                  credit-card glyph stands in as the payment mark. */
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
                 <CreditCard className="size-3.5" aria-hidden="true" />
                 Billed securely via Stripe
               </p>
@@ -353,7 +350,7 @@ export default async function SubscriptionSettingsPage() {
               >
                 {hasLiveSub ? "Upgrade available" : "Upgrade your membership"}
               </h2>
-              <p className="text-sm text-muted-foreground md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base">
                 {hasLiveSub
                   ? "Same card, same renewal date - you only pay the prorated difference."
                   : "Billed monthly via Stripe. Cancel anytime in two taps - no dark patterns."}
@@ -374,14 +371,14 @@ export default async function SubscriptionSettingsPage() {
           <div className="mb-3 px-1">
             <h2
               id="payments-heading"
-              className="text-xs font-semibold uppercase tracking-[0.3em] text-gold"
+              className="text-gold text-xs font-semibold tracking-[0.3em] uppercase"
             >
               Payment history
             </h2>
           </div>
 
           {payments.length === 0 ? (
-            <div className="rounded-3xl border border-border bg-card/80 shadow-card">
+            <div className="border-border bg-card/80 shadow-card rounded-3xl border">
               <EmptyState
                 icon={Receipt}
                 title="No payments yet."
@@ -390,7 +387,7 @@ export default async function SubscriptionSettingsPage() {
               />
             </div>
           ) : (
-            <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+            <div className="border-border bg-card/80 shadow-card overflow-hidden rounded-3xl border">
               {payments.map((p, i) => {
                 const { icon: Icon, className } = PAYMENT_ICON[p.status];
                 return (
@@ -401,14 +398,14 @@ export default async function SubscriptionSettingsPage() {
                       i > 0 && "border-t",
                     )}
                   >
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
+                    <span className="bg-foreground/5 flex size-10 shrink-0 items-center justify-center rounded-2xl">
                       <Icon className={`size-5 ${className}`} aria-hidden="true" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">
                         {p.description ?? "Subscription"}
                       </span>
-                      <span className="block text-xs text-muted-foreground">
+                      <span className="text-muted-foreground block text-xs">
                         {p.createdAt.toLocaleDateString("en-IE", {
                           day: "numeric",
                           month: "short",
@@ -433,7 +430,7 @@ export default async function SubscriptionSettingsPage() {
                             href={p.receiptUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex min-h-11 items-center gap-1 text-muted-foreground underline-offset-4 hover:underline"
+                            className="text-muted-foreground inline-flex min-h-11 items-center gap-1 underline-offset-4 hover:underline"
                             aria-label={`Download receipt - ${p.description ?? "Subscription"}`}
                           >
                             Receipt
@@ -445,7 +442,7 @@ export default async function SubscriptionSettingsPage() {
                             href={p.invoiceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex min-h-11 items-center gap-1 text-muted-foreground underline-offset-4 hover:underline"
+                            className="text-muted-foreground inline-flex min-h-11 items-center gap-1 underline-offset-4 hover:underline"
                             aria-label={`Open invoice - ${p.description ?? "Subscription"}`}
                           >
                             Invoice
@@ -459,7 +456,7 @@ export default async function SubscriptionSettingsPage() {
               })}
             </div>
           )}
-          <p className="mt-3 px-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-3 px-1 text-xs">
             Receipts are also emailed after every payment.
           </p>
         </section>

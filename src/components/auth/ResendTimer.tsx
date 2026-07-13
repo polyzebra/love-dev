@@ -72,7 +72,7 @@ export function ResendTimer({
 
   if (resends >= MAX_RESENDS) {
     return (
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-center text-sm">
         Still nothing? Check your spam folder, or go back and re-enter your details.
       </p>
     );
@@ -82,7 +82,7 @@ export function ResendTimer({
   const seconds = secondsLeft % 60;
 
   return (
-    <p className="text-center text-sm text-muted-foreground" aria-live="polite">
+    <p className="text-muted-foreground text-center text-sm" aria-live="polite">
       {secondsLeft > 0 ? (
         <>
           Resend code in{" "}
@@ -95,7 +95,7 @@ export function ResendTimer({
           type="button"
           onClick={resend}
           disabled={sending || disabled}
-          className="inline-flex items-center gap-1.5 rounded-sm font-medium text-primary-soft underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:opacity-50"
+          className="text-primary-soft focus-visible:ring-foreground/20 inline-flex items-center gap-1.5 rounded-sm font-medium underline-offset-2 outline-none hover:underline focus-visible:ring-2 disabled:opacity-50"
         >
           {sending && <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />}
           Resend code

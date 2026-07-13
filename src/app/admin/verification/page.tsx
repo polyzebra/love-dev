@@ -44,7 +44,10 @@ export default async function AdminVerificationPage() {
 
   return (
     <>
-      <PageHeader title="Verification" description={`${queue.length} awaiting review · oldest first`} />
+      <PageHeader
+        title="Verification"
+        description={`${queue.length} awaiting review · oldest first`}
+      />
       <div className="grid gap-4 md:grid-cols-2">
         {queue.map((item) => (
           <Card key={item.id} className="rounded-3xl">
@@ -53,7 +56,7 @@ export default async function AdminVerificationPage() {
                 <Badge variant="secondary" className="rounded-full">
                   {item.type === "PHOTO" ? "Photo verification" : "ID verification"}
                 </Badge>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-muted-foreground text-xs">
                   requested {formatAgo(item.createdAt)}
                 </span>
               </div>
@@ -65,7 +68,7 @@ export default async function AdminVerificationPage() {
                 </span>
               </p>
               {item.provider && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Provider: {item.provider} · Session {item.providerSessionId ?? "-"}
                 </p>
               )}

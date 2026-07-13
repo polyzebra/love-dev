@@ -43,7 +43,7 @@ export default async function ChatListPage() {
           <li key={c.conversationId}>
             <Link
               href={`/chat/${c.conversationId}`}
-              className="flex items-center gap-4 rounded-3xl p-3 transition-colors hover:bg-card hover:shadow-card focus-visible:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
+              className="hover:bg-card hover:shadow-card focus-visible:bg-card focus-visible:ring-foreground/20 flex items-center gap-4 rounded-3xl p-3 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
             >
               <div className="relative shrink-0">
                 <Avatar className="size-14">
@@ -52,7 +52,7 @@ export default async function ChatListPage() {
                 </Avatar>
                 <OnlineDot
                   online={c.other?.isOnline ?? false}
-                  className="absolute bottom-0.5 right-0.5"
+                  className="absolute right-0.5 bottom-0.5"
                 />
               </div>
               <div className="min-w-0 flex-1">
@@ -60,9 +60,11 @@ export default async function ChatListPage() {
                   <p className="truncate font-medium" title={c.other?.displayName ?? "Member"}>
                     {c.other?.displayName ?? "Member"}
                   </p>
-                  {c.isPinned && <Pin className="size-3.5 text-muted-foreground" aria-label="Pinned" />}
+                  {c.isPinned && (
+                    <Pin className="text-muted-foreground size-3.5" aria-label="Pinned" />
+                  )}
                   {c.lastMessage && (
-                    <span className="ml-auto shrink-0 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground ml-auto shrink-0 text-xs">
                       {formatRelativeTime(c.lastMessage.createdAt)}
                     </span>
                   )}
@@ -71,7 +73,7 @@ export default async function ChatListPage() {
                   <p
                     className={cn(
                       "truncate text-sm",
-                      c.unread > 0 ? "font-medium text-foreground" : "text-muted-foreground",
+                      c.unread > 0 ? "text-foreground font-medium" : "text-muted-foreground",
                     )}
                     title={c.lastMessage?.body ?? undefined}
                   >

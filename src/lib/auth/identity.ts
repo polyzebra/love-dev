@@ -23,7 +23,9 @@ export async function isAuthUserAlive(userId: string): Promise<boolean> {
       SELECT id::text FROM auth.users WHERE id::text = ${userId} LIMIT 1`;
     return rows.length > 0;
   } catch (error) {
-    console.warn(`[identity] auth.users lookup failed - assuming alive: ${String(error).slice(0, 80)}`);
+    console.warn(
+      `[identity] auth.users lookup failed - assuming alive: ${String(error).slice(0, 80)}`,
+    );
     return true;
   }
 }
@@ -255,10 +257,7 @@ export async function ensureAppUser(
     // Concurrent FIRST logins for one uid (double-delivered callback,
     // OTP verify racing the callback): the PK settles it - exactly one
     // row. The loser adopts the winner's row instead of erroring.
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       const winner = await db.user.findUnique({ where: { id: u.id } });
       if (winner) {
         console.info(`[identity] first-login race for auth.uid=${u.id} - adopting winner row`);

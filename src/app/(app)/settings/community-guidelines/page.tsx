@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  Gavel,
-  HeartHandshake,
-  ShieldAlert,
-  Sparkles,
-  UserRound,
-} from "lucide-react";
+import { Gavel, HeartHandshake, ShieldAlert, Sparkles, UserRound } from "lucide-react";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 
 export const metadata: Metadata = { title: "Community Guidelines" };
@@ -48,28 +42,28 @@ export default function CommunityGuidelinesPage() {
         {GUIDELINES.map(({ icon: Icon, title, body }) => (
           <section
             key={title}
-            className="rounded-3xl border border-border bg-card/80 p-6 shadow-card"
+            className="border-border bg-card/80 shadow-card rounded-3xl border p-6"
           >
             <div className="flex items-start gap-4">
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                <Icon className="size-5 text-accent-foreground" aria-hidden="true" />
+              <span className="bg-accent flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                <Icon className="text-accent-foreground size-5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
                 <h2 className="font-medium">{title}</h2>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{body}</p>
+                <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{body}</p>
               </div>
             </div>
           </section>
         ))}
 
-        <section className="rounded-3xl border border-destructive/30 bg-card/80 p-6 shadow-card">
+        <section className="border-destructive/30 bg-card/80 shadow-card rounded-3xl border p-6">
           <div className="flex items-start gap-4">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-destructive/15">
-              <Gavel className="size-5 text-destructive" aria-hidden="true" />
+            <span className="bg-destructive/15 flex size-11 shrink-0 items-center justify-center rounded-2xl">
+              <Gavel className="text-destructive size-5" aria-hidden="true" />
             </span>
             <div className="min-w-0">
               <h2 className="font-medium">What happens when rules are broken</h2>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
                 Every report is reviewed by a person. Depending on what we find, that leads to a
                 warning, a suspension or a permanent ban - serious violations skip straight to the
                 ban. We&apos;d rather have a smaller community than an unsafe one.
@@ -78,8 +72,9 @@ export default function CommunityGuidelinesPage() {
           </div>
         </section>
 
-        <p className="pb-4 text-center text-xs text-muted-foreground">
-          Seen something that doesn&apos;t belong here? Report it from the conversation, or visit the{" "}
+        <p className="text-muted-foreground pb-4 text-center text-xs">
+          Seen something that doesn&apos;t belong here? Report it from the conversation, or visit
+          the{" "}
           <Link href="/settings/safety" className="underline underline-offset-2">
             Safety Centre
           </Link>

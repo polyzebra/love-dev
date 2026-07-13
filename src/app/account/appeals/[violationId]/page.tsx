@@ -30,7 +30,7 @@ export const dynamic = "force-dynamic";
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="px-5 py-4">
-      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <dt className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
         {label}
       </dt>
       <dd className="mt-1 text-sm leading-relaxed">{children}</dd>
@@ -55,12 +55,12 @@ function StateCard({
   return (
     <section aria-label={ariaLabel} className="glass mt-6 rounded-xl p-6">
       <div className="flex items-start gap-4">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
+        <span className="bg-foreground/5 flex size-12 shrink-0 items-center justify-center rounded-2xl">
           <Icon className={`size-6 ${iconClass}`} aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
-          <div className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{children}</div>
+          <div className="text-muted-foreground mt-1.5 text-sm leading-relaxed">{children}</div>
         </div>
       </div>
     </section>
@@ -86,9 +86,8 @@ export default async function ViolationDetailPage({
   // Latest staff question for the NEEDS_INFO card (it also stays on the
   // timeline for the record).
   const latestQuestion =
-    appeal?.timeline
-      .filter((e) => e.type === "needs_info_requested" && e.note)
-      .at(-1)?.note ?? null;
+    appeal?.timeline.filter((e) => e.type === "needs_info_requested" && e.note).at(-1)?.note ??
+    null;
 
   return (
     // NOT animate-rise: the utility's `both` fill keeps a transform on the
@@ -98,7 +97,7 @@ export default async function ViolationDetailPage({
     <div>
       <Link
         href="/account/status"
-        className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm"
       >
         <ArrowLeft className="size-4" aria-hidden="true" /> Account status
       </Link>
@@ -106,13 +105,13 @@ export default async function ViolationDetailPage({
       <h1 className="font-display text-3xl font-semibold tracking-tight text-balance md:text-4xl">
         {ACTION_LABEL[violation.actionTaken]}
       </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-2 text-sm">
         {formatDate(violation.createdAt)}
         {violation.tab === "expired" ? " · No longer active" : ""}
       </p>
 
       <section aria-label="What happened" className="mt-6">
-        <dl className="divide-y overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+        <dl className="border-border bg-card/80 shadow-card divide-y overflow-hidden rounded-3xl border">
           <DetailRow label="Description">{violation.userVisibleReason}</DetailRow>
           <DetailRow label="Violation type">
             {VIOLATION_TYPE_LABEL[violation.violationType]}
@@ -137,8 +136,8 @@ export default async function ViolationDetailPage({
               ariaLabel="Previous appeal withdrawn"
             >
               You withdrew your last appeal
-              {appeal ? ` on ${formatDate(appeal.timeline.at(-1)?.at ?? appeal.submittedAt)}` : ""}
-              . That&apos;s not held against you - you can appeal this decision again below.
+              {appeal ? ` on ${formatDate(appeal.timeline.at(-1)?.at ?? appeal.submittedAt)}` : ""}.
+              That&apos;s not held against you - you can appeal this decision again below.
             </StateCard>
           )}
           {status === "EXPIRED" && (
@@ -154,8 +153,8 @@ export default async function ViolationDetailPage({
           )}
           {appeal && <AppealTimeline timeline={appeal.timeline} />}
           <section aria-label="Your right to appeal" className="mt-6 flex items-start gap-3 px-1">
-            <Scale className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <p className="text-sm leading-relaxed text-muted-foreground">{APPEAL_RIGHT_COPY}</p>
+            <Scale className="text-muted-foreground mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            <p className="text-muted-foreground text-sm leading-relaxed">{APPEAL_RIGHT_COPY}</p>
           </section>
           <AppealForm violationId={violation.id} />
         </>
@@ -205,9 +204,9 @@ export default async function ViolationDetailPage({
             title="Appeal approved"
             ariaLabel="Appeal approved"
           >
-            After review, we reversed the action taken on your account. Everything affected has
-            been restored{appeal.decidedAt ? ` on ${formatDate(appeal.decidedAt)}` : ""}. Thanks
-            for your patience.
+            After review, we reversed the action taken on your account. Everything affected has been
+            restored{appeal.decidedAt ? ` on ${formatDate(appeal.decidedAt)}` : ""}. Thanks for your
+            patience.
           </StateCard>
           <AppealTimeline timeline={appeal.timeline} />
         </>
@@ -226,15 +225,15 @@ export default async function ViolationDetailPage({
           <AppealTimeline timeline={appeal.timeline} />
         </>
       ) : violation.tab === "expired" ? (
-        <p className="mt-6 px-1 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mt-6 px-1 text-sm leading-relaxed">
           This action is no longer active on your account. It stays listed here for your records.
         </p>
       ) : (
-        <p className="mt-6 px-1 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mt-6 px-1 text-sm leading-relaxed">
           This decision is not appealable. If you have questions, our{" "}
           <Link
             href="/account/community-resources"
-            className="underline underline-offset-2 hover:text-foreground"
+            className="hover:text-foreground underline underline-offset-2"
           >
             community resources
           </Link>{" "}

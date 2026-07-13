@@ -35,7 +35,7 @@ export default async function PrivacySettingsPage() {
           </CardHeader>
           <CardContent>
             {blocks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">You haven&apos;t blocked anyone.</p>
+              <p className="text-muted-foreground text-sm">You haven&apos;t blocked anyone.</p>
             ) : (
               <ul className="divide-y">
                 {blocks.map((b) => (
@@ -66,9 +66,9 @@ export default async function PrivacySettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl border-destructive/30">
+        <Card className="border-destructive/30 rounded-3xl">
           <CardHeader>
-            <CardTitle className="text-base text-destructive">Delete your account</CardTitle>
+            <CardTitle className="text-destructive text-base">Delete your account</CardTitle>
             <CardDescription>
               Permanent, with a 30-day grace period. All personal data is erased. (GDPR Art. 17)
             </CardDescription>
@@ -78,7 +78,7 @@ export default async function PrivacySettingsPage() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-center text-xs">
           Questions? Read our{" "}
           <Link href="/legal/privacy" className="underline underline-offset-2">
             Privacy Policy

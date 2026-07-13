@@ -23,7 +23,7 @@ export default async function PushNotificationsPage() {
 
       <PushSetup />
 
-      <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="text-muted-foreground mb-2 px-1 text-sm font-semibold tracking-wide uppercase">
         What reaches you
       </h2>
       <SettingsToggleList
@@ -63,8 +63,8 @@ export default async function PushNotificationsPage() {
       />
 
       <SettingsNote>
-        Notifications delivered while the app is closed use your device&apos;s notification
-        settings for sound and vibration - on iPhone and iPad the system settings always decide.
+        Notifications delivered while the app is closed use your device&apos;s notification settings
+        for sound and vibration - on iPhone and iPad the system settings always decide.
       </SettingsNote>
     </>
   );

@@ -116,9 +116,7 @@ export function PhotoFrame({
     });
   }, []);
   const effectiveSrc =
-    src != null && retrySrc === src && !failed
-      ? `${src}${src.includes("?") ? "&" : "?"}r=1`
-      : src;
+    src != null && retrySrc === src && !failed ? `${src}${src.includes("?") ? "&" : "?"}r=1` : src;
 
   return (
     <div
@@ -127,7 +125,7 @@ export function PhotoFrame({
         "overflow-hidden",
         mode === "fill"
           ? cn("absolute inset-0", RADIUS[radius ?? "none"])
-          : cn("relative w-full aspect-[4/5]", RADIUS[radius ?? "default"]),
+          : cn("relative aspect-[4/5] w-full", RADIUS[radius ?? "default"]),
         className,
       )}
     >
@@ -155,8 +153,8 @@ export function PhotoFrame({
             onLoad={() => markLoaded(src)}
             onError={() => handleError(src)}
             className={cn(
-              "absolute inset-0 h-full w-full select-none object-cover transition-[opacity,filter] duration-700 ease-out [-webkit-touch-callout:none] [-webkit-user-drag:none]",
-              loaded ? "opacity-100 blur-0" : "opacity-0 blur-md",
+              "absolute inset-0 h-full w-full object-cover transition-[opacity,filter] duration-700 ease-out select-none [-webkit-touch-callout:none] [-webkit-user-drag:none]",
+              loaded ? "blur-0 opacity-100" : "opacity-0 blur-md",
               imgClassName,
             )}
           />

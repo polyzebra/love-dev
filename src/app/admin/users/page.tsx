@@ -53,7 +53,9 @@ export default async function AdminUsersPage({
       <PageHeader
         title="Users"
         description={
-          q ? `${users.length} matching "${q}" · newest first` : `${users.length} shown · newest first`
+          q
+            ? `${users.length} matching "${q}" · newest first`
+            : `${users.length} shown · newest first`
         }
       />
 
@@ -61,7 +63,7 @@ export default async function AdminUsersPage({
       <form className="mb-4 flex max-w-md gap-2" action="/admin/users" method="get" role="search">
         <div className="relative flex-1">
           <Search
-            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2"
             aria-hidden="true"
           />
           <Input
@@ -76,14 +78,14 @@ export default async function AdminUsersPage({
         {q && (
           <Link
             href="/admin/users"
-            className="flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-foreground/20 flex min-h-11 items-center rounded-full px-4 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
           >
             Clear
           </Link>
         )}
       </form>
 
-      <div className="overflow-x-auto rounded-3xl border bg-card">
+      <div className="bg-card overflow-x-auto rounded-3xl border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -102,16 +104,19 @@ export default async function AdminUsersPage({
                   <Link
                     href={`/admin/users/${user.id}`}
                     title={user.profile?.displayName ?? user.name ?? user.email}
-                    className="block truncate font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
+                    className="focus-visible:ring-foreground/20 block truncate font-medium hover:underline focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
                   >
                     {user.profile?.displayName ?? user.name ?? "-"}
                   </Link>
-                  <p className="truncate text-xs text-muted-foreground" title={user.email}>
+                  <p className="text-muted-foreground truncate text-xs" title={user.email}>
                     {user.email}
                   </p>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"} className="rounded-full">
+                  <Badge
+                    variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"}
+                    className="rounded-full"
+                  >
                     {pretty(user.status)}
                   </Badge>
                 </TableCell>
@@ -120,7 +125,7 @@ export default async function AdminUsersPage({
                   {user._count.reportsReceived}
                 </TableCell>
                 <TableCell
-                  className="text-sm text-muted-foreground"
+                  className="text-muted-foreground text-sm"
                   title={user.createdAt.toLocaleString("en-IE")}
                 >
                   {formatAgo(user.createdAt)}
@@ -132,13 +137,13 @@ export default async function AdminUsersPage({
             ))}
             {users.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="text-muted-foreground py-10 text-center">
                   {q ? (
                     <>
                       No results for &ldquo;{q}&rdquo;.{" "}
                       <Link
                         href="/admin/users"
-                        className="font-medium text-foreground underline underline-offset-2"
+                        className="text-foreground font-medium underline underline-offset-2"
                       >
                         Clear search
                       </Link>

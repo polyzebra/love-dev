@@ -1,8 +1,4 @@
-import {
-  byId,
-  pickTemplate,
-  type TaxonomyCategory,
-} from "@/lib/discovery/taxonomy";
+import { byId, pickTemplate, type TaxonomyCategory } from "@/lib/discovery/taxonomy";
 
 /**
  * Conversation assistant - rule-based today, LLM-swappable tomorrow.
@@ -98,14 +94,11 @@ function toSecondPerson(s: string): string {
 export function messageFromTemplate(template: string): string {
   const t = template.trim().replace(/\.$/, "");
   let m: RegExpMatchArray | null;
-  if ((m = t.match(/^Ask (?:about|for) (.+)$/)))
-    return `What's ${toSecondPerson(m[1])}?`;
-  if ((m = t.match(/^Ask if they (.+)$/)))
-    return `Do you ${toSecondPerson(m[1])}?`;
+  if ((m = t.match(/^Ask (?:about|for) (.+)$/))) return `What's ${toSecondPerson(m[1])}?`;
+  if ((m = t.match(/^Ask if they (.+)$/))) return `Do you ${toSecondPerson(m[1])}?`;
   if ((m = t.match(/^Ask (what|where|which|when|how|who) (.+)$/)))
     return `Tell me ${m[1]} ${toSecondPerson(m[2])}.`;
-  if ((m = t.match(/^Suggest (.+)$/)))
-    return `How about ${toSecondPerson(m[1])}?`;
+  if ((m = t.match(/^Suggest (.+)$/))) return `How about ${toSecondPerson(m[1])}?`;
   return `${toSecondPerson(t)}.`;
 }
 
@@ -144,10 +137,7 @@ function genericOpener(shared: string[], name: string): Suggestion[] {
   ];
 }
 
-function promptOpeners(
-  prompts: AssistantContext["theirPrompts"],
-  name: string,
-): Suggestion[] {
+function promptOpeners(prompts: AssistantContext["theirPrompts"], name: string): Suggestion[] {
   return prompts
     .filter((p) => p.answer.trim().length > 0)
     .map((p) => {

@@ -172,26 +172,27 @@ export default async function ConversationPage({
             aria-label={`View ${otherName}'s profile`}
           >
             <div className="relative shrink-0">
-              <Avatar className="size-11 border border-border">
+              <Avatar className="border-border size-11 border">
                 <AvatarImage src={peek.photoUrl ?? undefined} alt="" />
                 <AvatarFallback>{initialsOf(otherName)}</AvatarFallback>
               </Avatar>
-              <OnlineDot online={online} className="absolute -bottom-0.5 -right-0.5" />
+              <OnlineDot online={online} className="absolute -right-0.5 -bottom-0.5" />
             </div>
             <div className="min-w-0">
               <p className="flex items-center gap-1.5 truncate font-semibold">
                 {otherName}
                 {peek.isVerified && (
-                  <BadgeCheck className="size-4 shrink-0 fill-sky-400 text-card" aria-hidden="true" />
+                  <BadgeCheck
+                    className="text-card size-4 shrink-0 fill-sky-400"
+                    aria-hidden="true"
+                  />
                 )}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {online ? (
-                  <span className="text-success">Online now</span>
-                ) : (
-                  "Recently active"
-                )}
-                {peek.sharedInterests[0] ? ` · you both love ${peek.sharedInterests[0].toLowerCase()}` : ""}
+              <p className="text-muted-foreground truncate text-xs">
+                {online ? <span className="text-success">Online now</span> : "Recently active"}
+                {peek.sharedInterests[0]
+                  ? ` · you both love ${peek.sharedInterests[0].toLowerCase()}`
+                  : ""}
               </p>
             </div>
           </button>

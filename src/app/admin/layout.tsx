@@ -15,7 +15,7 @@ import {
   Stethoscope,
   ToggleRight,
   Users,
-  Compass
+  Compass,
 } from "lucide-react";
 import { getCurrentAdmin } from "@/lib/auth/require-user";
 import { isSuperAdmin } from "@/lib/rbac";
@@ -60,8 +60,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const nav = isSuperAdmin(adminUser.role) ? [...NAV, ...SUPER_NAV] : [...NAV];
 
   return (
-    <div className="min-h-dvh bg-background">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r bg-sidebar md:flex">
+    <div className="bg-background min-h-dvh">
+      <aside className="bg-sidebar fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r md:flex">
         <div className="flex items-center gap-2 px-5 py-5">
           <Logo href="/admin" size="sm" />
           <Badge variant="secondary" className="rounded-full text-[10px]">
@@ -74,7 +74,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <li key={href}>
                 <Link
                   href={href}
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                  className="text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-foreground/20 flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <Icon className="size-4.5" aria-hidden="true" />
                   {label}
@@ -87,13 +87,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="border-t px-3 py-2">
           <Link
             href="/discover"
-            className="flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-foreground/20 flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
             <ArrowLeft className="size-4.5" aria-hidden="true" />
             Back to Tirvea
           </Link>
         </div>
-        <div className="border-t px-5 py-4 text-xs text-muted-foreground">
+        <div className="text-muted-foreground border-t px-5 py-4 text-xs">
           Signed in as {adminUser.email}
           <br />
           Role: {adminUser.role}
@@ -102,20 +102,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       {/* Mobile top nav: horizontal scroll row (no sidebar, no overflow at
           390px). min-h-11 = 44px touch targets; desktop is untouched. */}
-      <nav aria-label="Admin" className="glass safe-top sticky top-0 z-40 flex gap-1 overflow-x-auto border-b px-3 py-1.5 scrollbar-none md:hidden">
+      <nav
+        aria-label="Admin"
+        className="glass safe-top sticky top-0 z-40 flex scrollbar-none gap-1 overflow-x-auto border-b px-3 py-1.5 md:hidden"
+      >
         {nav.map(({ href, label }) => (
           <Link
             key={href}
             href={href}
-            className="flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-foreground/20 flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
           >
             {label}
           </Link>
         ))}
-        <span aria-hidden="true" className="my-2.5 w-px shrink-0 self-stretch bg-border/50" />
+        <span aria-hidden="true" className="bg-border/50 my-2.5 w-px shrink-0 self-stretch" />
         <Link
           href="/discover"
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-foreground/20 flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back to Tirvea

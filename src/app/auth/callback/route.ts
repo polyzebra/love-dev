@@ -25,8 +25,7 @@ export async function GET(request: NextRequest) {
   const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/discover";
 
   const redirect = NextResponse.redirect(new URL(safeNext, url.origin));
-  const fail = (err: string) =>
-    NextResponse.redirect(new URL(`/login?error=${err}`, url.origin));
+  const fail = (err: string) => NextResponse.redirect(new URL(`/login?error=${err}`, url.origin));
 
   if (!code) return fail("OAuthCallbackError");
 

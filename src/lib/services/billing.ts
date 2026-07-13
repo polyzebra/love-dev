@@ -265,11 +265,7 @@ export function planChangeIdempotencyKey(
  */
 export type ChangePlanResult = {
   outcome:
-    | "PAID_AND_APPLIED"
-    | "ZERO_DUE_APPLIED"
-    | "REQUIRES_ACTION"
-    | "PENDING"
-    | "PAYMENT_FAILED";
+    "PAID_AND_APPLIED" | "ZERO_DUE_APPLIED" | "REQUIRES_ACTION" | "PENDING" | "PAYMENT_FAILED";
   /** The plan the user actually holds NOW (per persisted verified state). */
   plan: PlanTier;
   status: SubscriptionStatus;
@@ -490,9 +486,7 @@ export async function changePlan(userId: string, plan: PaidPlan): Promise<Change
         return {
           outcome: "REQUIRES_ACTION",
           ...persisted,
-          ...(paymentIntent.client_secret
-            ? { clientSecret: paymentIntent.client_secret }
-            : {}),
+          ...(paymentIntent.client_secret ? { clientSecret: paymentIntent.client_secret } : {}),
         };
       case "requires_payment_method":
       case "canceled":
@@ -615,9 +609,7 @@ export async function changePlanStatus(userId: string): Promise<ChangePlanStatus
         return {
           state: "REQUIRES_ACTION",
           ...persisted,
-          ...(paymentIntent.client_secret
-            ? { clientSecret: paymentIntent.client_secret }
-            : {}),
+          ...(paymentIntent.client_secret ? { clientSecret: paymentIntent.client_secret } : {}),
         };
       case "requires_payment_method":
       case "canceled":
@@ -706,7 +698,11 @@ export async function resumeSubscription(userId: string): Promise<ResumeResult> 
   if (!updated) {
     throw new BillingError("no_subscription", "Your subscription could not be verified.");
   }
-  return { plan: updated.tier, status: updated.status, cancelAtPeriodEnd: updated.cancelAtPeriodEnd };
+  return {
+    plan: updated.tier,
+    status: updated.status,
+    cancelAtPeriodEnd: updated.cancelAtPeriodEnd,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -962,7 +958,11 @@ export async function getCheckoutStatus(
       });
     }
     const fresh = await db.subscription.findUnique({ where: { userId } });
-    if (fresh && (fresh.status === "ACTIVE" || fresh.status === "TRIALING") && fresh.tier !== "FREE") {
+    if (
+      fresh &&
+      (fresh.status === "ACTIVE" || fresh.status === "TRIALING") &&
+      fresh.tier !== "FREE"
+    ) {
       return { state: "ACTIVE", plan: fresh.tier };
     }
     if (
@@ -983,9 +983,7 @@ export async function getCheckoutStatus(
   return { state: "SESSION_INVALID", plan: entitledTier(row ?? null) };
 }
 
-function entitledTier(
-  row: { tier: PlanTier; status: SubscriptionStatus } | null,
-): PlanTier {
+function entitledTier(row: { tier: PlanTier; status: SubscriptionStatus } | null): PlanTier {
   if (!row) return "FREE";
   return row.status === "ACTIVE" || row.status === "TRIALING" ? row.tier : "FREE";
 }
@@ -1130,9 +1128,7 @@ const str = (v: unknown): string | null => (typeof v === "string" ? v : null);
 
 /** invoice.customer/subscription across API versions (basil nests the sub id). */
 function invoiceRefs(object: Record<string, unknown>) {
-  const parent = object.parent as
-    | { subscription_details?: { subscription?: unknown } }
-    | undefined;
+  const parent = object.parent as { subscription_details?: { subscription?: unknown } } | undefined;
   return {
     customer: str(object.customer),
     subscription:
@@ -1315,8 +1311,7 @@ async function recordCheckoutPayment(
   // for the same charge then updates this row instead of duplicating it.
   const paymentKey = str(object.invoice) ?? sessionId;
   const metadataPlan = (object.metadata as Record<string, unknown> | undefined)?.plan;
-  const planLabel =
-    PLANS.find((p) => p.tier === metadataPlan)?.name ?? "Subscription";
+  const planLabel = PLANS.find((p) => p.tier === metadataPlan)?.name ?? "Subscription";
   await db.payment.upsert({
     where: { providerPaymentId: paymentKey },
     create: {

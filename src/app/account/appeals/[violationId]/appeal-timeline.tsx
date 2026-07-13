@@ -23,7 +23,7 @@ export function AppealTimeline({ timeline }: { timeline: AppealTimelineEntry[] }
   if (timeline.length === 0) return null;
   return (
     <section aria-label="Appeal timeline" className="mt-6">
-      <h2 className="px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="text-muted-foreground px-1 text-sm font-semibold tracking-wide uppercase">
         Appeal timeline
       </h2>
       <ol className="mt-3 space-y-0">
@@ -31,7 +31,10 @@ export function AppealTimeline({ timeline }: { timeline: AppealTimelineEntry[] }
           const quiet = entry.actorRole === "SYSTEM";
           const last = i === timeline.length - 1;
           return (
-            <li key={`${entry.type}-${entry.at.getTime()}-${i}`} className="relative flex gap-3.5 pl-1">
+            <li
+              key={`${entry.type}-${entry.at.getTime()}-${i}`}
+              className="relative flex gap-3.5 pl-1"
+            >
               {/* Rail: dot + connecting line */}
               <span aria-hidden="true" className="flex w-3 flex-col items-center">
                 <span
@@ -39,13 +42,13 @@ export function AppealTimeline({ timeline }: { timeline: AppealTimelineEntry[] }
                     quiet ? "bg-border" : "bg-foreground/40"
                   }`}
                 />
-                {!last && <span className="w-px flex-1 bg-border" />}
+                {!last && <span className="bg-border w-px flex-1" />}
               </span>
               <div className={`min-w-0 flex-1 ${last ? "pb-1" : "pb-5"}`}>
                 <p className={`text-sm ${quiet ? "text-muted-foreground" : "font-medium"}`}>
                   {EVENT_LABEL[entry.type] ?? "Update"}
                 </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(entry.at)}</p>
+                <p className="text-muted-foreground mt-0.5 text-xs">{formatDate(entry.at)}</p>
                 {entry.note && (
                   <p
                     className={`mt-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${

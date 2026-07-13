@@ -66,13 +66,28 @@ export async function bootstrapSuperAdmin(opts: {
     select: { id: true, email: true, emailVerified: true, status: true, role: true },
   });
   if (!user) {
-    return { status: "setup_required", reason: "user_not_found", email, instructions: SETUP_INSTRUCTIONS };
+    return {
+      status: "setup_required",
+      reason: "user_not_found",
+      email,
+      instructions: SETUP_INSTRUCTIONS,
+    };
   }
   if (!user.emailVerified) {
-    return { status: "setup_required", reason: "email_unverified", email, instructions: SETUP_INSTRUCTIONS };
+    return {
+      status: "setup_required",
+      reason: "email_unverified",
+      email,
+      instructions: SETUP_INSTRUCTIONS,
+    };
   }
   if (user.status !== "ACTIVE") {
-    return { status: "setup_required", reason: "account_not_active", email, instructions: SETUP_INSTRUCTIONS };
+    return {
+      status: "setup_required",
+      reason: "account_not_active",
+      email,
+      instructions: SETUP_INSTRUCTIONS,
+    };
   }
 
   await db.user.update({ where: { id: user.id }, data: { role: "SUPER_ADMIN" } });

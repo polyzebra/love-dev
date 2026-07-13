@@ -7,11 +7,17 @@ import { cn } from "@/lib/utils";
  * `fullStage` renders it on the swipe stage geometry (fixed, edge-to-edge,
  * clear of the desktop sidebar) so the deck mounts with zero layout shift.
  */
-export function PageLoader({ fullStage = false, className }: { fullStage?: boolean; className?: string }) {
+export function PageLoader({
+  fullStage = false,
+  className,
+}: {
+  fullStage?: boolean;
+  className?: string;
+}) {
   const spinner = (
     <span
       aria-hidden="true"
-      className="size-6 rounded-full border-2 border-foreground/20 border-t-primary animate-spin"
+      className="border-foreground/20 border-t-primary size-6 animate-spin rounded-full border-2"
     />
   );
 
@@ -20,9 +26,11 @@ export function PageLoader({ fullStage = false, className }: { fullStage?: boole
       <div
         role="status"
         aria-label="Loading"
-        className={cn("fixed inset-0 z-30 overflow-hidden bg-background", className)}
+        className={cn("bg-background fixed inset-0 z-30 overflow-hidden", className)}
       >
-        <div className="absolute inset-0 flex items-center justify-center lg:left-72">{spinner}</div>
+        <div className="absolute inset-0 flex items-center justify-center lg:left-72">
+          {spinner}
+        </div>
       </div>
     );
   }

@@ -14,7 +14,7 @@ export function CheckoutCancelledNotice() {
   return (
     <div
       role="status"
-      className="glass-chip mx-auto mb-8 w-fit max-w-full rounded-full px-5 py-2.5 text-center text-sm text-muted-foreground"
+      className="glass-chip text-muted-foreground mx-auto mb-8 w-fit max-w-full rounded-full px-5 py-2.5 text-center text-sm"
     >
       Checkout cancelled - you haven&apos;t been charged. Upgrade whenever it feels right.
     </div>

@@ -17,13 +17,13 @@ export function AccessDenied({
   message?: string;
 }) {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-background px-6">
-      <div className="w-full max-w-sm rounded-3xl border border-border bg-card/80 p-8 text-center shadow-card">
-        <span className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-accent">
-          <ShieldAlert className="size-6 text-accent-foreground" aria-hidden="true" />
+    <main className="bg-background flex min-h-dvh items-center justify-center px-6">
+      <div className="border-border bg-card/80 shadow-card w-full max-w-sm rounded-3xl border p-8 text-center">
+        <span className="bg-accent mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl">
+          <ShieldAlert className="text-accent-foreground size-6" aria-hidden="true" />
         </span>
         <h1 className="font-display text-xl font-semibold">{title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+        <p className="text-muted-foreground mt-2 text-sm">{message}</p>
         <Button asChild variant="secondary" className="mt-6 w-full rounded-full">
           <Link href="/discover">Back to Tirvea</Link>
         </Button>

@@ -48,8 +48,7 @@ export async function GET() {
     process.env.NODE_ENV === "production" && stripe.configured && stripe.problems.length > 0;
 
   return Response.json({
-    status:
-      database === "ok" && missing.length === 0 && !billingDegraded ? "healthy" : "degraded",
+    status: database === "ok" && missing.length === 0 && !billingDegraded ? "healthy" : "degraded",
     database,
     config: missing.length === 0 ? "ok" : { missing },
     billing,

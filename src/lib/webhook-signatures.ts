@@ -31,9 +31,7 @@ export function verifyStripeSignature(
   if (!Number.isFinite(timestamp)) return false;
   if (Math.abs(now.getTime() / 1000 - timestamp) > STRIPE_SIGNATURE_TOLERANCE_S) return false;
 
-  const expected = createHmac("sha256", secret)
-    .update(`${timestamp}.${rawBody}`)
-    .digest("hex");
+  const expected = createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
   const expectedBuf = Buffer.from(expected, "utf8");
   for (const candidate of parts.get("v1") ?? []) {
     const buf = Buffer.from(candidate, "utf8");

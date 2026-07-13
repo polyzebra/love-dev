@@ -55,10 +55,19 @@ export type SignInMethodsProps = {
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
-      <path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z" />
-      <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.2v3.1A12 12 0 0 0 12 24Z" />
+      <path
+        fill="#4285F4"
+        d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.2v3.1A12 12 0 0 0 12 24Z"
+      />
       <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.2a12 12 0 0 0 0 10.8l4.1-3.1Z" />
-      <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.2A12 12 0 0 0 1.2 6.6l4.1 3.1c.9-2.9 3.6-4.9 6.7-4.9Z" />
+      <path
+        fill="#EA4335"
+        d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.2A12 12 0 0 0 1.2 6.6l4.1 3.1c.9-2.9 3.6-4.9 6.7-4.9Z"
+      />
     </svg>
   );
 }
@@ -73,7 +82,7 @@ function AppleIcon() {
 
 function ActiveState({ label = "Active" }: { label?: string }) {
   return (
-    <span className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-success">
+    <span className="text-success flex shrink-0 items-center gap-1.5 text-sm font-medium">
       <Check className="size-4" aria-hidden="true" />
       {label}
     </span>
@@ -81,7 +90,7 @@ function ActiveState({ label = "Active" }: { label?: string }) {
 }
 
 function QuietState({ label }: { label: string }) {
-  return <span className="shrink-0 text-sm text-muted-foreground">{label}</span>;
+  return <span className="text-muted-foreground shrink-0 text-sm">{label}</span>;
 }
 
 const PROVIDER_LABEL: Record<OAuthProvider, string> = { google: "Google", apple: "Apple" };
@@ -173,7 +182,10 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
       <Tooltip>
         {/* span wrapper so the tooltip still opens over the disabled button */}
         <TooltipTrigger asChild>
-          <span tabIndex={0} className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20">
+          <span
+            tabIndex={0}
+            className="focus-visible:ring-foreground/20 shrink-0 rounded-full focus-visible:ring-2 focus-visible:outline-none"
+          >
             {unlinkButton}
           </span>
         </TooltipTrigger>
@@ -187,8 +199,8 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
       <section aria-label="Sign-in methods" className="glass overflow-hidden rounded-3xl">
         {/* Email */}
         <div className="flex min-h-14 items-center gap-4 px-5 py-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-            <Mail className="size-5 text-accent-foreground" aria-hidden="true" />
+          <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+            <Mail className="text-accent-foreground size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -197,67 +209,75 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
                 Sign-in code
               </Badge>
             </div>
-            <p className="truncate text-sm text-muted-foreground">{email}</p>
+            <p className="text-muted-foreground truncate text-sm">{email}</p>
           </div>
           {emailLinked ? <ActiveState /> : <QuietState label="Not linked" />}
         </div>
 
         {/* Google */}
-        <div className="flex min-h-14 items-center gap-4 border-t border-border px-5 py-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
+        <div className="border-border flex min-h-14 items-center gap-4 border-t px-5 py-4">
+          <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
             <GoogleIcon />
           </span>
           <div className="min-w-0 flex-1">
             <span className="block font-medium">Google</span>
-            <p className="truncate text-sm text-muted-foreground">
+            <p className="text-muted-foreground truncate text-sm">
               Use your Google account to sign in.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            {linkedProviders.includes("google") ? <ActiveState /> : <QuietState label="Not linked" />}
+            {linkedProviders.includes("google") ? (
+              <ActiveState />
+            ) : (
+              <QuietState label="Not linked" />
+            )}
             {oauthActions("google", linkedProviders.includes("google"))}
           </div>
         </div>
 
         {/* Apple - hidden until Apple sign-in ships */}
         {appleVisible && (
-          <div className="flex min-h-14 items-center gap-4 border-t border-border px-5 py-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
+          <div className="border-border flex min-h-14 items-center gap-4 border-t px-5 py-4">
+            <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
               <span className="text-accent-foreground">
                 <AppleIcon />
               </span>
             </span>
             <div className="min-w-0 flex-1">
               <span className="block font-medium">Apple</span>
-              <p className="truncate text-sm text-muted-foreground">
+              <p className="text-muted-foreground truncate text-sm">
                 Use your Apple ID to sign in.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-3">
-              {linkedProviders.includes("apple") ? <ActiveState /> : <QuietState label="Not linked" />}
+              {linkedProviders.includes("apple") ? (
+                <ActiveState />
+              ) : (
+                <QuietState label="Not linked" />
+              )}
               {oauthActions("apple", linkedProviders.includes("apple"))}
             </div>
           </div>
         )}
 
         {/* Phone */}
-        <div className="flex min-h-14 items-center gap-4 border-t border-border px-5 py-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-            <Smartphone className="size-5 text-accent-foreground" aria-hidden="true" />
+        <div className="border-border flex min-h-14 items-center gap-4 border-t px-5 py-4">
+          <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+            <Smartphone className="text-accent-foreground size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
             <span className="block font-medium">Phone</span>
             {phone.verified && phone.masked ? (
               <>
-                <p className="truncate text-sm text-muted-foreground">{phone.masked}</p>
+                <p className="text-muted-foreground truncate text-sm">{phone.masked}</p>
                 {!phone.loginEnabled && (
-                  <p className="text-xs text-muted-foreground/80">
+                  <p className="text-muted-foreground/80 text-xs">
                     Verified for your account - phone sign-in coming soon
                   </p>
                 )}
               </>
             ) : (
-              <p className="truncate text-sm text-muted-foreground">
+              <p className="text-muted-foreground truncate text-sm">
                 Add a number to verify your account.
               </p>
             )}
@@ -266,7 +286,7 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
             phone.loginEnabled ? (
               <ActiveState label="Active for sign-in" />
             ) : (
-              <span className="flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground">
+              <span className="text-muted-foreground flex shrink-0 items-center gap-1.5 text-sm">
                 <Check className="size-4" aria-hidden="true" />
                 Verified
               </span>
@@ -286,11 +306,14 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
       )}
 
       {/* Security note - honest about the invariants this page enforces */}
-      <section aria-label="Security note" className="glass mt-6 flex items-center gap-4 rounded-3xl px-5 py-4">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-          <ShieldCheck className="size-5 text-accent-foreground" aria-hidden="true" />
+      <section
+        aria-label="Security note"
+        className="glass mt-6 flex items-center gap-4 rounded-3xl px-5 py-4"
+      >
+        <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+          <ShieldCheck className="text-accent-foreground size-5" aria-hidden="true" />
         </span>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           We&apos;ll never remove your last sign-in method. Changes here are recorded.
         </p>
       </section>
@@ -299,9 +322,7 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
       <Dialog open={unlinkTarget !== null} onOpenChange={(open) => !open && setUnlinkTarget(null)}>
         <DialogContent className="rounded-3xl">
           <DialogHeader>
-            <DialogTitle>
-              Unlink {unlinkTarget ? PROVIDER_LABEL[unlinkTarget] : ""}?
-            </DialogTitle>
+            <DialogTitle>Unlink {unlinkTarget ? PROVIDER_LABEL[unlinkTarget] : ""}?</DialogTitle>
             <DialogDescription>
               You&apos;ll no longer be able to sign in to Tirvea with{" "}
               {unlinkTarget ? PROVIDER_LABEL[unlinkTarget] : "this method"}. Your other sign-in
@@ -325,7 +346,9 @@ export function SignInMethods({ email, linkedProviders, appleVisible, phone }: S
               disabled={busy !== null}
               onClick={() => unlinkTarget && confirmUnlink(unlinkTarget)}
             >
-              {busy !== null ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+              {busy !== null ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              ) : null}
               Unlink
             </Button>
           </DialogFooter>

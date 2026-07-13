@@ -60,17 +60,13 @@ export default async function AccountSettingsPage() {
       state: verification?.emailVerified ? "verified" : "todo",
       // The authenticated attach+verify flow at /auth/email is the one
       // real way to (re)verify an address on this account.
-      action: verification?.emailVerified
-        ? null
-        : { label: "Verify email", href: "/auth/email" },
+      action: verification?.emailVerified ? null : { label: "Verify email", href: "/auth/email" },
     },
     {
       label: "Phone",
       value: user?.phoneE164 ?? "Not added",
       state: verification?.phoneVerified ? "verified" : "todo",
-      action: verification?.phoneVerified
-        ? null
-        : { label: "Add phone", href: "/auth/phone" },
+      action: verification?.phoneVerified ? null : { label: "Add phone", href: "/auth/phone" },
     },
     {
       label: "Photo verification",
@@ -131,20 +127,32 @@ export default async function AccountSettingsPage() {
               ? "Optional ID verification completes your trust profile."
               : "Fully verified - matches can trust who they're meeting.";
         return (
-          <section className="glass mb-6 rounded-xl p-6" aria-label={`Trust score ${score} percent`}>
+          <section
+            className="glass mb-6 rounded-xl p-6"
+            aria-label={`Trust score ${score} percent`}
+          >
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Trust score</p>
-                <p className="mt-1 font-display text-4xl font-medium tabular-nums">{score}%</p>
-                <p className="mt-1 max-w-sm text-sm text-muted-foreground">{nextStep}</p>
+                <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
+                  Trust score
+                </p>
+                <p className="font-display mt-1 text-4xl font-medium tabular-nums">{score}%</p>
+                <p className="text-muted-foreground mt-1 max-w-sm text-sm">{nextStep}</p>
               </div>
-              <div className="hidden text-right text-xs text-muted-foreground sm:block">
-                <p>Email +{TRUST_WEIGHTS.email} · Phone +{TRUST_WEIGHTS.phone}</p>
-                <p>Photo +{TRUST_WEIGHTS.photo} · ID +{TRUST_WEIGHTS.id}</p>
+              <div className="text-muted-foreground hidden text-right text-xs sm:block">
+                <p>
+                  Email +{TRUST_WEIGHTS.email} · Phone +{TRUST_WEIGHTS.phone}
+                </p>
+                <p>
+                  Photo +{TRUST_WEIGHTS.photo} · ID +{TRUST_WEIGHTS.id}
+                </p>
               </div>
             </div>
-            <div className="mt-4 h-2 overflow-hidden rounded-full border border-border bg-foreground/10">
-              <div className="h-full rounded-full bg-linear-90 from-brand-bright to-[#e7c9a1] shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_40%,transparent)] transition-[width] duration-700" style={{ width: `${score}%` }} />
+            <div className="border-border bg-foreground/10 mt-4 h-2 overflow-hidden rounded-full border">
+              <div
+                className="from-brand-bright h-full rounded-full bg-linear-90 to-[#e7c9a1] shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_40%,transparent)] transition-[width] duration-700"
+                style={{ width: `${score}%` }}
+              />
             </div>
           </section>
         );
@@ -166,7 +174,7 @@ export default async function AccountSettingsPage() {
                 <Icon className={`size-5 shrink-0 ${className}`} aria-hidden="true" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{row.label}</p>
-                  <p className="truncate text-sm text-muted-foreground" title={row.value}>
+                  <p className="text-muted-foreground truncate text-sm" title={row.value}>
                     {row.value}
                   </p>
                 </div>
@@ -184,15 +192,11 @@ export default async function AccountSettingsPage() {
       <Card className="rounded-3xl">
         <CardHeader>
           <CardTitle className="text-base">Password</CardTitle>
-          <CardDescription>
-            Change or set your password via a secure email link.
-          </CardDescription>
+          <CardDescription>Change or set your password via a secure email link.</CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" className="h-11 rounded-full px-5" asChild>
-            <Link href="/forgot-password">
-              Change password
-            </Link>
+            <Link href="/forgot-password">Change password</Link>
           </Button>
         </CardContent>
       </Card>

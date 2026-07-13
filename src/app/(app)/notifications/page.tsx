@@ -9,9 +9,14 @@ import { formatRelativeTime, cn } from "@/lib/utils";
 export const metadata: Metadata = { title: "Notifications" };
 
 const ICONS = {
-  NEW_MATCH: Heart, NEW_MESSAGE: MessageCircle, NEW_LIKE: Heart,
-  SUPER_LIKE: Sparkles, PROFILE_VERIFIED: BadgeCheck,
-  SUBSCRIPTION: Sparkles, SAFETY: ShieldCheck, SYSTEM: Bell,
+  NEW_MATCH: Heart,
+  NEW_MESSAGE: MessageCircle,
+  NEW_LIKE: Heart,
+  SUPER_LIKE: Sparkles,
+  PROFILE_VERIFIED: BadgeCheck,
+  SUBSCRIPTION: Sparkles,
+  SAFETY: ShieldCheck,
+  SYSTEM: Bell,
 } as const;
 
 /** Unified notification centre - likes, matches, messages, verification,
@@ -36,23 +41,49 @@ export default async function NotificationsPage() {
 
   return (
     <>
-      <PageHeader title="Notifications" description="Everything that happened while you were away." />
+      <PageHeader
+        title="Notifications"
+        description="Everything that happened while you were away."
+      />
       {notifications.length === 0 ? (
-        <EmptyState icon={Bell} title="Nothing yet" description="Likes, matches and messages will land here." />
+        <EmptyState
+          icon={Bell}
+          title="Nothing yet"
+          description="Likes, matches and messages will land here."
+        />
       ) : (
         <ul className="space-y-2">
           {notifications.map((n) => {
             const Icon = ICONS[n.type] ?? Bell;
             return (
-              <li key={n.id} className={cn("glass flex items-start gap-3 rounded-3xl p-4", !n.readAt && "border-foreground/20")}>
-                <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-full", n.readAt ? "bg-foreground/5" : "bg-primary/15")}>
-                  <Icon className={cn("size-4.5", n.readAt ? "text-muted-foreground" : "text-primary-soft")} aria-hidden="true" />
+              <li
+                key={n.id}
+                className={cn(
+                  "glass flex items-start gap-3 rounded-3xl p-4",
+                  !n.readAt && "border-foreground/20",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex size-10 shrink-0 items-center justify-center rounded-full",
+                    n.readAt ? "bg-foreground/5" : "bg-primary/15",
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      "size-4.5",
+                      n.readAt ? "text-muted-foreground" : "text-primary-soft",
+                    )}
+                    aria-hidden="true"
+                  />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{n.title}</p>
-                  {n.body && <p className="text-sm text-muted-foreground">{n.body}</p>}
+                  {n.body && <p className="text-muted-foreground text-sm">{n.body}</p>}
                 </div>
-                <span className="shrink-0 text-xs text-muted-foreground">{formatRelativeTime(n.createdAt)}</span>
+                <span className="text-muted-foreground shrink-0 text-xs">
+                  {formatRelativeTime(n.createdAt)}
+                </span>
               </li>
             );
           })}

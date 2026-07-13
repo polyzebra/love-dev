@@ -27,7 +27,7 @@ export default async function ProfilePromptsPage() {
         <div className="space-y-3">
           <Link
             href="/profile"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
             Back to profile
@@ -35,9 +35,9 @@ export default async function ProfilePromptsPage() {
           <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">
             Your prompts
           </h1>
-          <p className="max-w-md text-sm text-muted-foreground">
-            Answer up to 4. Your answers become conversation starters - people reply to your
-            words, not your stats.
+          <p className="text-muted-foreground max-w-md text-sm">
+            Answer up to 4. Your answers become conversation starters - people reply to your words,
+            not your stats.
           </p>
         </div>
       </Reveal>

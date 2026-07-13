@@ -11,7 +11,13 @@ export const metadata: Metadata = {
 export default function PhoneCodePage() {
   // Suspense boundary for useSearchParams (the ?phone=... carrier).
   return (
-    <Suspense fallback={<AuthCard><AuthStepFallback /></AuthCard>}>
+    <Suspense
+      fallback={
+        <AuthCard>
+          <AuthStepFallback />
+        </AuthCard>
+      }
+    >
       <PhoneCodeStep />
     </Suspense>
   );

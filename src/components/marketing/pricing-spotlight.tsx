@@ -68,7 +68,7 @@ export function PricingSpotlight({
         : PLANS;
   const firstUpgrade = currentTier ? upgradePlansFor(currentTier)[0]?.tier : undefined;
   const [tier, setTier] = useState<PlanTierName>(
-    firstUpgrade ?? (plans.some((p) => p.tier === "PLUS") ? "PLUS" : plans[0]?.tier ?? "FREE"),
+    firstUpgrade ?? (plans.some((p) => p.tier === "PLUS") ? "PLUS" : (plans[0]?.tier ?? "FREE")),
   );
   const plan = plans.find((p) => p.tier === tier) ?? plans[0];
   if (!plan) return null; // nothing above the current tier - caller usually guards
@@ -77,7 +77,7 @@ export function PricingSpotlight({
   const upgradeInPlace = hasLiveSub && !isCurrent && plan.tier !== "FREE";
 
   return (
-    <div className="border-glow noise relative overflow-hidden rounded-[36px] bg-card/60 p-6 md:p-12">
+    <div className="border-glow noise bg-card/60 relative overflow-hidden rounded-[36px] p-6 md:p-12">
       {/* Spotlight follows the selected plan */}
       <div
         aria-hidden="true"
@@ -126,15 +126,17 @@ export function PricingSpotlight({
                 tabIndex={active ? 0 : -1}
                 onClick={() => setTier(p.tier)}
                 className={cn(
-                  "tap-target relative whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition-colors sm:px-8",
-                  active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                  "tap-target relative rounded-full px-3.5 py-2 text-sm font-semibold whitespace-nowrap transition-colors sm:px-8",
+                  active
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {active && (
                   <motion.span
                     layoutId="plan-pill"
                     transition={{ type: "spring", stiffness: 350, damping: 32 }}
-                    className="absolute inset-0 rounded-full bg-linear-160 from-brand-bright via-brand to-brand-active shadow-[0_6px_20px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
+                    className="from-brand-bright via-brand to-brand-active absolute inset-0 rounded-full bg-linear-160 shadow-[0_6px_20px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
                   />
                 )}
                 <span className="relative">{p.name}</span>
@@ -163,12 +165,12 @@ export function PricingSpotlight({
           >
             <div className="space-y-2">
               {isCurrent ? (
-                <span className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-gold">
+                <span className="glass-chip text-gold inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold tracking-widest uppercase">
                   <BadgeCheck className="size-3" aria-hidden="true" /> Your current plan
                 </span>
               ) : (
                 plan.tier === "PLUS" && (
-                  <span className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-gold">
+                  <span className="glass-chip text-gold inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold tracking-widest uppercase">
                     <Sparkles className="size-3" aria-hidden="true" /> Most loved
                   </span>
                 )
@@ -184,7 +186,7 @@ export function PricingSpotlight({
                 </span>
                 <span className="text-muted-foreground">/ month</span>
               </p>
-              <p className="mx-auto max-w-xs text-muted-foreground md:mx-0">
+              <p className="text-muted-foreground mx-auto max-w-xs md:mx-0">
                 {DESCRIPTIONS[plan.tier]}
               </p>
             </div>
@@ -225,7 +227,7 @@ export function PricingSpotlight({
                 errorClassName="mx-auto md:mx-0"
               />
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {upgradeInPlace
                 ? "Prorated - you only pay the difference · Same renewal date · Billed via Stripe"
                 : "Prices include VAT · Cancel in two taps · Billed via Stripe"}
@@ -253,8 +255,8 @@ export function PricingSpotlight({
                   }}
                   className="glass flex items-center gap-3 rounded-2xl px-5 py-4"
                 >
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/20">
-                    <Check className="size-3.5 text-primary-soft" aria-hidden="true" />
+                  <span className="bg-primary/20 flex size-6 shrink-0 items-center justify-center rounded-full">
+                    <Check className="text-primary-soft size-3.5" aria-hidden="true" />
                   </span>
                   <span className="text-sm font-medium">{feature}</span>
                 </motion.li>

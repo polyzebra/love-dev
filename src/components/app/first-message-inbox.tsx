@@ -68,9 +68,9 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
     try {
       const res = await respondRequest(card.id, action);
       if (!res.ok) {
-        const payload = (await res.json().catch(() => null)) as
-          | { error?: { message?: string } }
-          | null;
+        const payload = (await res.json().catch(() => null)) as {
+          error?: { message?: string };
+        } | null;
         restore(card, index);
         toast.error(payload?.error?.message ?? "Something went wrong. Try again.");
         return;
@@ -98,7 +98,7 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
         <h2 id="first-messages-heading" className="font-display text-xl font-medium tracking-tight">
           Messages waiting for you
         </h2>
-        <span className="text-sm text-muted-foreground" aria-hidden="true">
+        <span className="text-muted-foreground text-sm" aria-hidden="true">
           {items.length}
         </span>
       </div>
@@ -112,7 +112,7 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
             >
               <article
                 aria-label={`First message from ${card.senderName}`}
-                className="flex h-full gap-4 rounded-3xl border bg-card p-4 shadow-card"
+                className="bg-card shadow-card flex h-full gap-4 rounded-3xl border p-4"
               >
                 <div className="w-24 shrink-0 self-start">
                   <PhotoFrame
@@ -121,7 +121,7 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
                     variant="thumb"
                     loading="lazy"
                     radius="none"
-                    className="rounded-2xl bg-muted"
+                    className="bg-muted rounded-2xl"
                     fallback={
                       <div className="flex h-full items-center justify-center">
                         <Avatar className="size-12">
@@ -140,13 +140,16 @@ export function FirstMessageInbox({ initialItems }: { initialItems: FirstMessage
                     {card.senderName}
                     {card.senderAge != null ? `, ${card.senderAge}` : ""}
                     {card.senderCity && (
-                      <span className="font-normal text-muted-foreground"> · {card.senderCity}</span>
+                      <span className="text-muted-foreground font-normal">
+                        {" "}
+                        · {card.senderCity}
+                      </span>
                     )}
                   </p>
-                  <p className="mt-1 truncate text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 truncate text-sm">
                     &ldquo;{card.preview}&rdquo;
                   </p>
-                  <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
+                  <p className="text-primary mt-1.5 flex items-center gap-1.5 text-xs font-medium">
                     <Sparkles className="size-3 shrink-0" aria-hidden="true" />
                     <span className="truncate">{card.reason}</span>
                   </p>

@@ -89,9 +89,7 @@ function openersFor(profile: DiscoverProfile, viewerId: string | null): Opener[]
     : fromCategories;
 
   const seen = new Set<string>();
-  return merged
-    .filter((o) => (seen.has(o.send) ? false : (seen.add(o.send), true)))
-    .slice(0, 3);
+  return merged.filter((o) => (seen.has(o.send) ? false : (seen.add(o.send), true))).slice(0, 3);
 }
 
 /** md breakpoint - drawer below, dialog at and above. */
@@ -176,8 +174,7 @@ export function FirstMessageSheet({
       // rejections (length / content guard). Everything else toasts.
       const inline =
         error.fields?.body?.[0] ??
-        (res.status === 400 &&
-        (error.code === "invalid_body" || error.code === "content_rejected")
+        (res.status === 400 && (error.code === "invalid_body" || error.code === "content_rejected")
           ? error.message
           : undefined);
       if (inline) {
@@ -193,8 +190,7 @@ export function FirstMessageSheet({
       }
       // Always the REAL server message; a field error beats the shared
       // 422 envelope copy, and hardcoded text is a last resort only.
-      const message =
-        Object.values(error.fields ?? {}).flat()[0] ?? error.message;
+      const message = Object.values(error.fields ?? {}).flat()[0] ?? error.message;
       toast.error(
         message ??
           (res.status === 429
@@ -229,7 +225,7 @@ export function FirstMessageSheet({
                 // state (accent tint + soft primary border) - never a
                 // full-opacity rose border.
                 // Quiet utilitarian chips - no rings, no rose outlines.
-                "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:border-foreground/30",
+                "focus-visible:border-foreground/30 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none",
                 body === o.send
                   ? "border-border bg-foreground/10 text-primary"
                   : "border-border bg-foreground/5 text-muted-foreground hover:bg-foreground/10 hover:text-foreground",
@@ -259,13 +255,13 @@ export function FirstMessageSheet({
           // Spec states: default + focus keep a TRANSPARENT border - the
           // field is a calm filled surface with only a soft brand glow on
           // focus. Destructive styling exists solely via aria-invalid.
-          className="min-h-24 border-border bg-foreground/5 shadow-none hover:border-border focus-visible:border-border focus-visible:ring-0"
+          className="border-border bg-foreground/5 hover:border-border focus-visible:border-border min-h-24 shadow-none focus-visible:ring-0"
           disabled={pending}
         />
         <div className="flex items-start justify-between gap-3">
           <InlineFieldError id="first-message-body-error" message={bodyError} />
           <p
-            className="ml-auto text-right text-[11px] tabular-nums text-muted-foreground"
+            className="text-muted-foreground ml-auto text-right text-[11px] tabular-nums"
             aria-live="polite"
           >
             {body.length}/{MAX_LENGTH}

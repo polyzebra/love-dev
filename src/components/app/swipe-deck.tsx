@@ -34,10 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
-import {
-  FirstMessageSheet,
-  type FirstMessageResult,
-} from "@/components/app/first-message-sheet";
+import { FirstMessageSheet, type FirstMessageResult } from "@/components/app/first-message-sheet";
 import { PhotoFrame } from "@/components/shared/photo-frame";
 import { HeartBurst } from "@/components/fx/heart-burst";
 import { emitInteraction } from "@/lib/interaction-events";
@@ -59,9 +56,7 @@ export type ViewerContext = {
   goal: RelationshipGoal | null;
 };
 
-type Story =
-  | { kind: "reason"; text: string }
-  | { kind: "prompt"; label: string; answer: string };
+type Story = { kind: "reason"; text: string } | { kind: "prompt"; label: string; answer: string };
 
 /** Trust facts live in the trust row - never repeat them as the story line. */
 const NON_STORY_REASONS = new Set([
@@ -118,10 +113,7 @@ function sharedContextChips(profile: DiscoverProfile): string[] {
 function suggestedOpener(profile: DiscoverProfile): { label: string; send: string } | null {
   const strongest = sharedCategories(profile)[0]; // server sorts by weight
   if (!strongest) return null;
-  const template = pickTemplate(
-    strongest.chatPromptTemplates,
-    `${profile.userId}:${strongest.id}`,
-  );
+  const template = pickTemplate(strongest.chatPromptTemplates, `${profile.userId}:${strongest.id}`);
   if (!template) return null;
   return { label: template.replace(/\.$/, ""), send: messageFromTemplate(template) };
 }
@@ -163,7 +155,7 @@ function photoGradient(seed: string): string {
  */
 function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-background">
+    <div aria-hidden="true" className="bg-background absolute inset-0 overflow-hidden">
       <AnimatePresence initial={false}>
         {url && (
           <motion.img
@@ -174,14 +166,14 @@ function AmbientBackdrop({ url, tint }: { url: string | null; tint: RGB }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
-            className="absolute inset-0 h-full w-full scale-125 select-none object-cover blur-[64px] saturate-[1.2] [-webkit-touch-callout:none] [-webkit-user-drag:none]"
+            className="absolute inset-0 h-full w-full scale-125 object-cover blur-[64px] saturate-[1.2] select-none [-webkit-touch-callout:none] [-webkit-user-drag:none]"
             draggable={false}
             onContextMenu={(e) => e.preventDefault()}
           />
         )}
       </AnimatePresence>
       {/* Theme veil - keeps the field cinematic in dark, airy in light */}
-      <div className="absolute inset-0 bg-background/55" />
+      <div className="bg-background/55 absolute inset-0" />
       {/* Dominant-tone wash sampled from the person's photo */}
       <div
         className="absolute inset-0 transition-[background] duration-[1200ms] ease-out"
@@ -341,7 +333,7 @@ function TopCard({
             <button
               type="button"
               aria-label="Previous photo"
-              className="h-full w-1/2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60"
+              className="h-full w-1/2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-inset"
               onClick={() => {
                 if (!suppressTap.current) onCyclePhoto(-1);
               }}
@@ -349,7 +341,7 @@ function TopCard({
             <button
               type="button"
               aria-label="Next photo"
-              className="h-full w-1/2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/60"
+              className="h-full w-1/2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-inset"
               onClick={() => {
                 if (!suppressTap.current) onCyclePhoto(1);
               }}
@@ -362,7 +354,7 @@ function TopCard({
           <div
             aria-hidden="true"
             className={cn(
-              "absolute right-32 top-[calc(var(--safe-top)+2.25rem)] z-10 flex gap-1.5",
+              "absolute top-[calc(var(--safe-top)+2.25rem)] right-32 z-10 flex gap-1.5",
               indentIndicators ? "left-[4.5rem]" : "left-4",
             )}
           >
@@ -381,26 +373,26 @@ function TopCard({
         {/* Verdict stamps */}
         <motion.span
           style={{ opacity: likeOpacity }}
-          className="absolute left-6 top-[calc(var(--safe-top)+7.5rem)] -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-emerald-400"
+          className="absolute top-[calc(var(--safe-top)+7.5rem)] left-6 -rotate-12 rounded-2xl border-4 border-emerald-400 px-4 py-1 text-2xl font-extrabold tracking-widest text-emerald-400 uppercase"
           aria-hidden="true"
         >
           Like
         </motion.span>
         <motion.span
           style={{ opacity: passOpacity }}
-          className="absolute right-6 top-[calc(var(--safe-top)+7.5rem)] rotate-12 rounded-2xl border-4 border-white/85 px-4 py-1 text-2xl font-extrabold uppercase tracking-widest text-white/85"
+          className="absolute top-[calc(var(--safe-top)+7.5rem)] right-6 rotate-12 rounded-2xl border-4 border-white/85 px-4 py-1 text-2xl font-extrabold tracking-widest text-white/85 uppercase"
           aria-hidden="true"
         >
           Pass
         </motion.span>
 
         {/* Compatibility, demoted: a quiet pill under the stage controls */}
-        <div className="absolute right-4 top-[calc(var(--safe-top)+4.5rem)] z-10">
+        <div className="absolute top-[calc(var(--safe-top)+4.5rem)] right-4 z-10">
           <span
             role="img"
             // Sits over UNSCRIMMED photo: black-tinted glass so it stays
             // legible on bright photos (white/10 washed out against sky)
-            className="flex items-center gap-1 rounded-full border border-white/20 bg-black/25 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white/90"
+            className="flex items-center gap-1 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[11px] font-medium text-white/90 backdrop-blur-md"
             aria-label={`${profile.compatibility} percent match`}
           >
             <Heart className="size-3 fill-current text-rose-300/90" aria-hidden="true" />
@@ -413,7 +405,7 @@ function TopCard({
           {/* Long-name stress: the NAME truncates, the age never disappears;
               the full name stays reachable via title. */}
           <h2
-            className="flex items-baseline font-display text-4xl font-medium tracking-tight text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl"
+            className="font-display flex items-baseline text-4xl font-medium tracking-tight text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl"
             title={`${profile.displayName}, ${profile.age}`}
           >
             <span className="truncate">{profile.displayName}</span>
@@ -440,7 +432,10 @@ function TopCard({
               className="flex flex-wrap gap-1.5 pt-1"
               initial="hidden"
               animate="show"
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } } }}
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } },
+              }}
             >
               {profile.isVerified && (
                 <motion.span variants={TRUST_CHIP_VARIANTS} className={TRUST_CHIP_CLASS}>
@@ -451,7 +446,7 @@ function TopCard({
               {profile.isOnline && (
                 <motion.span variants={TRUST_CHIP_VARIANTS} className={TRUST_CHIP_CLASS}>
                   <span className="relative flex size-1.5" aria-hidden="true">
-                    <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-400" />
+                    <span className="animate-ping-soft absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
                     <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
                   </span>
                   Online now
@@ -490,7 +485,9 @@ export function SwipeDeck({
   backHref?: string | null;
 }) {
   const [deck, setDeck] = useState(initialProfiles);
-  const [matchedWith, setMatchedWith] = useState<(DiscoverProfile & { conversationId?: string }) | null>(null);
+  const [matchedWith, setMatchedWith] = useState<
+    (DiscoverProfile & { conversationId?: string }) | null
+  >(null);
   const busy = useRef(false);
   const deciderRef = useRef<((action: SwipeAction) => void) | null>(null);
   // First-message composer: who it's for, whether it's showing, and the
@@ -534,7 +531,7 @@ export function SwipeDeck({
   // Fallback CTA when no taxonomy category is shared but an interest is
   const firstSharedInterest =
     matchedWith && viewer
-      ? matchedWith.interests.find((i) => viewer.interests.includes(i)) ?? null
+      ? (matchedWith.interests.find((i) => viewer.interests.includes(i)) ?? null)
       : null;
 
   // Ambient light sampled from the current photo; falls back to brand rose
@@ -585,10 +582,10 @@ export function SwipeDeck({
           toast.error("Something went wrong. Try again.");
           return;
         }
-        const { data } = (await res.json()) as { data: { matched: boolean; conversationId?: string } };
-        emitInteraction(
-          action === "LIKE" ? "like" : action === "PASS" ? "pass" : "superlike",
-        );
+        const { data } = (await res.json()) as {
+          data: { matched: boolean; conversationId?: string };
+        };
+        emitInteraction(action === "LIKE" ? "like" : action === "PASS" ? "pass" : "superlike");
         if (data.matched) {
           emitInteraction("match");
           setMatchedWith({ ...current, conversationId: data.conversationId });
@@ -650,7 +647,7 @@ export function SwipeDeck({
   // ONE emotional line for the composer header - first human server
   // reason, else the goal line. Real data only, like the card itself.
   const composeReason = composeFor
-    ? composeFor.reasons.find((r) => !NON_STORY_REASONS.has(r)) ?? composeFor.goalLine
+    ? (composeFor.reasons.find((r) => !NON_STORY_REASONS.has(r)) ?? composeFor.goalLine)
     : null;
 
   /**
@@ -699,8 +696,8 @@ export function SwipeDeck({
           aria-label="Profile cards"
         >
           <p className="sr-only">
-            Keyboard: press the right arrow to like, the left arrow to pass, and U to undo your
-            last swipe.
+            Keyboard: press the right arrow to like, the left arrow to pass, and U to undo your last
+            swipe.
           </p>
           {/* Next card peek - ~4% visible at the edges, waiting underneath */}
           {next && (
@@ -713,7 +710,12 @@ export function SwipeDeck({
               className={cn("absolute inset-0 overflow-hidden", STAGE_RADIUS)}
             >
               {next.photos[0] ? (
-                <PhotoFrame mode="fill" variant="card" photo={next.photos[0]} className="opacity-60" />
+                <PhotoFrame
+                  mode="fill"
+                  variant="card"
+                  photo={next.photos[0]}
+                  className="opacity-60"
+                />
               ) : (
                 <div className="h-full w-full" style={{ background: photoGradient(next.userId) }} />
               )}
@@ -758,12 +760,12 @@ export function SwipeDeck({
               <Link
                 href={backHref}
                 aria-label="Back to Explore"
-                className={cn(chromeCircle, "absolute left-4 top-[calc(var(--safe-top)+1rem)]")}
+                className={cn(chromeCircle, "absolute top-[calc(var(--safe-top)+1rem)] left-4")}
               >
                 <ArrowLeft className="size-5" aria-hidden="true" />
               </Link>
             )}
-            <div className="absolute right-4 top-[calc(var(--safe-top)+1rem)] flex gap-2">
+            <div className="absolute top-[calc(var(--safe-top)+1rem)] right-4 flex gap-2">
               <Link href="/notifications" aria-label="Notifications" className={chromeCircle}>
                 <Bell className="size-5" aria-hidden="true" />
               </Link>
@@ -789,7 +791,10 @@ export function SwipeDeck({
                   whileTap={{ scale: 0.85 }}
                   aria-label="Undo last swipe"
                   aria-keyshortcuts="u"
-                  className={cn(PHOTO_GLASS_BUTTON, "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
+                  className={cn(
+                    PHOTO_GLASS_BUTTON,
+                    "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]",
+                  )}
                   onClick={undo}
                 >
                   <RotateCcw className="size-5 text-amber-300" aria-hidden="true" />
@@ -800,7 +805,10 @@ export function SwipeDeck({
                   whileHover={{ scale: 1.06 }}
                   aria-label="Pass"
                   aria-keyshortcuts="ArrowLeft"
-                  className={cn(PHOTO_GLASS_BUTTON, "size-14 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
+                  className={cn(
+                    PHOTO_GLASS_BUTTON,
+                    "size-14 shadow-[0_18px_40px_rgba(0,0,0,0.45)]",
+                  )}
                   onClick={() => act("PASS")}
                 >
                   <X className="size-6" aria-hidden="true" />
@@ -811,7 +819,7 @@ export function SwipeDeck({
                   whileHover={{ scale: 1.08 }}
                   aria-label="Like"
                   aria-keyshortcuts="ArrowRight"
-                  className="pointer-events-auto flex size-[4.5rem] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_32px_color-mix(in_srgb,var(--primary)_50%,transparent),0_18px_44px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 pointer-events-auto flex size-[4.5rem] items-center justify-center rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_32px_color-mix(in_srgb,var(--primary)_50%,transparent),0_18px_44px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
                   onClick={() => act("LIKE")}
                 >
                   <Heart className="size-8 fill-current" aria-hidden="true" />
@@ -821,7 +829,10 @@ export function SwipeDeck({
                   whileTap={{ scale: 0.85 }}
                   whileHover={{ scale: 1.06 }}
                   aria-label="Super Like"
-                  className={cn(PHOTO_GLASS_BUTTON, "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
+                  className={cn(
+                    PHOTO_GLASS_BUTTON,
+                    "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]",
+                  )}
                   onClick={() => act("SUPER_LIKE")}
                 >
                   <Star className="size-5 fill-sky-400 text-sky-400" aria-hidden="true" />
@@ -834,7 +845,10 @@ export function SwipeDeck({
                   whileTap={{ scale: 0.85 }}
                   whileHover={{ scale: 1.06 }}
                   aria-label={`Send ${top.displayName} a first message`}
-                  className={cn(PHOTO_GLASS_BUTTON, "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]")}
+                  className={cn(
+                    PHOTO_GLASS_BUTTON,
+                    "size-12 shadow-[0_18px_40px_rgba(0,0,0,0.45)]",
+                  )}
                   onClick={() => {
                     setComposeFor(top);
                     setComposeOpen(true);
@@ -880,7 +894,7 @@ export function SwipeDeck({
 
       {/* Match celebration - the moment leads with what you share */}
       <Dialog open={!!matchedWith} onOpenChange={(open) => !open && setMatchedWith(null)}>
-        <DialogContent className="overflow-hidden rounded-2xl border-border text-center sm:max-w-sm">
+        <DialogContent className="border-border overflow-hidden rounded-2xl text-center sm:max-w-sm">
           {matchedWith && <HeartBurst />}
           {/* Gentle rise on top of the dialog's CSS fade - softSpring so the
               moment settles softly. MotionConfig reducedMotion="user" strips
@@ -895,11 +909,13 @@ export function SwipeDeck({
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ ...SPRING.bounce, delay: 0.1 }}
-                className="flex size-16 items-center justify-center rounded-full bg-accent shadow-glow"
+                className="bg-accent shadow-glow flex size-16 items-center justify-center rounded-full"
               >
-                <Heart className="size-8 fill-primary text-primary" aria-hidden="true" />
+                <Heart className="fill-primary text-primary size-8" aria-hidden="true" />
               </motion.span>
-              <DialogTitle className="font-display text-3xl font-medium">It&apos;s a match</DialogTitle>
+              <DialogTitle className="font-display text-3xl font-medium">
+                It&apos;s a match
+              </DialogTitle>
               <DialogDescription>
                 {/* Explicit string child: this Next build's compiler strips
                     the leading space of JSX text that follows an expression
@@ -914,7 +930,10 @@ export function SwipeDeck({
                   <motion.ul
                     initial="hidden"
                     animate="show"
-                    variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.25 } } }}
+                    variants={{
+                      hidden: {},
+                      show: { transition: { staggerChildren: 0.1, delayChildren: 0.25 } },
+                    }}
                     className="flex flex-wrap justify-center gap-1.5"
                     aria-label="What you share"
                   >
@@ -925,25 +944,31 @@ export function SwipeDeck({
                           hidden: { opacity: 0, y: 10, scale: 0.92 },
                           show: { opacity: 1, y: 0, scale: 1, transition: SPRING.snappy },
                         }}
-                        className="rounded-full border border-primary/30 bg-primary/15 px-3 py-1 text-xs font-medium text-foreground"
+                        className="border-primary/30 bg-primary/15 text-foreground rounded-full border px-3 py-1 text-xs font-medium"
                       >
                         {chip}
                       </motion.li>
                     ))}
                   </motion.ul>
                 ) : matchedWith.promptTease ? (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     <span className="italic">&ldquo;{matchedWith.promptTease.answer}&rdquo;</span>
                     {" - "}their {lowerLabel(matchedWith.promptTease.label)}
                   </p>
                 ) : matchedWith.goalLine ? (
-                  <p className="text-sm text-muted-foreground">{matchedWith.goalLine}</p>
+                  <p className="text-muted-foreground text-sm">{matchedWith.goalLine}</p>
                 ) : null}
               </div>
             )}
             <div className="relative grid gap-2">
               <Button className="h-12 rounded-full" asChild>
-                <Link href={matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"}>Say hello</Link>
+                <Link
+                  href={
+                    matchedWith?.conversationId ? `/chat/${matchedWith.conversationId}` : "/chat"
+                  }
+                >
+                  Say hello
+                </Link>
               </Button>
               {opener ? (
                 <Button variant="outline" className="h-11 rounded-full" asChild>

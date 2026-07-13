@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border bg-card p-5">
+    <section className="bg-card rounded-3xl border p-5">
       <h2 className="mb-3 text-sm font-semibold">{title}</h2>
       {children}
     </section>
@@ -36,7 +36,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <dt className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
         {label}
       </dt>
       <dd className="mt-0.5 text-sm">{children}</dd>
@@ -48,9 +48,9 @@ function Stamp({ done, label }: { done: boolean; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-sm">
       {done ? (
-        <BadgeCheck className="size-4 text-success" aria-hidden="true" />
+        <BadgeCheck className="text-success size-4" aria-hidden="true" />
       ) : (
-        <CircleDashed className="size-4 text-muted-foreground/50" aria-hidden="true" />
+        <CircleDashed className="text-muted-foreground/50 size-4" aria-hidden="true" />
       )}
       {label}
     </span>
@@ -170,13 +170,17 @@ export default async function ModerationCaseDetailPage({
   const riskReasons = user.safetyRiskReasons
     ? user.safetyRiskReasons.split(",").filter(Boolean)
     : [];
-  const evidence = Array.isArray(kase.evidence) ? kase.evidence : kase.evidence ? [kase.evidence] : [];
+  const evidence = Array.isArray(kase.evidence)
+    ? kase.evidence
+    : kase.evidence
+      ? [kase.evidence]
+      : [];
 
   return (
     <>
       <Link
         href="/admin/moderation-cases"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm"
       >
         <ArrowLeft className="size-4" aria-hidden="true" /> Moderation cases
       </Link>
@@ -185,7 +189,7 @@ export default async function ModerationCaseDetailPage({
         title={`${pretty(kase.caseType)} case`}
         description={`opened ${formatAgo(kase.createdAt)}`}
         actions={
-          <span className="font-mono text-xs text-muted-foreground" title={kase.id}>
+          <span className="text-muted-foreground font-mono text-xs" title={kase.id}>
             id {shortId(kase.id)}
           </span>
         }
@@ -294,9 +298,7 @@ export default async function ModerationCaseDetailPage({
           <dl className="space-y-3">
             <Field label="Summary">{kase.summary}</Field>
             {kase.decisionReason && <Field label="Decision reason">{kase.decisionReason}</Field>}
-            {kase.reviewedAt && (
-              <Field label="Reviewed">{formatAgo(kase.reviewedAt)}</Field>
-            )}
+            {kase.reviewedAt && <Field label="Reviewed">{formatAgo(kase.reviewedAt)}</Field>}
           </dl>
         </Section>
 
@@ -312,7 +314,10 @@ export default async function ModerationCaseDetailPage({
             </Field>
             <Field label="Email">{user.email}</Field>
             <Field label="Account">
-              <Badge variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"} className="rounded-full">
+              <Badge
+                variant={ACCOUNT_STATUS_BADGE[user.status] ?? "outline"}
+                className="rounded-full"
+              >
                 {pretty(user.status)}
               </Badge>
             </Field>
@@ -340,7 +345,7 @@ export default async function ModerationCaseDetailPage({
               </span>
               <span className="text-muted-foreground"> / 100</span>
               {user.safetyRiskUpdatedAt && (
-                <span className="ml-2 text-xs text-muted-foreground">
+                <span className="text-muted-foreground ml-2 text-xs">
                   updated {formatAgo(user.safetyRiskUpdatedAt)}
                 </span>
               )}
@@ -356,7 +361,7 @@ export default async function ModerationCaseDetailPage({
                   {riskReasons.map((reason) => (
                     <span
                       key={reason}
-                      className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium"
+                      className="bg-muted rounded-full px-2.5 py-0.5 text-xs font-medium"
                     >
                       {reason}
                     </span>
@@ -368,7 +373,7 @@ export default async function ModerationCaseDetailPage({
               login risk {user.riskScore} · scam score {user.scamScore}
             </Field>
           </dl>
-          <p className="mt-3 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-3 text-xs">
             Recompute lives on the{" "}
             <Link href={`/admin/users/${user.id}`} className="underline underline-offset-2">
               user page
@@ -391,7 +396,9 @@ export default async function ModerationCaseDetailPage({
               />
               <dl className="min-w-0 flex-1 space-y-2 text-sm">
                 <Field label="Photo state">
-                  {casePhoto ? `${pretty(casePhoto.status)} · moderation ${pretty(casePhoto.moderation)}` : "deleted by owner"}
+                  {casePhoto
+                    ? `${pretty(casePhoto.status)} · moderation ${pretty(casePhoto.moderation)}`
+                    : "deleted by owner"}
                 </Field>
                 {moderationResult ? (
                   <Field label={`Moderation scores (${moderationResult.provider})`}>
@@ -407,13 +414,13 @@ export default async function ModerationCaseDetailPage({
                     </span>
                   </Field>
                 ) : (
-                  <p className="text-xs text-muted-foreground">No moderation result on file.</p>
+                  <p className="text-muted-foreground text-xs">No moderation result on file.</p>
                 )}
               </dl>
             </div>
           )}
           {user.photos.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No photos on the profile.</p>
+            <p className="text-muted-foreground text-sm">No photos on the profile.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {user.photos.map((p) => (
@@ -424,10 +431,10 @@ export default async function ModerationCaseDetailPage({
                     alt={`Profile photo (${pretty(p.status)})`}
                     loading="lazy"
                     className={`h-24 w-20 rounded-xl border object-cover ${
-                      p.id === kase.photoId ? "ring-2 ring-primary" : ""
+                      p.id === kase.photoId ? "ring-primary ring-2" : ""
                     }`}
                   />
-                  <figcaption className="mt-0.5 truncate text-center text-[10px] text-muted-foreground">
+                  <figcaption className="text-muted-foreground mt-0.5 truncate text-center text-[10px]">
                     {pretty(p.moderation)}
                   </figcaption>
                 </figure>
@@ -438,16 +445,16 @@ export default async function ModerationCaseDetailPage({
 
         <Section title="Linked reports">
           {!report && user.reportsReceived.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No reports linked to this user.</p>
+            <p className="text-muted-foreground text-sm">No reports linked to this user.</p>
           ) : (
             <ul className="space-y-3">
               {report && (
-                <li className="rounded-2xl bg-muted px-4 py-3 text-sm">
+                <li className="bg-muted rounded-2xl px-4 py-3 text-sm">
                   <p className="font-medium">
                     Case report · {pretty(report.reason)} · {pretty(report.status)}
                   </p>
                   {report.details && <p className="mt-1 italic">&ldquo;{report.details}&rdquo;</p>}
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     {formatAgo(report.createdAt)}
                   </p>
                 </li>
@@ -460,9 +467,7 @@ export default async function ModerationCaseDetailPage({
                       {pretty(r.reason)} ·{" "}
                       <span className="text-muted-foreground">{pretty(r.status)}</span>
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatAgo(r.createdAt)}
-                    </p>
+                    <p className="text-muted-foreground text-xs">{formatAgo(r.createdAt)}</p>
                   </li>
                 ))}
             </ul>
@@ -471,12 +476,15 @@ export default async function ModerationCaseDetailPage({
 
         <Section title="Violations on file">
           {user.violations.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No violations on file.</p>
+            <p className="text-muted-foreground text-sm">No violations on file.</p>
           ) : (
             <ul className="divide-y">
               {user.violations.map((v) => (
                 <li key={v.id} className="flex flex-wrap items-center gap-2 py-2.5">
-                  <Badge variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"} className="rounded-full">
+                  <Badge
+                    variant={ENFORCEMENT_BADGE[v.actionTaken] ?? "outline"}
+                    className="rounded-full"
+                  >
                     {pretty(v.actionTaken)}
                   </Badge>
                   <span className="text-sm">{pretty(v.violationType)}</span>
@@ -498,7 +506,7 @@ export default async function ModerationCaseDetailPage({
                       appeal {pretty(v.appeals[0].status)}
                     </Badge>
                   )}
-                  <span className="ml-auto text-xs text-muted-foreground">
+                  <span className="text-muted-foreground ml-auto text-xs">
                     {formatAgo(v.createdAt)}
                   </span>
                 </li>
@@ -509,12 +517,10 @@ export default async function ModerationCaseDetailPage({
 
         <Section title="Evidence trail">
           {evidence.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No structured evidence recorded.</p>
+            <p className="text-muted-foreground text-sm">No structured evidence recorded.</p>
           ) : (
-            <div className="overflow-x-auto rounded-2xl bg-muted p-4">
-              <pre className="text-xs leading-relaxed">
-                {JSON.stringify(evidence, null, 2)}
-              </pre>
+            <div className="bg-muted overflow-x-auto rounded-2xl p-4">
+              <pre className="text-xs leading-relaxed">{JSON.stringify(evidence, null, 2)}</pre>
             </div>
           )}
         </Section>

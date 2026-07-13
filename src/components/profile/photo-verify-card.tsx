@@ -112,7 +112,7 @@ export function PhotoVerifyCard({
   if (state === "pending" || state === "verification_started") {
     return (
       <StateCard
-        icon={<Hourglass className="size-5 text-gold" aria-hidden="true" />}
+        icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
         title="Verification in progress"
         body={
           state === "pending"
@@ -149,7 +149,7 @@ export function PhotoVerifyCard({
   if (state === "manual_review") {
     return (
       <StateCard
-        icon={<UserSearch className="size-5 text-gold" aria-hidden="true" />}
+        icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
         title="A person is taking a look"
         body="Your verification needs a quick manual review by our team. Nothing else is needed from you - we'll email you the result."
       />
@@ -159,7 +159,7 @@ export function PhotoVerifyCard({
   if (state === "failed") {
     return (
       <StateCard
-        icon={<XCircle className="size-5 text-muted-foreground" aria-hidden="true" />}
+        icon={<XCircle className="text-muted-foreground size-5" aria-hidden="true" />}
         title="Verification couldn't be completed"
         body="This attempt was final and can't be retried. Your profile stays fully usable - photo verification just won't show a badge."
       />
@@ -172,22 +172,22 @@ export function PhotoVerifyCard({
     <section className="glass rounded-3xl p-5">
       <div className="flex items-start gap-3.5">
         <span className="glass-chip flex size-11 shrink-0 items-center justify-center rounded-full">
-          <BadgeCheck className="size-5 text-gold" aria-hidden="true" />
+          <BadgeCheck className="text-gold size-5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-display text-lg font-medium tracking-tight">
             {retry ? "Try photo verification again" : "Get photo verified"}
           </p>
           {retry && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Your last attempt didn&apos;t go through - that happens. You can start a fresh one
-              any time.
+            <p className="text-muted-foreground mt-1 text-sm">
+              Your last attempt didn&apos;t go through - that happens. You can start a fresh one any
+              time.
             </p>
           )}
           <ul className="mt-2 space-y-1.5">
             {BENEFITS.map((benefit) => (
-              <li key={benefit} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Check className="size-3.5 shrink-0 text-success" aria-hidden="true" />
+              <li key={benefit} className="text-muted-foreground flex items-center gap-2 text-sm">
+                <Check className="text-success size-3.5 shrink-0" aria-hidden="true" />
                 {benefit}
               </li>
             ))}
@@ -202,7 +202,7 @@ export function PhotoVerifyCard({
               {retry ? "Try again" : "Start verification"}
             </Button>
           ) : (
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground/5 px-3.5 py-1.5 text-xs font-medium text-muted-foreground">
+            <p className="bg-foreground/5 text-muted-foreground mt-4 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium">
               <Hourglass className="size-3.5" aria-hidden="true" />
               Coming soon - verification isn&apos;t available just yet
             </p>
@@ -225,8 +225,8 @@ export function PhotoVerifyCard({
               <ul className="space-y-3">
                 {HOW_IT_WORKS.map(({ icon: Icon, copy }) => (
                   <li key={copy} className="flex items-center gap-3 text-sm">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-accent">
-                      <Icon className="size-4.5 text-accent-foreground" aria-hidden="true" />
+                    <span className="bg-accent flex size-9 shrink-0 items-center justify-center rounded-2xl">
+                      <Icon className="text-accent-foreground size-4.5" aria-hidden="true" />
                     </span>
                     {copy}
                   </li>
@@ -247,17 +247,17 @@ export function PhotoVerifyCard({
                 <DialogTitle className="font-display text-xl tracking-tight">
                   Before you start
                 </DialogTitle>
-                <DialogDescription>
-                  A quick word on how your selfie is handled.
-                </DialogDescription>
+                <DialogDescription>A quick word on how your selfie is handled.</DialogDescription>
               </DialogHeader>
-              <div className="flex items-start gap-3 rounded-2xl bg-foreground/5 p-4 text-sm leading-relaxed text-muted-foreground">
-                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+              <div className="bg-foreground/5 text-muted-foreground flex items-start gap-3 rounded-2xl p-4 text-sm leading-relaxed">
+                <ShieldCheck className="text-success mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <p>
-                  Your selfie is captured and checked by our verification partner, not by Tirvea.
-                  We only receive the result - <span className="font-medium text-foreground">
-                  we never store your selfie or any biometric data</span>. By continuing you
-                  consent to photo verification.
+                  Your selfie is captured and checked by our verification partner, not by Tirvea. We
+                  only receive the result -{" "}
+                  <span className="text-foreground font-medium">
+                    we never store your selfie or any biometric data
+                  </span>
+                  . By continuing you consent to photo verification.
                 </p>
               </div>
               <DialogFooter>
@@ -299,7 +299,7 @@ function StateCard({
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-display text-lg font-medium tracking-tight">{title}</p>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{body}</p>
+          <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{body}</p>
           {children}
         </div>
       </div>

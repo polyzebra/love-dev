@@ -1,7 +1,14 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**

@@ -73,7 +73,10 @@ function CompletionRing({ value }: { value: number }) {
   const r = 26;
   const c = 2 * Math.PI * r;
   return (
-    <div className="relative flex size-16 items-center justify-center" aria-label={`Profile ${value}% complete`}>
+    <div
+      className="relative flex size-16 items-center justify-center"
+      aria-label={`Profile ${value}% complete`}
+    >
       <svg viewBox="0 0 64 64" className="absolute inset-0 -rotate-90">
         <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="4" />
         <circle
@@ -94,7 +97,7 @@ function CompletionRing({ value }: { value: number }) {
           </linearGradient>
         </defs>
       </svg>
-      <span className="text-sm font-semibold tabular-nums text-white">{value}%</span>
+      <span className="text-sm font-semibold text-white tabular-nums">{value}%</span>
     </div>
   );
 }
@@ -155,7 +158,9 @@ export function PhotoManager({
       body.append("file", file);
       const res = await fetch("/api/photos", { method: "POST", body });
       if (!res.ok) {
-        toast.error(await readErrorMessage(res, "We could not upload that photo. Please try again."));
+        toast.error(
+          await readErrorMessage(res, "We could not upload that photo. Please try again."),
+        );
         return;
       }
       const json = (await res.json()) as { data: ManagedPhoto };
@@ -182,7 +187,9 @@ export function PhotoManager({
       });
       if (!res.ok) {
         setPhotos(previous);
-        toast.error(await readErrorMessage(res, "We could not reorder your photos. Please try again."));
+        toast.error(
+          await readErrorMessage(res, "We could not reorder your photos. Please try again."),
+        );
         return;
       }
       // No refresh(): unlike upload/delete, reorder changes no server-derived
@@ -272,7 +279,9 @@ export function PhotoManager({
       const res = await fetch(`/api/photos/${photo.id}`, { method: "DELETE" });
       if (!res.ok) {
         setPhotos(previous);
-        toast.error(await readErrorMessage(res, "We could not delete that photo. Please try again."));
+        toast.error(
+          await readErrorMessage(res, "We could not delete that photo. Please try again."),
+        );
         return;
       }
       router.refresh();
@@ -297,7 +306,10 @@ export function PhotoManager({
             variant="card"
             className="shadow-float"
             fallback={
-              <div className="absolute inset-0" style={{ background: coverGradient(gradientSeed) }} />
+              <div
+                className="absolute inset-0"
+                style={{ background: coverGradient(gradientSeed) }}
+              />
             }
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
@@ -306,7 +318,13 @@ export function PhotoManager({
             {/* Top rail: completion + edit */}
             <div className="absolute inset-x-5 top-5 flex items-start justify-between">
               <CompletionRing value={completionPct} />
-              <Button size="icon" variant="secondary" className="glass-chip size-11 rounded-full border-0 lg:hidden" aria-label="Settings" asChild>
+              <Button
+                size="icon"
+                variant="secondary"
+                className="glass-chip size-11 rounded-full border-0 lg:hidden"
+                aria-label="Settings"
+                asChild
+              >
                 <Link href="/settings">
                   <Settings className="size-5" aria-hidden="true" />
                 </Link>
@@ -315,11 +333,15 @@ export function PhotoManager({
 
             {/* Identity - editorial lockup */}
             <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 md:p-9">
-              <h1 className="flex flex-wrap items-center gap-3 font-display text-[clamp(2.2rem,6vw,4rem)] font-medium leading-none tracking-tight text-white">
+              <h1 className="font-display flex flex-wrap items-center gap-3 text-[clamp(2.2rem,6vw,4rem)] leading-none font-medium tracking-tight text-white">
                 {displayName}, {age}
                 {photoVerified && (
-                  <span role="img" className="relative flex items-center justify-center" aria-label="Photo verified">
-                    <span className="absolute size-8 animate-ping-soft rounded-full bg-sky-400/25" />
+                  <span
+                    role="img"
+                    className="relative flex items-center justify-center"
+                    aria-label="Photo verified"
+                  >
+                    <span className="animate-ping-soft absolute size-8 rounded-full bg-sky-400/25" />
                     <BadgeCheck className="relative size-8 fill-sky-400 text-white" />
                   </span>
                 )}
@@ -344,8 +366,8 @@ export function PhotoManager({
       <Reveal>
         <section>
           <div className="mb-3 flex items-baseline justify-between px-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Gallery</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">Gallery</p>
+            <p className="text-muted-foreground text-xs">
               {photos.length}/{PHOTO_LIMITS.max} photos
             </p>
           </div>
@@ -383,10 +405,10 @@ export function PhotoManager({
                   variant="gallery"
                   loading="lazy"
                   radius="none"
-                  className="rounded-2xl border border-border"
+                  className="border-border rounded-2xl border"
                 >
                   {i === 0 && (
-                    <span className="glass-chip absolute left-2 top-2 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white">
+                    <span className="glass-chip absolute top-2 left-2 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.18em] text-white uppercase">
                       Cover
                     </span>
                   )}
@@ -396,7 +418,7 @@ export function PhotoManager({
                       if (!suppressClick.current) setDeleteTarget(photo);
                     }}
                     aria-label={i === 0 ? "Delete cover photo" : `Delete photo ${i + 1}`}
-                    className={`${controlClass} absolute right-1.5 top-1.5 size-9`}
+                    className={`${controlClass} absolute top-1.5 right-1.5 size-9`}
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
                   </button>
@@ -406,7 +428,9 @@ export function PhotoManager({
                       onClick={() => {
                         if (!suppressClick.current) void movePhoto(i, -1);
                       }}
-                      aria-label={i === 1 ? `Make photo ${i + 1} the cover` : `Move photo ${i + 1} earlier`}
+                      aria-label={
+                        i === 1 ? `Make photo ${i + 1} the cover` : `Move photo ${i + 1} earlier`
+                      }
                       className={`${controlClass} absolute bottom-1.5 left-1.5 size-11`}
                     >
                       <ChevronLeft className="size-4" aria-hidden="true" />
@@ -419,7 +443,7 @@ export function PhotoManager({
                         if (!suppressClick.current) void movePhoto(i, 1);
                       }}
                       aria-label={i === 0 ? "Move cover photo later" : `Move photo ${i + 1} later`}
-                      className={`${controlClass} absolute bottom-1.5 right-1.5 size-11`}
+                      className={`${controlClass} absolute right-1.5 bottom-1.5 size-11`}
                     >
                       <ChevronRight className="size-4" aria-hidden="true" />
                     </button>
@@ -432,24 +456,26 @@ export function PhotoManager({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-foreground/15 text-muted-foreground transition-colors hover:border-foreground/25 hover:text-foreground disabled:pointer-events-none"
+                className="border-foreground/15 text-muted-foreground hover:border-foreground/25 hover:text-foreground flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed transition-colors disabled:pointer-events-none"
                 aria-label="Add photo"
                 aria-busy={uploading}
               >
                 {uploading ? (
                   <span
                     aria-hidden="true"
-                    className="size-5 animate-spin rounded-full border-2 border-foreground/20 border-t-primary"
+                    className="border-foreground/20 border-t-primary size-5 animate-spin rounded-full border-2"
                   />
                 ) : (
                   <Camera className="size-5" aria-hidden="true" />
                 )}
-                <span className="text-[11px] font-medium">{uploading ? "Uploading" : "Add photo"}</span>
+                <span className="text-[11px] font-medium">
+                  {uploading ? "Uploading" : "Add photo"}
+                </span>
               </button>
             )}
           </div>
           {photos.length < PHOTO_LIMITS.min && (
-            <p className="mt-2 px-1 text-xs text-warning">
+            <p className="text-warning mt-2 px-1 text-xs">
               Add at least {PHOTO_LIMITS.min} photos to appear in Discover.
             </p>
           )}

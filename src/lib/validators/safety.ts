@@ -2,7 +2,9 @@ import { z } from "zod";
 
 export const reportSchema = z.object({
   reportedId: z.union([z.string().cuid(), z.string().uuid()], { error: "Invalid user id" }),
-  messageId: z.union([z.string().cuid(), z.string().uuid()], { error: "Invalid user id" }).optional(),
+  messageId: z
+    .union([z.string().cuid(), z.string().uuid()], { error: "Invalid user id" })
+    .optional(),
   reason: z.enum([
     "FAKE_PROFILE",
     "INAPPROPRIATE_CONTENT",

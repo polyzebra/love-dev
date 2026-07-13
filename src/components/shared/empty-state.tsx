@@ -21,12 +21,12 @@ export function EmptyState({
         className,
       )}
     >
-      <div className="flex size-16 items-center justify-center rounded-3xl bg-accent">
-        <Icon className="size-7 text-accent-foreground" aria-hidden="true" />
+      <div className="bg-accent flex size-16 items-center justify-center rounded-3xl">
+        <Icon className="text-accent-foreground size-7" aria-hidden="true" />
       </div>
       <div className="space-y-1.5">
         <h2 className="text-lg font-semibold">{title}</h2>
-        <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mx-auto max-w-sm text-sm leading-relaxed">
           {description}
         </p>
       </div>

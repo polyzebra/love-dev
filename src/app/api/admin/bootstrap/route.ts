@@ -40,13 +40,21 @@ export async function POST(req: Request) {
   }
   const email = process.env.ADMIN_BOOTSTRAP_EMAIL;
   if (!email || email.trim().length === 0) {
-    return apiError(503, "not_configured", "ADMIN_BOOTSTRAP_EMAIL is not configured on the server.");
+    return apiError(
+      503,
+      "not_configured",
+      "ADMIN_BOOTSTRAP_EMAIL is not configured on the server.",
+    );
   }
 
   const result = await bootstrapSuperAdmin({ email, via: "api", req });
   switch (result.status) {
     case "gone":
-      return apiError(410, "gone", "Bootstrap already completed - a SUPER_ADMIN exists. This endpoint is permanently disabled.");
+      return apiError(
+        410,
+        "gone",
+        "Bootstrap already completed - a SUPER_ADMIN exists. This endpoint is permanently disabled.",
+      );
     case "setup_required":
       return apiError(
         409,

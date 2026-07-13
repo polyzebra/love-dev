@@ -21,7 +21,10 @@ async function requireActor(permission: Permission) {
   return session.user;
 }
 
-export async function setUserStatus(userId: string, status: "ACTIVE" | "SUSPENDED" | "SHADOW_BANNED") {
+export async function setUserStatus(
+  userId: string,
+  status: "ACTIVE" | "SUSPENDED" | "SHADOW_BANNED",
+) {
   const actor = await requireActor("users:suspend");
   await db.user.update({ where: { id: userId }, data: { status } });
   await audit({
@@ -116,7 +119,13 @@ export async function toggleFeatureFlag(key: string, enabled: boolean) {
 export async function toggleExploreCategory(id: string, isActive: boolean) {
   const actor = await requireActor("flags:manage");
   await db.exploreCategory.update({ where: { id }, data: { isActive } });
-  await audit({ actorId: actor.id, action: "explore.toggle", targetType: "exploreCategory", targetId: id, metadata: { isActive } });
+  await audit({
+    actorId: actor.id,
+    action: "explore.toggle",
+    targetType: "exploreCategory",
+    targetId: id,
+    metadata: { isActive },
+  });
   revalidatePath("/admin/explore");
   revalidatePath("/explore");
 }
@@ -125,7 +134,10 @@ export async function moveExploreCategory(id: string, direction: "up" | "down") 
   const actor = await requireActor("flags:manage");
   const cat = await db.exploreCategory.findUniqueOrThrow({ where: { id } });
   const neighbour = await db.exploreCategory.findFirst({
-    where: { group: cat.group, sortOrder: direction === "up" ? { lt: cat.sortOrder } : { gt: cat.sortOrder } },
+    where: {
+      group: cat.group,
+      sortOrder: direction === "up" ? { lt: cat.sortOrder } : { gt: cat.sortOrder },
+    },
     orderBy: { sortOrder: direction === "up" ? "desc" : "asc" },
   });
   if (!neighbour) return;
@@ -133,18 +145,36 @@ export async function moveExploreCategory(id: string, direction: "up" | "down") 
     db.exploreCategory.update({ where: { id: cat.id }, data: { sortOrder: neighbour.sortOrder } }),
     db.exploreCategory.update({ where: { id: neighbour.id }, data: { sortOrder: cat.sortOrder } }),
   ]);
-  await audit({ actorId: actor.id, action: "explore.reorder", targetType: "exploreCategory", targetId: id });
+  await audit({
+    actorId: actor.id,
+    action: "explore.reorder",
+    targetType: "exploreCategory",
+    targetId: id,
+  });
   revalidatePath("/admin/explore");
   revalidatePath("/explore");
 }
 
 export async function updateExploreCategory(
   id: string,
-  data: { title?: string; description?: string; gradientFrom?: string; gradientTo?: string; iconKey?: string; imageUrl?: string | null },
+  data: {
+    title?: string;
+    description?: string;
+    gradientFrom?: string;
+    gradientTo?: string;
+    iconKey?: string;
+    imageUrl?: string | null;
+  },
 ) {
   const actor = await requireActor("flags:manage");
   await db.exploreCategory.update({ where: { id }, data });
-  await audit({ actorId: actor.id, action: "explore.update", targetType: "exploreCategory", targetId: id, metadata: data });
+  await audit({
+    actorId: actor.id,
+    action: "explore.update",
+    targetType: "exploreCategory",
+    targetId: id,
+    metadata: data,
+  });
   revalidatePath("/admin/explore");
   revalidatePath("/explore");
 }

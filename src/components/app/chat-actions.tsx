@@ -33,7 +33,13 @@ const REPORT_REASONS = [
   { value: "OTHER", label: "Something else" },
 ] as const;
 
-export function ChatActions({ otherUserId, otherName }: { otherUserId: string; otherName: string }) {
+export function ChatActions({
+  otherUserId,
+  otherName,
+}: {
+  otherUserId: string;
+  otherName: string;
+}) {
   const router = useRouter();
   const [reportOpen, setReportOpen] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
@@ -161,7 +167,12 @@ export function ChatActions({ otherUserId, otherName }: { otherUserId: string; o
             <Button variant="ghost" className="rounded-2xl" onClick={() => setBlockOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" className="rounded-2xl" onClick={submitBlock} disabled={busy}>
+            <Button
+              variant="destructive"
+              className="rounded-2xl"
+              onClick={submitBlock}
+              disabled={busy}
+            >
               {busy ? <Loader2 className="size-4 animate-spin" /> : null}
               Block
             </Button>

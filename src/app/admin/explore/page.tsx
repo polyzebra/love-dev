@@ -18,20 +18,37 @@ export default async function AdminExplorePage() {
 
   return (
     <>
-      <PageHeader title="Explore" description="Manage discovery categories, order and visibility." />
+      <PageHeader
+        title="Explore"
+        description="Manage discovery categories, order and visibility."
+      />
       <ul className="space-y-2">
         {categories.map((c) => (
           <li key={c.id} className="glass flex items-center gap-4 rounded-3xl p-3 pr-4">
-            <div className="scale-[0.45] -m-6" aria-hidden="true">
-              <ExploreCard3DVisual iconKey={c.iconKey} imageUrl={c.imageUrl} from={c.gradientFrom} to={c.gradientTo} title={c.title} />
+            <div className="-m-6 scale-[0.45]" aria-hidden="true">
+              <ExploreCard3DVisual
+                iconKey={c.iconKey}
+                imageUrl={c.imageUrl}
+                from={c.gradientFrom}
+                to={c.gradientTo}
+                title={c.title}
+              />
             </div>
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-2 font-medium">
                 {c.title}
-                <Badge variant="secondary" className="rounded-full text-[10px]">{c.group.toLowerCase()}</Badge>
-                {!c.isActive && <Badge variant="outline" className="rounded-full text-[10px]">inactive</Badge>}
+                <Badge variant="secondary" className="rounded-full text-[10px]">
+                  {c.group.toLowerCase()}
+                </Badge>
+                {!c.isActive && (
+                  <Badge variant="outline" className="rounded-full text-[10px]">
+                    inactive
+                  </Badge>
+                )}
               </p>
-              <p className="truncate text-xs text-muted-foreground">/{c.slug} · {c._count.preferences} saved · order {c.sortOrder}</p>
+              <p className="text-muted-foreground truncate text-xs">
+                /{c.slug} · {c._count.preferences} saved · order {c.sortOrder}
+              </p>
             </div>
             <ExploreRowActions id={c.id} isActive={c.isActive} />
           </li>

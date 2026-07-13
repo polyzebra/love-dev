@@ -28,9 +28,7 @@ export const pushSubscribeSchema = z
 
 export type PushSubscribeInput = z.infer<typeof pushSubscribeSchema>;
 
-export const pushUnsubscribeSchema = z
-  .object({ endpoint: z.string().min(1).max(2048) })
-  .strict();
+export const pushUnsubscribeSchema = z.object({ endpoint: z.string().min(1).max(2048) }).strict();
 
 /**
  * Hosts (exact or dot-suffix) operated by the browser vendors' push

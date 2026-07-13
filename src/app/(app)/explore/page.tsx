@@ -18,8 +18,15 @@ export default async function ExplorePage() {
   if (groups.length === 0) {
     return (
       <>
-        <PageHeader title="Explore" description="Find people by intent, energy and shared ground." />
-        <EmptyState icon={Compass} title="Explore is warming up" description="Categories are being curated. Check back soon." />
+        <PageHeader
+          title="Explore"
+          description="Find people by intent, energy and shared ground."
+        />
+        <EmptyState
+          icon={Compass}
+          title="Explore is warming up"
+          description="Categories are being curated. Check back soon."
+        />
       </>
     );
   }
@@ -30,7 +37,10 @@ export default async function ExplorePage() {
       <div className="mx-auto w-full max-w-6xl space-y-10">
         {groups.map(({ group, label, categories }) => (
           <section key={group} aria-labelledby={`explore-${group}`}>
-            <h2 id={`explore-${group}`} className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
+            <h2
+              id={`explore-${group}`}
+              className="text-gold mb-3 px-1 text-xs font-semibold tracking-[0.3em] uppercase"
+            >
               {label}
             </h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">

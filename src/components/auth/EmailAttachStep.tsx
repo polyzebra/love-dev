@@ -181,10 +181,7 @@ export function EmailAttachStep() {
     return (
       <AuthShell step={1} title="That email is already in use" stepKey="conflict">
         <div className="space-y-6">
-          <div
-            role="alert"
-            className="border-border bg-foreground/5 rounded-2xl border px-5 py-5"
-          >
+          <div role="alert" className="border-border bg-foreground/5 rounded-2xl border px-5 py-5">
             <Mail className="text-muted-foreground mb-3 size-6" aria-hidden="true" />
             <p className="text-foreground text-sm leading-relaxed">{conflictMessage}</p>
           </div>
@@ -257,7 +254,7 @@ export function EmailAttachStep() {
             <button
               type="button"
               onClick={backToInput}
-              className="text-primary-soft rounded-sm whitespace-nowrap underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-foreground/20"
+              className="text-primary-soft focus-visible:ring-foreground/20 rounded-sm whitespace-nowrap underline-offset-2 outline-none hover:underline focus-visible:ring-2"
             >
               Change email
             </button>

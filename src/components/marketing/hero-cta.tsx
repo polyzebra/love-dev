@@ -21,7 +21,11 @@ export function HeroCta({
     <Button
       size="lg"
       variant={variant === "primary" ? "default" : "outline"}
-      className={variant === "primary" ? "h-14 rounded-full px-10 text-base" : "h-14 rounded-full px-8 text-base"}
+      className={
+        variant === "primary"
+          ? "h-14 rounded-full px-10 text-base"
+          : "h-14 rounded-full px-8 text-base"
+      }
       asChild
     >
       <Link href={href}>{children}</Link>

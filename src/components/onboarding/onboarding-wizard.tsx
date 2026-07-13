@@ -63,9 +63,7 @@ const ONBOARDING_PROMPT_KEYS: readonly PromptKey[] = [
   "favourite-place",
   "starter",
 ];
-const ONBOARDING_PROMPTS = PROFILE_PROMPTS.filter((p) =>
-  ONBOARDING_PROMPT_KEYS.includes(p.key),
-);
+const ONBOARDING_PROMPTS = PROFILE_PROMPTS.filter((p) => ONBOARDING_PROMPT_KEYS.includes(p.key));
 
 const PROMPT_PLACEHOLDERS: Partial<Record<PromptKey, string>> = {
   "typical-saturday": "Farmers market, sea swim, big breakfast…",
@@ -149,10 +147,28 @@ const GENDERS = [
 
 const CITIES: Record<"IE" | "GB", string[]> = {
   IE: ["Dublin", "Cork", "Galway", "Limerick", "Waterford", "Kilkenny", "Belfast"],
-  GB: ["London", "Manchester", "Birmingham", "Edinburgh", "Glasgow", "Bristol", "Leeds", "Liverpool", "Cardiff", "Newcastle"],
+  GB: [
+    "London",
+    "Manchester",
+    "Birmingham",
+    "Edinburgh",
+    "Glasgow",
+    "Bristol",
+    "Leeds",
+    "Liverpool",
+    "Cardiff",
+    "Newcastle",
+  ],
 };
 
-const STEPS = ["Basics", "Intentions", "Date style", "Interests & community", "Prompts", "Finish"] as const;
+const STEPS = [
+  "Basics",
+  "Intentions",
+  "Date style",
+  "Interests & community",
+  "Prompts",
+  "Finish",
+] as const;
 
 /** Honest value, shown after each completed step - explanation, not pressure. */
 const STEP_VALUE: Record<number, string> = {
@@ -190,7 +206,7 @@ function ChipToggle({
       className={cn(
         "tap-target inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
         selected
-          ? "border-transparent bg-linear-160 from-brand-bright to-brand-hover text-primary-foreground shadow-[0_4px_18px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
+          ? "from-brand-bright to-brand-hover text-primary-foreground border-transparent bg-linear-160 shadow-[0_4px_18px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
           : "glass-chip text-muted-foreground hover:text-foreground",
       )}
     >
@@ -256,8 +272,8 @@ function CategoryCard({
           <Icon className="size-5" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-medium leading-tight">{category.label}</span>
-          <span className="mt-0.5 block truncate text-sm text-muted-foreground">
+          <span className="block leading-tight font-medium">{category.label}</span>
+          <span className="text-muted-foreground mt-0.5 block truncate text-sm">
             {category.description}
           </span>
         </span>
@@ -270,7 +286,7 @@ function CategoryCard({
         >
           {selected && (
             <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING.snappy}>
-              <Check className="size-3 text-primary-foreground" strokeWidth={3} />
+              <Check className="text-primary-foreground size-3" strokeWidth={3} />
             </motion.span>
           )}
         </span>
@@ -295,7 +311,7 @@ function CategoryGroup({
   return (
     <fieldset className="space-y-2.5">
       {title && (
-        <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        <legend className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
           {title}
         </legend>
       )}
@@ -540,15 +556,15 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={SPRING.bounce}
-          className="flex size-20 items-center justify-center rounded-full bg-accent shadow-[0_0_60px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
+          className="bg-accent flex size-20 items-center justify-center rounded-full shadow-[0_0_60px_color-mix(in_srgb,var(--primary)_40%,transparent)]"
         >
-          <Heart className="size-9 fill-primary text-primary" aria-hidden="true" />
+          <Heart className="fill-primary text-primary size-9" aria-hidden="true" />
         </motion.span>
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.7, ease: EASE_LUXE }}
-          className="max-w-full break-words px-5 font-display text-4xl font-medium tracking-tight"
+          className="font-display max-w-full px-5 text-4xl font-medium tracking-tight break-words"
         >
           You&apos;re in, {data.displayName.split(" ")[0]}.
         </motion.h1>
@@ -556,7 +572,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6, ease: EASE_LUXE }}
-          className="max-w-xs text-muted-foreground"
+          className="text-muted-foreground max-w-xs"
         >
           Your profile is live. Let&apos;s find someone worth your evening.
         </motion.p>
@@ -577,7 +593,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               exit={{ opacity: 0, y: -6 }}
               className="font-medium"
             >
-              <span className="mr-2 tabular-nums text-muted-foreground">
+              <span className="text-muted-foreground mr-2 tabular-nums">
                 {step + 1}/{STEPS.length}
               </span>
               {STEPS[step]}
@@ -597,7 +613,10 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
             <span className="tabular-nums">{profileScore}%</span>
           </span>
         </div>
-        <Progress value={progress} aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`} />
+        <Progress
+          value={progress}
+          aria-label={`Onboarding progress: step ${step + 1} of ${STEPS.length}`}
+        />
         <AnimatePresence>
           {valueNote && (
             <motion.p
@@ -606,7 +625,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5, ease: EASE_LUXE }}
-              className="text-xs text-gold"
+              className="text-gold text-xs"
               aria-live="polite"
             >
               {valueNote}
@@ -791,11 +810,11 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   A few words in your voice
                 </h1>
                 <p className="text-muted-foreground">
-                  Your answers become conversation starters. Three is the sweet
-                  spot - but you can always add them later.
+                  Your answers become conversation starters. Three is the sweet spot - but you can
+                  always add them later.
                 </p>
               </div>
-              <p className="text-sm text-muted-foreground" aria-live="polite">
+              <p className="text-muted-foreground text-sm" aria-live="polite">
                 {answeredPrompts === 0
                   ? `Pick up to ${MAX_PROMPTS} prompts that sound like you.`
                   : `${answeredPrompts} answered${answeredPrompts < 3 ? " - a couple more and your profile really talks" : ". Lovely."}`}
@@ -814,9 +833,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                         // Calm selected state - accent tint + check on a
                         // neutral border. Selection is the fill, never a
                         // rose border.
-                        selected
-                          ? "border-border bg-accent shadow-card"
-                          : "bg-card",
+                        selected ? "border-border bg-accent shadow-card" : "bg-card",
                         !selected && !atLimit && "hover:border-foreground/25",
                         atLimit && "opacity-45",
                       )}
@@ -832,9 +849,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                         <span
                           className={cn(
                             "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                            selected
-                              ? "border-primary bg-primary"
-                              : "border-muted-foreground/30",
+                            selected ? "border-primary bg-primary" : "border-muted-foreground/30",
                           )}
                           aria-hidden="true"
                         >
@@ -844,10 +859,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                               animate={{ scale: 1 }}
                               transition={SPRING.snappy}
                             >
-                              <Check
-                                className="size-3 text-primary-foreground"
-                                strokeWidth={3}
-                              />
+                              <Check className="text-primary-foreground size-3" strokeWidth={3} />
                             </motion.span>
                           )}
                         </span>
@@ -872,7 +884,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                                 className="rounded-2xl"
                                 aria-label={prompt.label}
                               />
-                              <p className="text-right text-xs tabular-nums text-muted-foreground">
+                              <p className="text-muted-foreground text-right text-xs tabular-nums">
                                 {entry.answer.length}/{PROMPT_ANSWER_MAX}
                               </p>
                             </div>
@@ -900,10 +912,22 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
               <fieldset className="space-y-2">
                 <legend className="text-sm font-medium">Country</legend>
                 <div className="flex gap-2">
-                  <ChipToggle selected={data.country === "IE"} onToggle={() => { set("country", "IE"); set("city", ""); }}>
+                  <ChipToggle
+                    selected={data.country === "IE"}
+                    onToggle={() => {
+                      set("country", "IE");
+                      set("city", "");
+                    }}
+                  >
                     Ireland
                   </ChipToggle>
-                  <ChipToggle selected={data.country === "GB"} onToggle={() => { set("country", "GB"); set("city", ""); }}>
+                  <ChipToggle
+                    selected={data.country === "GB"}
+                    onToggle={() => {
+                      set("country", "GB");
+                      set("city", "");
+                    }}
+                  >
                     United Kingdom
                   </ChipToggle>
                 </div>
@@ -936,23 +960,22 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: EASE_LUXE, delay: 0.08 }}
-                className="space-y-3 rounded-2xl border bg-card p-5"
+                className="bg-card space-y-3 rounded-2xl border p-5"
               >
                 <p className="font-medium">After this, two quick wins</p>
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400 light:text-rose-600">
+                  <span className="light:text-rose-600 flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400">
                     <Camera className="size-5" aria-hidden="true" />
                   </span>
-                  <p className="text-sm text-muted-foreground">
-                    Add your photos from your profile - profiles with photos
-                    get seen first.
+                  <p className="text-muted-foreground text-sm">
+                    Add your photos from your profile - profiles with photos get seen first.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 light:text-sky-600">
+                  <span className="light:text-sky-600 flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400">
                     <BadgeCheck className="size-5" aria-hidden="true" />
                   </span>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Get verified - a verified badge builds instant trust.
                   </p>
                 </div>

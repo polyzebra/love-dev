@@ -86,9 +86,7 @@ export const auth = cache(async (): Promise<AppSession | null> => {
     await supabase.auth.signOut().catch(() => {});
     return null;
   }
-  db.user
-    .update({ where: { id: user.id }, data: { lastActiveAt: new Date() } })
-    .catch(() => {});
+  db.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } }).catch(() => {});
 
   return {
     user: {

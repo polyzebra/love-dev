@@ -64,7 +64,10 @@ export async function POST(req: Request, { params }: Params) {
     action: `safety.case.${data.action}`,
     targetType: "moderationCase",
     targetId: id,
-    metadata: { userId: existing.userId, ...(data.decisionReason ? { decisionReason: data.decisionReason } : {}) },
+    metadata: {
+      userId: existing.userId,
+      ...(data.decisionReason ? { decisionReason: data.decisionReason } : {}),
+    },
   });
 
   return ok({ case: updated });

@@ -45,13 +45,7 @@ type PreviewData = {
 };
 
 type Step =
-  | "idle"
-  | "previewing"
-  | "preview"
-  | "processing"
-  | "authenticating"
-  | "polling"
-  | "failed";
+  "idle" | "previewing" | "preview" | "processing" | "authenticating" | "polling" | "failed";
 
 const POLL_INTERVAL_MS = 2_000;
 const POLL_BUDGET_MS = 30_000;
@@ -310,7 +304,7 @@ export function UpgradePlanButton({
         role="status"
         aria-live="polite"
         className={cn(
-          "max-w-xs text-sm text-muted-foreground",
+          "text-muted-foreground max-w-xs text-sm",
           !error && "sr-only",
           errorClassName,
         )}
@@ -358,8 +352,8 @@ export function UpgradePlanButton({
               <DialogHeader>
                 <DialogTitle>Upgrade to {preview.planName}</DialogTitle>
                 <DialogDescription>
-                  You&apos;ll pay only the prorated difference for the rest of your current
-                  billing period. Your renewal date stays the same.
+                  You&apos;ll pay only the prorated difference for the rest of your current billing
+                  period. Your renewal date stays the same.
                 </DialogDescription>
               </DialogHeader>
               <dl className="space-y-3 text-sm">
@@ -396,7 +390,7 @@ export function UpgradePlanButton({
                   Not now
                 </Button>
               </DialogFooter>
-              <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+              <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
                 <ShieldCheck className="size-3.5" aria-hidden="true" />
                 Charged securely by Stripe - never before you confirm
               </p>
@@ -418,7 +412,7 @@ export function UpgradePlanButton({
                 </DialogDescription>
               </DialogHeader>
               <div className="flex items-center justify-center py-6">
-                <Loader2 className="size-8 animate-spin text-muted-foreground" aria-hidden="true" />
+                <Loader2 className="text-muted-foreground size-8 animate-spin" aria-hidden="true" />
               </div>
             </>
           )}

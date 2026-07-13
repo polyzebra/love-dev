@@ -35,7 +35,7 @@ export function AuthErrorBanner({
           id={id}
           role="alert"
           className={cn(
-            "rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive",
+            "border-destructive/30 bg-destructive/10 text-destructive rounded-xl border px-4 py-3 text-sm",
             className,
           )}
         >

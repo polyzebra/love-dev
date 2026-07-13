@@ -41,7 +41,7 @@ export default async function AdminAuditPage() {
         title="Audit log"
         description="Append-only record of privileged and safety-relevant actions. Newest first."
       />
-      <div className="overflow-x-auto rounded-3xl border bg-card">
+      <div className="bg-card overflow-x-auto rounded-3xl border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -66,12 +66,12 @@ export default async function AdminAuditPage() {
                     {humanizeAdminAction(entry.action)}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell className="text-muted-foreground text-sm">
                   {entry.targetType ? (
                     <span title={entry.targetId ?? undefined}>
                       {entry.targetType}{" "}
                       {entry.targetId ? (
-                        <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs">
+                        <code className="bg-muted rounded-md px-1.5 py-0.5 font-mono text-xs">
                           {shortId(entry.targetId)}
                         </code>
                       ) : (
@@ -83,7 +83,7 @@ export default async function AdminAuditPage() {
                   )}
                 </TableCell>
                 <TableCell
-                  className="whitespace-nowrap text-right text-sm tabular-nums text-muted-foreground"
+                  className="text-muted-foreground text-right text-sm whitespace-nowrap tabular-nums"
                   title={formatAgo(entry.createdAt)}
                 >
                   {stamp(entry.createdAt)}
@@ -92,7 +92,7 @@ export default async function AdminAuditPage() {
             ))}
             {entries.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={4} className="text-muted-foreground py-10 text-center">
                   No audit entries yet. Privileged actions are recorded here as they happen.
                 </TableCell>
               </TableRow>

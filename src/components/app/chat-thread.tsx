@@ -114,7 +114,15 @@ export function ChatThread({
       messageCount: settled.length,
       theyAreOnline,
     });
-  }, [messages, sharedCategoryIds, sharedInterests, otherName, theirPrompts, currentUserId, theyAreOnline]);
+  }, [
+    messages,
+    sharedCategoryIds,
+    sharedInterests,
+    otherName,
+    theirPrompts,
+    currentUserId,
+    theyAreOnline,
+  ]);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -165,7 +173,10 @@ export function ChatThread({
           for (const m of data.messages) {
             // Ids we have never seen arrived while the thread was open -
             // they animate in; known ids only update in place (SEEN etc.).
-            byId.set(m.id, byId.has(m.id) ? { ...m, isNew: byId.get(m.id)!.isNew } : { ...m, isNew: true });
+            byId.set(
+              m.id,
+              byId.has(m.id) ? { ...m, isNew: byId.get(m.id)!.isNew } : { ...m, isNew: true },
+            );
           }
           const settled = [...byId.values()].sort(
             (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -173,7 +184,10 @@ export function ChatThread({
           const merged = [...settled, ...pending];
           const nearBottom =
             listRef.current &&
-            listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight < 120;
+            listRef.current.scrollHeight -
+              listRef.current.scrollTop -
+              listRef.current.clientHeight <
+              120;
           if (merged.length !== prev.length && nearBottom) {
             requestAnimationFrame(() => scrollToBottom());
           }
@@ -241,12 +255,12 @@ export function ChatThread({
       {/* Messages */}
       <div
         ref={listRef}
-        className="flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-1 pb-4 pt-2"
+        className="flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-1 pt-2 pb-4"
         role="log"
         aria-label={`Conversation with ${otherName}`}
       >
         {/* Quiet safety line - present, not shouting */}
-        <p className="flex items-center justify-center gap-1.5 pb-6 pt-2 text-center text-[11px] text-muted-foreground">
+        <p className="text-muted-foreground flex items-center justify-center gap-1.5 pt-2 pb-6 text-center text-[11px]">
           <ShieldCheck className="size-3" aria-hidden="true" />
           Keep chats here and never send money ·{" "}
           <span className="underline underline-offset-2">Report</span> anything off
@@ -255,11 +269,11 @@ export function ChatThread({
         {isOpening && (
           <div className="flex flex-col items-center gap-4 pt-12 text-center">
             <span className="glass-chip flex size-14 items-center justify-center rounded-full">
-              <Sparkles className="size-6 text-gold" aria-hidden="true" />
+              <Sparkles className="text-gold size-6" aria-hidden="true" />
             </span>
             <div>
               <p className="font-display text-xl">You matched with {otherName}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-sm">
                 Openers about their interests get replies. &ldquo;Hey&rdquo; doesn&apos;t.
               </p>
             </div>
@@ -281,7 +295,7 @@ export function ChatThread({
           return (
             <div key={m.id} className={cn(pos === "first" || pos === "solo" ? "pt-3" : "pt-0.5")}>
               {showTime && (
-                <p className="py-3 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                <p className="text-muted-foreground py-3 text-center text-[10px] font-medium tracking-[0.2em] uppercase">
                   {formatRelativeTime(m.createdAt)}
                 </p>
               )}
@@ -295,7 +309,7 @@ export function ChatThread({
                   className={cn(
                     "max-w-[78%] px-4 py-2.5 text-sm/relaxed",
                     mine
-                      ? "bg-linear-160 from-[#f43f5e] to-brand-hover text-primary-foreground shadow-[0_4px_16px_color-mix(in_srgb,var(--primary)_25%,transparent)]"
+                      ? "to-brand-hover text-primary-foreground bg-linear-160 from-[#f43f5e] shadow-[0_4px_16px_color-mix(in_srgb,var(--primary)_25%,transparent)]"
                       : "glass text-foreground",
                     // Bubble geometry by position in the burst
                     mine
@@ -314,7 +328,7 @@ export function ChatThread({
                     m.pending && "opacity-60",
                   )}
                 >
-                  <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                  <p className="break-words whitespace-pre-wrap">{m.body}</p>
                 </div>
               </motion.div>
               {isLastMine && (
@@ -322,14 +336,14 @@ export function ChatThread({
                    create and SEEN via markRead - "Delivered" renders only
                    if a realtime transport ever sets it. While the POST is
                    in flight the bubble says so instead of claiming SENT. */
-                <p className="flex items-center justify-end gap-1 pr-2 pt-1 text-[10px] text-muted-foreground">
+                <p className="text-muted-foreground flex items-center justify-end gap-1 pt-1 pr-2 text-[10px]">
                   {m.pending ? (
                     <>
                       Sending <Clock className="size-3" aria-hidden="true" />
                     </>
                   ) : m.status === "SEEN" ? (
                     <>
-                      Seen <CheckCheck className="size-3 text-primary-soft" aria-hidden="true" />
+                      Seen <CheckCheck className="text-primary-soft size-3" aria-hidden="true" />
                     </>
                   ) : m.status === "DELIVERED" ? (
                     <>
@@ -352,7 +366,7 @@ export function ChatThread({
           Tapping inserts the ready-to-send text; nothing is auto-sent. */}
       {suggestions.length > 0 && (
         <div
-          className="scrollbar-none flex gap-2 overflow-x-auto pb-2.5"
+          className="flex scrollbar-none gap-2 overflow-x-auto pb-2.5"
           aria-label="Conversation suggestions"
         >
           {suggestions.map((s) => {

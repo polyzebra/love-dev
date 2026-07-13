@@ -10,12 +10,7 @@ import type { RelationshipGoal } from "@/generated/prisma/enums";
  * Explore category.
  */
 
-export type TaxonomyGroup =
-  | "right-now"
-  | "relationship"
-  | "lifestyle"
-  | "interests"
-  | "community";
+export type TaxonomyGroup = "right-now" | "relationship" | "lifestyle" | "interests" | "community";
 
 export const GROUP_LABELS: Record<TaxonomyGroup, string> = {
   "right-now": "Right now",
@@ -80,10 +75,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask what they feel like doing tonight.",
       "Suggest something easy this evening.",
     ],
-    matchReasonTemplates: [
-      "You're both free tonight.",
-      "Tonight could actually happen.",
-    ],
+    matchReasonTemplates: ["You're both free tonight.", "Tonight could actually happen."],
   },
   {
     id: "coffee-now",
@@ -228,10 +220,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask what fun looks like for them lately.",
       "Suggest something spontaneous.",
     ],
-    matchReasonTemplates: [
-      "You're both keeping it light.",
-      "No pressure suits you both.",
-    ],
+    matchReasonTemplates: ["You're both keeping it light.", "No pressure suits you both."],
   },
   {
     id: "new-friends",
@@ -300,14 +289,8 @@ export const TAXONOMY: TaxonomyCategory[] = [
     profileFieldMapping: "interests",
     interestSlugs: ["coffee-dates"],
     scoringWeight: 4,
-    chatPromptTemplates: [
-      "Ask about their favourite cafe.",
-      "Suggest coffee this week.",
-    ],
-    matchReasonTemplates: [
-      "You both like coffee dates.",
-      "Coffee could be a natural first plan.",
-    ],
+    chatPromptTemplates: ["Ask about their favourite cafe.", "Suggest coffee this week."],
+    matchReasonTemplates: ["You both like coffee dates.", "Coffee could be a natural first plan."],
   },
   {
     id: "foodies",
@@ -329,10 +312,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask about the best meal they've had lately.",
       "Ask for the one restaurant they always recommend.",
     ],
-    matchReasonTemplates: [
-      "You're both foodies.",
-      "Dinner plans basically write themselves.",
-    ],
+    matchReasonTemplates: ["You're both foodies.", "Dinner plans basically write themselves."],
   },
   {
     id: "music-lovers",
@@ -354,10 +334,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask what song they have on repeat.",
       "Ask about the best gig they've been to.",
     ],
-    matchReasonTemplates: [
-      "You both love music.",
-      "A gig together sounds about right.",
-    ],
+    matchReasonTemplates: ["You both love music.", "A gig together sounds about right."],
   },
   {
     id: "nature-lovers",
@@ -400,10 +377,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
     profileFieldMapping: "interests",
     interestSlugs: ["gym", "running", "yoga", "cycling"],
     scoringWeight: 4,
-    chatPromptTemplates: [
-      "Ask how they like to train.",
-      "Ask about their favourite way to move.",
-    ],
+    chatPromptTemplates: ["Ask how they like to train.", "Ask about their favourite way to move."],
     matchReasonTemplates: [
       "You both make time for fitness.",
       "An active first date is on the table.",
@@ -430,10 +404,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask what they're playing right now.",
       "Ask about the game they always come back to.",
     ],
-    matchReasonTemplates: [
-      "You both game.",
-      "Co-op night is a real first-date option.",
-    ],
+    matchReasonTemplates: ["You both game.", "Co-op night is a real first-date option."],
   },
   {
     id: "movies-tv",
@@ -480,10 +451,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask what they're making at the moment.",
       "Ask what they'd create with a free month.",
     ],
-    matchReasonTemplates: [
-      "You're both creative.",
-      "You both make things - compare notes.",
-    ],
+    matchReasonTemplates: ["You're both creative.", "You both make things - compare notes."],
   },
   // ------------------------------------------------------- COMMUNITY
   {
@@ -505,10 +473,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask where in Ireland feels most like home.",
       "Ask for their favourite spot back home.",
     ],
-    matchReasonTemplates: [
-      "You're both Irish.",
-      "Home means the same place to you both.",
-    ],
+    matchReasonTemplates: ["You're both Irish.", "Home means the same place to you both."],
   },
   {
     id: "uk",
@@ -529,10 +494,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
       "Ask which city they know best.",
       "Ask for the most underrated place in the UK.",
     ],
-    matchReasonTemplates: [
-      "You're both from the UK.",
-      "You know the same streets.",
-    ],
+    matchReasonTemplates: ["You're both from the UK.", "You know the same streets."],
   },
   {
     id: "international",
@@ -549,10 +511,7 @@ export const TAXONOMY: TaxonomyCategory[] = [
     exploreVisible: true,
     profileFieldMapping: "communityTags",
     scoringWeight: 2,
-    chatPromptTemplates: [
-      "Ask where their story started.",
-      "Ask which place changed them most.",
-    ],
+    chatPromptTemplates: ["Ask where their story started.", "Ask which place changed them most."],
     matchReasonTemplates: [
       "You both carry more than one home.",
       "Two passports, one conversation.",
@@ -601,7 +560,9 @@ export function categoriesForProfile(p: {
 /** Deterministic template pick - stable per pair, no Math.random. */
 export const pickTemplate = (templates: string[], seed: string) =>
   templates.length
-    ? templates[Math.abs([...seed].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)) % templates.length]
+    ? templates[
+        Math.abs([...seed].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)) % templates.length
+      ]
     : "";
 
 /** Canonical human phrasing of relationship intent - the only goal-line map. */

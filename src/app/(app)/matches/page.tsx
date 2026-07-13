@@ -6,19 +6,12 @@ import { db } from "@/lib/db";
 import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline } from "@/lib/presence";
 import { listFirstMessagesFor } from "@/lib/services/first-messages";
-import {
-  GOAL_LINES,
-  categoriesForProfile,
-  pickTemplate,
-} from "@/lib/discovery/taxonomy";
+import { GOAL_LINES, categoriesForProfile, pickTemplate } from "@/lib/discovery/taxonomy";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { PhotoFrame, type FramePhoto } from "@/components/shared/photo-frame";
-import {
-  FirstMessageInbox,
-  type FirstMessageCardData,
-} from "@/components/app/first-message-inbox";
+import { FirstMessageInbox, type FirstMessageCardData } from "@/components/app/first-message-inbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
@@ -112,7 +105,11 @@ export default async function MatchesPage() {
             id: true,
             lastActiveAt: true,
             profile: { select: { displayName: true, birthDate: true, city: true } },
-            photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
+            photos: {
+              orderBy: [{ isCover: "desc" }, { position: "asc" }],
+              take: 1,
+              select: { url: true, galleryUrl: true, blurDataUrl: true },
+            },
           },
         },
         userB: {
@@ -120,7 +117,11 @@ export default async function MatchesPage() {
             id: true,
             lastActiveAt: true,
             profile: { select: { displayName: true, birthDate: true, city: true } },
-            photos: { orderBy: [{ isCover: "desc" }, { position: "asc" }], take: 1, select: { url: true, galleryUrl: true, blurDataUrl: true } },
+            photos: {
+              orderBy: [{ isCover: "desc" }, { position: "asc" }],
+              take: 1,
+              select: { url: true, galleryUrl: true, blurDataUrl: true },
+            },
           },
         },
       },
@@ -190,7 +191,7 @@ export default async function MatchesPage() {
             <li key={m.id}>
               <Link
                 href={m.conversation ? `/chat/${m.conversation.id}` : "/chat"}
-                className="group block overflow-hidden rounded-3xl border bg-card shadow-card transition-shadow hover:shadow-float"
+                className="group bg-card shadow-card hover:shadow-float block overflow-hidden rounded-3xl border transition-shadow"
               >
                 <PhotoFrame
                   photo={other.photos[0] ?? null}
@@ -210,13 +211,16 @@ export default async function MatchesPage() {
                   }
                 >
                   {isNew && (
-                    <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground">
+                    <span className="bg-primary text-primary-foreground absolute top-3 left-3 rounded-full px-2.5 py-0.5 text-[11px] font-semibold">
                       New match
                     </span>
                   )}
                 </PhotoFrame>
                 <div className="flex items-center gap-2 p-3">
-                  <p className="truncate text-sm font-medium" title={age ? `${name}, ${age}` : name}>
+                  <p
+                    className="truncate text-sm font-medium"
+                    title={age ? `${name}, ${age}` : name}
+                  >
                     {name}
                     {age ? `, ${age}` : ""}
                   </p>

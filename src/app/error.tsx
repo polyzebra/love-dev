@@ -17,17 +17,15 @@ export default function GlobalError({
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
-      <div className="flex size-16 items-center justify-center rounded-3xl bg-accent">
-        <TriangleAlert className="size-7 text-accent-foreground" aria-hidden="true" />
+      <div className="bg-accent flex size-16 items-center justify-center rounded-3xl">
+        <TriangleAlert className="text-accent-foreground size-7" aria-hidden="true" />
       </div>
       <div className="space-y-2">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Something went wrong</h1>
-        <p className="max-w-sm text-muted-foreground">
+        <p className="text-muted-foreground max-w-sm">
           An unexpected error occurred. It has been logged and we&apos;re on it.
         </p>
-        {error.digest && (
-          <p className="text-xs text-muted-foreground">Reference: {error.digest}</p>
-        )}
+        {error.digest && <p className="text-muted-foreground text-xs">Reference: {error.digest}</p>}
       </div>
       <Button size="lg" className="rounded-full px-8" onClick={reset}>
         Try again

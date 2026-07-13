@@ -46,9 +46,7 @@ export const MODERATION_TIMEOUT_MS_DEFAULT = 8_000;
 
 export function moderationTimeoutMs(): number {
   const raw = Number(process.env.MODERATION_TIMEOUT_MS);
-  return Number.isFinite(raw) && raw >= 500 && raw <= 60_000
-    ? raw
-    : MODERATION_TIMEOUT_MS_DEFAULT;
+  return Number.isFinite(raw) && raw >= 500 && raw <= 60_000 ? raw : MODERATION_TIMEOUT_MS_DEFAULT;
 }
 
 function clamp01(value: unknown): number | null {
@@ -119,7 +117,10 @@ export const openAiModerationProvider: ModerationProvider = {
       ...NULL_SCORES,
       adultScore: adult,
       minorRiskScore: minors,
-      violenceScore: scoresIn["violence"] !== undefined || scoresIn["violence/graphic"] !== undefined ? violence : null,
+      violenceScore:
+        scoresIn["violence"] !== undefined || scoresIn["violence/graphic"] !== undefined
+          ? violence
+          : null,
       confidence: adult ?? minors ?? null,
     };
     const labels = Object.entries(result.categories ?? {})
@@ -134,7 +135,9 @@ export const openAiModerationProvider: ModerationProvider = {
       faceDetected: null, // OpenAI moderation does not do face detection
       facesCount: null,
       labels: labels.length > 0 ? labels : ["openai:clean"],
-      reason: result.flagged ? `openai flagged: ${labels.join(", ")}` : "openai: no categories flagged",
+      reason: result.flagged
+        ? `openai flagged: ${labels.join(", ")}`
+        : "openai: no categories flagged",
       scores,
       providerReference: null,
     };
@@ -178,7 +181,8 @@ export const googleVisionProvider: ModerationProvider = {
   name: "google_vision",
   async analyze(input): Promise<ModerationVerdict> {
     const key = process.env.GOOGLE_VISION_API_KEY?.trim();
-    if (!key) throw new Error("google_vision adapter selected but GOOGLE_VISION_API_KEY is not set");
+    if (!key)
+      throw new Error("google_vision adapter selected but GOOGLE_VISION_API_KEY is not set");
     const buffer = requireBuffer(input, "google_vision");
 
     const res = await fetch(
@@ -275,11 +279,7 @@ export const hiveModerationProvider: ModerationProvider = {
     const buffer = requireBuffer(input, "hive");
 
     const form = new FormData();
-    form.append(
-      "media",
-      new Blob([new Uint8Array(buffer)], { type: "image/webp" }),
-      "photo.webp",
-    );
+    form.append("media", new Blob([new Uint8Array(buffer)], { type: "image/webp" }), "photo.webp");
     const res = await fetch("https://api.thehive.ai/api/v2/task/sync", {
       method: "POST",
       headers: { Authorization: `Token ${key}` },
@@ -304,8 +304,7 @@ export const hiveModerationProvider: ModerationProvider = {
         }
       }
     }
-    scores.confidence =
-      scores.adultScore ?? scores.minorRiskScore ?? scores.violenceScore ?? null;
+    scores.confidence = scores.adultScore ?? scores.minorRiskScore ?? scores.violenceScore ?? null;
     const top = Math.max(
       scores.adultScore ?? 0,
       scores.violenceScore ?? 0,
@@ -352,7 +351,10 @@ export const azureContentSafetyProvider: ModerationProvider = {
 // Provider health (ProviderHealth rows - admin read model)
 // ---------------------------------------------------------------------------
 
-export async function recordProviderSuccess(provider: string, now: Date = new Date()): Promise<void> {
+export async function recordProviderSuccess(
+  provider: string,
+  now: Date = new Date(),
+): Promise<void> {
   try {
     await db.providerHealth.upsert({
       where: { provider },
@@ -485,11 +487,15 @@ export function resolveConfiguredProviders(
   for (const name of list) {
     const adapter = name === "external" ? externalProvider : ADAPTERS[name];
     if (!adapter) {
-      console.warn(`[moderation:chain] unknown provider "${name}" in MODERATION_PROVIDERS - skipped`);
+      console.warn(
+        `[moderation:chain] unknown provider "${name}" in MODERATION_PROVIDERS - skipped`,
+      );
       continue;
     }
     if (!adapterConfigured(name)) {
-      console.warn(`[moderation:chain] provider "${name}" is not configured (missing env) - skipped`);
+      console.warn(
+        `[moderation:chain] provider "${name}" is not configured (missing env) - skipped`,
+      );
       continue;
     }
     providers.push(adapter);

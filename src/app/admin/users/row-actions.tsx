@@ -25,7 +25,13 @@ type Status = "ACTIVE" | "SUSPENDED" | "SHADOW_BANNED";
 /** Same confirm-dialog register as the user-detail trust actions. */
 const CONFIRMS: Record<
   Status,
-  { title: string; description: string; confirmLabel: string; success: string; destructive: boolean }
+  {
+    title: string;
+    description: string;
+    confirmLabel: string;
+    success: string;
+    destructive: boolean;
+  }
 > = {
   ACTIVE: {
     title: "Reinstate this account?",

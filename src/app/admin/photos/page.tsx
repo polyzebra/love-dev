@@ -95,7 +95,10 @@ export default async function AdminPhotosPage({
   ];
   const actors =
     actorIds.length > 0
-      ? await db.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, email: true } })
+      ? await db.user.findMany({
+          where: { id: { in: actorIds } },
+          select: { id: true, email: true },
+        })
       : [];
   const actorEmail = new Map(actors.map((a) => [a.id, a.email]));
 
@@ -112,7 +115,7 @@ export default async function AdminPhotosPage({
             key={t.key}
             href={`/admin/photos?tab=${t.key}`}
             className={cn(
-              "flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 md:min-h-9",
+              "focus-visible:ring-foreground/20 flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none md:min-h-9",
               t.key === tab
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -132,7 +135,7 @@ export default async function AdminPhotosPage({
           description={`No photos in "${active.label}".`}
         />
       ) : (
-        <div className="overflow-x-auto rounded-3xl border bg-card">
+        <div className="bg-card overflow-x-auto rounded-3xl border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -156,7 +159,7 @@ export default async function AdminPhotosPage({
                     <img
                       src={photo.thumbUrl ?? photo.url}
                       alt={`Photo by ${photo.user.profile?.displayName ?? photo.user.email}`}
-                      className="h-20 w-16 rounded-xl bg-muted object-cover"
+                      className="bg-muted h-20 w-16 rounded-xl object-cover"
                       loading="lazy"
                     />
                     {photo.isCover && (
@@ -168,24 +171,27 @@ export default async function AdminPhotosPage({
                   <TableCell>
                     <Link
                       href={`/admin/users?q=${encodeURIComponent(photo.user.email)}`}
-                      className="font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/20"
+                      className="focus-visible:ring-foreground/20 font-medium hover:underline focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
                     >
                       {photo.user.profile?.displayName ?? photo.user.name ?? "-"}
                     </Link>
-                    <p className="max-w-48 truncate text-xs text-muted-foreground" title={photo.user.email}>
+                    <p
+                      className="text-muted-foreground max-w-48 truncate text-xs"
+                      title={photo.user.email}
+                    >
                       {photo.user.email}
                     </p>
                   </TableCell>
                   <TableCell
-                    className="text-sm text-muted-foreground"
+                    className="text-muted-foreground text-sm"
                     title={photo.createdAt.toLocaleString("en-IE")}
                   >
                     {formatAgo(photo.createdAt)}
                   </TableCell>
                   <TableCell>
                     <p className="text-sm">{photo.mimeType ?? "-"}</p>
-                    <p className="text-xs text-muted-foreground">{formatBytes(photo.sizeBytes)}</p>
-                    <span className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">{formatBytes(photo.sizeBytes)}</p>
+                    <span className="text-muted-foreground mt-1 flex items-center gap-1.5 text-xs">
                       <span
                         className="inline-block size-3.5 rounded-full border"
                         style={
@@ -202,16 +208,16 @@ export default async function AdminPhotosPage({
                   </TableCell>
                   <TableCell className="text-sm">
                     {photo.faceDetected == null ? "-" : photo.faceDetected ? "Yes" : "No"}
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {photo.facesCount != null ? `${photo.facesCount} face(s)` : "-"}
                     </p>
                   </TableCell>
                   <TableCell className="max-w-64">
                     {photo.moderationEvents.length === 0 ? (
-                      <span className="text-sm text-muted-foreground">-</span>
+                      <span className="text-muted-foreground text-sm">-</span>
                     ) : (
                       <details>
-                        <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+                        <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
                           {photo.moderationEvents.length} event
                           {photo.moderationEvents.length === 1 ? "" : "s"}
                         </summary>
@@ -220,12 +226,14 @@ export default async function AdminPhotosPage({
                             <li key={event.id} className="text-xs">
                               <p className="font-medium">
                                 {event.action}
-                                <span className="ml-1.5 font-normal text-muted-foreground">
+                                <span className="text-muted-foreground ml-1.5 font-normal">
                                   {formatAgo(event.createdAt)} ·{" "}
                                   {event.actorId
                                     ? (actorEmail.get(event.actorId) ?? event.actorId)
                                     : "automated"}
-                                  {event.aiScore != null ? ` · score ${event.aiScore.toFixed(2)}` : ""}
+                                  {event.aiScore != null
+                                    ? ` · score ${event.aiScore.toFixed(2)}`
+                                    : ""}
                                 </span>
                               </p>
                               {event.reason && (

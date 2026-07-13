@@ -126,9 +126,7 @@ export function downgradeLossesFor(tier: PlanTierName): string[] {
     losses.push("Rewind - taking back an accidental pass");
   }
   if (paid.superLikesPerDay > free.superLikesPerDay) {
-    losses.push(
-      `${paid.superLikesPerDay} Super Likes a day (Free has ${free.superLikesPerDay})`,
-    );
+    losses.push(`${paid.superLikesPerDay} Super Likes a day (Free has ${free.superLikesPerDay})`);
   }
   if (FIRST_MESSAGE_LIMITS[tier] > FIRST_MESSAGE_LIMITS.FREE) {
     losses.push(
@@ -149,7 +147,18 @@ export const INTEREST_CATALOGUE: { category: string; items: string[] }[] = [
   },
   {
     category: "Sports",
-    items: ["GAA", "Rugby", "Football", "Running", "Gym", "Sea swimming", "Hiking", "Yoga", "Cycling", "Golf"],
+    items: [
+      "GAA",
+      "Rugby",
+      "Football",
+      "Running",
+      "Gym",
+      "Sea swimming",
+      "Hiking",
+      "Yoga",
+      "Cycling",
+      "Golf",
+    ],
   },
   {
     category: "Creativity",
@@ -157,7 +166,16 @@ export const INTEREST_CATALOGUE: { category: string; items: string[] }[] = [
   },
   {
     category: "Values & lifestyle",
-    items: ["Volunteering", "Sustainability", "Politics", "Spirituality", "Travel", "Languages", "Dogs", "Cats"],
+    items: [
+      "Volunteering",
+      "Sustainability",
+      "Politics",
+      "Spirituality",
+      "Travel",
+      "Languages",
+      "Dogs",
+      "Cats",
+    ],
   },
 ] as const;
 

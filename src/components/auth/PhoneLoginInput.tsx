@@ -97,7 +97,10 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
     const parsed = storedPhone ? parsePhoneNumberFromString(storedPhone) : null;
     const seededCountry = parsed && allowedCountries.find((c) => c.iso === parsed.country);
     return parsed && seededCountry
-      ? { display: formatNational(String(parsed.nationalNumber), seededCountry), country: seededCountry }
+      ? {
+          display: formatNational(String(parsed.nationalNumber), seededCountry),
+          country: seededCountry,
+        }
       : null;
   }, [storedPhone, allowedCountries]);
 

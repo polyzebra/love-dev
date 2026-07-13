@@ -1,15 +1,8 @@
 import { after } from "next/server";
 import { db } from "@/lib/db";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
-import type {
-  DeliveryStatus,
-  NotificationType,
-} from "@/generated/prisma/enums";
-import {
-  sendPushToUser,
-  type PushEndpointResult,
-  type PushPayload,
-} from "@/lib/services/push";
+import type { DeliveryStatus, NotificationType } from "@/generated/prisma/enums";
+import { sendPushToUser, type PushEndpointResult, type PushPayload } from "@/lib/services/push";
 import { pickEmailProvider, renderNotificationEmail } from "@/lib/services/email";
 
 /**
@@ -132,9 +125,7 @@ export function evaluateQuietHours(config: QuietHoursConfig, now: Date = new Dat
   if (start < 0 || start > 1439 || end < 0 || end > 1439) return false;
 
   const minutes = localMinutesIn(config.timezone, now);
-  return start < end
-    ? minutes >= start && minutes < end
-    : minutes >= start || minutes < end; // overnight wrap
+  return start < end ? minutes >= start && minutes < end : minutes >= start || minutes < end; // overnight wrap
 }
 
 // ---------------------------------------------------------------------------
@@ -243,7 +234,10 @@ export async function notifyUser(
   // Settings row (created lazily with defaults on first touch).
   let settings = await client.userSettings.findUnique({ where: { userId: input.userId } });
   if (!settings) {
-    await client.userSettings.createMany({ data: [{ userId: input.userId }], skipDuplicates: true });
+    await client.userSettings.createMany({
+      data: [{ userId: input.userId }],
+      skipDuplicates: true,
+    });
     settings = await client.userSettings.findUniqueOrThrow({ where: { userId: input.userId } });
   }
 
@@ -338,9 +332,7 @@ export async function notifyUser(
         channel: "EMAIL",
         status: emailProvider.configured ? "PENDING" : "DEAD",
         provider: emailProvider.configured ? emailProvider.name : "none",
-        ...(emailProvider.configured
-          ? { nextAttemptAt: now }
-          : { errorCode: "not_configured" }),
+        ...(emailProvider.configured ? { nextAttemptAt: now } : { errorCode: "not_configured" }),
         idempotencyKey: `${input.dedupeKey}:email`,
       });
     }
@@ -442,8 +434,7 @@ export async function dispatchPushDelivery(
   const n = delivery.notification;
   const data = (n.data ?? {}) as Record<string, unknown>;
   const copy = pushCopyFor(n.type, n.title, n.body);
-  const conversationId =
-    typeof data.conversationId === "string" ? data.conversationId : null;
+  const conversationId = typeof data.conversationId === "string" ? data.conversationId : null;
   const matchId = typeof data.matchId === "string" ? data.matchId : null;
   // Deterministic tag: repeated pushes for the same conversation/match
   // collapse into one OS notification client-side.
@@ -749,10 +740,7 @@ export async function processPendingEmail(
 // Email provider webhook application (route: /api/webhooks/email)
 // ---------------------------------------------------------------------------
 
-export type EmailWebhookEventType =
-  | "email.delivered"
-  | "email.bounced"
-  | "email.complained";
+export type EmailWebhookEventType = "email.delivered" | "email.bounced" | "email.complained";
 
 export type ApplyEmailEventResult =
   | { applied: true; deliveryId: string; status: DeliveryStatus; suppressed: boolean }
@@ -786,7 +774,10 @@ export async function applyEmailProviderEvent(
     type === "email.delivered" ? "DELIVERED" : type === "email.bounced" ? "BOUNCED" : "COMPLAINED";
   if (delivery.status === target) return { applied: false, reason: "already_applied" };
   // A terminal bounce/complaint outranks a late "delivered" event.
-  if (target === "DELIVERED" && (delivery.status === "BOUNCED" || delivery.status === "COMPLAINED")) {
+  if (
+    target === "DELIVERED" &&
+    (delivery.status === "BOUNCED" || delivery.status === "COMPLAINED")
+  ) {
     return { applied: false, reason: "already_applied" };
   }
 

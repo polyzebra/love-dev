@@ -15,7 +15,13 @@ export const metadata: Metadata = {
 export default function LoginEmailVerifyPage() {
   // Suspense boundary for useSearchParams (the ?email=... carrier).
   return (
-    <Suspense fallback={<AuthCard><AuthStepFallback /></AuthCard>}>
+    <Suspense
+      fallback={
+        <AuthCard>
+          <AuthStepFallback />
+        </AuthCard>
+      }
+    >
       <EmailCodeStep />
     </Suspense>
   );

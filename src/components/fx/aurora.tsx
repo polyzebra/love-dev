@@ -30,9 +30,9 @@ export function Aurora({
       {/* Key light from above */}
       <div className="absolute inset-0 bg-[radial-gradient(80rem_50rem_at_50%_-20%,rgba(251,113,133,0.13),transparent_60%)]" />
       {/* Drifting orbs */}
-      <div className="absolute left-[8%] top-[6%] size-[42rem] animate-aurora-a rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_22%,transparent),transparent_70%)] blur-3xl" />
-      <div className="absolute right-[4%] top-[28%] size-[36rem] animate-aurora-b rounded-full bg-[radial-gradient(closest-side,rgba(167,139,250,0.13),transparent_70%)] blur-3xl" />
-      <div className="absolute bottom-[-10%] left-[30%] size-[40rem] animate-aurora-c rounded-full bg-[radial-gradient(closest-side,rgba(231,201,161,0.10),transparent_70%)] blur-3xl" />
+      <div className="animate-aurora-a absolute top-[6%] left-[8%] size-[42rem] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_22%,transparent),transparent_70%)] blur-3xl" />
+      <div className="animate-aurora-b absolute top-[28%] right-[4%] size-[36rem] rounded-full bg-[radial-gradient(closest-side,rgba(167,139,250,0.13),transparent_70%)] blur-3xl" />
+      <div className="animate-aurora-c absolute bottom-[-10%] left-[30%] size-[40rem] rounded-full bg-[radial-gradient(closest-side,rgba(231,201,161,0.10),transparent_70%)] blur-3xl" />
       {/* Vignette to seat everything into the page surface */}
       <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_10%,transparent_50%,color-mix(in_oklab,var(--background)_90%,transparent)_100%)]" />
     </div>

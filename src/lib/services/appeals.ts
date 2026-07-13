@@ -1,10 +1,6 @@
 import { db } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
-import type {
-  AppealStatus,
-  EnforcementAction,
-  ModerationCaseType,
-} from "@/generated/prisma/enums";
+import type { AppealStatus, EnforcementAction, ModerationCaseType } from "@/generated/prisma/enums";
 import { audit } from "@/lib/audit";
 import { recordAuthEvent } from "@/lib/auth/audit";
 import { sendSafetyNotice } from "@/lib/services/safety-notices";
@@ -62,10 +58,16 @@ export const OPEN_APPEAL_STATUSES = [
 ] as const satisfies readonly AppealStatus[];
 
 /** A human decided - final for that violation. */
-export const DECIDED_APPEAL_STATUSES = ["APPROVED", "REJECTED"] as const satisfies readonly AppealStatus[];
+export const DECIDED_APPEAL_STATUSES = [
+  "APPROVED",
+  "REJECTED",
+] as const satisfies readonly AppealStatus[];
 
 /** Closed without a decision - the user may appeal the violation again. */
-export const REOPENABLE_APPEAL_STATUSES = ["WITHDRAWN", "EXPIRED"] as const satisfies readonly AppealStatus[];
+export const REOPENABLE_APPEAL_STATUSES = [
+  "WITHDRAWN",
+  "EXPIRED",
+] as const satisfies readonly AppealStatus[];
 
 export function isOpenAppealStatus(status: string): boolean {
   return (OPEN_APPEAL_STATUSES as readonly string[]).includes(status);
@@ -391,7 +393,10 @@ export async function requestAppealInfo(input: {
   });
   if (!appeal) throw new AppealError("appeal_not_found", "Appeal not found.");
   if (!isOpenAppealStatus(appeal.status) || appeal.status === "NEEDS_INFO") {
-    throw new AppealError("appeal_not_pending", "This appeal cannot be asked for more information.");
+    throw new AppealError(
+      "appeal_not_pending",
+      "This appeal cannot be asked for more information.",
+    );
   }
   const now = new Date();
   const claimed = await db.appeal.updateMany({
@@ -399,7 +404,10 @@ export async function requestAppealInfo(input: {
     data: { status: "NEEDS_INFO", needsInfoRequestedAt: now, reviewedById: input.actorId },
   });
   if (claimed.count === 0) {
-    throw new AppealError("appeal_not_pending", "This appeal cannot be asked for more information.");
+    throw new AppealError(
+      "appeal_not_pending",
+      "This appeal cannot be asked for more information.",
+    );
   }
   await db.appealEvent.create({
     data: {
@@ -409,9 +417,14 @@ export async function requestAppealInfo(input: {
       note: message,
     },
   });
-  await sendSafetyNotice(appeal.userId, "appeal_needs_info", `appeal:${appeal.id}:needs-info:${now.getTime()}`, {
-    appealId: appeal.id,
-  });
+  await sendSafetyNotice(
+    appeal.userId,
+    "appeal_needs_info",
+    `appeal:${appeal.id}:needs-info:${now.getTime()}`,
+    {
+      appealId: appeal.id,
+    },
+  );
   return { appealId: appeal.id, status: "NEEDS_INFO" };
 }
 

@@ -13,7 +13,7 @@ import { LogoutButton } from "./logout-button";
  */
 export default function AccountStatusLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="noise relative flex min-h-dvh flex-col overflow-x-hidden bg-background">
+    <div className="noise bg-background relative flex min-h-dvh flex-col overflow-x-hidden">
       <Aurora fixed intensity="faint" />
       <header className="safe-top relative mx-auto flex w-full max-w-2xl items-center justify-between px-5 py-5">
         <Logo />
@@ -22,19 +22,19 @@ export default function AccountStatusLayout({ children }: { children: React.Reac
       <main className="relative mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 pb-16">
         {children}
       </main>
-      <footer className="safe-bottom relative mx-auto w-full max-w-2xl px-5 pb-8 pt-4 text-center text-xs text-muted-foreground">
+      <footer className="safe-bottom text-muted-foreground relative mx-auto w-full max-w-2xl px-5 pt-4 pb-8 text-center text-xs">
         <Link
           href="/account/community-resources"
-          className="underline underline-offset-2 hover:text-foreground"
+          className="hover:text-foreground underline underline-offset-2"
         >
           Community resources
         </Link>{" "}
         ·{" "}
-        <Link href="/legal/terms" className="underline underline-offset-2 hover:text-foreground">
+        <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
           Terms
         </Link>{" "}
         ·{" "}
-        <Link href="/legal/privacy" className="underline underline-offset-2 hover:text-foreground">
+        <Link href="/legal/privacy" className="hover:text-foreground underline underline-offset-2">
           Privacy
         </Link>
       </footer>

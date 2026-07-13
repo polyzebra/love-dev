@@ -1,7 +1,12 @@
 import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { swipeSchema } from "@/lib/validators/swipe";
-import { planTierOf, recordSwipe, swipesRemainingToday, undoLastSwipe } from "@/lib/services/matching";
+import {
+  planTierOf,
+  recordSwipe,
+  swipesRemainingToday,
+  undoLastSwipe,
+} from "@/lib/services/matching";
 import { schedulePushDispatch } from "@/lib/services/notify";
 import { SWIPE_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
@@ -21,7 +26,8 @@ export async function POST(req: Request) {
   const { data, response: invalid } = await parseBody(req, swipeSchema);
   if (invalid) return invalid;
 
-  if (data.toId === user.id) return apiError(400, "invalid_target", "You cannot swipe on yourself.");
+  if (data.toId === user.id)
+    return apiError(400, "invalid_target", "You cannot swipe on yourself.");
 
   // LIMITED accounts keep read access but cannot send likes (trust-safety
   // ladder). Suspended/banned never reach here - requireSession refused.
@@ -47,7 +53,11 @@ export async function POST(req: Request) {
   if (data.action !== "PASS") {
     const remaining = await swipesRemainingToday(user.id, tier);
     if (data.action === "LIKE" && remaining.likes <= 0) {
-      return apiError(402, "limit_reached", "You are out of likes for today. Upgrade for unlimited likes.");
+      return apiError(
+        402,
+        "limit_reached",
+        "You are out of likes for today. Upgrade for unlimited likes.",
+      );
     }
     if (data.action === "SUPER_LIKE" && remaining.superLikes <= 0) {
       return apiError(402, "limit_reached", "You are out of Super Likes for today.");

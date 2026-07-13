@@ -43,7 +43,11 @@ export default async function AuthDiagnosticsPage() {
   });
 
   const entries: { label: string; value: React.ReactNode; hint?: string }[] = [
-    { label: "Auth uid (User.id)", value: <code className="break-all text-xs">{user.id}</code>, hint: "Role is attached to this id - never to the email." },
+    {
+      label: "Auth uid (User.id)",
+      value: <code className="text-xs break-all">{user.id}</code>,
+      hint: "Role is attached to this id - never to the email.",
+    },
     { label: "Email (masked)", value: maskEmail(user.email) },
     { label: "Email (normalized)", value: normalizeEmail(user.email) },
     { label: "Role", value: <Badge className="rounded-full">{user.role}</Badge> },
@@ -73,20 +77,23 @@ export default async function AuthDiagnosticsPage() {
         title="Auth diagnostics"
         description="Identity self-check for this deployment. Names only - never tokens or keys."
       />
-      <div className="max-w-2xl overflow-hidden rounded-3xl border bg-card">
-        <div className="flex items-center gap-2 border-b px-5 py-3 text-sm text-muted-foreground">
+      <div className="bg-card max-w-2xl overflow-hidden rounded-3xl border">
+        <div className="text-muted-foreground flex items-center gap-2 border-b px-5 py-3 text-sm">
           <Stethoscope className="size-4" aria-hidden="true" />
           Every view of this page is recorded in the audit log.
         </div>
         <dl>
           {entries.map(({ label, value, hint }, i) => (
-            <div key={label} className={`flex flex-col gap-1 px-5 py-3 sm:flex-row sm:items-baseline sm:gap-4 ${i > 0 ? "border-t" : ""}`}>
-              <dt className="w-48 shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <div
+              key={label}
+              className={`flex flex-col gap-1 px-5 py-3 sm:flex-row sm:items-baseline sm:gap-4 ${i > 0 ? "border-t" : ""}`}
+            >
+              <dt className="text-muted-foreground w-48 shrink-0 text-xs font-medium tracking-wide uppercase">
                 {label}
               </dt>
               <dd className="min-w-0 text-sm">
                 {value}
-                {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+                {hint && <p className="text-muted-foreground mt-0.5 text-xs">{hint}</p>}
               </dd>
             </div>
           ))}

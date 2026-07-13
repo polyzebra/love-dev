@@ -71,16 +71,12 @@ function NavProgressBar({ active }: { active: boolean }) {
   if (phase === "idle") return null;
 
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5"
-    >
+    <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5">
       <div
         className={cn(
-          "h-full origin-left rounded-r-full bg-primary shadow-[0_0_8px_color-mix(in_srgb,var(--primary)_55%,transparent)]",
+          "bg-primary h-full origin-left rounded-r-full shadow-[0_0_8px_color-mix(in_srgb,var(--primary)_55%,transparent)]",
           phase === "active" && "animate-nav-progress",
-          phase === "done" &&
-            "scale-x-100 opacity-0 transition-[opacity] duration-300 ease-out",
+          phase === "done" && "scale-x-100 opacity-0 transition-[opacity] duration-300 ease-out",
         )}
       />
     </div>

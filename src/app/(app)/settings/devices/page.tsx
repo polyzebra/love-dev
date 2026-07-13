@@ -35,7 +35,7 @@ export default async function DevicesSettingsPage() {
         </CardHeader>
         <CardContent>
           {devices.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-2xl bg-muted px-4 py-6 text-sm text-muted-foreground">
+            <div className="bg-muted text-muted-foreground flex items-center gap-3 rounded-2xl px-4 py-6 text-sm">
               <MonitorSmartphone className="size-5" aria-hidden="true" />
               Device tracking activates on your next sign-in.
             </div>
@@ -43,12 +43,13 @@ export default async function DevicesSettingsPage() {
             <ul className="divide-y">
               {devices.map((d) => (
                 <li key={d.id} className="flex items-center gap-3 py-3.5">
-                  <MonitorSmartphone className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <MonitorSmartphone
+                    className="text-muted-foreground size-5 shrink-0"
+                    aria-hidden="true"
+                  />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">
-                      {d.platform ?? "Unknown device"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="truncate text-sm font-medium">{d.platform ?? "Unknown device"}</p>
+                    <p className="text-muted-foreground text-sm">
                       Last active {formatAgo(d.lastSeenAt)}
                     </p>
                   </div>

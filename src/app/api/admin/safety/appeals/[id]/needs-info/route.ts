@@ -27,7 +27,11 @@ export async function POST(req: Request, { params }: Params) {
   if (invalid) return invalid;
 
   try {
-    const result = await requestAppealInfo({ actorId: actor.id, appealId: id, message: data.message });
+    const result = await requestAppealInfo({
+      actorId: actor.id,
+      appealId: id,
+      message: data.message,
+    });
     await audit({
       actorId: actor.id,
       action: "appeal.needs_info",

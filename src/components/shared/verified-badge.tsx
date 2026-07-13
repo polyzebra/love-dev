@@ -2,7 +2,13 @@ import { BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-export function VerifiedBadge({ className, label = "Photo verified" }: { className?: string; label?: string }) {
+export function VerifiedBadge({
+  className,
+  label = "Photo verified",
+}: {
+  className?: string;
+  label?: string;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -11,7 +17,7 @@ export function VerifiedBadge({ className, label = "Photo verified" }: { classNa
           aria-label={label}
           role="img"
         >
-          <BadgeCheck className="size-[1.1em] fill-sky-500 text-background" />
+          <BadgeCheck className="text-background size-[1.1em] fill-sky-500" />
         </span>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>

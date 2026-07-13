@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = { title: "Explore" };
 
 export default async function ExploreCategoryPage({
-  params, searchParams,
+  params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string>>;
@@ -56,27 +57,51 @@ export default async function ExploreCategoryPage({
     <>
       {/* Category hero */}
       <section
-        className="relative mb-6 overflow-hidden rounded-2xl border border-border p-6 shadow-card"
-        style={{ background: `radial-gradient(130% 120% at 20% 0%, ${category.gradientFrom}40, transparent 60%), radial-gradient(120% 130% at 90% 100%, ${category.gradientTo}30, transparent 55%)` }}
+        className="border-border shadow-card relative mb-6 overflow-hidden rounded-2xl border p-6"
+        style={{
+          background: `radial-gradient(130% 120% at 20% 0%, ${category.gradientFrom}40, transparent 60%), radial-gradient(120% 130% at 90% 100%, ${category.gradientTo}30, transparent 55%)`,
+        }}
       >
         <div className="flex items-start justify-between">
-          <Button variant="ghost" size="icon" className="rounded-full" aria-label="Back to Explore" asChild>
-            <Link href="/explore"><ArrowLeft className="size-5" /></Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            aria-label="Back to Explore"
+            asChild
+          >
+            <Link href="/explore">
+              <ArrowLeft className="size-5" />
+            </Link>
           </Button>
           <ExplorePreferenceToggle categoryId={category.id} initialSaved={saved} />
         </div>
         <div className="mt-2 flex items-center gap-5">
-          <ExploreCard3DVisual iconKey={category.iconKey} imageUrl={category.imageUrl} from={category.gradientFrom} to={category.gradientTo} title={category.title} />
+          <ExploreCard3DVisual
+            iconKey={category.iconKey}
+            imageUrl={category.imageUrl}
+            from={category.gradientFrom}
+            to={category.gradientTo}
+            title={category.title}
+          />
           <div>
-            <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">{category.title}</h1>
-            {category.description && <p className="mt-1 max-w-md text-sm text-muted-foreground">{category.description}</p>}
-            <p className="mt-2 text-xs font-medium tabular-nums text-gold">{total} people here now</p>
+            <h1 className="font-display text-3xl font-medium tracking-tight md:text-4xl">
+              {category.title}
+            </h1>
+            {category.description && (
+              <p className="text-muted-foreground mt-1 max-w-md text-sm">{category.description}</p>
+            )}
+            <p className="text-gold mt-2 text-xs font-medium tabular-nums">
+              {total} people here now
+            </p>
           </div>
         </div>
       </section>
 
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">People</h2>
+        <h2 className="text-muted-foreground text-sm font-semibold tracking-[0.25em] uppercase">
+          People
+        </h2>
         <ExploreFilterSheet />
       </div>
 
@@ -91,7 +116,9 @@ export default async function ExploreCategoryPage({
           }
           action={
             <Button variant="outline" className="rounded-full" asChild>
-              <Link href={hasFilters ? `/explore/${slug}` : "/profile"}>{hasFilters ? "Clear filters" : "Add this to your profile"}</Link>
+              <Link href={hasFilters ? `/explore/${slug}` : "/profile"}>
+                {hasFilters ? "Clear filters" : "Add this to your profile"}
+              </Link>
             </Button>
           }
         />
@@ -108,13 +135,23 @@ export default async function ExploreCategoryPage({
             <div className="mt-6 flex items-center justify-center gap-3 text-sm">
               {page > 1 && (
                 <Button variant="outline" className="rounded-full" asChild>
-                  <Link href={`/explore/${slug}?${new URLSearchParams({ ...filterParams, page: String(page - 1) })}`}>Previous</Link>
+                  <Link
+                    href={`/explore/${slug}?${new URLSearchParams({ ...filterParams, page: String(page - 1) })}`}
+                  >
+                    Previous
+                  </Link>
                 </Button>
               )}
-              <span className="tabular-nums text-muted-foreground">{page} / {totalPages}</span>
+              <span className="text-muted-foreground tabular-nums">
+                {page} / {totalPages}
+              </span>
               {page < totalPages && (
                 <Button variant="outline" className="rounded-full" asChild>
-                  <Link href={`/explore/${slug}?${new URLSearchParams({ ...filterParams, page: String(page + 1) })}`}>Next</Link>
+                  <Link
+                    href={`/explore/${slug}?${new URLSearchParams({ ...filterParams, page: String(page + 1) })}`}
+                  >
+                    Next
+                  </Link>
                 </Button>
               )}
             </div>
@@ -130,10 +167,16 @@ export default async function ExploreCategoryPage({
         />
       )}
       {profileParam && !viewerProfile && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/95 p-6 backdrop-blur-xl" role="alertdialog" aria-label="Profile unavailable">
+        <div
+          className="bg-background/95 fixed inset-0 z-[70] flex items-center justify-center p-6 backdrop-blur-xl"
+          role="alertdialog"
+          aria-label="Profile unavailable"
+        >
           <div className="glass max-w-xs space-y-4 rounded-xl p-6 text-center">
             <p className="font-display text-xl">This profile isn&apos;t available</p>
-            <p className="text-sm text-muted-foreground">It may have been hidden or is no longer on Tirvea.</p>
+            <p className="text-muted-foreground text-sm">
+              It may have been hidden or is no longer on Tirvea.
+            </p>
             <Button className="rounded-full" asChild>
               <Link href={`/explore/${slug}`}>Back to Explore</Link>
             </Button>

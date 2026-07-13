@@ -36,7 +36,16 @@ export const DEFAULT_COUNTRY_ISO: CountryCode = "IE";
 
 /** Where most of our members are - pinned to the top of the sheet. */
 export const POPULAR_ISOS: CountryCode[] = [
-  "IE", "GB", "LV", "LT", "PL", "RO", "DE", "FR", "ES", "US",
+  "IE",
+  "GB",
+  "LV",
+  "LT",
+  "PL",
+  "RO",
+  "DE",
+  "FR",
+  "ES",
+  "US",
 ];
 
 /** "IE" -> regional indicators U+1F1EE U+1F1EA -> the flag emoji. */
@@ -96,8 +105,5 @@ export function matchesCountry(country: Country, query: string): boolean {
   if (!q) return true;
   const digits = q.startsWith("+") ? q.slice(1) : q;
   if (/^\d+$/.test(digits)) return country.dialCode.slice(1).startsWith(digits);
-  return (
-    country.name.toLowerCase().includes(q) ||
-    country.iso.toLowerCase().startsWith(q)
-  );
+  return country.name.toLowerCase().includes(q) || country.iso.toLowerCase().startsWith(q);
 }

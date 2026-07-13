@@ -18,7 +18,14 @@ import { CaseList, type CaseRow } from "./case-list";
 export const metadata: Metadata = { title: "Moderation cases" };
 export const dynamic = "force-dynamic";
 
-const STATUSES = ["OPEN", "UNDER_REVIEW", "APPEALED", "ACTION_TAKEN", "DISMISSED", "REVERSED"] as const;
+const STATUSES = [
+  "OPEN",
+  "UNDER_REVIEW",
+  "APPEALED",
+  "ACTION_TAKEN",
+  "DISMISSED",
+  "REVERSED",
+] as const;
 const SEVERITIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const;
 
 type CaseStatus = (typeof STATUSES)[number];
@@ -45,13 +52,21 @@ function filterHref(f: Filters): string {
   return qs ? `/admin/moderation-cases?${qs}` : "/admin/moderation-cases";
 }
 
-function Chip({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+function Chip({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
       className={cn(
-        "flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 md:min-h-9",
+        "focus-visible:ring-foreground/20 flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none md:min-h-9",
         active
           ? "bg-primary text-primary-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -106,7 +121,9 @@ export default async function ModerationCasesPage({
   ]);
 
   // Assignee chips need emails - one bounded lookup for the ids on screen.
-  const assigneeIds = [...new Set(cases.map((c) => c.assignedToId).filter((id): id is string => !!id))];
+  const assigneeIds = [
+    ...new Set(cases.map((c) => c.assignedToId).filter((id): id is string => !!id)),
+  ];
   const assignees =
     assigneeIds.length > 0
       ? await db.user.findMany({
@@ -151,7 +168,12 @@ export default async function ModerationCasesPage({
       />
 
       {/* Search: user email, user id or case id - server-side. */}
-      <form action="/admin/moderation-cases" method="GET" role="search" className="mb-4 flex max-w-md gap-2">
+      <form
+        action="/admin/moderation-cases"
+        method="GET"
+        role="search"
+        className="mb-4 flex max-w-md gap-2"
+      >
         {filters.status && <input type="hidden" name="status" value={filters.status} />}
         {filters.severity && <input type="hidden" name="severity" value={filters.severity} />}
         {filters.priority && <input type="hidden" name="priority" value={filters.priority} />}
@@ -159,7 +181,7 @@ export default async function ModerationCasesPage({
         {filters.overdue && <input type="hidden" name="overdue" value="1" />}
         <div className="relative flex-1">
           <Search
-            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2"
             aria-hidden="true"
           />
           <Input
@@ -174,7 +196,7 @@ export default async function ModerationCasesPage({
         {filters.q && (
           <Link
             href={filterHref({ ...filters, q: "" })}
-            className="flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-foreground/20 flex min-h-11 items-center rounded-full px-4 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
           >
             Clear
           </Link>
@@ -183,25 +205,40 @@ export default async function ModerationCasesPage({
 
       <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Filter by status">
         {[null, ...STATUSES].map((s) => (
-          <Chip key={s ?? "all"} href={filterHref({ ...filters, status: s })} active={s === filters.status}>
+          <Chip
+            key={s ?? "all"}
+            href={filterHref({ ...filters, status: s })}
+            active={s === filters.status}
+          >
             {s ? pretty(s) : "All statuses"}
           </Chip>
         ))}
       </div>
       <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Filter by severity">
         {[null, ...SEVERITIES].map((s) => (
-          <Chip key={s ?? "all"} href={filterHref({ ...filters, severity: s })} active={s === filters.severity}>
+          <Chip
+            key={s ?? "all"}
+            href={filterHref({ ...filters, severity: s })}
+            active={s === filters.severity}
+          >
             {s ? pretty(s) : "All severities"}
           </Chip>
         ))}
       </div>
-      <div className="mb-5 flex flex-wrap gap-1.5" aria-label="Filter by priority, assignment and SLA">
+      <div
+        className="mb-5 flex flex-wrap gap-1.5"
+        aria-label="Filter by priority, assignment and SLA"
+      >
         {[null, ...SEVERITIES].map((p) => (
-          <Chip key={p ?? "all"} href={filterHref({ ...filters, priority: p })} active={p === filters.priority}>
+          <Chip
+            key={p ?? "all"}
+            href={filterHref({ ...filters, priority: p })}
+            active={p === filters.priority}
+          >
             {p ? `prio ${pretty(p)}` : "All priorities"}
           </Chip>
         ))}
-        <span aria-hidden="true" className="my-1.5 w-px self-stretch bg-border/60" />
+        <span aria-hidden="true" className="bg-border/60 my-1.5 w-px self-stretch" />
         <Chip
           href={filterHref({ ...filters, assigned: filters.assigned === "me" ? null : "me" })}
           active={filters.assigned === "me"}
@@ -240,7 +277,7 @@ export default async function ModerationCasesPage({
               filters.overdue) && (
               <Link
                 href="/admin/moderation-cases"
-                className="flex min-h-11 items-center rounded-full border px-5 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                className="hover:bg-muted focus-visible:ring-foreground/20 flex min-h-11 items-center rounded-full border px-5 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
               >
                 Clear search and filters
               </Link>

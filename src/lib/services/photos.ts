@@ -75,7 +75,9 @@ export type ProcessedPhoto = {
 };
 
 function toHex(value: number): string {
-  return Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0");
+  return Math.max(0, Math.min(255, Math.round(value)))
+    .toString(16)
+    .padStart(2, "0");
 }
 
 /**
@@ -200,7 +202,10 @@ export async function validateProcessedVariant(
     );
   }
   if (decoded.channels !== 3) {
-    return fail(`has ${decoded.channels} channels, expected 3 opaque (alpha must be flattened)`, decoded);
+    return fail(
+      `has ${decoded.channels} channels, expected 3 opaque (alpha must be flattened)`,
+      decoded,
+    );
   }
   const inputNearUniform = input.maxStdev < BLANK_MAX_STDEV;
   if (buffer.length < MIN_VARIANT_BYTES && !inputNearUniform) {
@@ -412,7 +417,9 @@ export async function uploadProfilePhoto(
     }
 
     // Verify what actually landed: download back and byte-compare.
-    const { data, error: downloadError } = await supabase.storage.from(PHOTOS_BUCKET).download(path);
+    const { data, error: downloadError } = await supabase.storage
+      .from(PHOTOS_BUCKET)
+      .download(path);
     const stored = data ? Buffer.from(await data.arrayBuffer()) : null;
     if (downloadError || !stored || !stored.equals(body)) {
       await cleanup();

@@ -33,10 +33,7 @@ export async function PATCH(req: Request) {
 
   // Every id must belong to the session user, and the list must cover all of
   // the user's photos - a partial reorder would leave duplicate positions.
-  if (
-    data.order.length !== owned.size ||
-    !data.order.every((id) => owned.has(id))
-  ) {
+  if (data.order.length !== owned.size || !data.order.every((id) => owned.has(id))) {
     return apiError(400, "invalid_order", "Provide every photo id you own, exactly once.");
   }
 

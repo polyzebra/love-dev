@@ -7,12 +7,10 @@ import { TAXONOMY } from "@/lib/discovery/taxonomy";
 const AVAILABILITY_TAG_IDS = TAXONOMY.filter(
   (c) => c.profileFieldMapping === "availabilityTags",
 ).map((c) => c.id);
-const COMMUNITY_TAG_IDS = TAXONOMY.filter(
-  (c) => c.profileFieldMapping === "communityTags",
-).map((c) => c.id);
-const TAXONOMY_INTEREST_SLUGS = [
-  ...new Set(TAXONOMY.flatMap((c) => c.interestSlugs ?? [])),
-];
+const COMMUNITY_TAG_IDS = TAXONOMY.filter((c) => c.profileFieldMapping === "communityTags").map(
+  (c) => c.id,
+);
+const TAXONOMY_INTEREST_SLUGS = [...new Set(TAXONOMY.flatMap((c) => c.interestSlugs ?? []))];
 
 const idEnum = (values: string[]) => z.enum(values as [string, ...string[]]);
 
@@ -82,13 +80,25 @@ export const onboardingSchema = z
     occupation: z.string().trim().max(80).optional().nullable(),
     education: educationEnum.optional().nullable(),
     // Taxonomy category ids ("right now" group) -> Profile.availabilityTags
-    availabilityTags: idEnum(AVAILABILITY_TAG_IDS).array().max(AVAILABILITY_TAG_IDS.length).optional().default([]),
+    availabilityTags: idEnum(AVAILABILITY_TAG_IDS)
+      .array()
+      .max(AVAILABILITY_TAG_IDS.length)
+      .optional()
+      .default([]),
     // Secondary trait - no longer collected in onboarding, editable later
     personalityTags: z.array(z.string().max(40)).max(5).optional().default([]),
     // Taxonomy category ids ("community" group) -> Profile.communityTags
-    communityTags: idEnum(COMMUNITY_TAG_IDS).array().max(COMMUNITY_TAG_IDS.length).optional().default([]),
+    communityTags: idEnum(COMMUNITY_TAG_IDS)
+      .array()
+      .max(COMMUNITY_TAG_IDS.length)
+      .optional()
+      .default([]),
     // Taxonomy-derived interest slugs -> ProfileInterest rows
-    interests: idEnum(TAXONOMY_INTEREST_SLUGS).array().max(TAXONOMY_INTEREST_SLUGS.length).optional().default([]),
+    interests: idEnum(TAXONOMY_INTEREST_SLUGS)
+      .array()
+      .max(TAXONOMY_INTEREST_SLUGS.length)
+      .optional()
+      .default([]),
     smoking: lifestyleEnum.optional().default("PREFER_NOT_TO_SAY"),
     drinking: lifestyleEnum.optional().default("PREFER_NOT_TO_SAY"),
     exercise: exerciseEnum.optional().nullable(),

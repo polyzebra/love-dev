@@ -56,8 +56,7 @@ export function effectiveTier(sub: SubscriptionSnapshot | null, now = new Date()
       return sub.tier;
     case "PAST_DUE": {
       if (!sub.currentPeriodEnd) return "FREE";
-      const graceEnd =
-        sub.currentPeriodEnd.getTime() + PAST_DUE_GRACE_DAYS * 24 * 60 * 60 * 1000;
+      const graceEnd = sub.currentPeriodEnd.getTime() + PAST_DUE_GRACE_DAYS * 24 * 60 * 60 * 1000;
       return now.getTime() <= graceEnd ? sub.tier : "FREE";
     }
     default:

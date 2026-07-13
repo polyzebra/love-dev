@@ -112,8 +112,10 @@ export function computeCompatibility(
     pts += W.location;
     reasons.push({ weight: W.location, text: `You're both in ${candidate.city}.` });
   } else if (
-    viewer.latitude != null && viewer.longitude != null &&
-    candidate.latitude != null && candidate.longitude != null &&
+    viewer.latitude != null &&
+    viewer.longitude != null &&
+    candidate.latitude != null &&
+    candidate.longitude != null &&
     haversineKm(viewer.latitude, viewer.longitude, candidate.latitude, candidate.longitude) <= 25
   ) {
     pts += 12;
@@ -133,8 +135,10 @@ export function computeCompatibility(
 
   // Lifestyle similarity (declared habits only)
   let lifestyle = 0;
-  if (viewer.smoking !== "PREFER_NOT_TO_SAY" && viewer.smoking === candidate.smoking) lifestyle += 4;
-  if (viewer.drinking !== "PREFER_NOT_TO_SAY" && viewer.drinking === candidate.drinking) lifestyle += 3;
+  if (viewer.smoking !== "PREFER_NOT_TO_SAY" && viewer.smoking === candidate.smoking)
+    lifestyle += 4;
+  if (viewer.drinking !== "PREFER_NOT_TO_SAY" && viewer.drinking === candidate.drinking)
+    lifestyle += 3;
   if (viewer.exercise && viewer.exercise === candidate.exercise) lifestyle += 3;
   pts += Math.min(W.lifestyle, lifestyle);
   if (lifestyle >= 7) reasons.push({ weight: lifestyle, text: "Your day-to-day habits line up." });

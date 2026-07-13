@@ -13,7 +13,10 @@ import { Aurora } from "@/components/fx/aurora";
  */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div data-debug="auth-layout" className="noise relative flex min-h-dvh flex-col overflow-hidden bg-background">
+    <div
+      data-debug="auth-layout"
+      className="noise bg-background relative flex min-h-dvh flex-col overflow-hidden"
+    >
       <Aurora fixed />
       <header className="safe-top relative mx-auto w-full max-w-6xl px-6 py-6 md:px-10">
         <Logo />
@@ -21,13 +24,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main className="relative flex flex-1 items-center justify-center px-4 pb-16">
         {children}
       </main>
-      <footer className="safe-bottom relative pb-6 text-center text-xs text-muted-foreground">
+      <footer className="safe-bottom text-muted-foreground relative pb-6 text-center text-xs">
         By continuing you agree to our{" "}
-        <Link href="/legal/terms" className="underline underline-offset-2 hover:text-foreground">
+        <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
           Terms
         </Link>{" "}
         and{" "}
-        <Link href="/legal/privacy" className="underline underline-offset-2 hover:text-foreground">
+        <Link href="/legal/privacy" className="hover:text-foreground underline underline-offset-2">
           Privacy Policy
         </Link>
         .

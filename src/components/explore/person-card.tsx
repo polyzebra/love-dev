@@ -38,7 +38,7 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
       type="button"
       onClick={open}
       aria-label={`View ${person.displayName}'s profile`}
-      className="group relative block w-full overflow-hidden rounded-3xl border border-border bg-card/80 text-left shadow-card transition-shadow hover:shadow-float"
+      className="group border-border bg-card/80 shadow-card hover:shadow-float relative block w-full overflow-hidden rounded-3xl border text-left transition-shadow"
     >
       <PhotoFrame
         photo={person.photo}
@@ -49,7 +49,7 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
         className="bg-muted"
         imgClassName="transition-[opacity,filter,transform] duration-300 group-hover:scale-[1.03]"
         fallback={
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-foreground/10 to-transparent font-display text-3xl text-foreground/60">
+          <div className="from-foreground/10 font-display text-foreground/60 flex h-full items-center justify-center bg-gradient-to-br to-transparent text-3xl">
             {initialsOf(person.displayName)}
           </div>
         }
@@ -59,12 +59,17 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
             <span className="truncate" title={`${person.displayName}, ${person.age}`}>
               {person.displayName}, {person.age}
             </span>
-            {person.isVerified && <BadgeCheck className="size-4 shrink-0 fill-sky-400 text-black/40" aria-label="Photo verified" />}
+            {person.isVerified && (
+              <BadgeCheck
+                className="size-4 shrink-0 fill-sky-400 text-black/40"
+                aria-label="Photo verified"
+              />
+            )}
             <OnlineDot online={person.isOnline} className="ml-auto shrink-0" />
           </p>
           {person.sharedInterests > 0 && (
             <p className="mt-0.5 flex items-center gap-1 text-[11px] text-white/80">
-              <Sparkles className="size-3 text-gold" aria-hidden="true" />
+              <Sparkles className="text-gold size-3" aria-hidden="true" />
               {person.sharedInterests} shared interest{person.sharedInterests > 1 ? "s" : ""}
             </p>
           )}

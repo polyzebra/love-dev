@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  BookOpenText,
-  ChevronRight,
-  LifeBuoy,
-  Mail,
-  ShieldCheck,
-} from "lucide-react";
+import { BookOpenText, ChevronRight, LifeBuoy, Mail, ShieldCheck } from "lucide-react";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -48,57 +42,57 @@ export default function SupportPage() {
       <div className="space-y-6">
         <a
           href="mailto:support@tirvea.app"
-          className="flex items-center gap-4 rounded-3xl border border-border bg-card/80 px-5 py-5 shadow-card transition-colors hover:bg-muted"
+          className="border-border bg-card/80 shadow-card hover:bg-muted flex items-center gap-4 rounded-3xl border px-5 py-5 transition-colors"
         >
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent">
-            <Mail className="size-5 text-accent-foreground" aria-hidden="true" />
+          <span className="bg-accent flex size-11 shrink-0 items-center justify-center rounded-2xl">
+            <Mail className="text-accent-foreground size-5" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-medium">Contact us</span>
-            <span className="block truncate text-sm text-muted-foreground">
+            <span className="text-muted-foreground block truncate text-sm">
               support@tirvea.app - a real person reads every message
             </span>
           </span>
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <ChevronRight className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
         </a>
 
-        <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
+        <div className="border-border bg-card/80 shadow-card overflow-hidden rounded-3xl border">
           <Link
             href="/settings/safety"
-            className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted"
+            className="hover:bg-muted flex items-center gap-4 px-5 py-4 transition-colors"
           >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-              <ShieldCheck className="size-5 text-accent-foreground" aria-hidden="true" />
+            <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+              <ShieldCheck className="text-accent-foreground size-5" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block font-medium">Safety Centre</span>
-              <span className="block truncate text-sm text-muted-foreground">
+              <span className="text-muted-foreground block truncate text-sm">
                 Tools and guidance for safer dating
               </span>
             </span>
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <ChevronRight className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
           </Link>
           <Link
             href="/settings/community-guidelines"
-            className="flex items-center gap-4 border-t px-5 py-4 transition-colors hover:bg-muted"
+            className="hover:bg-muted flex items-center gap-4 border-t px-5 py-4 transition-colors"
           >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent">
-              <BookOpenText className="size-5 text-accent-foreground" aria-hidden="true" />
+            <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-2xl">
+              <BookOpenText className="text-accent-foreground size-5" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block font-medium">Community Guidelines</span>
-              <span className="block truncate text-sm text-muted-foreground">
+              <span className="text-muted-foreground block truncate text-sm">
                 What we expect from every member
               </span>
             </span>
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <ChevronRight className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
           </Link>
         </div>
 
         <Card className="rounded-3xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <LifeBuoy className="size-4 text-muted-foreground" aria-hidden="true" />
+              <LifeBuoy className="text-muted-foreground size-4" aria-hidden="true" />
               Frequently asked
             </CardTitle>
           </CardHeader>
@@ -106,7 +100,7 @@ export default function SupportPage() {
             {FAQ.map(({ q, a }) => (
               <div key={q} className="py-4 first:pt-0 last:pb-0">
                 <h3 className="text-sm font-medium">{q}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{a}</p>
+                <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">{a}</p>
               </div>
             ))}
           </CardContent>

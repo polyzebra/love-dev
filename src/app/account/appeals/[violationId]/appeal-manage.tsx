@@ -80,9 +80,9 @@ export function AppealRespond({
     return (
       <section aria-label="Reply sent" className="glass mt-6 rounded-xl p-6">
         <h2 className="font-display text-xl font-semibold tracking-tight">Thanks - reply sent</h2>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-          Your reply was added to the appeal and our team will continue the review. We&apos;ll
-          email you once a decision has been made.
+        <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+          Your reply was added to the appeal and our team will continue the review. We&apos;ll email
+          you once a decision has been made.
         </p>
       </section>
     );
@@ -91,22 +91,22 @@ export function AppealRespond({
   return (
     <section
       aria-label="We need a bit more information"
-      className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-6"
+      className="border-gold/40 bg-gold/5 mt-6 rounded-xl border p-6"
     >
       <div className="flex items-start gap-4">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gold/15">
-          <MessageCircleQuestion className="size-6 text-gold" aria-hidden="true" />
+        <span className="bg-gold/15 flex size-12 shrink-0 items-center justify-center rounded-2xl">
+          <MessageCircleQuestion className="text-gold size-6" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-xl font-semibold tracking-tight">
             We need a bit more information
           </h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
             A member of our team has a question about your appeal. Your reply goes straight to the
             person reviewing it.
           </p>
           {question && (
-            <blockquote className="mt-3 rounded-2xl bg-background/70 px-4 py-3 text-sm leading-relaxed">
+            <blockquote className="bg-background/70 mt-3 rounded-2xl px-4 py-3 text-sm leading-relaxed">
               {question}
             </blockquote>
           )}
@@ -124,20 +124,20 @@ export function AppealRespond({
         placeholder="Write your reply here."
         aria-label="Your reply to our team"
         aria-invalid={error ? true : undefined}
-        className="mt-4 min-h-24 rounded-3xl bg-background px-4 py-3"
+        className="bg-background mt-4 min-h-24 rounded-3xl px-4 py-3"
         disabled={pending}
       />
       <div className="mt-1.5 flex items-baseline justify-between px-1">
         {error ? (
-          <p className="text-xs text-destructive" role="alert">
+          <p className="text-destructive text-xs" role="alert">
             {error}
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             You can send one reply, so include everything that feels relevant.
           </p>
         )}
-        <p className="text-xs tabular-nums text-muted-foreground">
+        <p className="text-muted-foreground text-xs tabular-nums">
           {text.trim().length}/{REPLY_MAX}
         </p>
       </div>
@@ -150,7 +150,7 @@ export function AppealRespond({
         {pending ? "Sending…" : "Send reply"}
       </Button>
       {respondByLabel && (
-        <p className="mt-3 text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-center text-xs">
           Please reply by {respondByLabel}. If we don&apos;t hear back by then, this appeal closes
           automatically - you could still submit a new one afterwards.
         </p>
@@ -184,12 +184,12 @@ export function AppealWithdraw({ appealId }: { appealId: string }) {
 
   return (
     <div className="mt-6 px-1">
-      <p className="text-sm leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground text-sm leading-relaxed">
         Changed your mind?{" "}
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="min-h-11 font-medium text-foreground underline underline-offset-2 hover:text-muted-foreground"
+          className="text-foreground hover:text-muted-foreground min-h-11 font-medium underline underline-offset-2"
         >
           Withdraw this appeal
         </button>
@@ -211,7 +211,7 @@ export function AppealWithdraw({ appealId }: { appealId: string }) {
             </DialogDescription>
           </DialogHeader>
           {error && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-destructive text-sm" role="alert">
               {error}
             </p>
           )}

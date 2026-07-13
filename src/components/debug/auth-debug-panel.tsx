@@ -79,8 +79,7 @@ function snapshot(prevPath: string) {
     vis: document.visibilityState,
     online: navigator.onLine,
     standalone:
-      window.matchMedia?.("(display-mode: standalone)").matches ||
-      navigator.standalone === true,
+      window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone === true,
     nodes: NODES.filter((n) => q(n)),
     cardChildren: card?.childElementCount ?? null,
     card: styleOf(card),
@@ -201,11 +200,19 @@ export function AuthDebugPanel({ buildId }: { buildId: string }) {
         if (m.type === "childList") {
           for (const n of m.addedNodes) {
             const name = debugName(n);
-            if (name) log("dom:insert", { node: name, cardChildren: q("auth-card")?.childElementCount ?? null });
+            if (name)
+              log("dom:insert", {
+                node: name,
+                cardChildren: q("auth-card")?.childElementCount ?? null,
+              });
           }
           for (const n of m.removedNodes) {
             const name = debugName(n);
-            if (name) log("dom:remove", { node: name, cardChildren: q("auth-card")?.childElementCount ?? null });
+            if (name)
+              log("dom:remove", {
+                node: name,
+                cardChildren: q("auth-card")?.childElementCount ?? null,
+              });
           }
           const tname = debugName(m.target);
           if (tname === "auth-card") {
@@ -254,7 +261,13 @@ export function AuthDebugPanel({ buildId }: { buildId: string }) {
         }
       }
     });
-    for (const type of ["navigation", "paint", "largest-contentful-paint", "longtask", "resource"]) {
+    for (const type of [
+      "navigation",
+      "paint",
+      "largest-contentful-paint",
+      "longtask",
+      "resource",
+    ]) {
       try {
         po.observe({ type, buffered: true } as PerformanceObserverInit);
       } catch {

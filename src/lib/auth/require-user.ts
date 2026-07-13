@@ -43,8 +43,7 @@ export async function requireUser(opts?: { allow?: string }): Promise<AppSession
  * below is defense in depth should auth() ever loosen.
  */
 export type AdminGate =
-  | { ok: true; user: AppSession["user"] }
-  | { ok: false; reason: "unauthenticated" | "forbidden" };
+  { ok: true; user: AppSession["user"] } | { ok: false; reason: "unauthenticated" | "forbidden" };
 
 export async function getCurrentAdmin(tier: "staff" | "super" = "staff"): Promise<AdminGate> {
   const session = await auth();

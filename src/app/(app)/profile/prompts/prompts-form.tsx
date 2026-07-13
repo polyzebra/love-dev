@@ -28,14 +28,14 @@ export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string,
       <div className="flex items-center justify-between px-1">
         <p
           className={cn(
-            "text-xs font-semibold uppercase tracking-[0.2em]",
+            "text-xs font-semibold tracking-[0.2em] uppercase",
             overLimit ? "text-warning" : "text-muted-foreground",
           )}
         >
           {answeredCount}/{MAX_ANSWERED} answered
         </p>
         {(state.error || overLimit) && (
-          <p className="text-xs text-warning" role="alert">
+          <p className="text-warning text-xs" role="alert">
             {overLimit ? `Answer at most ${MAX_ANSWERED} prompts` : state.error}
           </p>
         )}
@@ -49,7 +49,7 @@ export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string,
               <div className="glass rounded-3xl p-5">
                 <label
                   htmlFor={`prompt-${prompt.key}`}
-                  className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+                  className="text-muted-foreground text-[11px] font-semibold tracking-[0.2em] uppercase"
                 >
                   {prompt.label}
                 </label>
@@ -57,7 +57,9 @@ export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string,
                   id={`prompt-${prompt.key}`}
                   name={`prompt:${prompt.key}`}
                   value={value}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, [prompt.key]: e.target.value }))}
+                  onChange={(e) =>
+                    setAnswers((prev) => ({ ...prev, [prompt.key]: e.target.value }))
+                  }
                   maxLength={PROMPT_ANSWER_MAX_LENGTH}
                   rows={2}
                   placeholder="Write something only you could say"
@@ -66,7 +68,7 @@ export function PromptsForm({ initialAnswers }: { initialAnswers: Record<string,
                   className="mt-2.5 min-h-16 resize-none rounded-2xl"
                 />
                 {value.length > 0 && (
-                  <p className="mt-1.5 text-right text-[11px] tabular-nums text-muted-foreground">
+                  <p className="text-muted-foreground mt-1.5 text-right text-[11px] tabular-nums">
                     {value.length}/{PROMPT_ANSWER_MAX_LENGTH}
                   </p>
                 )}

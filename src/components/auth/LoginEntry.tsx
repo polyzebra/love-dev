@@ -30,10 +30,19 @@ import { authRedirectUrl } from "@/lib/auth/url";
 export function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
-      <path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z" />
-      <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.2v3.1A12 12 0 0 0 12 24Z" />
+      <path
+        fill="#4285F4"
+        d="M23.5 12.3c0-.9-.1-1.8-.2-2.6H12v4.9h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-9Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.2v3.1A12 12 0 0 0 12 24Z"
+      />
       <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.2a12 12 0 0 0 0 10.8l4.1-3.1Z" />
-      <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.2A12 12 0 0 0 1.2 6.6l4.1 3.1c.9-2.9 3.6-4.9 6.7-4.9Z" />
+      <path
+        fill="#EA4335"
+        d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.2A12 12 0 0 0 1.2 6.6l4.1 3.1c.9-2.9 3.6-4.9 6.7-4.9Z"
+      />
     </svg>
   );
 }
@@ -175,84 +184,88 @@ export function LoginEntry({
 
   return (
     <AuthCard>
-    <motion.div
-      data-debug="login-page"
-      // Slide-and-settle ONLY - never opacity: the sign-in choices must
-      // be readable from the very first committed frame (a fade from 0
-      // re-blanks the card right after the loading fallback unmounts).
-      initial={animatable ? { y: 12 } : false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE_LUXE }}
-      className="flex flex-col"
-    >
-      <div className="mb-9 flex flex-col items-center gap-5 text-center">
-        <Logo size="lg" />
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-balance">
-            Find something real.
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Sign in or create your Tirvea account.
-          </p>
+      <motion.div
+        data-debug="login-page"
+        // Slide-and-settle ONLY - never opacity: the sign-in choices must
+        // be readable from the very first committed frame (a fade from 0
+        // re-blanks the card right after the loading fallback unmounts).
+        initial={animatable ? { y: 12 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE_LUXE }}
+        className="flex flex-col"
+      >
+        <div className="mb-9 flex flex-col items-center gap-5 text-center">
+          <Logo size="lg" />
+          <div className="space-y-2">
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-balance">
+              Find something real.
+            </h1>
+            <p className="text-muted-foreground text-sm">Sign in or create your Tirvea account.</p>
+          </div>
         </div>
-      </div>
 
-      <div data-debug="login-form" className="grid gap-3">
-        {appleEnabled && (
+        <div data-debug="login-form" className="grid gap-3">
+          {appleEnabled && (
+            <ProviderActionButton
+              pending={pending === "apple"}
+              onClick={() => startOAuth("apple")}
+              icon={<AppleIcon />}
+            >
+              Continue with Apple
+            </ProviderActionButton>
+          )}
           <ProviderActionButton
-            pending={pending === "apple"}
-            onClick={() => startOAuth("apple")}
-            icon={<AppleIcon />}
+            pending={pending === "google"}
+            onClick={() => startOAuth("google")}
+            icon={<GoogleIcon />}
           >
-            Continue with Apple
+            Continue with Google
           </ProviderActionButton>
-        )}
-        <ProviderActionButton
-          pending={pending === "google"}
-          onClick={() => startOAuth("google")}
-          icon={<GoogleIcon />}
-        >
-          Continue with Google
-        </ProviderActionButton>
-        <ProviderLink href="/login/email" icon={<Mail className="size-5" aria-hidden="true" />}>
-          Continue with Email
-        </ProviderLink>
-        {phoneEnabled && (
-          <ProviderLink
-            href="/login/phone"
-            icon={<Smartphone className="size-5" aria-hidden="true" />}
-          >
-            Continue with phone number
+          <ProviderLink href="/login/email" icon={<Mail className="size-5" aria-hidden="true" />}>
+            Continue with Email
           </ProviderLink>
-        )}
-      </div>
+          {phoneEnabled && (
+            <ProviderLink
+              href="/login/phone"
+              icon={<Smartphone className="size-5" aria-hidden="true" />}
+            >
+              Continue with phone number
+            </ProviderLink>
+          )}
+        </div>
 
-      <p className="mt-6 text-center">
-        <Link
-          href="/auth/recovery"
-          className="rounded-sm text-sm font-medium text-primary-soft underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-foreground/20"
-        >
-          Trouble signing in?
-        </Link>
-      </p>
+        <p className="mt-6 text-center">
+          <Link
+            href="/auth/recovery"
+            className="text-primary-soft focus-visible:ring-foreground/20 rounded-sm text-sm font-medium underline-offset-2 outline-none hover:underline focus-visible:ring-2"
+          >
+            Trouble signing in?
+          </Link>
+        </p>
 
-      <p className="mt-8 text-center text-xs leading-relaxed text-pretty text-muted-foreground">
-        By continuing, you agree to our{" "}
-        <Link href="/legal/terms" className="underline underline-offset-2 hover:text-foreground">
-          Terms of Use
-        </Link>{" "}
-        and acknowledge our{" "}
-        <Link href="/legal/privacy" className="underline underline-offset-2 hover:text-foreground">
-          Privacy Policy
-        </Link>{" "}
-        and{" "}
-        {/* No /legal/cookies route exists (yet) - cookie disclosures live in the privacy policy. */}
-        <Link href="/legal/privacy" className="underline underline-offset-2 hover:text-foreground">
-          Cookie Policy
-        </Link>
-        .
-      </p>
-    </motion.div>
+        <p className="text-muted-foreground mt-8 text-center text-xs leading-relaxed text-pretty">
+          By continuing, you agree to our{" "}
+          <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
+            Terms of Use
+          </Link>{" "}
+          and acknowledge our{" "}
+          <Link
+            href="/legal/privacy"
+            className="hover:text-foreground underline underline-offset-2"
+          >
+            Privacy Policy
+          </Link>{" "}
+          and{" "}
+          {/* No /legal/cookies route exists (yet) - cookie disclosures live in the privacy policy. */}
+          <Link
+            href="/legal/privacy"
+            className="hover:text-foreground underline underline-offset-2"
+          >
+            Cookie Policy
+          </Link>
+          .
+        </p>
+      </motion.div>
     </AuthCard>
   );
 }

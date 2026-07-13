@@ -99,7 +99,9 @@ export type StripeInvoice = {
   invoice_pdf?: string | null;
   /** String id unless expanded via latest_invoice.payment_intent. */
   payment_intent?: string | StripePaymentIntent | null;
-  lines?: { data?: { price?: { id?: string } | null; pricing?: { price_details?: { price?: string } } }[] };
+  lines?: {
+    data?: { price?: { id?: string } | null; pricing?: { price_details?: { price?: string } } }[];
+  };
 };
 
 export type StripeCheckoutSession = {
@@ -235,15 +237,12 @@ function restClient(secretKey: string): StripeClient {
     idempotencyKey?: string,
   ): Promise<T> {
     const body = method === "POST" && params ? stripeFormEncode(params).toString() : undefined;
-    const query =
-      method === "GET" && params ? `?${stripeFormEncode(params).toString()}` : "";
+    const query = method === "GET" && params ? `?${stripeFormEncode(params).toString()}` : "";
     const res = await fetch(`${STRIPE_API}${path}${query}`, {
       method,
       headers: {
         Authorization: `Bearer ${secretKey}`,
-        ...(body !== undefined
-          ? { "Content-Type": "application/x-www-form-urlencoded" }
-          : {}),
+        ...(body !== undefined ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
         ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
       },
       body,
@@ -337,20 +336,14 @@ function restClient(secretKey: string): StripeClient {
       return page.data ?? [];
     },
     payInvoice: (id, idempotencyKey) =>
-      request<StripeInvoice>(
-        "POST",
-        `/invoices/${encodeURIComponent(id)}/pay`,
-        {},
-        idempotencyKey,
-      ),
+      request<StripeInvoice>("POST", `/invoices/${encodeURIComponent(id)}/pay`, {}, idempotencyKey),
     createPortalSession: ({ customer, returnUrl, flow }) =>
       request<StripePortalSession>("POST", "/billing_portal/sessions", {
         customer,
         return_url: returnUrl,
         ...(flow ? { flow_data: { type: flow } } : {}),
       }),
-    retrievePrice: (id) =>
-      request<StripePrice>("GET", `/prices/${encodeURIComponent(id)}`),
+    retrievePrice: (id) => request<StripePrice>("GET", `/prices/${encodeURIComponent(id)}`),
   };
 }
 
@@ -403,8 +396,7 @@ export const PLAN_PRICE_EXPECTATIONS: Record<
 };
 
 export function stripePriceIdFor(plan: PaidPlan): string | null {
-  const id =
-    plan === "PLUS" ? env.STRIPE_PLUS_MONTHLY_PRICE_ID : env.STRIPE_GOLD_MONTHLY_PRICE_ID;
+  const id = plan === "PLUS" ? env.STRIPE_PLUS_MONTHLY_PRICE_ID : env.STRIPE_GOLD_MONTHLY_PRICE_ID;
   return id ?? null;
 }
 
@@ -501,10 +493,14 @@ export async function validateStripeEnvDeep(force = false): Promise<StripeDeepRe
           problems.push(`${plan} price currency is ${price.currency}, expected ${expect.currency}`);
         }
         if (typeof price.unit_amount === "number" && price.unit_amount !== expect.amountCents) {
-          problems.push(`${plan} price amount is ${price.unit_amount}, expected ${expect.amountCents}`);
+          problems.push(
+            `${plan} price amount is ${price.unit_amount}, expected ${expect.amountCents}`,
+          );
         }
         if (price.recurring?.interval && price.recurring.interval !== expect.interval) {
-          problems.push(`${plan} price interval is ${price.recurring.interval}, expected ${expect.interval}`);
+          problems.push(
+            `${plan} price interval is ${price.recurring.interval}, expected ${expect.interval}`,
+          );
         }
         if (price.active === false) {
           problems.push(`${plan} price is archived in Stripe`);
@@ -515,7 +511,9 @@ export async function validateStripeEnvDeep(force = false): Promise<StripeDeepRe
             `${plan} price id not found with this key - likely a live/test mode mismatch between STRIPE_SECRET_KEY and the price ids`,
           );
         } else {
-          problems.push(`${plan} price could not be verified (${error instanceof Error ? error.message : "unknown error"})`);
+          problems.push(
+            `${plan} price could not be verified (${error instanceof Error ? error.message : "unknown error"})`,
+          );
         }
       }
     }

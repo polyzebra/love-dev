@@ -141,7 +141,10 @@ export async function getExploreCategories(viewerId: string): Promise<ExploreGro
   const [categories, blockedIds, myPrefs] = await Promise.all([
     db.exploreCategory.findMany({ where: { isActive: true } }),
     blockedIdsFor(viewerId),
-    db.userExplorePreference.findMany({ where: { userId: viewerId }, select: { categoryId: true } }),
+    db.userExplorePreference.findMany({
+      where: { userId: viewerId },
+      select: { categoryId: true },
+    }),
   ]);
   const mine = new Set(myPrefs.map((p) => p.categoryId));
   const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS);
@@ -212,9 +215,12 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
 
   const now = Date.now();
   const ageWhere: Prisma.ProfileWhereInput = {};
-  if (filters.ageMin) ageWhere.birthDate = { lte: new Date(now - filters.ageMin * 365.25 * 24 * 3600_000) };
+  if (filters.ageMin)
+    ageWhere.birthDate = { lte: new Date(now - filters.ageMin * 365.25 * 24 * 3600_000) };
   if (filters.ageMax)
-    ageWhere.AND = [{ birthDate: { gte: new Date(now - (filters.ageMax + 1) * 365.25 * 24 * 3600_000) } }];
+    ageWhere.AND = [
+      { birthDate: { gte: new Date(now - (filters.ageMax + 1) * 365.25 * 24 * 3600_000) } },
+    ];
 
   // Respect mutual gender preferences when the viewer has a profile
   const genderWhere: Prisma.ProfileWhereInput = me
@@ -234,7 +240,9 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
             ...ageWhere,
             ...genderWhere,
             ...(filters.country ? { country: filters.country } : {}),
-            ...(filters.relationshipGoal ? { relationshipGoal: filters.relationshipGoal as never } : {}),
+            ...(filters.relationshipGoal
+              ? { relationshipGoal: filters.relationshipGoal as never }
+              : {}),
           },
         },
       },
@@ -246,7 +254,9 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
   const candidates = await db.user.findMany({
     where,
     include: {
-      profile: { include: { interests: { select: { interest: { select: { slug: true, label: true } } } } } },
+      profile: {
+        include: { interests: { select: { interest: { select: { slug: true, label: true } } } } },
+      },
       photos: {
         where: { moderation: { not: "REJECTED" } },
         orderBy: [{ isCover: "desc" }, { position: "asc" }],

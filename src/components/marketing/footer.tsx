@@ -27,7 +27,7 @@ const GROUPS = [
 
 export function MarketingFooter() {
   return (
-    <footer className="relative overflow-hidden border-t border-border">
+    <footer className="border-border relative overflow-hidden border-t">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-10">
         <div className="space-y-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -39,7 +39,7 @@ export function MarketingFooter() {
             className="h-8 w-auto select-none"
             draggable={false}
           />
-          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
             Dating, designed with intention.
             <br />
             Wherever you are.
@@ -49,7 +49,7 @@ export function MarketingFooter() {
           <nav key={group.title} aria-label={group.title}>
             {/* h2, not h3: pages like /pricing have no body h2, and an
                 h1->h3 jump breaks the heading outline. */}
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            <h2 className="text-muted-foreground mb-4 text-xs font-semibold tracking-[0.2em] uppercase">
               {group.title}
             </h2>
             <ul className="space-y-3">
@@ -57,7 +57,7 @@ export function MarketingFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-foreground/80 transition-colors hover:text-foreground"
+                    className="text-foreground/80 hover:text-foreground text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -79,11 +79,11 @@ export function MarketingFooter() {
         width={1084}
         height={259}
         draggable={false}
-        className="pointer-events-none mx-auto -mb-[2%] block w-full max-w-6xl select-none px-6 opacity-5"
+        className="pointer-events-none mx-auto -mb-[2%] block w-full max-w-6xl px-6 opacity-5 select-none"
       />
 
-      <div className="border-t border-border">
-        <p className="mx-auto max-w-6xl px-6 py-6 text-xs text-muted-foreground md:px-10">
+      <div className="border-border border-t">
+        <p className="text-muted-foreground mx-auto max-w-6xl px-6 py-6 text-xs md:px-10">
           © {new Date().getFullYear()} Tirvea Ltd. All rights reserved.
         </p>
       </div>

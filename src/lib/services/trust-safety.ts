@@ -43,7 +43,10 @@ export const DISCOVERABLE_STATUSES = [
 ] as const satisfies readonly AccountStatus[];
 
 /** No app access at all - the gate routes these to the status area. */
-export const RESTRICTED_STATUSES = ["SUSPENDED", "BANNED"] as const satisfies readonly AccountStatus[];
+export const RESTRICTED_STATUSES = [
+  "SUSPENDED",
+  "BANNED",
+] as const satisfies readonly AccountStatus[];
 
 export function isDiscoverableStatus(status: string): boolean {
   return (DISCOVERABLE_STATUSES as readonly string[]).includes(status);
@@ -73,7 +76,11 @@ export const DISCOVERABLE_USER_WHERE = {
 
 export type UploadGate =
   | { ok: true }
-  | { ok: false; code: "account_restricted" | "photo_review_required" | "upload_blocked"; message: string };
+  | {
+      ok: false;
+      code: "account_restricted" | "photo_review_required" | "upload_blocked";
+      message: string;
+    };
 
 /**
  * May this user upload a new photo right now? Blocked while suspended/
@@ -200,7 +207,9 @@ export async function openModerationCase(
       select: { id: true, severity: true, priority: true, evidence: true },
     });
     if (existing) {
-      const prior = Array.isArray(existing.evidence) ? existing.evidence : [existing.evidence ?? {}];
+      const prior = Array.isArray(existing.evidence)
+        ? existing.evidence
+        : [existing.evidence ?? {}];
       const escalate = SEVERITY_RANK[input.severity] > SEVERITY_RANK[existing.severity];
       await tx.moderationCase.update({
         where: { id: existing.id },
@@ -284,7 +293,11 @@ export async function resolveCasesForDeletedPhoto(photoId: string): Promise<numb
 
 export type CaseAssignResult =
   | { ok: true; caseId: string; assignedToId: string | null }
-  | { ok: false; code: "case_not_found" | "assignee_not_staff" | "case_closed" | "already_assigned"; message: string };
+  | {
+      ok: false;
+      code: "case_not_found" | "assignee_not_staff" | "case_closed" | "already_assigned";
+      message: string;
+    };
 
 const OPEN_CASE_STATUSES = ["OPEN", "UNDER_REVIEW", "APPEALED"] as const;
 
@@ -311,7 +324,11 @@ export async function assignCase(
     return { ok: false, code: "case_closed", message: "A closed case cannot be assigned." };
   }
   if (!assignee || assignee.role === "USER") {
-    return { ok: false, code: "assignee_not_staff", message: "Cases can only be assigned to staff." };
+    return {
+      ok: false,
+      code: "assignee_not_staff",
+      message: "Cases can only be assigned to staff.",
+    };
   }
   await db.moderationCase.update({
     where: { id: caseId },
@@ -351,7 +368,11 @@ export async function claimCase(
     if (!(OPEN_CASE_STATUSES as readonly string[]).includes(existing.status)) {
       return { ok: false, code: "case_closed", message: "A closed case cannot be claimed." };
     }
-    return { ok: false, code: "already_assigned", message: "Someone else already holds this case." };
+    return {
+      ok: false,
+      code: "already_assigned",
+      message: "Someone else already holds this case.",
+    };
   }
   await db.moderationCase.updateMany({
     where: { id: caseId, firstResponseAt: null },
@@ -439,7 +460,12 @@ export async function escalateOverdueCases(now: Date = new Date()): Promise<Esca
     escalated += 1;
     await recordAuthEvent({
       type: "case_sla_escalated",
-      metadata: { caseId: c.id, caseType: c.caseType, from: c.priority, to: bumpPriority(c.priority) },
+      metadata: {
+        caseId: c.id,
+        caseType: c.caseType,
+        from: c.priority,
+        to: bumpPriority(c.priority),
+      },
     });
     for (const s of staff) {
       const { notifyUser } = await import("@/lib/services/notify");
@@ -623,9 +649,7 @@ export async function enforceGraduated(input: EnforcementInput): Promise<Enforce
         where: { id: input.userId },
         data: {
           status: nextStatus,
-          ...(nextStatus === "BANNED"
-            ? { bannedAt: now, banReason: copy.reason }
-            : {}),
+          ...(nextStatus === "BANNED" ? { bannedAt: now, banReason: copy.reason } : {}),
         },
       });
     }
@@ -965,7 +989,10 @@ export async function clearBanCredentials(userId: string): Promise<void> {
 }
 
 /** Is this credential on the ban blocklist (unexpired)? */
-export async function isCredentialBanned(kind: "PHONE" | "DEVICE", value: string): Promise<boolean> {
+export async function isCredentialBanned(
+  kind: "PHONE" | "DEVICE",
+  value: string,
+): Promise<boolean> {
   const row = await db.bannedCredential.findUnique({
     where: { kind_value: { kind, value } },
     select: { expiresAt: true },

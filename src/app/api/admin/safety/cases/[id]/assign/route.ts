@@ -26,9 +26,7 @@ export async function POST(req: Request, { params }: Params) {
   const { data, response: invalid } = await parseBody(req, assignSchema);
   if (invalid) return invalid;
 
-  const result = data.assigneeId
-    ? await assignCase(id, data.assigneeId)
-    : await unassignCase(id);
+  const result = data.assigneeId ? await assignCase(id, data.assigneeId) : await unassignCase(id);
   if (!result.ok) {
     if (result.code === "case_not_found") return notFound("Case");
     return apiError(result.code === "assignee_not_staff" ? 422 : 409, result.code, result.message);

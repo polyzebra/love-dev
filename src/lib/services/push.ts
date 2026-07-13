@@ -143,7 +143,10 @@ export type PushPayload = {
 };
 
 /** TTL/urgency by notification type: messages are ephemeral, matches keep. */
-export function deliveryPolicyFor(type: NotificationType): { ttl: number; urgency: PushSendOptions["urgency"] } {
+export function deliveryPolicyFor(type: NotificationType): {
+  ttl: number;
+  urgency: PushSendOptions["urgency"];
+} {
   switch (type) {
     case "NEW_MESSAGE":
       return { ttl: 3600, urgency: "high" };

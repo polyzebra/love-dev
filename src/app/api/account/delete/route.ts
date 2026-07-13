@@ -31,7 +31,6 @@ export async function POST() {
   });
 
   return ok({
-    message:
-      "Your account is scheduled for deletion in 30 days. Sign in before then to cancel.",
+    message: "Your account is scheduled for deletion in 30 days. Sign in before then to cancel.",
   });
 }

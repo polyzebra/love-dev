@@ -50,10 +50,7 @@ export function ManageBillingButton({
         return; // stay busy while the browser navigates
       }
       setBusy(false);
-      setError(
-        payload?.error?.message ??
-          "We couldn't open the billing portal. Please try again.",
-      );
+      setError(payload?.error?.message ?? "We couldn't open the billing portal. Please try again.");
     } catch {
       setBusy(false);
       setError("We couldn't reach Tirvea. Check your connection and try again.");
@@ -95,7 +92,7 @@ export function ManageBillingButton({
       <p
         role="status"
         aria-live="polite"
-        className={cn("max-w-xs text-sm text-muted-foreground", !error && "sr-only")}
+        className={cn("text-muted-foreground max-w-xs text-sm", !error && "sr-only")}
       >
         {error}
       </p>

@@ -70,10 +70,11 @@ export default function LandingPage() {
       <section className="relative overflow-hidden py-32 md:py-44">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <Reveal>
-            <p className="font-display text-[clamp(1.8rem,4.5vw,3.4rem)] font-medium leading-[1.25] tracking-tight text-balance">
-              Swiping was built to be <span className="italic text-muted-foreground">endless</span>.
+            <p className="font-display text-[clamp(1.8rem,4.5vw,3.4rem)] leading-[1.25] font-medium tracking-tight text-balance">
+              Swiping was built to be <span className="text-muted-foreground italic">endless</span>.
               <br />
-              We built Tirvea to be <span className="text-luxe italic">the last app you download</span>.
+              We built Tirvea to be{" "}
+              <span className="text-luxe italic">the last app you download</span>.
             </p>
           </Reveal>
         </div>
@@ -85,7 +86,7 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 md:grid-cols-2 md:px-10">
           <Reveal className="order-2 md:order-1">
             <TiltCard maxTilt={7} className="rounded-2xl">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/12 shadow-float light:border-border">
+              <div className="shadow-float light:border-border relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/12">
                 <Image
                   src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=640&q=75&auto=format&fit=crop"
                   alt="A couple laughing together over coffee"
@@ -96,7 +97,7 @@ export default function LandingPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 {/* Aspirational copy in the product's voice - never a
                     fabricated member quote. */}
-                <p className="absolute bottom-5 left-5 right-5 font-display text-xl italic text-white/95">
+                <p className="font-display absolute right-5 bottom-5 left-5 text-xl text-white/95 italic">
                   From first hello to first coffee.
                 </p>
               </div>
@@ -105,19 +106,19 @@ export default function LandingPage() {
 
           <div className="order-1 space-y-6 md:order-2">
             <Reveal>
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
+              <p className="text-gold text-xs font-semibold tracking-[0.35em] uppercase">
                 The difference
               </p>
             </Reveal>
             <Reveal delay={0.08}>
-              <h2 className="font-display text-4xl font-medium leading-[1.06] tracking-tight md:text-6xl">
+              <h2 className="font-display text-4xl leading-[1.06] font-medium tracking-tight md:text-6xl">
                 Designed like it&apos;s
                 <br />
                 <span className="italic">someone&apos;s story.</span>
               </h2>
             </Reveal>
             <Reveal delay={0.16}>
-              <p className="max-w-md text-lg leading-relaxed text-muted-foreground">
+              <p className="text-muted-foreground max-w-md text-lg leading-relaxed">
                 Because it is. Profiles read like people, not inventory. Distance, intentions and
                 shared interests sit exactly where your eyes expect them - and nothing screams for
                 your attention.
@@ -126,10 +127,13 @@ export default function LandingPage() {
             <Reveal delay={0.24}>
               <Link
                 href="/login"
-                className="group inline-flex items-center gap-2 text-sm font-semibold text-primary-soft"
+                className="group text-primary-soft inline-flex items-center gap-2 text-sm font-semibold"
               >
                 Create your profile
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </Link>
             </Reveal>
           </div>
@@ -140,10 +144,10 @@ export default function LandingPage() {
       <section className="relative py-24 md:py-36">
         <div className="mx-auto max-w-6xl px-6 md:px-10">
           <Reveal>
-            <h2 className="mb-20 max-w-2xl font-display text-4xl font-medium leading-[1.06] tracking-tight md:text-6xl">
+            <h2 className="font-display mb-20 max-w-2xl text-4xl leading-[1.06] font-medium tracking-tight md:text-6xl">
               Three promises,
               <br />
-              <span className="italic text-muted-foreground">kept by design.</span>
+              <span className="text-muted-foreground italic">kept by design.</span>
             </h2>
           </Reveal>
           <RevealGroup className="grid gap-6 md:grid-cols-3">
@@ -155,13 +159,13 @@ export default function LandingPage() {
                 <article className="glass group relative overflow-hidden rounded-xl p-8 transition-transform duration-500 hover:-translate-y-1.5">
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute -right-4 -top-8 font-display text-[7rem] font-semibold leading-none text-foreground/4 transition-colors duration-500 group-hover:text-primary/10"
+                    className="font-display text-foreground/4 group-hover:text-primary/10 pointer-events-none absolute -top-8 -right-4 text-[7rem] leading-none font-semibold transition-colors duration-500"
                   >
                     {number}
                   </span>
-                  <Icon className="mb-6 size-7 text-primary-soft" aria-hidden="true" />
+                  <Icon className="text-primary-soft mb-6 size-7" aria-hidden="true" />
                   <h3 className="mb-3 text-xl font-semibold tracking-tight">{title}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
                 </article>
               </RevealItem>
             ))}
@@ -173,27 +177,30 @@ export default function LandingPage() {
       <section className="relative py-24 md:my-12 md:py-36">
         <div className="mx-auto max-w-6xl px-6 md:px-10">
           <Reveal>
-            <div className="border-glow noise relative overflow-hidden rounded-[36px] bg-card/60 px-8 py-16 md:px-16 md:py-24">
+            <div className="border-glow noise bg-card/60 relative overflow-hidden rounded-[36px] px-8 py-16 md:px-16 md:py-24">
               <div
                 aria-hidden="true"
                 className="absolute -top-32 left-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(56,189,248,0.12),transparent_70%)] blur-2xl"
               />
               <div className="relative grid items-center gap-12 md:grid-cols-[auto_1fr]">
                 <div className="relative mx-auto flex size-36 items-center justify-center md:size-44">
-                  <span className="absolute inset-0 animate-ping-soft rounded-full bg-sky-400/20" />
+                  <span className="animate-ping-soft absolute inset-0 rounded-full bg-sky-400/20" />
                   <span className="glass-chip absolute inset-3 rounded-full" />
-                  <BadgeCheck className="relative size-16 fill-sky-400 text-white md:size-20" aria-hidden="true" />
+                  <BadgeCheck
+                    className="relative size-16 fill-sky-400 text-white md:size-20"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="space-y-5 text-center md:text-left">
-                  <h2 className="font-display text-3xl font-medium leading-tight tracking-tight md:text-5xl">
+                  <h2 className="font-display text-3xl leading-tight font-medium tracking-tight md:text-5xl">
                     The blue tick means
                     <br />
                     <span className="italic">they&apos;re real.</span>
                   </h2>
-                  <p className="mx-auto max-w-lg text-muted-foreground md:mx-0">
+                  <p className="text-muted-foreground mx-auto max-w-lg md:mx-0">
                     A quick selfie check earns every member their verification badge. Reports are
-                    reviewed by humans, blocking is instant and absolute, and your exact location
-                    is never shown to anyone.
+                    reviewed by humans, blocking is instant and absolute, and your exact location is
+                    never shown to anyone.
                   </p>
                   <Button variant="outline" className="h-12 rounded-full px-6" asChild>
                     <Link href="/safety">
@@ -213,28 +220,37 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-6 md:px-10">
           <div className="grid gap-16 md:grid-cols-[0.8fr_1.2fr]">
             <Reveal>
-              <h2 className="font-display text-4xl font-medium leading-[1.06] tracking-tight md:sticky md:top-32 md:text-6xl">
+              <h2 className="font-display text-4xl leading-[1.06] font-medium tracking-tight md:sticky md:top-32 md:text-6xl">
                 Tonight,
                 <br />
-                <span className="italic text-muted-foreground">it starts.</span>
+                <span className="text-muted-foreground italic">it starts.</span>
               </h2>
             </Reveal>
             <RevealGroup className="space-y-2" stagger={0.12}>
               {[
-                ["Five honest minutes", "Photos that look like you, intentions you actually hold, and the small details that make someone stop scrolling."],
-                ["One quick selfie", "Our verification check earns your blue tick - and filters out everyone who wouldn't take it."],
-                ["A feed worth opening", "A short, curated set of profiles each day. When it's mutual, the conversation starts warm."],
+                [
+                  "Five honest minutes",
+                  "Photos that look like you, intentions you actually hold, and the small details that make someone stop scrolling.",
+                ],
+                [
+                  "One quick selfie",
+                  "Our verification check earns your blue tick - and filters out everyone who wouldn't take it.",
+                ],
+                [
+                  "A feed worth opening",
+                  "A short, curated set of profiles each day. When it's mutual, the conversation starts warm.",
+                ],
               ].map(([title, body], i) => (
                 <RevealItem key={title}>
-                  <div className="group flex gap-8 border-t border-border py-10 last:border-b">
-                    <span className="font-display text-2xl italic text-primary-soft/70">
+                  <div className="group border-border flex gap-8 border-t py-10 last:border-b">
+                    <span className="font-display text-primary-soft/70 text-2xl italic">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div className="space-y-2">
-                      <h3 className="text-2xl font-semibold tracking-tight transition-colors group-hover:text-primary-soft">
+                      <h3 className="group-hover:text-primary-soft text-2xl font-semibold tracking-tight transition-colors">
                         {title}
                       </h3>
-                      <p className="max-w-md leading-relaxed text-muted-foreground">{body}</p>
+                      <p className="text-muted-foreground max-w-md leading-relaxed">{body}</p>
                     </div>
                   </div>
                 </RevealItem>
@@ -249,17 +265,17 @@ export default function LandingPage() {
         <Aurora intensity="hero" />
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           <Reveal>
-            <ShieldCheck className="mx-auto mb-8 size-8 text-gold" aria-hidden="true" />
+            <ShieldCheck className="text-gold mx-auto mb-8 size-8" aria-hidden="true" />
           </Reveal>
           <Reveal delay={0.08}>
-            <h2 className="font-display text-[clamp(2.6rem,7vw,5.5rem)] font-medium leading-[1.02] tracking-tight text-balance">
+            <h2 className="font-display text-[clamp(2.6rem,7vw,5.5rem)] leading-[1.02] font-medium tracking-tight text-balance">
               Your person is
               <br />
               <span className="text-luxe italic">not on page 400.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.18}>
-            <p className="mx-auto mt-6 max-w-md text-lg text-muted-foreground">
+            <p className="text-muted-foreground mx-auto mt-6 max-w-md text-lg">
               They&apos;re in a curated feed, verified, and looking for the same thing you are.
             </p>
           </Reveal>
