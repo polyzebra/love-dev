@@ -11,6 +11,16 @@ export const checkoutSchema = z.strictObject({
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 
+/**
+ * POST /api/billing/change-plan body - the SAME contract as checkout: the
+ * browser names a target plan and nothing else. Which change is legal
+ * (strictly-higher tier, live subscription) is decided server-side in
+ * changePlan() against the canonical hierarchy.
+ */
+export const changePlanSchema = checkoutSchema;
+
+export type ChangePlanInput = z.infer<typeof changePlanSchema>;
+
 /** GET /api/billing/checkout-status?session_id= */
 export const checkoutStatusQuerySchema = z.object({
   session_id: z.string().min(1).max(200),

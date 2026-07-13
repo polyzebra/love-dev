@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireAdminPage } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
+import { PLANS } from "@/lib/constants";
 import { daysAgo } from "@/lib/presence";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +37,11 @@ export default async function AdminPaymentsPage() {
     db.subscription.count({ where: { tier: "GOLD", status: "ACTIVE" } }),
   ]);
 
-  const mrrApprox = (plusCount * 1499 + goldCount * 2999) / 100;
+  // ONE price source: monthly amounts come from the PLANS catalogue, the
+  // same place the pricing UI and Stripe validation read.
+  const monthlyCents = (tier: "PLUS" | "GOLD") =>
+    PLANS.find((p) => p.tier === tier)?.priceMonthlyCents ?? 0;
+  const mrrApprox = (plusCount * monthlyCents("PLUS") + goldCount * monthlyCents("GOLD")) / 100;
 
   return (
     <>

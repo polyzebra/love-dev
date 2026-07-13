@@ -25,14 +25,16 @@ import type {
   StripeClient,
   StripeSubscription,
   StripeCheckoutSession,
+  UpdateSubscriptionPriceParams,
 } from "../src/lib/stripe";
 
 process.env.AUTH_HASH_SALT = process.env.AUTH_HASH_SALT || "test-salt";
 // Billing must consider itself configured so getStripeClient()/env checks
 // behave like production; the spy client guarantees zero real API calls.
-if (!process.env.STRIPE_SECRET_KEY?.trim()) {
-  process.env.STRIPE_SECRET_KEY = "sk_test_dummy_for_tests";
-}
+// The key is ALWAYS the dummy - it is never sent anywhere, and a
+// non-standard local key (e.g. an mk_ mock key) must not fail the
+// format checks of case 19d.
+process.env.STRIPE_SECRET_KEY = "sk_test_dummy_for_tests";
 if (!process.env.STRIPE_WEBHOOK_SECRET?.trim()) {
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_dummy";
 }
@@ -72,13 +74,18 @@ async function main() {
     syncStripeSubscription,
     processStripeEvent,
     checkoutIdempotencyKey,
+    changePlan,
+    planChangeIdempotencyKey,
+    PLAN_CHANGE_PRORATION_BEHAVIOR,
+    hasLiveSubscription,
     BillingError,
   } = await import("../src/lib/services/billing");
+  const { PLANS, planRank, upgradePlansFor } = await import("../src/lib/constants");
   const { getUserEntitlements, effectiveTier } = await import(
     "../src/lib/services/entitlements"
   );
   const { planTierOf } = await import("../src/lib/services/matching");
-  const { checkoutSchema } = await import("../src/lib/validators/billing");
+  const { checkoutSchema, changePlanSchema } = await import("../src/lib/validators/billing");
   const { POST: webhookPOST } = await import("../src/app/api/webhooks/stripe/route");
 
   const PLUS_PRICE = process.env.STRIPE_PLUS_MONTHLY_PRICE_ID!;
@@ -94,6 +101,7 @@ async function main() {
   const subscriptions = new Map<string, StripeSubscription>();
   const idempotencySessions = new Map<string, string>();
   const portalCalls: { customer: string; returnUrl: string }[] = [];
+  const planChangeCalls: UpdateSubscriptionPriceParams[] = [];
   const priceCatalogue = new Map<string, { currency: string; unit_amount: number; interval: string }>([
     [PLUS_PRICE, { currency: "eur", unit_amount: 1499, interval: "month" }],
     [GOLD_PRICE, { currency: "eur", unit_amount: 2999, interval: "month" }],
@@ -132,6 +140,20 @@ async function main() {
     async retrieveSubscription(id) {
       const s = subscriptions.get(id);
       if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
+      return s;
+    },
+    async updateSubscriptionPrice(p) {
+      planChangeCalls.push(p);
+      const s = subscriptions.get(p.subscriptionId);
+      if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
+      const item = s.items?.data?.[0];
+      if (!item) throw new StripeApiError(400, "invalid_request", "Subscription has no item");
+      if (item.id && item.id !== p.itemId) {
+        throw new StripeApiError(400, "invalid_request", "No such subscription item");
+      }
+      // Stripe REPLACES the item's price in place - same subscription,
+      // same customer, same billing period fields.
+      item.price = { id: p.priceId };
       return s;
     },
     async listSubscriptions(customerId) {
@@ -173,6 +195,7 @@ async function main() {
       items: {
         data: [
           {
+            id: `si_test_${++seq}`,
             price: { id: opts.priceId },
             current_period_start: nowSecs,
             current_period_end: opts.periodEndSecs ?? nowSecs + 30 * 24 * 3600,
@@ -584,6 +607,129 @@ async function main() {
     });
 
     // -----------------------------------------------------------------------
+    // In-place plan change (upgrade) - Stripe subscription UPDATE
+    // -----------------------------------------------------------------------
+    await check("hierarchy: upgrade targets derive from canonical FREE < PLUS < GOLD", () => {
+      assert.ok(planRank("FREE") < planRank("PLUS"));
+      assert.ok(planRank("PLUS") < planRank("GOLD"));
+      assert.deepEqual(upgradePlansFor("FREE").map((p) => p.tier), ["PLUS", "GOLD"]);
+      assert.deepEqual(upgradePlansFor("PLUS").map((p) => p.tier), ["GOLD"]);
+      assert.deepEqual(upgradePlansFor("GOLD").map((p) => p.tier), []);
+      // The hierarchy IS the PLANS order - adding a tier propagates.
+      assert.deepEqual(PLANS.map((p) => p.tier), ["FREE", "PLUS", "GOLD"]);
+    });
+
+    await check("change-plan schema is as strict as checkout (no price ids from the browser)", () => {
+      assert.equal(changePlanSchema.safeParse({ plan: "GOLD" }).success, true);
+      assert.equal(changePlanSchema.safeParse({ plan: "DIAMOND" }).success, false);
+      assert.equal(
+        changePlanSchema.safeParse({ plan: "GOLD", priceId: "price_evil" }).success,
+        false,
+      );
+    });
+
+    await check("no live subscription -> no_subscription (checkout is the path)", async () => {
+      const gina = await seedUser("gina"); // free member, no subscription row
+      assert.equal(hasLiveSubscription(await subRow(alice)), true);
+      await assert.rejects(
+        () => changePlan(gina, "GOLD"),
+        (e: unknown) => e instanceof BillingError && e.code === "no_subscription",
+      );
+    });
+
+    let aliceSubId = "";
+    await check("PLUS -> GOLD updates the EXISTING subscription in place (no duplicate)", async () => {
+      const before = await subRow(alice);
+      assert.equal(before.tier, "PLUS");
+      aliceSubId = before.providerSubId!;
+      const subCountBefore = subscriptions.size;
+      const checkoutsBefore = checkoutSessionsCreated;
+      const customersBefore = customers.size;
+      const periodEndBefore = before.currentPeriodEnd?.getTime();
+
+      const result = await changePlan(alice, "GOLD");
+      assert.equal(result.plan, "GOLD");
+      assert.equal(result.status, "ACTIVE");
+
+      // UPDATE, never CREATE: no second subscription, session or customer.
+      assert.equal(subscriptions.size, subCountBefore);
+      assert.equal(checkoutSessionsCreated, checkoutsBefore);
+      assert.equal(customers.size, customersBefore);
+
+      const row = await subRow(alice);
+      assert.equal(row.tier, "GOLD");
+      assert.equal(row.status, "ACTIVE");
+      assert.equal(row.providerSubId, aliceSubId, "same Stripe subscription id");
+      assert.equal(row.providerCustomerId, before.providerCustomerId, "customer id unchanged");
+      assert.equal(row.stripePriceId, GOLD_PRICE, "item price replaced with GOLD");
+      assert.equal(
+        row.currentPeriodEnd?.getTime(),
+        periodEndBefore,
+        "billing cycle anchor preserved",
+      );
+
+      // The Stripe call carried the configured proration + idempotency.
+      const call = planChangeCalls[planChangeCalls.length - 1];
+      assert.equal(call.subscriptionId, aliceSubId);
+      assert.equal(call.priceId, GOLD_PRICE);
+      assert.equal(call.prorationBehavior, PLAN_CHANGE_PRORATION_BEHAVIOR);
+      assert.equal(call.itemId, subscriptions.get(aliceSubId)!.items!.data![0].id);
+      assert.equal(call.idempotencyKey, planChangeIdempotencyKey(alice, "GOLD"));
+
+      // Entitlements follow immediately - no webhook needed.
+      assert.equal((await getUserEntitlements(alice)).plan, "GOLD");
+    });
+
+    await check("the customer.subscription.updated webhook after an upgrade is a harmless no-op", async () => {
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.updated",
+        data: {
+          object: { id: aliceSubId, customer: (await subRow(alice)).providerCustomerId },
+        },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      const row = await subRow(alice);
+      assert.equal(row.tier, "GOLD");
+      assert.equal(row.providerSubId, aliceSubId);
+    });
+
+    await check("GOLD has no upgrade: same tier and downgrades answer invalid_plan_change", async () => {
+      await assert.rejects(
+        () => changePlan(alice, "GOLD"),
+        (e: unknown) => e instanceof BillingError && e.code === "invalid_plan_change",
+      );
+      await assert.rejects(
+        () => changePlan(alice, "PLUS"),
+        (e: unknown) => e instanceof BillingError && e.code === "invalid_plan_change",
+      );
+      assert.equal((await subRow(alice)).tier, "GOLD", "nothing changed");
+    });
+
+    await check("PAST_DUE blocks in-place upgrades (fix the payment method first)", async () => {
+      const frank = await seedUser("frank");
+      const { sessionId } = await startCheckout(frank, "PLUS");
+      const frankSub = completeCheckout(sessionId, { priceId: PLUS_PRICE });
+      await syncStripeSubscription({
+        stripeCustomerId: frankSub.customer,
+        stripeSubscriptionId: frankSub.id,
+      });
+      assert.equal((await subRow(frank)).tier, "PLUS");
+      subscriptions.set(frankSub.id, { ...subscriptions.get(frankSub.id)!, status: "past_due" });
+      await syncStripeSubscription({
+        stripeCustomerId: frankSub.customer,
+        stripeSubscriptionId: frankSub.id,
+      });
+      const callsBefore = planChangeCalls.length;
+      await assert.rejects(
+        () => changePlan(frank, "GOLD"),
+        (e: unknown) => e instanceof BillingError && e.code === "payment_past_due",
+      );
+      assert.equal(planChangeCalls.length, callsBefore, "Stripe never called");
+      assert.equal((await subRow(frank)).tier, "PLUS");
+    });
+
+    // -----------------------------------------------------------------------
     // Env validation
     // -----------------------------------------------------------------------
     await check("case 19a: identical PLUS/GOLD price ids fail validation", () => {
@@ -648,6 +794,7 @@ async function main() {
       skip("case 3: unauthenticated POST /api/billing/checkout answers 401", "dev server not running");
       skip("unauthenticated GET /api/billing/checkout-status answers 401", "dev server not running");
       skip("unauthenticated POST /api/billing/portal answers 401", "dev server not running");
+      skip("unauthenticated POST /api/billing/change-plan answers 401", "dev server not running");
     } else {
       await check("case 3: unauthenticated POST /api/billing/checkout answers 401", async () => {
         const res = await fetch(`${base}/api/billing/checkout`, {
@@ -663,6 +810,14 @@ async function main() {
       });
       await check("unauthenticated POST /api/billing/portal answers 401", async () => {
         const res = await fetch(`${base}/api/billing/portal`, { method: "POST" });
+        assert.equal(res.status, 401);
+      });
+      await check("unauthenticated POST /api/billing/change-plan answers 401", async () => {
+        const res = await fetch(`${base}/api/billing/change-plan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: "GOLD" }),
+        });
         assert.equal(res.status, 401);
       });
     }

@@ -154,13 +154,14 @@ check("cancelAtPeriodEnd and PAST_DUE grace states have honest copy", () => {
   assert.match(subPage, /didn(?:'|&apos;)t go through/);
 });
 
-check("upgrade CTAs are the shared pricing spotlight (whose paid CTAs are CheckoutButton); billing runs through the portal button", () => {
+check("upgrade CTAs are the shared pricing spotlight (whose paid CTAs are Checkout/UpgradePlan buttons); billing runs through the portal button", () => {
   // The upgrade section embeds the ONE plan-card surface - no duplicated
-  // Plus/Gold markup on the settings page. CheckoutButton lives inside
-  // PricingSpotlight (pinned below in the pricing honesty section).
-  assert.match(subPage, /<PricingSpotlight variant="embedded"/);
+  // Plus/Gold markup on the settings page. CheckoutButton/UpgradePlanButton
+  // live inside PricingSpotlight (pinned below in the pricing honesty and
+  // upgrade-path sections).
+  assert.match(subPage, /<PricingSpotlight\s+variant="embedded"/);
   assert.ok(
-    !/<CheckoutButton/.test(subPage),
+    !/<CheckoutButton|<UpgradePlanButton/.test(subPage),
     "no second copy of the upgrade CTA outside the shared spotlight",
   );
   assert.match(subPage, /<ManageBillingButton/);
@@ -292,6 +293,68 @@ check("paid CTAs on the pricing spotlight are the real CheckoutButton, not /logi
     !/Get \$\{plan\.name\}|href="\/login"[^]*Get /.test(spotlightSrc),
     "paid plans must not link to /login",
   );
+});
+
+// ---------------------------------------------------------------------------
+console.log("upgrade path - in-place plan change, one canonical hierarchy");
+// ---------------------------------------------------------------------------
+
+const upgradeButton = read("src", "components", "billing", "upgrade-plan-button.tsx");
+const pricingPage = read("src", "app", "(marketing)", "pricing", "page.tsx");
+
+check("plan cards derive from the canonical hierarchy, never a hand-rolled list", () => {
+  // Both the tiers shown and the upgrade targets come from
+  // planRank/upgradePlansFor (lib/constants) - adding a tier to PLANS
+  // propagates to every surface without touching this component.
+  assert.match(spotlightSrc, /upgradePlansFor\(/);
+  assert.match(spotlightSrc, /planRank\(/);
+});
+
+check("members with a live subscription upgrade IN PLACE - no portal detour to discover Gold", () => {
+  assert.match(spotlightSrc, /<UpgradePlanButton/);
+  assert.match(upgradeButton, /\/api\/billing\/change-plan/);
+  assert.ok(
+    !/\/api\/billing\/portal/.test(stripComments(upgradeButton)),
+    "the upgrade CTA must never fall back to the portal",
+  );
+});
+
+check("the current plan is labelled, never sold back (no CTA to buy what you hold)", () => {
+  assert.match(spotlightSrc, /Your current plan/);
+  assert.match(spotlightSrc, /currentTier === plan\.tier/);
+});
+
+check("upgrade CTA copy is exact and proration is honest", () => {
+  assert.match(upgradeButton, /Upgrade to \$\{planName\}/);
+  assert.match(spotlightSrc, /you only pay the difference/);
+  assert.match(spotlightSrc, /Same renewal date/);
+});
+
+check("UpgradePlanButton keeps the calm CTA contract (size reserved, aria-busy, inline error)", () => {
+  const stacked = upgradeButton.match(/col-start-1 row-start-1/g) ?? [];
+  assert.ok(stacked.length >= 2, "both labels stacked in the same grid cell");
+  assert.match(upgradeButton, /aria-busy=\{busy\}/);
+  assert.match(upgradeButton, /disabled=\{busy\}/);
+  assert.match(upgradeButton, /aria-live="polite"/);
+  assert.match(upgradeButton, /res\.status === 401/);
+  assert.match(upgradeButton, /router\.refresh\(\)/);
+});
+
+check("settings page decides the upgrade path via the SHARED live-subscription predicate", () => {
+  assert.match(subPage, /hasLiveSubscription\(subscription\)/);
+  assert.match(subPage, /from "@\/lib\/services\/billing"/);
+  assert.ok(
+    !/\["ACTIVE", "TRIALING", "PAST_DUE"\]/.test(stripComments(subPage)),
+    "no re-derived status list on the page",
+  );
+  assert.match(subPage, /upgradePlansFor\(/);
+});
+
+check("pricing page is plan-aware: current tier + live-sub state feed the spotlight", () => {
+  assert.match(pricingPage, /effectiveTier\(subscription\)/);
+  assert.match(pricingPage, /hasLiveSubscription\(subscription\)/);
+  assert.match(pricingPage, /currentTier=\{currentTier\}/);
+  assert.match(pricingPage, /hasLiveSub=\{hasLiveSub\}/);
 });
 
 console.log(`\nbilling-ui: ${passed} checks passed`);

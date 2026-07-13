@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { siteUrl } from "@/lib/auth/url";
+import { planRank } from "@/lib/constants";
 import {
   getStripeClient,
   planForPriceId,
@@ -14,9 +15,12 @@ import type { PlanTier, SubscriptionStatus } from "@/generated/prisma/enums";
 
 /**
  * Canonical Stripe subscription lifecycle - the ONE place billing state
- * changes. Three entry points, one truth:
+ * changes. Four entry points, one truth:
  *
  *   startCheckout()          creates a Checkout Session (CHECKOUT_PENDING)
+ *   changePlan()             in-place upgrade of an EXISTING subscription
+ *                            (Stripe subscription update - never a second
+ *                            subscription)
  *   syncStripeSubscription() refetch-latest sync, used by BOTH the webhook
  *                            and checkout-status reconciliation
  *   processStripeEvent()     idempotent webhook dispatch (StripeEvent ledger)
@@ -41,6 +45,9 @@ export class BillingError extends Error {
       | "billing_unavailable"
       | "already_subscribed"
       | "no_customer"
+      | "no_subscription"
+      | "invalid_plan_change"
+      | "payment_past_due"
       | "not_found",
     message: string,
   ) {
@@ -54,6 +61,9 @@ export const BILLING_ERROR_STATUS: Record<BillingError["code"], number> = {
   billing_unavailable: 503,
   already_subscribed: 409,
   no_customer: 409,
+  no_subscription: 409,
+  invalid_plan_change: 409,
+  payment_past_due: 409,
   not_found: 404,
 };
 
@@ -62,6 +72,18 @@ export const BILLING_ERROR_STATUS: Record<BillingError["code"], number> = {
 // included on purpose: the fix for a failed payment is the portal, not a
 // second subscription.
 const LIVE_SUB_STATUSES: SubscriptionStatus[] = ["ACTIVE", "TRIALING", "PAST_DUE"];
+
+/**
+ * "Does this row hold a live Stripe subscription?" - the shared predicate
+ * behind duplicate-checkout prevention AND every UI decision about which
+ * upgrade path to offer (checkout vs in-place plan change). Pages import
+ * THIS instead of re-deriving the status list.
+ */
+export function hasLiveSubscription<T extends { tier: PlanTier; status: SubscriptionStatus }>(
+  row: T | null,
+): row is T {
+  return !!row && row.tier !== "FREE" && LIVE_SUB_STATUSES.includes(row.status);
+}
 
 function requireClient() {
   const client = getStripeClient();
@@ -170,6 +192,134 @@ export async function startCheckout(
   });
 
   return { url: session.url, sessionId: session.id };
+}
+
+// ---------------------------------------------------------------------------
+// In-place plan change (upgrade) - Stripe subscription UPDATE, never a
+// second subscription
+// ---------------------------------------------------------------------------
+
+/**
+ * Proration policy for in-place upgrades, applied on the Stripe
+ * subscription update. `create_prorations` (Stripe's default) grants the
+ * new plan immediately and settles the prorated difference on the next
+ * invoice - the billing cycle anchor is never touched. Swap this ONE
+ * constant to `always_invoice` to charge the difference immediately.
+ */
+export const PLAN_CHANGE_PRORATION_BEHAVIOR = "create_prorations" as const;
+
+/** Same double-tap window as checkout: identical user+plan requests share one Stripe idempotency key. */
+export function planChangeIdempotencyKey(userId: string, plan: PaidPlan, now = Date.now()): string {
+  return `planchange_${userId}_${plan}_${Math.floor(now / CHECKOUT_IDEMPOTENCY_WINDOW_MS)}`;
+}
+
+export type ChangePlanResult = { plan: PlanTier; status: SubscriptionStatus };
+
+/**
+ * Upgrade an EXISTING live subscription to a higher tier from inside the
+ * product - the user never has to discover plan changes in the Stripe
+ * portal. Invariants:
+ *
+ *  - UPDATE, never CREATE: the existing subscription item's price is
+ *    replaced in place, so no second subscription (or Stripe customer)
+ *    can ever appear and the billing cycle anchor is preserved.
+ *  - upgrades only: the target must rank strictly ABOVE the current tier
+ *    in the canonical FREE < PLUS < GOLD hierarchy (downgrades and
+ *    cancellation stay in the portal, where Stripe explains the credit).
+ *  - no live subscription -> no_subscription: the caller should send the
+ *    user through checkout instead (the exact mirror of startCheckout's
+ *    already_subscribed guard).
+ *  - PAST_DUE -> payment_past_due: fixing the payment method comes first;
+ *    stacking a prorated upgrade on a failing card only deepens dunning.
+ *  - persistence happens through syncStripeSubscription (refetch-latest),
+ *    the same single write path the webhook uses - the concurrently
+ *    arriving customer.subscription.updated event is a harmless no-op.
+ */
+export async function changePlan(userId: string, plan: PaidPlan): Promise<ChangePlanResult> {
+  const client = requireClient();
+  logEnvProblemsOnce();
+  const priceId = stripePriceIdFor(plan);
+  if (!priceId) {
+    throw new BillingError(
+      "billing_unavailable",
+      `The ${plan} plan is not configured on this deployment.`,
+    );
+  }
+
+  const row = await db.subscription.findUnique({ where: { userId } });
+  if (!hasLiveSubscription(row)) {
+    throw new BillingError(
+      "no_subscription",
+      "You don't have an active subscription to change - start a checkout instead.",
+    );
+  }
+  if (row.status === "PAST_DUE") {
+    throw new BillingError(
+      "payment_past_due",
+      "Your last payment didn't go through. Update your payment method in billing first.",
+    );
+  }
+  if (planRank(plan) <= planRank(row.tier)) {
+    throw new BillingError(
+      "invalid_plan_change",
+      plan === row.tier
+        ? "You're already on this plan."
+        : "Only upgrades happen here - downgrades and cancellation live in billing.",
+    );
+  }
+  if (!row.providerSubId || !row.providerCustomerId) {
+    throw new BillingError(
+      "no_subscription",
+      "We couldn't find your subscription. Please contact support.",
+    );
+  }
+
+  let sub: StripeSubscription;
+  try {
+    sub = await client.retrieveSubscription(row.providerSubId);
+  } catch (error) {
+    if (error instanceof StripeApiError && error.status === 404) {
+      throw new BillingError(
+        "no_subscription",
+        "Your subscription could not be found at Stripe. Please contact support.",
+      );
+    }
+    throw error;
+  }
+  if (sub.customer !== row.providerCustomerId) {
+    // Cross-customer subscription id - same refusal as syncStripeSubscription.
+    console.error(
+      `[billing:change-plan] subscription ${sub.id} belongs to ${sub.customer}, not ${row.providerCustomerId} - refusing`,
+    );
+    throw new BillingError("no_subscription", "Your subscription could not be verified.");
+  }
+  const itemId = sub.items?.data?.[0]?.id;
+  if (!itemId) {
+    throw new BillingError(
+      "no_subscription",
+      "Your subscription has no billable item. Please contact support.",
+    );
+  }
+
+  await client.updateSubscriptionPrice({
+    subscriptionId: sub.id,
+    itemId,
+    priceId,
+    prorationBehavior: PLAN_CHANGE_PRORATION_BEHAVIOR,
+    idempotencyKey: planChangeIdempotencyKey(userId, plan),
+  });
+
+  // Persist through the ONE write path (refetch-latest) - identical to
+  // what the webhook will do again moments later, idempotently.
+  const updated = await syncStripeSubscription({
+    stripeCustomerId: row.providerCustomerId,
+    stripeSubscriptionId: sub.id,
+    sourceEventId: `planchange:${sub.id}`,
+  });
+  if (!updated) {
+    throw new BillingError("no_subscription", "Your subscription could not be verified.");
+  }
+  return { plan: updated.tier, status: updated.status };
 }
 
 // ---------------------------------------------------------------------------

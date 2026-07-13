@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { effectiveTier } from "@/lib/services/entitlements";
+import { hasLiveSubscription } from "@/lib/services/billing";
+import type { PlanTierName } from "@/lib/constants";
 import { Reveal } from "@/components/fx/reveal";
 import { MarketingHero } from "@/components/marketing/hero";
 import { CheckoutCancelledNotice } from "@/components/marketing/checkout-cancelled-notice";
@@ -10,7 +15,27 @@ export const metadata: Metadata = {
   description: "Simple plans for every pace of dating. Start free, upgrade when it clicks.",
 };
 
-export default function PricingPage() {
+/**
+ * Public pricing page, plan-aware for signed-in members: the spotlight
+ * receives the viewer's EFFECTIVE tier (same policy as every entitlement
+ * gate) so it shows the current plan and the tiers above it - a Plus
+ * member sees "Your current plan" + "Upgrade to Tirvea Gold", a Gold
+ * member only their membership, and nobody is ever sold the plan they
+ * already hold. Anonymous visitors see the full catalogue. Reading the
+ * session makes this render dynamic - correct for billing state.
+ */
+export default async function PricingPage() {
+  const session = await auth();
+  let currentTier: PlanTierName | null = null;
+  let hasLiveSub = false;
+  if (session) {
+    const subscription = await db.subscription.findUnique({
+      where: { userId: session.user.id },
+    });
+    currentTier = effectiveTier(subscription);
+    hasLiveSub = hasLiveSubscription(subscription);
+  }
+
   return (
     <>
       <MarketingHero
@@ -31,7 +56,7 @@ export default function PricingPage() {
             <CheckoutCancelledNotice />
           </Suspense>
           <Reveal delay={0.1}>
-            <PricingSpotlight />
+            <PricingSpotlight currentTier={currentTier} hasLiveSub={hasLiveSub} />
           </Reveal>
         </div>
       </section>

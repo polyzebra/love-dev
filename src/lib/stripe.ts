@@ -96,6 +96,16 @@ export type CreateCheckoutSessionParams = {
   idempotencyKey: string;
 };
 
+export type UpdateSubscriptionPriceParams = {
+  subscriptionId: string;
+  /** The existing subscription item to swap - Stripe REPLACES its price
+   * in place, so no second subscription (or item) can ever appear. */
+  itemId: string;
+  priceId: string;
+  prorationBehavior: "create_prorations" | "always_invoice" | "none";
+  idempotencyKey: string;
+};
+
 /** Everything billing needs from Stripe - implemented by REST and by test spies. */
 export interface StripeClient {
   createCustomer(params: {
@@ -105,6 +115,10 @@ export interface StripeClient {
   createCheckoutSession(params: CreateCheckoutSessionParams): Promise<StripeCheckoutSession>;
   retrieveCheckoutSession(id: string): Promise<StripeCheckoutSession>;
   retrieveSubscription(id: string): Promise<StripeSubscription>;
+  /** In-place plan change on an EXISTING subscription (upgrade path):
+   * same subscription id, same customer, same billing cycle - only the
+   * item's price changes, prorated per prorationBehavior. */
+  updateSubscriptionPrice(params: UpdateSubscriptionPriceParams): Promise<StripeSubscription>;
   /** Newest-first, all statuses - callers pick the relevant one. */
   listSubscriptions(customerId: string): Promise<StripeSubscription[]>;
   createPortalSession(params: {
@@ -198,6 +212,18 @@ function restClient(secretKey: string): StripeClient {
       request<StripeCheckoutSession>("GET", `/checkout/sessions/${encodeURIComponent(id)}`),
     retrieveSubscription: (id) =>
       request<StripeSubscription>("GET", `/subscriptions/${encodeURIComponent(id)}`),
+    updateSubscriptionPrice: (p) =>
+      request<StripeSubscription>(
+        "POST",
+        `/subscriptions/${encodeURIComponent(p.subscriptionId)}`,
+        {
+          items: [{ id: p.itemId, price: p.priceId }],
+          proration_behavior: p.prorationBehavior,
+          // billing_cycle_anchor is deliberately NOT sent: Stripe's
+          // default ("unchanged") preserves the existing billing cycle.
+        },
+        p.idempotencyKey,
+      ),
     listSubscriptions: async (customerId) => {
       const page = await request<{ data?: StripeSubscription[] }>("GET", "/subscriptions", {
         customer: customerId,

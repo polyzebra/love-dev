@@ -88,6 +88,25 @@ export const PLANS = [
   },
 ] as const;
 
+export type Plan = (typeof PLANS)[number];
+export type PlanTierName = Plan["tier"];
+
+/**
+ * THE canonical subscription hierarchy: FREE < PLUS < GOLD, defined by
+ * the order of PLANS above. Every upgrade surface (settings, pricing,
+ * change-plan validation) derives from these two helpers - a user's
+ * current plan can never appear as an upgrade option, and adding a tier
+ * to PLANS automatically propagates everywhere.
+ */
+export function planRank(tier: PlanTierName): number {
+  return PLANS.findIndex((p) => p.tier === tier);
+}
+
+/** Plans strictly ABOVE the given tier - the only valid upgrade targets. */
+export function upgradePlansFor(tier: PlanTierName): Plan[] {
+  return PLANS.filter((p) => planRank(p.tier) > planRank(tier));
+}
+
 export const INTEREST_CATALOGUE: { category: string; items: string[] }[] = [
   {
     category: "Going out",

@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { PLANS } from "@/lib/constants";
+import { PLANS, upgradePlansFor } from "@/lib/constants";
 import { effectiveTier } from "@/lib/services/entitlements";
+import { hasLiveSubscription } from "@/lib/services/billing";
 import type { PaymentStatus } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
@@ -78,16 +79,19 @@ export default async function SubscriptionSettingsPage() {
   const plan = PLANS.find((p) => p.tier === effective) ?? PLANS[0];
   const paid = effective !== "FREE";
 
-  // Mirrors LIVE_SUB_STATUSES in services/billing.ts: while one of these
-  // is live, POST /checkout answers 409 - so we surface the portal, not
-  // upgrade CTAs.
-  const hasLiveSub =
-    !!subscription &&
-    subscription.tier !== "FREE" &&
-    ["ACTIVE", "TRIALING", "PAST_DUE"].includes(subscription.status);
+  // THE shared predicate from services/billing.ts - the same test that
+  // makes POST /checkout answer 409 decides which upgrade path the page
+  // offers: checkout (no live sub) vs in-place plan change (live sub).
+  const hasLiveSub = hasLiveSubscription(subscription);
   const hasBillingProfile = Boolean(subscription?.providerCustomerId);
 
   const pastDue = subscription?.status === "PAST_DUE";
+
+  // Upgrade cards derive from the canonical FREE < PLUS < GOLD hierarchy:
+  // strictly-higher tiers than the plan the user holds. Gold members get
+  // no upgrade section at all; past-due members fix their payment first.
+  const upgradeTargets = upgradePlansFor(hasLiveSub ? subscription.tier : "FREE");
+  const showUpgrades = upgradeTargets.length > 0 && !pastDue;
   const paidPlanName =
     PLANS.find((p) => p.tier === subscription?.tier)?.name ?? plan.name;
 
@@ -203,9 +207,12 @@ export default async function SubscriptionSettingsPage() {
       </Reveal>
 
       {/* ============ UPGRADE - the same stage /pricing renders ============ */}
-      {/* Only while no live subscription exists (a live one 409s at
-          checkout; plan CHANGES go through the portal above). */}
-      {!hasLiveSub && (
+      {/* Directly under the current-plan hero, only the tiers ABOVE the
+          user's plan (canonical hierarchy). No live subscription -> the
+          cards start a checkout; a live one -> they update the existing
+          Stripe subscription in place (same billing cycle, prorated) -
+          nobody is sent portal-spelunking to discover Gold. */}
+      {showUpgrades && (
         <Reveal>
           <section aria-labelledby="upgrade-heading" className="mt-10">
             <div className="mb-6 space-y-1 px-1">
@@ -213,13 +220,19 @@ export default async function SubscriptionSettingsPage() {
                 id="upgrade-heading"
                 className="font-display text-3xl font-medium tracking-tight md:text-4xl"
               >
-                Upgrade your membership
+                {hasLiveSub ? "Upgrade available" : "Upgrade your membership"}
               </h2>
               <p className="text-sm text-muted-foreground md:text-base">
-                Billed monthly via Stripe. Cancel anytime in two taps - no dark patterns.
+                {hasLiveSub
+                  ? "Same card, same renewal date - you only pay the prorated difference."
+                  : "Billed monthly via Stripe. Cancel anytime in two taps - no dark patterns."}
               </p>
             </div>
-            <PricingSpotlight variant="embedded" />
+            <PricingSpotlight
+              variant="embedded"
+              currentTier={hasLiveSub ? subscription.tier : "FREE"}
+              hasLiveSub={hasLiveSub}
+            />
           </section>
         </Reveal>
       )}
