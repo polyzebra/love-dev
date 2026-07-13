@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AuthStepFallback } from "@/components/auth/AuthStepFallback";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { phoneLoginEnabled } from "@/lib/auth/phone";
@@ -18,7 +19,7 @@ export const dynamic = "force-dynamic";
 export default function PhoneLoginVerifyPage() {
   if (!phoneLoginEnabled()) redirect("/login");
   return (
-    <Suspense>
+    <Suspense fallback={<AuthStepFallback />}>
       <PhoneLoginCode />
     </Suspense>
   );

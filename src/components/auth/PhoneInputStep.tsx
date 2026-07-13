@@ -243,7 +243,7 @@ export function PhoneInputStep({ allowedIsos }: { allowedIsos: string[] }) {
           }
           status={<AuthErrorBanner message={serverError} />}
           cta={
-            <AuthSubmitButton pending={pending} disabled={pending}>
+            <AuthSubmitButton pending={pending} pendingLabel="Sending code..." disabled={pending}>
               Send code
             </AuthSubmitButton>
           }

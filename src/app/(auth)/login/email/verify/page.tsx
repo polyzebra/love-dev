@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AuthStepFallback } from "@/components/auth/AuthStepFallback";
 import type { Metadata } from "next";
 import { EmailCodeStep } from "@/components/auth/EmailCodeStep";
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function LoginEmailVerifyPage() {
   // Suspense boundary for useSearchParams (the ?email=... carrier).
   return (
-    <Suspense>
+    <Suspense fallback={<AuthStepFallback />}>
       <EmailCodeStep />
     </Suspense>
   );

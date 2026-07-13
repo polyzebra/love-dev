@@ -273,7 +273,7 @@ export function PhoneLoginInput({ allowedIsos }: { allowedIsos: string[] }) {
           </>
         }
         cta={
-          <AuthSubmitButton pending={pending} disabled={pending}>
+          <AuthSubmitButton pending={pending} pendingLabel="Sending code..." disabled={pending}>
             Send code
           </AuthSubmitButton>
         }

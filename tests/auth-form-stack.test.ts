@@ -121,4 +121,46 @@ check("shells document the reversal of the thumb-CTA design", () => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// No blank loading states (regression pins for the white-pill/card bug)
+// ---------------------------------------------------------------------------
+
+check("a pending CTA always shows spinner PLUS visible text, never a bare spinner", () => {
+  const btn = read("AuthSubmitButton.tsx");
+  assert.match(btn, /pendingLabel/);
+  assert.match(btn, /aria-busy=\{pending\}/);
+  for (const file of [
+    "EmailInputStep.tsx",
+    "PhoneInputStep.tsx",
+    "PhoneLoginInput.tsx",
+    "EmailAttachStep.tsx",
+  ]) {
+    assert.match(read(file), /pendingLabel="Sending code\.\.\."/, file);
+  }
+});
+
+check("routed auth Suspense boundaries always render a meaningful fallback", () => {
+  const APP = join(import.meta.dirname, "..", "src", "app", "(auth)");
+  for (const page of [
+    join(APP, "login", "email", "verify", "page.tsx"),
+    join(APP, "login", "phone", "verify", "page.tsx"),
+    join(APP, "auth", "phone-code", "page.tsx"),
+  ]) {
+    const src = readFileSync(page, "utf8");
+    assert.match(src, /<Suspense fallback=\{<AuthStepFallback/, page);
+  }
+  const fallback = read("AuthStepFallback.tsx");
+  assert.match(fallback, /animate-spin/);
+  assert.match(fallback, /Opening verification\.\.\./);
+});
+
+check("the brand button never paints as a blank pill (solid fallback under the gradient)", () => {
+  const button = readFileSync(
+    join(import.meta.dirname, "..", "src", "components", "ui", "button.tsx"),
+    "utf8",
+  );
+  assert.match(button, /bg-primary bg-linear-160/, "solid color must underlie the gradient");
+  assert.match(button, /appearance-none/, "no native control chrome on iOS Safari");
+});
+
 console.log(`\n${passed} checks passed`);

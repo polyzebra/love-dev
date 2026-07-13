@@ -5,13 +5,19 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  // appearance-none: a disabled/loading <button> must never fall back to
+  // the native (white) control chrome on iOS Safari.
+  "inline-flex shrink-0 cursor-pointer appearance-none items-center justify-center gap-2 rounded-full text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        // House CTA: rose gradient with depth, inner highlight and glow
+        // House CTA: rose gradient with depth, inner highlight and glow.
+        // bg-primary is the SOLID paint under the gradient image: engines
+        // that cannot render the oklab gradient (older Safari) show a
+        // brand-pink pill instead of a blank white one. Modern engines
+        // paint the gradient over it - zero visual change.
         default:
-          "relative overflow-hidden bg-linear-160 from-brand-bright via-brand to-brand-active text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_24px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-[transform,box-shadow] duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_10px_36px_color-mix(in_srgb,var(--primary)_50%,transparent)] hover:brightness-110 active:scale-[0.97]",
+          "relative overflow-hidden bg-primary bg-linear-160 from-brand-bright via-brand to-brand-active text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_24px_color-mix(in_srgb,var(--primary)_35%,transparent)] transition-[transform,box-shadow] duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_10px_36px_color-mix(in_srgb,var(--primary)_50%,transparent)] hover:brightness-110 active:scale-[0.97]",
         destructive:
           "bg-destructive/15 border border-destructive/40 text-destructive shadow-xs hover:bg-destructive/25 active:scale-[0.97]",
         // Frosted glass secondary
