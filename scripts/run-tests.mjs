@@ -27,6 +27,7 @@ const LIVE = new Set([
   "api-0f.test.ts",
   "api-0g.test.ts",
   "api-0h.test.ts",
+  "api-0i.test.ts",
 ]);
 
 const UNIT = new Set([
