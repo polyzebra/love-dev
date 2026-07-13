@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   const { user, response } = await requireSession();
   if (response) return response;
 
-  const limited = await guardRate(`photos:${user.id}`, RATE_LIMITS.api);
+  const limited = await guardRate(`upload:${user.id}`, RATE_LIMITS.upload);
   if (limited) return limited;
 
   // Trust-safety enforcement: uploads are blocked while the account is

@@ -1,10 +1,14 @@
-import { ok, parseBody, requireSession } from "@/lib/api";
+import { guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import { discoveryPreferencesSchema } from "@/lib/validators/profile";
 import { db } from "@/lib/db";
 
 export async function PATCH(req: Request) {
   const { user, response } = await requireSession();
   if (response) return response;
+
+  const limited = await guardRate(`profile-write:${user.id}`, RATE_LIMITS.profileWrite);
+  if (limited) return limited;
 
   const { data, response: invalid } = await parseBody(req, discoveryPreferencesSchema);
   if (invalid) return invalid;
