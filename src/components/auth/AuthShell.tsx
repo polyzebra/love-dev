@@ -76,7 +76,10 @@ export function AuthShell({
       <AnimatePresence mode="wait">
         <motion.div
           key={stepKey ?? "step"}
-          initial={animatable ? { opacity: 0, x: 28 } : false}
+          // Slide ONLY - the freshly routed step must be readable from its
+          // first committed frame; an opacity fade re-blanks the card
+          // right after the segment loading state unmounts.
+          initial={animatable ? { x: 28 } : false}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -28 }}
           transition={{ duration: 0.5, ease: EASE_LUXE }}

@@ -161,12 +161,15 @@ check("the (auth) segment has a branded loading state - route entries never show
   );
   assert.match(loading, /AuthStepFallback/);
   assert.match(loading, /Opening sign in\.\.\./);
-  // The /login entry must be readable from its first committed frame -
-  // motion may translate it, never hide it.
-  assert.ok(
-    !/initial=\{animatable \? \{ opacity/.test(read("LoginEntry.tsx")),
-    "LoginEntry entrance must not start at opacity 0",
-  );
+  // Every routed auth surface must be readable from its first committed
+  // frame - motion may translate it, never hide it. (The "empty white
+  // card with blank bars" bug was LoginStepShell fading in from 0.)
+  for (const file of ["LoginEntry.tsx", "LoginStepShell.tsx", "AuthShell.tsx"]) {
+    assert.ok(
+      !/initial=\{animatable \? \{ opacity/.test(read(file)),
+      `${file} entrance must not start at opacity 0`,
+    );
+  }
 });
 
 check("entrance animations are hydration-gated - SSR HTML never hides step content", () => {
