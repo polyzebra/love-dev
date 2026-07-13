@@ -19,7 +19,10 @@ export function AuthStepFallback({
     <div
       role="status"
       aria-live="polite"
-      className="flex min-h-72 flex-col items-center justify-center gap-3"
+      // 26rem ≈ the real auth steps' content height (login entry ~453px,
+      // email step ~388px): the card must NOT visibly jump in size when
+      // the fallback is replaced by the destination UI.
+      className="flex min-h-[26rem] flex-col items-center justify-center gap-3"
     >
       <Loader2 className="size-6 animate-spin text-primary-soft" aria-hidden="true" />
       <p className="text-sm text-muted-foreground">{label}</p>
