@@ -1,10 +1,13 @@
 import { db } from "@/lib/db";
 import { notifyUser } from "@/lib/services/notify";
+import { broadcastToConversation } from "@/lib/services/realtime";
 
 /**
- * Chat service. Realtime transport (WebSocket/SSE, e.g. Supabase Realtime
- * or Pusher) plugs in at the route layer; persistence and access control
- * live here so the transport can change without touching the domain.
+ * Chat service. Persistence and access control live here; Supabase
+ * Realtime (services/realtime.ts) is the delivery layer - every write
+ * lands in PostgreSQL first, then best-effort broadcasts to the
+ * conversation's private channel. A lost broadcast costs a recovery
+ * fetch, never a message.
  */
 
 export async function assertParticipant(conversationId: string, userId: string) {
@@ -105,6 +108,20 @@ export async function sendMessage(params: {
     return created;
   });
 
+  // Live delivery first (participants only - RLS-authorized private
+  // channel). serverTs lets clients measure delivery latency honestly.
+  await broadcastToConversation(params.conversationId, "message:new", {
+    id: message.id,
+    conversationId: params.conversationId,
+    senderId: message.senderId,
+    type: message.type,
+    status: message.status,
+    body: message.body,
+    replyTo: message.replyTo,
+    createdAt: message.createdAt.toISOString(),
+    serverTs: Date.now(),
+  });
+
   // Notify every other participant through the outbox. notifyUser itself
   // skips the sender (actorUserId), suppresses blocked pairs, respects the
   // pushMessages preference/quiet hours, and suppresses push while the
@@ -140,14 +157,47 @@ export async function sendMessage(params: {
 }
 
 export async function markRead(conversationId: string, userId: string) {
-  await db.$transaction([
+  const at = new Date();
+  const [, updated] = await db.$transaction([
     db.participant.update({
       where: { conversationId_userId: { conversationId, userId } },
-      data: { lastReadAt: new Date() },
+      data: { lastReadAt: at },
     }),
     db.message.updateMany({
       where: { conversationId, senderId: { not: userId }, status: { not: "SEEN" } },
       data: { status: "SEEN" },
     }),
   ]);
+  // Only a state CHANGE is worth a live event - repeated reads are noise.
+  if (updated.count > 0) {
+    await broadcastToConversation(conversationId, "receipt", {
+      kind: "read",
+      conversationId,
+      byId: userId,
+      at: at.toISOString(),
+    });
+  }
+  return updated.count;
+}
+
+/**
+ * Recipient's device acknowledged receiving message(s): SENT -> DELIVERED
+ * for everything the OTHER side sent. Never regresses SEEN (the where
+ * clause targets SENT only), so late/out-of-order acks are harmless.
+ */
+export async function markDelivered(conversationId: string, userId: string) {
+  const at = new Date();
+  const updated = await db.message.updateMany({
+    where: { conversationId, senderId: { not: userId }, status: "SENT" },
+    data: { status: "DELIVERED" },
+  });
+  if (updated.count > 0) {
+    await broadcastToConversation(conversationId, "receipt", {
+      kind: "delivered",
+      conversationId,
+      byId: userId,
+      at: at.toISOString(),
+    });
+  }
+  return updated.count;
 }

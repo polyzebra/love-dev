@@ -15,4 +15,9 @@ export const conversationActionSchema = z.object({
   action: z.enum(["pin", "unpin", "archive", "unarchive", "mute", "unmute", "read"]),
 });
 
+/** Recipient-side message state ack (Phase 0G realtime receipts). */
+export const receiptSchema = z.object({
+  kind: z.enum(["delivered", "read"]),
+});
+
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;
