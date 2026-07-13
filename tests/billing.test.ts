@@ -77,6 +77,8 @@ async function main() {
     processStripeEvent,
     checkoutIdempotencyKey,
     changePlan,
+    previewChangePlan,
+    changePlanStatus,
     planChangeIdempotencyKey,
     PLAN_CHANGE_PRORATION_BEHAVIOR,
     hasLiveSubscription,
@@ -116,6 +118,12 @@ async function main() {
   const payInvoiceCalls: string[] = [];
   /** Scripted outcome for the next payInvoice call. */
   let payInvoiceOutcome: "paid" | "declined" = "paid";
+  /** Scripted outcome for the next subscription-update (upgrade) call. */
+  let upgradeOutcome: "paid" | "zero_due" | "requires_action" | "declined" | "pending" = "paid";
+  /** Stripe-side idempotency: same key -> same stored response, ONE application. */
+  const planChangeResponses = new Map<string, StripeSubscription>();
+  let planChangeApplications = 0;
+  const previewCalls: { customerId: string; subscriptionId: string; itemId: string; priceId: string }[] = [];
   const priceCatalogue = new Map<string, { currency: string; unit_amount: number; interval: string }>([
     [PLUS_PRICE, { currency: "eur", unit_amount: 1499, interval: "month" }],
     [GOLD_PRICE, { currency: "eur", unit_amount: 2999, interval: "month" }],
@@ -156,8 +164,38 @@ async function main() {
       if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
       return s;
     },
+    async retrieveSubscriptionPaymentState(id) {
+      // The spy keeps latest_invoice/pending_update inline, so the
+      // "expanded" fetch is the same object.
+      const s = subscriptions.get(id);
+      if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
+      return s;
+    },
+    async previewSubscriptionUpdate(p) {
+      previewCalls.push(p);
+      const s = subscriptions.get(p.subscriptionId);
+      if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
+      if (s.items?.data?.[0]?.id !== p.itemId) {
+        throw new StripeApiError(400, "invalid_request", "No such subscription item");
+      }
+      // Nothing changes - a preview is read-only at Stripe too.
+      return {
+        id: `in_preview_${++seq}`,
+        customer: p.customerId,
+        status: "draft",
+        amount_due: 1514,
+        currency: "eur",
+        tax: null,
+        billing_reason: "upcoming",
+        lines: { data: [{ price: { id: p.priceId } }] },
+      };
+    },
     async updateSubscriptionPrice(p) {
       planChangeCalls.push(p);
+      // Idempotency: a replayed key returns the SAME response and never
+      // re-applies - exactly like Stripe.
+      const replay = planChangeResponses.get(p.idempotencyKey);
+      if (replay) return replay;
       const s = subscriptions.get(p.subscriptionId);
       if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
       const item = s.items?.data?.[0];
@@ -165,9 +203,51 @@ async function main() {
       if (item.id && item.id !== p.itemId) {
         throw new StripeApiError(400, "invalid_request", "No such subscription item");
       }
-      // Stripe REPLACES the item's price in place - same subscription,
-      // same customer, same billing period fields.
-      item.price = { id: p.priceId };
+      if (p.paymentBehavior !== "pending_if_incomplete") {
+        throw new StripeApiError(400, "invalid_request", "test spy expects pending_if_incomplete");
+      }
+      planChangeApplications += 1;
+
+      // pending_if_incomplete semantics: the price ONLY changes when the
+      // upgrade invoice is collected; otherwise the proposed change parks
+      // in pending_update and the old price stays live.
+      if (upgradeOutcome === "zero_due") {
+        item.price = { id: p.priceId };
+        s.pending_update = null;
+        s.latest_invoice = null;
+      } else {
+        const inv = registerInvoice(s.customer, {
+          priceId: p.priceId,
+          amountCents: 1500, // prorated difference
+          status: upgradeOutcome === "paid" ? "paid" : "open",
+          attempted: upgradeOutcome !== "requires_action",
+          billingReason: "subscription_update",
+        });
+        inv.payment_intent = {
+          id: `pi_${inv.id}`,
+          status:
+            upgradeOutcome === "paid"
+              ? "succeeded"
+              : upgradeOutcome === "requires_action"
+                ? "requires_action"
+                : upgradeOutcome === "declined"
+                  ? "requires_payment_method"
+                  : "processing",
+          client_secret: `${inv.id}_secret_test`,
+        };
+        s.latest_invoice = inv;
+        if (upgradeOutcome === "paid") {
+          item.price = { id: p.priceId };
+          s.pending_update = null;
+        } else {
+          s.pending_update = {
+            expires_at: Math.floor(Date.now() / 1000) + 3 * 24 * 3600,
+            __targetPrice: p.priceId,
+            __invoiceId: inv.id,
+          };
+        }
+      }
+      planChangeResponses.set(p.idempotencyKey, s);
       return s;
     },
     async updateSubscriptionCancellation(p) {
@@ -228,6 +308,7 @@ async function main() {
       amountCents: number;
       status?: StripeInvoice["status"];
       attempted?: boolean;
+      billingReason?: string;
     },
   ): StripeInvoice {
     const id = `in_test_${++seq}`;
@@ -236,6 +317,7 @@ async function main() {
       id,
       customer,
       status: opts.status ?? "paid",
+      billing_reason: opts.billingReason ?? "subscription_create",
       amount_paid: paid ? opts.amountCents : 0,
       amount_due: opts.amountCents,
       currency: "eur",
@@ -247,6 +329,33 @@ async function main() {
     };
     invoices.set(id, inv);
     return inv;
+  }
+
+  /** Stripe collects a pending update's invoice -> the change applies. */
+  function applyPendingUpdate(subId: string): StripeInvoice {
+    const s = subscriptions.get(subId)!;
+    const pending = s.pending_update as { __targetPrice: string; __invoiceId: string };
+    const inv = invoices.get(pending.__invoiceId)!;
+    inv.status = "paid";
+    inv.amount_paid = inv.amount_due ?? 0;
+    if (inv.payment_intent && typeof inv.payment_intent === "object") {
+      inv.payment_intent.status = "succeeded";
+    }
+    s.items!.data![0].price = { id: pending.__targetPrice };
+    s.pending_update = null;
+    s.latest_invoice = inv;
+    return inv;
+  }
+
+  /** The pending update's invoice was never paid -> Stripe expires it. */
+  function expirePendingUpdate(subId: string): void {
+    const s = subscriptions.get(subId)!;
+    const pending = s.pending_update as { __invoiceId: string } | null;
+    if (pending) {
+      const inv = invoices.get(pending.__invoiceId);
+      if (inv) inv.status = "void";
+    }
+    s.pending_update = null;
   }
 
   /** Script a subscription at "Stripe" and mark the session complete. */
@@ -726,7 +835,7 @@ async function main() {
     });
 
     let aliceSubId = "";
-    await check("PLUS -> GOLD updates the EXISTING subscription in place (no duplicate)", async () => {
+    await check("PLUS -> GOLD: paid upgrade updates the EXISTING subscription in place (no duplicate)", async () => {
       const before = await subRow(alice);
       assert.equal(before.tier, "PLUS");
       aliceSubId = before.providerSubId!;
@@ -734,8 +843,11 @@ async function main() {
       const checkoutsBefore = checkoutSessionsCreated;
       const customersBefore = customers.size;
       const periodEndBefore = before.currentPeriodEnd?.getTime();
+      const paymentsBefore = await db.payment.count({ where: { userId: alice } });
 
+      upgradeOutcome = "paid";
       const result = await changePlan(alice, "GOLD");
+      assert.equal(result.outcome, "PAID_AND_APPLIED", "never a generic success");
       assert.equal(result.plan, "GOLD");
       assert.equal(result.status, "ACTIVE");
 
@@ -756,15 +868,33 @@ async function main() {
         "billing cycle anchor preserved",
       );
 
-      // The Stripe call carried the configured proration + idempotency.
+      // The corrected Stripe request: always_invoice + pending_if_incomplete
+      // + a STABLE per-transition idempotency key.
       const call = planChangeCalls[planChangeCalls.length - 1];
       assert.equal(call.subscriptionId, aliceSubId);
       assert.equal(call.priceId, GOLD_PRICE);
+      assert.equal(call.prorationBehavior, "always_invoice");
       assert.equal(call.prorationBehavior, PLAN_CHANGE_PRORATION_BEHAVIOR);
+      assert.equal(call.paymentBehavior, "pending_if_incomplete");
       assert.equal(call.itemId, subscriptions.get(aliceSubId)!.items!.data![0].id);
-      assert.equal(call.idempotencyKey, planChangeIdempotencyKey(alice, "GOLD"));
+      assert.equal(
+        call.idempotencyKey,
+        // "none": alice's sub had no latest_invoice before this attempt.
+        planChangeIdempotencyKey(aliceSubId, PLUS_PRICE, GOLD_PRICE, "none"),
+      );
 
-      // Entitlements follow immediately - no webhook needed.
+      // The PAID upgrade invoice lands in history immediately.
+      assert.equal(
+        await db.payment.count({ where: { userId: alice } }),
+        paymentsBefore + 1,
+      );
+      const upgradePayment = await db.payment.findFirstOrThrow({
+        where: { userId: alice, description: "Tirvea Gold - upgrade" },
+      });
+      assert.equal(upgradePayment.status, "SUCCEEDED");
+      assert.equal(upgradePayment.amountCents, 1500);
+
+      // Entitlements follow the CONFIRMED payment - no webhook needed.
       assert.equal((await getUserEntitlements(alice)).plan, "GOLD");
     });
 
@@ -815,6 +945,234 @@ async function main() {
       );
       assert.equal(planChangeCalls.length, callsBefore, "Stripe never called");
       assert.equal((await subRow(frank)).tier, "PLUS");
+    });
+
+    // -----------------------------------------------------------------------
+    // Payment-gated upgrades: preview -> confirm -> pay -> apply.
+    // Gold is NEVER granted before Stripe confirms the money.
+    // -----------------------------------------------------------------------
+    const kara = await seedUser("kara");
+    const karaSession = (await startCheckout(kara, "PLUS", testEmail("kara"))).sessionId;
+    const karaSub = completeCheckout(karaSession, { priceId: PLUS_PRICE });
+    await syncStripeSubscription({
+      stripeCustomerId: karaSub.customer,
+      stripeSubscriptionId: karaSub.id,
+    });
+
+    await check("preview returns the EXACT Stripe proration - nothing charged, nothing changed", async () => {
+      const before = await subRow(kara);
+      const preview = await previewChangePlan(kara, "GOLD");
+      assert.equal(preview.amountDueCents, 1514, "the spy's scripted Stripe amount, verbatim");
+      assert.equal(preview.currency, "eur");
+      assert.equal(preview.nextRecurringCents, 2999);
+      assert.equal(preview.planName, "Tirvea Gold");
+      assert.equal(
+        preview.renewsAt?.getTime(),
+        before.currentPeriodEnd?.getTime(),
+        "renewal date unchanged in the preview",
+      );
+      assert.ok(preview.expiresAt.getTime() > Date.now());
+      const call = previewCalls[previewCalls.length - 1];
+      assert.equal(call.subscriptionId, karaSub.id);
+      assert.equal(call.itemId, karaSub.items!.data![0].id);
+      assert.equal(call.priceId, GOLD_PRICE);
+      // Read-only: same tier, same price, no invoice recorded.
+      const after = await subRow(kara);
+      assert.equal(after.tier, "PLUS");
+      assert.equal(after.stripePriceId, PLUS_PRICE);
+    });
+
+    await check("requires_action: plan UNCHANGED, clientSecret returned to the owner only", async () => {
+      upgradeOutcome = "requires_action";
+      const result = await changePlan(kara, "GOLD");
+      assert.equal(result.outcome, "REQUIRES_ACTION");
+      assert.ok(result.clientSecret?.includes("_secret_"), "Stripe.js secret present");
+      assert.equal(result.plan, "PLUS", "the response says the truth: still Plus");
+      const row = await subRow(kara);
+      assert.equal(row.tier, "PLUS");
+      assert.equal(row.stripePriceId, PLUS_PRICE, "price untouched while pending");
+      assert.equal((await getUserEntitlements(kara)).plan, "PLUS", "no entitlement leak");
+    });
+
+    await check("upgrade lock: a second request while one awaits payment answers upgrade_pending", async () => {
+      await assert.rejects(
+        () => changePlan(kara, "GOLD"),
+        (e: unknown) => e instanceof BillingError && e.code === "upgrade_pending",
+      );
+      await assert.rejects(
+        () => previewChangePlan(kara, "GOLD"),
+        (e: unknown) => e instanceof BillingError && e.code === "upgrade_pending",
+      );
+    });
+
+    await check("customer.subscription.updated ALONE cannot activate Gold", async () => {
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.updated",
+        data: { object: { id: karaSub.id, customer: karaSub.customer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      assert.equal((await subRow(kara)).tier, "PLUS");
+    });
+
+    await check("invoice.created cannot activate Gold or fabricate history", async () => {
+      const paymentsBefore = await db.payment.count({ where: { userId: kara } });
+      const pendingInvoiceId = (karaSub.pending_update as { __invoiceId: string }).__invoiceId;
+      const event = {
+        id: nextEventId(),
+        type: "invoice.created",
+        data: { object: { ...invoices.get(pendingInvoiceId)!, subscription: karaSub.id } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      assert.equal((await subRow(kara)).tier, "PLUS");
+      assert.equal(await db.payment.count({ where: { userId: kara } }), paymentsBefore);
+    });
+
+    await check("status endpoint reports REQUIRES_ACTION from FRESH Stripe state", async () => {
+      const status = await changePlanStatus(kara);
+      assert.equal(status.state, "REQUIRES_ACTION");
+      assert.ok(status.clientSecret?.includes("_secret_"));
+      assert.equal(status.plan, "PLUS");
+    });
+
+    await check("pending_update_applied (payment succeeded) activates Gold + records the invoice", async () => {
+      const upgradeInvoice = applyPendingUpdate(karaSub.id);
+      const applied = {
+        id: nextEventId(),
+        type: "customer.subscription.pending_update_applied",
+        data: { object: { id: karaSub.id, customer: karaSub.customer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(applied))).status, 200);
+      assert.equal((await subRow(kara)).tier, "GOLD");
+      const paid = {
+        id: nextEventId(),
+        type: "invoice.paid",
+        data: { object: { ...upgradeInvoice, subscription: karaSub.id } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(paid))).status, 200);
+      const payment = await db.payment.findUniqueOrThrow({
+        where: { providerPaymentId: upgradeInvoice.id },
+      });
+      assert.equal(payment.status, "SUCCEEDED");
+      assert.equal(payment.description, "Tirvea Gold - upgrade");
+      assert.equal((await changePlanStatus(kara)).state, "ACTIVE_GOLD");
+      assert.equal((await getUserEntitlements(kara)).plan, "GOLD");
+    });
+
+    await check("combined lifecycle: cancel after a PAID upgrade shows ENDING, resume restores", async () => {
+      const s = subscriptions.get(karaSub.id)!;
+      s.cancel_at_period_end = true;
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.updated",
+        data: { object: { id: karaSub.id, customer: karaSub.customer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      const row = await subRow(kara);
+      assert.equal(row.tier, "GOLD");
+      assert.equal(row.cancelAtPeriodEnd, true, "Gold ENDING until period end");
+      const resumed = await resumeSubscription(kara);
+      assert.equal(resumed.cancelAtPeriodEnd, false);
+      assert.equal(resumed.plan, "GOLD");
+      assert.equal((await subRow(kara)).providerSubId, karaSub.id, "same Gold subscription");
+    });
+
+    const liam = await seedUser("liam");
+    const liamSession = (await startCheckout(liam, "PLUS", testEmail("liam"))).sessionId;
+    const liamSub = completeCheckout(liamSession, { priceId: PLUS_PRICE });
+    await syncStripeSubscription({
+      stripeCustomerId: liamSub.customer,
+      stripeSubscriptionId: liamSub.id,
+    });
+
+    await check("declined card: PAYMENT_FAILED, Plus unchanged, failed upgrade invoice in history", async () => {
+      upgradeOutcome = "declined";
+      const result = await changePlan(liam, "GOLD");
+      assert.equal(result.outcome, "PAYMENT_FAILED");
+      assert.equal(result.plan, "PLUS");
+      const row = await subRow(liam);
+      assert.equal(row.tier, "PLUS");
+      assert.equal(row.stripePriceId, PLUS_PRICE);
+      assert.equal((await getUserEntitlements(liam)).plan, "PLUS");
+      const failed = await db.payment.findFirstOrThrow({
+        where: { userId: liam, description: "Tirvea Gold - upgrade" },
+      });
+      assert.equal(failed.status, "FAILED", "the failed attempt is honest history");
+      // No fake Gold ENDING state can exist for a failed upgrade.
+      assert.equal(row.cancelAtPeriodEnd, false);
+    });
+
+    await check("pending_update_expired keeps Plus and clears the pending change", async () => {
+      expirePendingUpdate(liamSub.id);
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.pending_update_expired",
+        data: { object: { id: liamSub.id, customer: liamSub.customer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      assert.equal((await subRow(liam)).tier, "PLUS");
+      assert.equal((await changePlanStatus(liam)).state, "STILL_PLUS");
+    });
+
+    await check("double tap: concurrent identical upgrades produce ONE Stripe application", async () => {
+      upgradeOutcome = "paid";
+      const applicationsBefore = planChangeApplications;
+      const subCountBefore = subscriptions.size;
+      // Depending on interleaving the loser sees a replay (same
+      // idempotency key), an already-applied price (ZERO_DUE), or an
+      // already-upgraded row (invalid_plan_change) - every path is safe.
+      const settled = await Promise.allSettled([
+        changePlan(liam, "GOLD"),
+        changePlan(liam, "GOLD"),
+      ]);
+      assert.equal(planChangeApplications, applicationsBefore + 1, "one update applied");
+      assert.equal(subscriptions.size, subCountBefore, "no duplicate subscription");
+      const fulfilled = settled.filter(
+        (s): s is PromiseFulfilledResult<Awaited<ReturnType<typeof changePlan>>> =>
+          s.status === "fulfilled",
+      );
+      assert.ok(
+        fulfilled.some((s) => s.value.outcome === "PAID_AND_APPLIED"),
+        "the winning tap paid and applied",
+      );
+      for (const s of settled) {
+        if (s.status === "fulfilled") {
+          assert.ok(
+            ["PAID_AND_APPLIED", "ZERO_DUE_APPLIED"].includes(s.value.outcome),
+            `unexpected outcome ${s.value.outcome}`,
+          );
+        } else {
+          assert.ok(
+            s.reason instanceof BillingError && s.reason.code === "invalid_plan_change",
+            "a losing tap may only fail as already-upgraded",
+          );
+        }
+      }
+      assert.equal((await subRow(liam)).tier, "GOLD");
+      assert.equal(
+        await db.payment.count({
+          where: { userId: liam, description: "Tirvea Gold - upgrade", status: "SUCCEEDED" },
+        }),
+        1,
+        "one upgrade invoice in history",
+      );
+    });
+
+    await check("zero-due upgrade applies ONLY on Stripe's confirmation (fresh price, no pending)", async () => {
+      const mona = await seedUser("mona");
+      const monaSession = (await startCheckout(mona, "PLUS", testEmail("mona"))).sessionId;
+      const monaSub = completeCheckout(monaSession, { priceId: PLUS_PRICE });
+      await syncStripeSubscription({
+        stripeCustomerId: monaSub.customer,
+        stripeSubscriptionId: monaSub.id,
+      });
+      upgradeOutcome = "zero_due";
+      const result = await changePlan(mona, "GOLD");
+      assert.equal(result.outcome, "ZERO_DUE_APPLIED");
+      assert.equal(result.plan, "GOLD");
+      assert.equal(subscriptions.get(monaSub.id)!.pending_update, null);
+      assert.equal((await subRow(mona)).tier, "GOLD");
+      upgradeOutcome = "paid"; // restore default
     });
 
     // -----------------------------------------------------------------------

@@ -6,21 +6,25 @@ import { BillingError, BILLING_ERROR_STATUS, changePlan } from "@/lib/services/b
 /**
  * POST /api/billing/change-plan  { plan: "PLUS" | "GOLD" }
  *
- * In-place upgrade of the user's EXISTING Stripe subscription: the
- * subscription item's price is replaced (Stripe subscription update), so
- * the customer, subscription id and billing cycle all stay put and no
- * second subscription can appear. Prorated per
- * PLAN_CHANGE_PRORATION_BEHAVIOR. The response reflects state persisted
- * from verified Stripe data - never an optimistic client-side grant.
+ * PAYMENT-GATED in-place upgrade of the user's EXISTING Stripe
+ * subscription: proration_behavior=always_invoice raises the prorated
+ * invoice NOW, payment_behavior=pending_if_incomplete keeps the OLD plan
+ * until that invoice is PAID. The response names what happened to the
+ * money - never a generic success:
  *
- *  200 { data: { plan, status } }
- *  401 unauthorized                 - no session
- *  409 no_subscription              - nothing live to change; UI should
- *                                     start a checkout instead
- *  409 invalid_plan_change          - same tier or a downgrade (portal)
- *  409 payment_past_due             - fix the payment method first
- *  422 validation_error             - unknown plan / extra keys
- *  503 billing_unavailable          - Stripe not configured
+ *  200 { data: { outcome: "PAID_AND_APPLIED" | "ZERO_DUE_APPLIED"
+ *                        | "REQUIRES_ACTION"  (+ clientSecret, owner-only)
+ *                        | "PENDING" | "PAYMENT_FAILED",
+ *                plan, status } }
+ *  401 unauthorized
+ *  409 no_subscription / invalid_plan_change / payment_past_due /
+ *      upgrade_pending (a change is already awaiting payment)
+ *  422 validation_error   - unknown plan / extra keys (no price ids,
+ *                           no amounts - ever)
+ *  503 billing_unavailable
+ *
+ * The clientSecret is returned ONLY to the authenticated owner and is
+ * never logged anywhere on this path.
  */
 export async function POST(req: Request) {
   const { user, response } = await requireSession();

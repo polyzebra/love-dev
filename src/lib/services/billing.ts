@@ -59,6 +59,7 @@ export class BillingError extends Error {
       | "no_subscription"
       | "invalid_plan_change"
       | "payment_past_due"
+      | "upgrade_pending"
       | "not_ending"
       | "no_open_invoice"
       | "payment_failed"
@@ -78,6 +79,7 @@ export const BILLING_ERROR_STATUS: Record<BillingError["code"], number> = {
   no_subscription: 409,
   invalid_plan_change: 409,
   payment_past_due: 409,
+  upgrade_pending: 409,
   not_ending: 409,
   no_open_invoice: 409,
   payment_failed: 402,
@@ -217,20 +219,63 @@ export async function startCheckout(
 // ---------------------------------------------------------------------------
 
 /**
- * Proration policy for in-place upgrades, applied on the Stripe
- * subscription update. `create_prorations` (Stripe's default) grants the
- * new plan immediately and settles the prorated difference on the next
- * invoice - the billing cycle anchor is never touched. Swap this ONE
- * constant to `always_invoice` to charge the difference immediately.
+ * Proration policy for in-place upgrades: `always_invoice` raises the
+ * prorated difference as an invoice NOW and attempts collection NOW.
+ * NEVER `create_prorations` for paid upgrades - that grants the new plan
+ * immediately and defers the charge to the next cycle (the exact bug
+ * behind the free-Gold incident).
  */
-export const PLAN_CHANGE_PRORATION_BEHAVIOR = "create_prorations" as const;
+export const PLAN_CHANGE_PRORATION_BEHAVIOR = "always_invoice" as const;
 
-/** Same double-tap window as checkout: identical user+plan requests share one Stripe idempotency key. */
-export function planChangeIdempotencyKey(userId: string, plan: PaidPlan, now = Date.now()): string {
-  return `planchange_${userId}_${plan}_${Math.floor(now / CHECKOUT_IDEMPOTENCY_WINDOW_MS)}`;
+/**
+ * `pending_if_incomplete` makes Stripe itself the payment gate: the
+ * subscription KEEPS the old price and parks the proposed change in
+ * pending_update until the upgrade invoice is PAID. A failed or
+ * abandoned payment expires the update and nothing ever changed.
+ */
+export const PLAN_CHANGE_PAYMENT_BEHAVIOR = "pending_if_incomplete" as const;
+
+/**
+ * STABLE per upgrade ATTEMPT: subscription + from-price + to-price +
+ * the subscription's latest_invoice at attempt time. A double-tap (or a
+ * lost-response retry) sees the same latest_invoice and replays the SAME
+ * Stripe request - one update, one invoice. A genuinely new attempt
+ * (after a declined/expired one settled a new latest invoice) gets a new
+ * key, so a fixed card is never answered with a replayed decline.
+ */
+export function planChangeIdempotencyKey(
+  subscriptionId: string,
+  fromPriceId: string,
+  toPriceId: string,
+  latestInvoiceRef: string,
+): string {
+  return `planchange_${subscriptionId}_${fromPriceId}_${toPriceId}_${latestInvoiceRef}`;
 }
 
-export type ChangePlanResult = { plan: PlanTier; status: SubscriptionStatus };
+/**
+ * The change-plan contract: the caller learns EXACTLY what happened to
+ * the money, never a generic success.
+ *
+ *  PAID_AND_APPLIED  upgrade invoice collected; new plan is live
+ *  ZERO_DUE_APPLIED  Stripe confirmed nothing was owed; new plan is live
+ *  REQUIRES_ACTION   card authentication needed - clientSecret drives
+ *                    Stripe.js; plan is UNCHANGED until it succeeds
+ *  PENDING           payment processing at Stripe; plan UNCHANGED so far
+ *  PAYMENT_FAILED    collection failed; plan UNCHANGED
+ */
+export type ChangePlanResult = {
+  outcome:
+    | "PAID_AND_APPLIED"
+    | "ZERO_DUE_APPLIED"
+    | "REQUIRES_ACTION"
+    | "PENDING"
+    | "PAYMENT_FAILED";
+  /** The plan the user actually holds NOW (per persisted verified state). */
+  plan: PlanTier;
+  status: SubscriptionStatus;
+  /** Only for REQUIRES_ACTION; owner-only, never logged. */
+  clientSecret?: string;
+};
 
 /**
  * Upgrade an EXISTING live subscription to a higher tier from inside the
@@ -252,7 +297,16 @@ export type ChangePlanResult = { plan: PlanTier; status: SubscriptionStatus };
  *    the same single write path the webhook uses - the concurrently
  *    arriving customer.subscription.updated event is a harmless no-op.
  */
-export async function changePlan(userId: string, plan: PaidPlan): Promise<ChangePlanResult> {
+/**
+ * Shared guards for preview AND execution of an upgrade. Loads the
+ * user's canonical customer/subscription, verifies ownership against the
+ * stored mapping, and refuses every state in which charging would be
+ * wrong: no live subscription, past-due/unpaid/incomplete (fresh Stripe
+ * status, not just the cached row), non-upgrades, and an upgrade that is
+ * ALREADY awaiting payment (pending_update) - which also serves as the
+ * concurrency lock across devices.
+ */
+async function loadUpgradeContext(userId: string, plan: PaidPlan) {
   const client = requireClient();
   logEnvProblemsOnce();
   const priceId = stripePriceIdFor(plan);
@@ -293,7 +347,7 @@ export async function changePlan(userId: string, plan: PaidPlan): Promise<Change
 
   let sub: StripeSubscription;
   try {
-    sub = await client.retrieveSubscription(row.providerSubId);
+    sub = await client.retrieveSubscriptionPaymentState(row.providerSubId);
   } catch (error) {
     if (error instanceof StripeApiError && error.status === 404) {
       throw new BillingError(
@@ -310,33 +364,274 @@ export async function changePlan(userId: string, plan: PaidPlan): Promise<Change
     );
     throw new BillingError("no_subscription", "Your subscription could not be verified.");
   }
-  const itemId = sub.items?.data?.[0]?.id;
-  if (!itemId) {
+  // Fresh Stripe status beats the cached row: never start a paid upgrade
+  // on a subscription that already owes money.
+  if (["past_due", "unpaid", "incomplete"].includes(sub.status)) {
+    throw new BillingError(
+      "payment_past_due",
+      "Your subscription has an outstanding payment. Settle it in billing first.",
+    );
+  }
+  if (sub.pending_update) {
+    throw new BillingError(
+      "upgrade_pending",
+      "A plan change is already awaiting payment confirmation - finish or let it expire first.",
+    );
+  }
+  const item = sub.items?.data?.[0];
+  if (!item?.id) {
     throw new BillingError(
       "no_subscription",
       "Your subscription has no billable item. Please contact support.",
     );
   }
 
-  await client.updateSubscriptionPrice({
+  return {
+    client,
+    row,
+    sub,
+    itemId: item.id,
+    // Snapshot BOTH attempt discriminators at the same read: the price
+    // being replaced and the latest invoice at attempt time.
+    fromPriceId: item.price?.id ?? "unknown",
+    latestInvoiceRef:
+      typeof sub.latest_invoice === "string"
+        ? sub.latest_invoice
+        : (sub.latest_invoice?.id ?? "none"),
+    priceId,
+  };
+}
+
+export async function changePlan(userId: string, plan: PaidPlan): Promise<ChangePlanResult> {
+  const { client, row, sub, itemId, fromPriceId, latestInvoiceRef, priceId } =
+    await loadUpgradeContext(userId, plan);
+
+  if (fromPriceId === priceId) {
+    // A concurrent identical request already applied this upgrade at
+    // Stripe (the DB row simply hadn't synced yet) - sync and report,
+    // never re-apply and never re-charge.
+    const synced = await syncStripeSubscription({
+      stripeCustomerId: row.providerCustomerId!,
+      stripeSubscriptionId: sub.id,
+      sourceEventId: `planchange-race:${sub.id}`,
+    });
+    return {
+      outcome: "ZERO_DUE_APPLIED",
+      plan: synced?.tier ?? row.tier,
+      status: synced?.status ?? row.status,
+    };
+  }
+
+  const updated = await client.updateSubscriptionPrice({
     subscriptionId: sub.id,
     itemId,
     priceId,
     prorationBehavior: PLAN_CHANGE_PRORATION_BEHAVIOR,
-    idempotencyKey: planChangeIdempotencyKey(userId, plan),
+    paymentBehavior: PLAN_CHANGE_PAYMENT_BEHAVIOR,
+    idempotencyKey: planChangeIdempotencyKey(sub.id, fromPriceId, priceId, latestInvoiceRef),
   });
 
-  // Persist through the ONE write path (refetch-latest) - identical to
-  // what the webhook will do again moments later, idempotently.
-  const updated = await syncStripeSubscription({
-    stripeCustomerId: row.providerCustomerId,
+  // What did Stripe actually do with the money?
+  const newPriceId = updated.items?.data?.[0]?.price?.id ?? null;
+  const invoice =
+    updated.latest_invoice && typeof updated.latest_invoice === "object"
+      ? updated.latest_invoice
+      : null;
+  const paymentIntent =
+    invoice?.payment_intent && typeof invoice.payment_intent === "object"
+      ? invoice.payment_intent
+      : null;
+
+  // Persist through the ONE write path (refetch-latest). Under
+  // pending_if_incomplete an unpaid change leaves the price - and
+  // therefore the tier - unchanged, so nothing is ever granted early.
+  const synced = await syncStripeSubscription({
+    stripeCustomerId: row.providerCustomerId!,
     stripeSubscriptionId: sub.id,
     sourceEventId: `planchange:${sub.id}`,
   });
-  if (!updated) {
+  const persisted = {
+    plan: synced?.tier ?? row.tier,
+    status: synced?.status ?? row.status,
+  };
+
+  // Settled upgrade invoices belong in payment history immediately
+  // (paid, or attempted-and-failed). An authentication-pending invoice
+  // is recorded once it settles (webhook / status endpoint / reconcile).
+  if (
+    invoice &&
+    (invoice.status === "paid" ||
+      paymentIntent?.status === "requires_payment_method" ||
+      paymentIntent?.status === "canceled")
+  ) {
+    await recordInvoicePayment(userId, invoice);
+  }
+
+  if (newPriceId === priceId) {
+    const amountDue = invoice?.amount_due ?? 0;
+    const paid = invoice?.status === "paid";
+    if (!paid && amountDue > 0) {
+      // Defensive: pending_if_incomplete should make this impossible.
+      console.error(
+        `[billing:change-plan] price applied with UNPAID invoice ${invoice?.id} on ${sub.id} - reporting PENDING (audit)`,
+      );
+      return { outcome: "PENDING", ...persisted };
+    }
+    return {
+      outcome: !invoice || amountDue === 0 ? "ZERO_DUE_APPLIED" : "PAID_AND_APPLIED",
+      ...persisted,
+    };
+  }
+
+  if (updated.pending_update) {
+    switch (paymentIntent?.status) {
+      case "requires_action":
+      case "requires_confirmation":
+        return {
+          outcome: "REQUIRES_ACTION",
+          ...persisted,
+          ...(paymentIntent.client_secret
+            ? { clientSecret: paymentIntent.client_secret }
+            : {}),
+        };
+      case "requires_payment_method":
+      case "canceled":
+        return { outcome: "PAYMENT_FAILED", ...persisted };
+      default:
+        return { outcome: "PENDING", ...persisted };
+    }
+  }
+
+  // Neither applied nor pending - report honestly, grant nothing.
+  return { outcome: "PENDING", ...persisted };
+}
+
+// ---------------------------------------------------------------------------
+// Upgrade preview - the exact Stripe proration, before any confirmation
+// ---------------------------------------------------------------------------
+
+export type ChangePlanPreview = {
+  plan: PaidPlan;
+  planName: string;
+  /** Exactly what Stripe would collect NOW (always_invoice proration). */
+  amountDueCents: number;
+  currency: string;
+  /** Tax portion when Stripe reports it; null when unavailable. */
+  taxCents: number | null;
+  /** The recurring price after the upgrade. */
+  nextRecurringCents: number;
+  /** The unchanged renewal date. */
+  renewsAt: Date | null;
+  /** Previews are estimates; the UI should re-preview after this. */
+  expiresAt: Date;
+};
+
+/** How long a preview is presented as fresh before the UI re-previews. */
+const PREVIEW_TTL_MS = 10 * 60_000;
+
+/**
+ * Preview the exact upgrade invoice via Stripe's create_preview - same
+ * guards, same item, same price the real update would use. Nothing is
+ * created or charged. The browser names a plan; every id and amount
+ * comes from the server and Stripe.
+ */
+export async function previewChangePlan(
+  userId: string,
+  plan: PaidPlan,
+): Promise<ChangePlanPreview> {
+  const { client, row, sub, itemId, priceId } = await loadUpgradeContext(userId, plan);
+  const preview = await client.previewSubscriptionUpdate({
+    customerId: row.providerCustomerId!,
+    subscriptionId: sub.id,
+    itemId,
+    priceId,
+  });
+  const target = PLANS.find((p) => p.tier === plan)!;
+  return {
+    plan,
+    planName: target.name,
+    amountDueCents: preview.amount_due ?? 0,
+    currency: preview.currency ?? "eur",
+    taxCents: typeof preview.tax === "number" ? preview.tax : null,
+    nextRecurringCents: target.priceMonthlyCents,
+    renewsAt: periodOf(sub).end,
+    expiresAt: new Date(Date.now() + PREVIEW_TTL_MS),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Upgrade status - fresh Stripe truth for polling/reconciliation
+// ---------------------------------------------------------------------------
+
+export type ChangePlanStatusResult = {
+  state: "ACTIVE_GOLD" | "STILL_PLUS" | "REQUIRES_ACTION" | "PAYMENT_FAILED" | "PENDING";
+  plan: PlanTier;
+  status: SubscriptionStatus;
+  /** Only while authentication is still required; owner-only, never logged. */
+  clientSecret?: string;
+};
+
+/**
+ * Fresh-fetches the subscription WITH payment state from Stripe, syncs
+ * it (so the DB can never disagree for long), and answers where the
+ * upgrade stands. Never trusts the DB plan alone. State names follow the
+ * Plus->Gold journey; semantically ACTIVE_GOLD = "target tier live",
+ * STILL_PLUS = "previous tier unchanged".
+ */
+export async function changePlanStatus(userId: string): Promise<ChangePlanStatusResult> {
+  const client = requireClient();
+  const row = await db.subscription.findUnique({ where: { userId } });
+  if (!row?.providerSubId || !row.providerCustomerId) {
+    throw new BillingError("no_subscription", "No subscription to report on.");
+  }
+  const sub = await client.retrieveSubscriptionPaymentState(row.providerSubId);
+  if (sub.customer !== row.providerCustomerId) {
+    console.error(
+      `[billing:status] subscription ${sub.id} belongs to ${sub.customer}, not ${row.providerCustomerId} - refusing`,
+    );
     throw new BillingError("no_subscription", "Your subscription could not be verified.");
   }
-  return { plan: updated.tier, status: updated.status };
+
+  const synced = await syncStripeSubscription({
+    stripeCustomerId: row.providerCustomerId,
+    stripeSubscriptionId: sub.id,
+    sourceEventId: `status:${sub.id}`,
+  });
+  const persisted = {
+    plan: synced?.tier ?? row.tier,
+    status: synced?.status ?? row.status,
+  };
+
+  if (sub.pending_update) {
+    const invoice =
+      sub.latest_invoice && typeof sub.latest_invoice === "object" ? sub.latest_invoice : null;
+    const paymentIntent =
+      invoice?.payment_intent && typeof invoice.payment_intent === "object"
+        ? invoice.payment_intent
+        : null;
+    switch (paymentIntent?.status) {
+      case "requires_action":
+      case "requires_confirmation":
+        return {
+          state: "REQUIRES_ACTION",
+          ...persisted,
+          ...(paymentIntent.client_secret
+            ? { clientSecret: paymentIntent.client_secret }
+            : {}),
+        };
+      case "requires_payment_method":
+      case "canceled":
+        return { state: "PAYMENT_FAILED", ...persisted };
+      default:
+        return { state: "PENDING", ...persisted };
+    }
+  }
+
+  const freshTier = planForPriceId(sub.items?.data?.[0]?.price?.id ?? null);
+  if (freshTier === "GOLD" && ["active", "trialing"].includes(sub.status)) {
+    return { state: "ACTIVE_GOLD", ...persisted };
+  }
+  return { state: "STILL_PLUS", ...persisted };
 }
 
 // ---------------------------------------------------------------------------
@@ -740,10 +1035,17 @@ function invoicePriceId(inv: StripeInvoice): string | null {
   return line?.price?.id ?? line?.pricing?.price_details?.price ?? null;
 }
 
-/** "Tirvea Gold" etc. via the trusted price map; never a guessed label. */
+/** "Tirvea Gold - upgrade" etc. via the trusted price map; never a guessed label. */
 function invoicePlanLabel(inv: StripeInvoice): string {
   const tier = planForPriceId(invoicePriceId(inv));
-  return PLANS.find((p) => p.tier === tier)?.name ?? "Subscription";
+  const name = PLANS.find((p) => p.tier === tier)?.name ?? "Subscription";
+  const reason =
+    inv.billing_reason === "subscription_update"
+      ? " - upgrade"
+      : inv.billing_reason === "subscription_cycle"
+        ? " - renewal"
+        : "";
+  return `${name}${reason}`;
 }
 
 /**
@@ -906,8 +1208,11 @@ async function dispatchStripeEvent(event: StripeWebhookEvent): Promise<boolean> 
       return true;
     }
 
-    case "invoice.paid":
-    case "invoice.payment_failed":
+    // Sync-only invoice/payment events: entitlements never move here -
+    // sync is price-driven and pending_if_incomplete keeps the old price
+    // until Stripe collects, so invoice.created can never grant a tier.
+    case "invoice.created":
+    case "invoice.finalized":
     case "invoice.payment_action_required": {
       const refs = invoiceRefs(object);
       if (!refs.customer) return false;
@@ -916,13 +1221,52 @@ async function dispatchStripeEvent(event: StripeWebhookEvent): Promise<boolean> 
         stripeSubscriptionId: refs.subscription,
         sourceEventId: event.id,
       });
+      return true;
+    }
+
+    case "invoice.paid":
+    case "invoice.payment_succeeded":
+    case "invoice.payment_failed": {
+      const refs = invoiceRefs(object);
+      if (!refs.customer) return false;
+      // Refetch-latest: a PAID upgrade invoice means Stripe has applied
+      // the pending update, so the fresh subscription now carries the
+      // new price; a failed one means it still carries the old price.
+      await syncStripeSubscription({
+        stripeCustomerId: refs.customer,
+        stripeSubscriptionId: refs.subscription,
+        sourceEventId: event.id,
+      });
       // Payment history: every settled invoice becomes (or updates) a
-      // Payment row - renewals included, not just the first checkout.
-      if (event.type !== "invoice.payment_action_required") {
-        const row = await db.subscription.findUnique({
-          where: { providerCustomerId: refs.customer },
-        });
-        if (row) await recordInvoicePayment(row.userId, object as StripeInvoice);
+      // Payment row - renewals and upgrade invoices included.
+      const row = await db.subscription.findUnique({
+        where: { providerCustomerId: refs.customer },
+      });
+      if (row) await recordInvoicePayment(row.userId, object as StripeInvoice);
+      return true;
+    }
+
+    // Payment intents settle asynchronously (3DS): refetch-latest by
+    // customer lands whatever the payment outcome made true at Stripe.
+    case "payment_intent.succeeded":
+    case "payment_intent.payment_failed": {
+      const customer = str(object.customer);
+      if (!customer) return false;
+      await syncStripeSubscription({
+        stripeCustomerId: customer,
+        stripeSubscriptionId: null,
+        sourceEventId: event.id,
+      });
+      const row = await db.subscription.findUnique({
+        where: { providerCustomerId: customer },
+      });
+      if (row?.providerCustomerId) {
+        // The intent's invoice settled - re-materialise history.
+        try {
+          await reconcileInvoicePayments(row.userId, row.providerCustomerId);
+        } catch (error) {
+          console.error("[billing:webhook] invoice reconcile failed:", error);
+        }
       }
       return true;
     }

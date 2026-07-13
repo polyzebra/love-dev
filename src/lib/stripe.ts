@@ -58,22 +58,47 @@ export type StripeSubscription = {
   current_period_start?: number;
   current_period_end?: number;
   items?: { data?: StripeSubscriptionItem[] };
-  /** Present while a payment-gated plan change awaits its invoice. */
-  pending_update?: Record<string, unknown> | null;
+  /** Present while a payment-gated plan change awaits its invoice
+   * (payment_behavior=pending_if_incomplete keeps the OLD price live
+   * until the update's invoice is paid). */
+  pending_update?: ({ expires_at?: number } & Record<string, unknown>) | null;
+  /** String id unless expanded. */
+  latest_invoice?: string | StripeInvoice | null;
   metadata?: Record<string, string>;
+};
+
+export type StripePaymentIntent = {
+  id: string;
+  status?:
+    | "requires_payment_method"
+    | "requires_confirmation"
+    | "requires_action"
+    | "processing"
+    | "requires_capture"
+    | "canceled"
+    | "succeeded";
+  /** SECRET-ADJACENT: forward only to the authenticated owner, never log. */
+  client_secret?: string | null;
 };
 
 export type StripeInvoice = {
   id: string;
   customer?: string | null;
   status?: "draft" | "open" | "paid" | "uncollectible" | "void" | null;
+  /** Why the invoice exists: subscription_create / subscription_cycle /
+   * subscription_update (upgrades) / manual ... */
+  billing_reason?: string | null;
   amount_paid?: number;
   amount_due?: number;
+  amount_remaining?: number;
+  tax?: number | null;
   currency?: string;
   created?: number;
   attempted?: boolean;
   hosted_invoice_url?: string | null;
   invoice_pdf?: string | null;
+  /** String id unless expanded via latest_invoice.payment_intent. */
+  payment_intent?: string | StripePaymentIntent | null;
   lines?: { data?: { price?: { id?: string } | null; pricing?: { price_details?: { price?: string } } }[] };
 };
 
@@ -124,6 +149,10 @@ export type UpdateSubscriptionPriceParams = {
   itemId: string;
   priceId: string;
   prorationBehavior: "create_prorations" | "always_invoice" | "none";
+  /** pending_if_incomplete = the price does NOT change until the
+   * update's invoice is PAID; the proposed change waits in
+   * pending_update. This is what payment-gates upgrades. */
+  paymentBehavior: "pending_if_incomplete" | "error_if_incomplete" | "allow_incomplete";
   idempotencyKey: string;
 };
 
@@ -136,6 +165,17 @@ export interface StripeClient {
   createCheckoutSession(params: CreateCheckoutSessionParams): Promise<StripeCheckoutSession>;
   retrieveCheckoutSession(id: string): Promise<StripeCheckoutSession>;
   retrieveSubscription(id: string): Promise<StripeSubscription>;
+  /** Same subscription WITH latest_invoice.payment_intent and
+   * pending_update expanded - the payment-state truth for upgrades. */
+  retrieveSubscriptionPaymentState(id: string): Promise<StripeSubscription>;
+  /** Preview the exact invoice an in-place price swap would raise NOW
+   * (always_invoice proration) - nothing is changed or charged. */
+  previewSubscriptionUpdate(params: {
+    customerId: string;
+    subscriptionId: string;
+    itemId: string;
+    priceId: string;
+  }): Promise<StripeInvoice>;
   /** In-place plan change on an EXISTING subscription (upgrade path):
    * same subscription id, same customer, same billing cycle - only the
    * item's price changes, prorated per prorationBehavior. */
@@ -246,6 +286,19 @@ function restClient(secretKey: string): StripeClient {
       request<StripeCheckoutSession>("GET", `/checkout/sessions/${encodeURIComponent(id)}`),
     retrieveSubscription: (id) =>
       request<StripeSubscription>("GET", `/subscriptions/${encodeURIComponent(id)}`),
+    retrieveSubscriptionPaymentState: (id) =>
+      request<StripeSubscription>("GET", `/subscriptions/${encodeURIComponent(id)}`, {
+        expand: ["latest_invoice.payment_intent", "pending_update"],
+      }),
+    previewSubscriptionUpdate: (p) =>
+      request<StripeInvoice>("POST", "/invoices/create_preview", {
+        customer: p.customerId,
+        subscription: p.subscriptionId,
+        subscription_details: {
+          items: [{ id: p.itemId, price: p.priceId }],
+          proration_behavior: "always_invoice",
+        },
+      }),
     updateSubscriptionPrice: (p) =>
       request<StripeSubscription>(
         "POST",
@@ -253,6 +306,8 @@ function restClient(secretKey: string): StripeClient {
         {
           items: [{ id: p.itemId, price: p.priceId }],
           proration_behavior: p.prorationBehavior,
+          payment_behavior: p.paymentBehavior,
+          expand: ["latest_invoice.payment_intent", "pending_update"],
           // billing_cycle_anchor is deliberately NOT sent: Stripe's
           // default ("unchanged") preserves the existing billing cycle.
         },

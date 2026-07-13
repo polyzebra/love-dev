@@ -335,11 +335,109 @@ check("upgrade CTA copy is exact and proration is honest", () => {
 check("UpgradePlanButton keeps the calm CTA contract (size reserved, aria-busy, inline error)", () => {
   const stacked = upgradeButton.match(/col-start-1 row-start-1/g) ?? [];
   assert.ok(stacked.length >= 2, "both labels stacked in the same grid cell");
-  assert.match(upgradeButton, /aria-busy=\{busy\}/);
-  assert.match(upgradeButton, /disabled=\{busy\}/);
+  assert.match(upgradeButton, /aria-busy=/);
+  assert.match(upgradeButton, /disabled=\{step !== "idle"\}/);
   assert.match(upgradeButton, /aria-live="polite"/);
   assert.match(upgradeButton, /res\.status === 401/);
   assert.match(upgradeButton, /router\.refresh\(\)/);
+});
+
+// ---------------------------------------------------------------------------
+console.log("payment-gated upgrade - money confirmed BEFORE the plan changes");
+// ---------------------------------------------------------------------------
+
+const billingService = read("src", "lib", "services", "billing.ts");
+const changePlanRoute = read("src", "app", "api", "billing", "change-plan", "route.ts");
+const previewRoute = read("src", "app", "api", "billing", "change-plan", "preview", "route.ts");
+const statusRoute = read("src", "app", "api", "billing", "change-plan", "status", "route.ts");
+
+check("the Stripe update is always_invoice + pending_if_incomplete - never create_prorations", () => {
+  assert.match(billingService, /PLAN_CHANGE_PRORATION_BEHAVIOR = "always_invoice"/);
+  assert.match(billingService, /PLAN_CHANGE_PAYMENT_BEHAVIOR = "pending_if_incomplete"/);
+  assert.ok(
+    !/PRORATION_BEHAVIOR = "create_prorations"/.test(billingService),
+    "create_prorations must never gate a paid upgrade",
+  );
+});
+
+check("preview happens BEFORE payment: modal shows Due today, then explicit Confirm and pay", () => {
+  assert.match(upgradeButton, /\/api\/billing\/change-plan\/preview/);
+  assert.match(upgradeButton, /Due today/);
+  assert.match(upgradeButton, /New monthly price/);
+  assert.match(upgradeButton, /Next renewal/);
+  assert.match(upgradeButton, /prorated difference for the rest of your current/);
+  assert.match(upgradeButton, /renewal date stays the same/);
+  assert.match(upgradeButton, /Confirm and pay \{dueToday\}/);
+  assert.match(upgradeButton, /Not now/);
+  // The update endpoint is called ONLY from the explicit confirmation.
+  assert.match(upgradeButton, /if \(step !== "preview"\) return;/);
+});
+
+check("processing state blocks double taps and never optimistically shows the new plan", () => {
+  assert.match(upgradeButton, /Processing secure payment\.\.\./);
+  assert.match(upgradeButton, /showCloseButton=\{!busy\}/);
+  // Exactly ONE success toast site, reachable only from confirmed outcomes.
+  const toasts = stripComments(upgradeButton).match(/toast\(/g) ?? [];
+  assert.equal(toasts.length, 1, "one success path, no optimistic toast");
+  assert.match(upgradeButton, /case "PAID_AND_APPLIED":\s*\n\s*case "ZERO_DUE_APPLIED":\s*\n\s*return succeed\(\)/);
+});
+
+check("every server outcome is handled: paid, zero-due, requires_action, pending, failed", () => {
+  for (const outcome of [
+    '"PAID_AND_APPLIED"',
+    '"ZERO_DUE_APPLIED"',
+    '"REQUIRES_ACTION"',
+    '"PENDING"',
+    '"PAYMENT_FAILED"',
+  ]) {
+    assert.ok(upgradeButton.includes(outcome), `outcome ${outcome} unhandled`);
+    assert.ok(billingService.includes(outcome), `outcome ${outcome} missing server-side`);
+  }
+});
+
+check("REQUIRES_ACTION drives real Stripe.js authentication, then verifies server-side", () => {
+  assert.match(upgradeButton, /js\.stripe\.com\/v3/);
+  assert.match(upgradeButton, /confirmCardPayment/);
+  // Authentication outcome is never trusted locally - the status endpoint decides.
+  assert.match(upgradeButton, /outcome verified server-side/);
+  assert.match(upgradeButton, /\/api\/billing\/change-plan\/status/);
+});
+
+check("PENDING polls the status endpoint for up to 30s and grants nothing locally", () => {
+  assert.match(upgradeButton, /POLL_BUDGET_MS = 30_000/);
+  assert.match(upgradeButton, /state === "ACTIVE_GOLD"/);
+});
+
+check("failure keeps the current plan, with Try again + Update payment method", () => {
+  assert.match(upgradeButton, /couldn(?:'|&apos;)t complete the upgrade/);
+  assert.match(upgradeButton, /current plan is unchanged/);
+  assert.match(upgradeButton, /Try again/);
+  assert.match(upgradeButton, /Update payment method/);
+  assert.match(upgradeButton, /flow="payment_method_update"/);
+});
+
+check("clientSecret is owner-only and never logged", () => {
+  for (const [name, src] of [
+    ["upgrade-plan-button", upgradeButton],
+    ["change-plan route", changePlanRoute],
+    ["status route", statusRoute],
+    ["billing service", billingService],
+  ] as const) {
+    assert.ok(
+      !/console\.[a-z]+\([^)]*(clientSecret|client_secret)/i.test(src),
+      `${name} must never log the client secret`,
+    );
+  }
+  assert.match(upgradeButton, /clientSecretRef/);
+});
+
+check("preview and status routes are authenticated and never accept price ids or amounts", () => {
+  assert.match(previewRoute, /requireSession\(\)/);
+  assert.match(statusRoute, /requireSession\(\)/);
+  assert.match(previewRoute, /changePlanSchema/);
+  const validators = read("src", "lib", "validators", "billing.ts");
+  assert.match(validators, /strictObject/);
+  assert.ok(!/amount|price_?id/i.test(validators), "no amounts or price ids from the browser");
 });
 
 check("settings page decides the upgrade path via the SHARED live-subscription predicate", () => {
