@@ -108,8 +108,7 @@ async function main() {
   const a = await mkUser("a");
   const b = await mkUser("b");
 
-  const call = (route: string, headers: Record<string, string> = {}) =>
-    fetch(route, { headers });
+  const call = (route: string, headers: Record<string, string> = {}) => fetch(route, { headers });
 
   try {
     console.log("bearer transport, live:");
@@ -141,13 +140,16 @@ async function main() {
       assert.equal(res.status, 200);
     });
 
-    await check("CONFLICTING cookie and Bearer identities -> 401, never a silent pick", async () => {
-      const res = await call(ROUTE, {
-        cookie: a.cookieHeader,
-        authorization: `Bearer ${b.token}`,
-      });
-      assert.equal(res.status, 401);
-    });
+    await check(
+      "CONFLICTING cookie and Bearer identities -> 401, never a silent pick",
+      async () => {
+        const res = await call(ROUTE, {
+          cookie: a.cookieHeader,
+          authorization: `Bearer ${b.token}`,
+        });
+        assert.equal(res.status, 401);
+      },
+    );
 
     await check("malformed Authorization headers -> 401 even with a valid cookie", async () => {
       for (const bad of ["Bearer", "Basic dXNlcjpwdw==", "Bearer a b", "Token x"]) {
@@ -156,28 +158,34 @@ async function main() {
       }
     });
 
-    await check("tampered signature -> 401 (verified by Supabase, not decoded locally)", async () => {
-      const parts = a.token.split(".");
-      const flipped = parts[2].slice(0, -6) + (parts[2].endsWith("AAAAAA") ? "BBBBBB" : "AAAAAA");
-      const res = await call(ROUTE, {
-        authorization: `Bearer ${parts[0]}.${parts[1]}.${flipped}`,
-      });
-      assert.equal(res.status, 401);
-    });
+    await check(
+      "tampered signature -> 401 (verified by Supabase, not decoded locally)",
+      async () => {
+        const parts = a.token.split(".");
+        const flipped = parts[2].slice(0, -6) + (parts[2].endsWith("AAAAAA") ? "BBBBBB" : "AAAAAA");
+        const res = await call(ROUTE, {
+          authorization: `Bearer ${parts[0]}.${parts[1]}.${flipped}`,
+        });
+        assert.equal(res.status, 401);
+      },
+    );
 
-    await check("unsigned alg:none token -> 401 (unsigned contents are never trusted)", async () => {
-      const header = b64url(JSON.stringify({ alg: "none", typ: "JWT" }));
-      const payload = b64url(
-        JSON.stringify({
-          sub: a.uid,
-          aud: "authenticated",
-          role: "authenticated",
-          exp: Math.floor(Date.now() / 1000) + 3600,
-        }),
-      );
-      const res = await call(ROUTE, { authorization: `Bearer ${header}.${payload}.` });
-      assert.equal(res.status, 401);
-    });
+    await check(
+      "unsigned alg:none token -> 401 (unsigned contents are never trusted)",
+      async () => {
+        const header = b64url(JSON.stringify({ alg: "none", typ: "JWT" }));
+        const payload = b64url(
+          JSON.stringify({
+            sub: a.uid,
+            aud: "authenticated",
+            role: "authenticated",
+            exp: Math.floor(Date.now() / 1000) + 3600,
+          }),
+        );
+        const res = await call(ROUTE, { authorization: `Bearer ${header}.${payload}.` });
+        assert.equal(res.status, 401);
+      },
+    );
 
     await check("expired-shape token -> 401 (expiry validated server-side)", async () => {
       const header = b64url(JSON.stringify({ alg: "ES256", typ: "JWT" }));

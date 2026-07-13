@@ -25,9 +25,7 @@
  */
 
 export type BearerParse =
-  | { kind: "none" }
-  | { kind: "malformed" }
-  | { kind: "token"; token: string };
+  { kind: "none" } | { kind: "malformed" } | { kind: "token"; token: string };
 
 /**
  * Strict Authorization-header parse. Accepts exactly one form:

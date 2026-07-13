@@ -74,8 +74,8 @@ export function ExploreCard3DVisual({
 }) {
   const box = size === "lg" ? "size-24" : "size-20";
   if (imageUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={imageUrl}
         alt=""
