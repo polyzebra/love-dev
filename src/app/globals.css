@@ -461,12 +461,25 @@
   }
 }
 
-/* Editorial gradient headline text */
+/* Editorial gradient headline text.
+   background-clip:text paints glyph INK only inside the background box.
+   Italic Playfair overhangs its advance width, and its ascent+descent
+   exceed tight display line-heights, so edge ink was shaved off
+   (::selection paint ignores background-clip - which is why selecting
+   the text "repaired" it). Extend the PAINTED box over the ink with
+   net-zero layout: vertical padding on an inline never affects layout,
+   horizontal padding is cancelled by equal negative margins, and clone
+   repeats the padding on every line fragment so mid-span wrap edges are
+   covered too. */
 @utility text-luxe {
   background: linear-gradient(180deg, var(--luxe-0) 0%, var(--luxe-55) 55%, var(--luxe-100) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  padding: 0.22em 0.14em;
+  margin-inline: -0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 @utility safe-top { padding-top: var(--safe-top); }
