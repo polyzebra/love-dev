@@ -124,6 +124,22 @@ export default async function proxy(request: NextRequest) {
       return redirect;
     }
     for (const c of authCookies) response.cookies.delete(c.name);
+    return response;
+  }
+
+  // Reverse gate: SIGNED-IN visitors never enter the auth front door.
+  // The /login page's own redirect() runs after the (auth) segment has
+  // already committed, leaving the shell mounted with an EMPTY slot for
+  // the whole next-route fetch (the logo-and-footer-only frame captured
+  // on real iPhones). Redirecting at the edge keeps the previous screen
+  // visible through the entire hop. /discover's requireUser then routes
+  // users who still owe a gate step; the page-level redirect stays as a
+  // backstop. Refreshed session cookies (token rotation!) must ride the
+  // redirect, or the rotated refresh token would be lost.
+  if (pathname === "/login") {
+    const redirect = NextResponse.redirect(new URL("/discover", request.url));
+    for (const c of response.cookies.getAll()) redirect.cookies.set(c);
+    return redirect;
   }
 
   return response;
