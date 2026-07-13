@@ -11,6 +11,10 @@ const schema = z.object({
     "explore_profile_liked",
     "explore_profile_passed",
     "explore_profile_clicked",
+    // Phase 0G: realtime chat transport health - counters only, no
+    // message content, no ids (delivery latency, reconnects, duplicate
+    // and recovered-event counts).
+    "chat_transport",
   ]),
   data: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
 });

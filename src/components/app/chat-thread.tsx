@@ -28,21 +28,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import {
+  applyReceipt,
+  confirmPending,
+  mergeMessages,
+  type ThreadMessage,
+} from "@/lib/chat/thread-store";
+import { useConversationChannel } from "@/components/app/use-conversation-channel";
 
-export type ThreadMessage = {
-  id: string;
-  senderId: string;
-  body: string | null;
-  status: "SENT" | "DELIVERED" | "SEEN";
-  createdAt: string | Date;
-  pending?: boolean;
-  /** Client-only: arrived while the thread was open, so animate its entrance.
-      Messages present at mount (and confirmed sends) never carry it. */
-  isNew?: boolean;
-};
+export type { ThreadMessage } from "@/lib/chat/thread-store";
 
-const POLL_INTERVAL_MS = 5000;
 const HEARTBEAT_INTERVAL_MS = 10_000;
+const METRICS_FLUSH_INTERVAL_MS = 60_000;
 const GROUP_WINDOW_MS = 3 * 60_000;
 
 /** Chip icon per suggestion kind. */
@@ -156,49 +153,154 @@ export function ChatThread({
     return () => clearInterval(timer);
   }, [conversationId]);
 
-  // Poll for new messages - swap for WebSocket/SSE transport in production
+  // ---- Realtime transport (Phase 0G) --------------------------------------
+  // Supabase Realtime private channel is the delivery layer; PostgreSQL
+  // stays the source of truth. Every event and every recovery fetch goes
+  // through the same dedupe/order/no-regress rules (lib/chat/thread-store).
+  // Transport health metrics are batched to /api/analytics - counters
+  // only, never message content or ids.
+  const metrics = useRef({
+    deliveries: 0,
+    latencySumMs: 0,
+    latencyMaxMs: 0,
+    duplicates: 0,
+    recovered: 0,
+    reconnects: 0,
+    reconnectSumMs: 0,
+    degradedFetches: 0,
+  });
+
   useEffect(() => {
-    const timer = setInterval(async () => {
+    const flush = (beacon: boolean) => {
+      const m = metrics.current;
+      if (m.deliveries + m.duplicates + m.recovered + m.reconnects + m.degradedFetches === 0) {
+        return;
+      }
+      const payload = JSON.stringify({ name: "chat_transport", data: { ...m } });
+      metrics.current = {
+        deliveries: 0,
+        latencySumMs: 0,
+        latencyMaxMs: 0,
+        duplicates: 0,
+        recovered: 0,
+        reconnects: 0,
+        reconnectSumMs: 0,
+        degradedFetches: 0,
+      };
+      try {
+        if (beacon && navigator.sendBeacon) {
+          navigator.sendBeacon("/api/analytics", new Blob([payload], { type: "application/json" }));
+        } else {
+          void fetch("/api/analytics", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: payload,
+          }).catch(() => undefined);
+        }
+      } catch {
+        // Metrics must never affect the thread.
+      }
+    };
+    const timer = setInterval(() => flush(false), METRICS_FLUSH_INTERVAL_MS);
+    const onHide = () => flush(true);
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("pagehide", onHide);
+      flush(true);
+    };
+  }, [conversationId]);
+
+  const maybeFollowBottom = useCallback(
+    (grew: boolean) => {
+      const nearBottom =
+        listRef.current &&
+        listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight <
+          120;
+      if (grew && nearBottom) requestAnimationFrame(() => scrollToBottom());
+    },
+    [scrollToBottom],
+  );
+
+  // Recipient-side receipts: "delivered" the moment a message reaches this
+  // device, "read" while the thread is actually on screen. Both are
+  // idempotent server-side and only broadcast on real state changes.
+  const sendReceipt = useCallback(
+    (kind: "delivered" | "read") => {
+      try {
+        void fetch(`/api/conversations/${conversationId}/receipts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind }),
+        }).catch(() => undefined);
+      } catch {
+        // Receipts must never take down the thread.
+      }
+    },
+    [conversationId],
+  );
+
+  const mergeIncoming = useCallback(
+    (incoming: ThreadMessage[], source: "realtime" | "recovery" | "degraded") => {
+      setMessages((prev) => {
+        const out = mergeMessages(prev, incoming);
+        if (source === "realtime") {
+          metrics.current.duplicates += out.duplicateCount;
+        } else {
+          // Rows a recovery fetch found that realtime never delivered.
+          metrics.current.recovered += out.addedIds.length;
+          if (source === "degraded") metrics.current.degradedFetches += 1;
+        }
+        const fromOthers = out.addedIds.length > 0;
+        if (fromOthers) {
+          sendReceipt(document.visibilityState === "visible" ? "read" : "delivered");
+        }
+        maybeFollowBottom(out.messages.length !== prev.length);
+        return out.messages;
+      });
+    },
+    [maybeFollowBottom, sendReceipt],
+  );
+
+  const recover = useCallback(
+    async (reason: "subscribe" | "visibility" | "degraded") => {
       try {
         const res = await fetch(`/api/conversations/${conversationId}/messages?take=50`);
         if (!res.ok) return;
         const { data } = (await res.json()) as { data: { messages: ThreadMessage[] } };
-        setMessages((prev) => {
-          const pending = prev.filter((m) => m.pending);
-          // MERGE by id instead of replacing: the poll only carries the
-          // last 50 messages, and dropping older ones mid-read would yank
-          // the scroll position on long threads. Server rows win so status
-          // updates (SEEN) still land.
-          const byId = new Map(prev.filter((m) => !m.pending).map((m) => [m.id, m]));
-          for (const m of data.messages) {
-            // Ids we have never seen arrived while the thread was open -
-            // they animate in; known ids only update in place (SEEN etc.).
-            byId.set(
-              m.id,
-              byId.has(m.id) ? { ...m, isNew: byId.get(m.id)!.isNew } : { ...m, isNew: true },
-            );
-          }
-          const settled = [...byId.values()].sort(
-            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-          );
-          const merged = [...settled, ...pending];
-          const nearBottom =
-            listRef.current &&
-            listRef.current.scrollHeight -
-              listRef.current.scrollTop -
-              listRef.current.clientHeight <
-              120;
-          if (merged.length !== prev.length && nearBottom) {
-            requestAnimationFrame(() => scrollToBottom());
-          }
-          return merged;
-        });
+        mergeIncoming(data.messages, reason === "degraded" ? "degraded" : "recovery");
       } catch {
-        // offline - polling will recover
+        // Offline - the next reconnect/visibility recovery will catch up.
       }
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [conversationId, scrollToBottom]);
+    },
+    [conversationId, mergeIncoming],
+  );
+
+  useConversationChannel({
+    conversationId,
+    onBroadcast: (event, payload) => {
+      if (event === "message:new") {
+        const serverTs = typeof payload.serverTs === "number" ? payload.serverTs : null;
+        if (serverTs) {
+          const latency = Math.max(0, Date.now() - serverTs);
+          metrics.current.deliveries += 1;
+          metrics.current.latencySumMs += latency;
+          metrics.current.latencyMaxMs = Math.max(metrics.current.latencyMaxMs, latency);
+        }
+        mergeIncoming([payload as unknown as ThreadMessage], "realtime");
+      } else if (event === "receipt") {
+        const receipt = payload as { kind?: "delivered" | "read"; byId?: string };
+        if (receipt.kind && receipt.byId && receipt.byId !== currentUserId) {
+          setMessages((prev) => applyReceipt(prev, { kind: receipt.kind!, byId: receipt.byId! }));
+        }
+      }
+    },
+    onRecover: (reason) => void recover(reason),
+    onReconnectMeasured: (ms) => {
+      metrics.current.reconnects += 1;
+      metrics.current.reconnectSumMs += ms;
+    },
+  });
 
   async function send(text?: string) {
     const body = (text ?? draft).trim();
@@ -228,17 +330,10 @@ export function ChatThread({
       emitInteraction("message-send");
       // The confirmed message never re-animates (isNew stays unset) - it
       // visually IS the optimistic bubble settling, not a new arrival.
-      const confirmed: ThreadMessage = { ...data, isNew: false };
-      setMessages((prev) => {
-        // The poll may have delivered the confirmed message while the POST
-        // was in flight - swap the optimistic bubble out and dedupe by id
-        // so a retry/poll race can never show the message twice.
-        const withoutOptimistic = prev.filter((m) => m.id !== optimistic.id);
-        if (withoutOptimistic.some((m) => m.id === data.id)) {
-          return withoutOptimistic.map((m) => (m.id === data.id ? confirmed : m));
-        }
-        return prev.map((m) => (m.id === optimistic.id ? confirmed : m));
-      });
+      // Realtime may have delivered the confirmed message while the POST
+      // was in flight - confirmPending swaps the optimistic bubble out and
+      // dedupes by id so no race can ever show the message twice.
+      setMessages((prev) => confirmPending(prev, optimistic.id, data));
     } catch {
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
       setDraft(body);

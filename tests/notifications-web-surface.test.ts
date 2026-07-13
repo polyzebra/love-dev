@@ -193,11 +193,13 @@ check("no Capacitor packages are installed (documentation-only path)", () => {
 console.log("what must survive, survives");
 // ---------------------------------------------------------------------------
 
-check("chat thread keeps the presence heartbeat and message polling", () => {
+check("chat thread keeps the presence heartbeat and live message updates", () => {
   const thread = read("src", "components", "app", "chat-thread.tsx");
   assert.ok(thread.includes("/api/presence/heartbeat"));
   assert.ok(thread.includes("HEARTBEAT_INTERVAL_MS"));
-  assert.ok(thread.includes("POLL_INTERVAL_MS"));
+  // Phase 0G: the 5s poll became the realtime transport + recovery fetch.
+  assert.ok(thread.includes("useConversationChannel"), "realtime transport wired");
+  assert.ok(!thread.includes("POLL_INTERVAL_MS"), "permanent polling stays removed");
   assert.ok(thread.includes("setMessages"), "visual new-message updates stay");
 });
 

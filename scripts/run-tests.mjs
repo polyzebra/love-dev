@@ -25,12 +25,14 @@ const LIVE = new Set([
   "api-v1.test.ts",
   "api-0e.test.ts",
   "api-0f.test.ts",
+  "api-0g.test.ts",
 ]);
 
 const UNIT = new Set([
   // Pure source-contract suites - no DB import, no env needed.
   "auth-form-stack.test.ts",
   "rate-limit.test.ts",
+  "thread-store.test.ts",
   "auth-url.test.ts",
   "billing-ui.test.ts",
   "login-routes.test.ts",
