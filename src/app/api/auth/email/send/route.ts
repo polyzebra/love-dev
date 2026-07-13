@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
-import { withUnavailableGuard } from "@/lib/api";
+import { withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { emailSchema } from "@/lib/validators/auth";
 import { isDisposableEmail } from "@/lib/auth/disposable-domains";
 import { checkOtpSendIpLimit, resendCooldown } from "@/lib/auth/rate-limit";
@@ -28,11 +27,11 @@ export const POST = withUnavailableGuard("auth:email/send", async (req: Request)
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, error: "Enter a valid email address." }, { status: 400 });
+    return authError(400, "invalid_email", "Enter a valid email address.");
   }
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: "Enter a valid email address." }, { status: 400 });
+    return authError(400, "invalid_email", "Enter a valid email address.");
   }
   const email = parsed.data.email;
 
@@ -40,7 +39,7 @@ export const POST = withUnavailableGuard("auth:email/send", async (req: Request)
   // server-authoritative escalating cooldown (30s -> 60s -> 120s, max 5
   // sends/hour) whether or not a code actually goes out.
   const cooldown = await resendCooldown("email", email);
-  const neutral = NextResponse.json({ ok: true, retryAfter: cooldown.retryAfter });
+  const neutral = authOk({ retryAfter: cooldown.retryAfter });
 
   // Disposable domains: pretend success, record the truth
   if (isDisposableEmail(email)) {

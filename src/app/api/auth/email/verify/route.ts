@@ -1,8 +1,7 @@
 import { EMAIL_OTP_LENGTH } from "@/lib/auth/otp";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
-import { withUnavailableGuard } from "@/lib/api";
+import { withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { emailSchema } from "@/lib/validators/auth";
 import { ensureAppUser } from "@/lib/auth/identity";
 import { authNextStep } from "@/lib/auth/gate";
@@ -43,11 +42,11 @@ export const POST = withUnavailableGuard("auth:email/verify", async (req: Reques
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, error: CODE_FAILED }, { status: 400 });
+    return authError(400, "code_failed", CODE_FAILED);
   }
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: CODE_FAILED }, { status: 400 });
+    return authError(400, "code_failed", CODE_FAILED);
   }
   const { email, code } = parsed.data;
   const ipHash = ipHashFrom(req);
@@ -63,7 +62,7 @@ export const POST = withUnavailableGuard("auth:email/verify", async (req: Reques
       req,
       metadata: { reason: blocked.reason ?? "locked" },
     });
-    return NextResponse.json({ ok: false, error: LOCKED }, { status: 429 });
+    return authError(429, "too_many_attempts", LOCKED);
   }
 
   const supabase = await supabaseServer();
@@ -75,7 +74,7 @@ export const POST = withUnavailableGuard("auth:email/verify", async (req: Reques
       req,
       metadata: { code: error?.code ?? "no_user" },
     });
-    return NextResponse.json({ ok: false, error: CODE_FAILED }, { status: 400 });
+    return authError(400, "code_failed", CODE_FAILED);
   }
 
   const result = await ensureAppUser(data.user, { req });
@@ -87,7 +86,7 @@ export const POST = withUnavailableGuard("auth:email/verify", async (req: Reques
       req,
       metadata: { reason: result.reason },
     });
-    return NextResponse.json({ ok: false, error: ACCOUNT_UNAVAILABLE }, { status: 403 });
+    return authError(403, "account_unavailable", ACCOUNT_UNAVAILABLE);
   }
 
   // Device + risk evaluation. ensureAppUser already stamped the new
@@ -145,5 +144,5 @@ export const POST = withUnavailableGuard("auth:email/verify", async (req: Reques
     req,
     metadata: { deviceHash: device?.deviceHash ?? null, riskScore },
   });
-  return NextResponse.json({ ok: true, next });
+  return authOk({ next });
 });

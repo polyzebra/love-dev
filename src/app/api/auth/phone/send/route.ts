@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireSession, withUnavailableGuard } from "@/lib/api";
+import { requireSession, withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { sendPhoneVerification } from "@/lib/auth/phone-flow";
 import { authNextStep } from "@/lib/auth/gate";
 
@@ -76,7 +76,7 @@ export const POST = withUnavailableGuard(
           { status: 400 },
         );
       case "account_blocked":
-        return NextResponse.json({ ok: false, error: NUMBER_UNAVAILABLE }, { status: 403 });
+        return authError(403, "number_unavailable", NUMBER_UNAVAILABLE);
       case "duplicate_phone":
         // Dev diagnostic - console only, never UI. A 409 here means the
         // number is verified on a DIFFERENT canonical account (identity =
@@ -109,7 +109,7 @@ export const POST = withUnavailableGuard(
           { status: 503 },
         );
       case "sent":
-        return NextResponse.json({ ok: true, retryAfter: outcome.retryAfter });
+        return authOk({ retryAfter: outcome.retryAfter });
     }
   },
   PHONE_UNAVAILABLE,

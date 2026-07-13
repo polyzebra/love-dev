@@ -16,7 +16,10 @@ export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   const header = req.headers.get("authorization");
   if (!secret || header !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: { code: "unauthorized" } }, { status: 401 });
+    return NextResponse.json(
+      { error: { code: "unauthorized", message: "Missing or invalid cron credential." } },
+      { status: 401 },
+    );
   }
 
   const deleted = await cleanupAbandonedAuthUsers();

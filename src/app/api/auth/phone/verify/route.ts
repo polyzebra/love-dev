@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireSession, withUnavailableGuard } from "@/lib/api";
+import { requireSession, withUnavailableGuard, authOk } from "@/lib/api";
 import { confirmPhoneVerification } from "@/lib/auth/phone-flow";
 import { authNextStep } from "@/lib/auth/gate";
 
@@ -117,7 +117,7 @@ export const POST = withUnavailableGuard(
         );
       case "already_verified":
       case "verified":
-        return NextResponse.json({ ok: true, next: authNextStep(outcome.user) });
+        return authOk({ next: authNextStep(outcome.user) });
     }
   },
   "Phone verification is temporarily unavailable.",

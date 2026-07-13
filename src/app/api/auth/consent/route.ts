@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { requireSession, withUnavailableGuard } from "@/lib/api";
+import { requireSession, withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { acceptConsentForUser } from "@/lib/auth/consent";
 import { authNextStep } from "@/lib/auth/gate";
 
@@ -19,13 +18,14 @@ export const POST = withUnavailableGuard("auth:consent", async (req: Request) =>
   if (response) return response;
 
   const user = await db.user.findUnique({ where: { id: sessionUser.id } });
-  if (!user)
-    return NextResponse.json({ ok: false, error: "Sign in to continue." }, { status: 401 });
+  if (!user) return authError(401, "unauthorized", "Sign in to continue.");
 
   if (user.bannedAt || user.status === "SUSPENDED") {
-    return NextResponse.json({ ok: false, next: "/account-blocked" }, { status: 403 });
+    return authError(403, "account_restricted", "This account is restricted.", {
+      next: "/account-blocked",
+    });
   }
 
   const updated = await acceptConsentForUser(user, req);
-  return NextResponse.json({ ok: true, next: authNextStep(updated) });
+  return authOk({ next: authNextStep(updated) });
 });

@@ -1,7 +1,7 @@
 import { EMAIL_OTP_LENGTH } from "@/lib/auth/otp";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireSession, withUnavailableGuard } from "@/lib/api";
+import { requireSession, withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { supabaseServer } from "@/lib/supabase/server";
 import { emailSchema } from "@/lib/validators/auth";
 import { verifyEmailAttach, EMAIL_IN_USE_MESSAGE } from "@/lib/auth/email-attach-flow";
@@ -81,7 +81,7 @@ export const POST = withUnavailableGuard("auth:email-attach/verify", async (req:
         { status: 400 },
       );
     case "account_blocked":
-      return NextResponse.json({ ok: false, error: ACCOUNT_UNAVAILABLE }, { status: 403 });
+      return authError(403, "account_unavailable", ACCOUNT_UNAVAILABLE);
     case "locked":
       return NextResponse.json(
         { ok: false, code: "too_many_attempts", error: LOCKED },
@@ -104,6 +104,6 @@ export const POST = withUnavailableGuard("auth:email-attach/verify", async (req:
       );
     case "already_verified":
     case "attached":
-      return NextResponse.json({ ok: true, next: authNextStep(outcome.user) });
+      return authOk({ next: authNextStep(outcome.user) });
   }
 });

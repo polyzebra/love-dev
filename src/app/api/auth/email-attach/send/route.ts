@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireSession, withUnavailableGuard } from "@/lib/api";
+import { requireSession, withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { supabaseServer } from "@/lib/supabase/server";
 import { emailSchema } from "@/lib/validators/auth";
 import { sendEmailAttach, EMAIL_IN_USE_MESSAGE } from "@/lib/auth/email-attach-flow";
@@ -75,7 +75,7 @@ export const POST = withUnavailableGuard("auth:email-attach/send", async (req: R
         { status: 400 },
       );
     case "account_blocked":
-      return NextResponse.json({ ok: false, error: ACCOUNT_UNAVAILABLE }, { status: 403 });
+      return authError(403, "account_unavailable", ACCOUNT_UNAVAILABLE);
     case "email_in_use":
       return NextResponse.json(
         { ok: false, code: "email_in_use", error: EMAIL_IN_USE_MESSAGE },
@@ -89,8 +89,8 @@ export const POST = withUnavailableGuard("auth:email-attach/send", async (req: R
         next: authNextStep(outcome.user),
       });
     case "send_failed":
-      return NextResponse.json({ ok: false, error: SEND_FAILED }, { status: 503 });
+      return authError(503, "send_failed", SEND_FAILED);
     case "sent":
-      return NextResponse.json({ ok: true, retryAfter: outcome.retryAfter });
+      return authOk({ retryAfter: outcome.retryAfter });
   }
 });

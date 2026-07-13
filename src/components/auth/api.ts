@@ -12,7 +12,10 @@ type Json = Record<string, unknown> | null;
 
 async function post(path: string, body: unknown): Promise<{ status: number; json: Json } | null> {
   try {
-    const res = await fetch(path, {
+    // The web client consumes the CANONICAL versioned surface; bare
+    // /api/* remains only as the frozen legacy alias (docs/API-CONTRACT.md).
+    const versioned = path.startsWith("/api/v1/") ? path : path.replace(/^\/api\//, "/api/v1/");
+    const res = await fetch(versioned, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -58,8 +61,28 @@ export type VerifyResult =
  * countdown is the one honest signal.
  */
 function retryAfterOf(json: Json): number | undefined {
-  const value = json?.retryAfter;
+  const data = json?.data;
+  const fromData =
+    data && typeof data === "object" ? (data as { retryAfter?: unknown }).retryAfter : undefined;
+  const value = fromData ?? json?.retryAfter;
   return typeof value === "number" && value > 0 ? Math.ceil(value) : undefined;
+}
+
+/** Standard-envelope success payload, with legacy top-level fallback. */
+function successOf(json: Json): Record<string, unknown> | null {
+  const data = json?.data;
+  if (data && typeof data === "object") return data as Record<string, unknown>;
+  return json?.ok === true ? (json as Record<string, unknown>) : null;
+}
+
+/** Machine code from the standard envelope, legacy top-level fallback. */
+function codeOf(json: Json): string | undefined {
+  const error = json?.error;
+  if (error && typeof error === "object") {
+    const code = (error as { code?: unknown }).code;
+    if (typeof code === "string" && code) return code;
+  }
+  return typeof json?.code === "string" ? (json.code as string) : undefined;
 }
 
 /** POST /api/auth/email/send - contractually always a neutral 200. */
@@ -75,9 +98,9 @@ export async function sendEmailCode(email: string): Promise<SendResult> {
 export async function verifyEmailCode(email: string, code: string): Promise<VerifyResult> {
   const res = await post("/api/auth/email/verify", { email, code });
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
-  const next = res.json?.next;
-  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
-  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+  const success = successOf(res.json);
+  if (success && typeof success.next === "string") return { ok: true, next: success.next };
+  return { ok: false, code: codeOf(res.json), message: errorMessage(res.json) ?? GENERIC_MESSAGE };
 }
 
 /**
@@ -92,18 +115,19 @@ export async function sendPhoneCode(input: {
 }): Promise<SendResult> {
   const res = await post("/api/auth/phone/send", input);
   if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
-  if (res.json?.ok === true) {
+  const success = successOf(res.json);
+  if (success) {
     // Already verified on this account: a success state - the flow
     // simply continues to `next` without an OTP screen.
-    if (res.json.alreadyVerified === true && typeof res.json.next === "string") {
-      return { ok: true, alreadyVerified: true, next: res.json.next };
+    if (success.alreadyVerified === true && typeof success.next === "string") {
+      return { ok: true, alreadyVerified: true, next: success.next };
     }
     return { ok: true, retryAfter: retryAfterOf(res.json) };
   }
   return {
     ok: false,
     blocked: res.json?.blocked === true || res.status === 503,
-    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    code: codeOf(res.json),
     message: errorMessage(res.json) ?? GENERIC_MESSAGE,
   };
 }
@@ -112,11 +136,11 @@ export async function sendPhoneCode(input: {
 export async function verifyPhoneCode(phoneE164: string, code: string): Promise<VerifyResult> {
   const res = await post("/api/auth/phone/verify", { phoneE164, code });
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
-  const next = res.json?.next;
-  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  const success = successOf(res.json);
+  if (success && typeof success.next === "string") return { ok: true, next: success.next };
   return {
     ok: false,
-    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    code: codeOf(res.json),
     message: errorMessage(res.json) ?? GENERIC_MESSAGE,
   };
 }
@@ -135,18 +159,19 @@ export async function verifyPhoneCode(phoneE164: string, code: string): Promise<
 export async function sendEmailAttachCode(email: string): Promise<SendResult> {
   const res = await post("/api/auth/email-attach/send", { email });
   if (!res) return { ok: false, blocked: false, message: OFFLINE_MESSAGE };
-  if (res.json?.ok === true) {
+  const success = successOf(res.json);
+  if (success) {
     // Already verified on this account: a success state - the flow
     // simply continues to `next` without an OTP screen.
-    if (res.json.alreadyVerified === true && typeof res.json.next === "string") {
-      return { ok: true, alreadyVerified: true, next: res.json.next };
+    if (success.alreadyVerified === true && typeof success.next === "string") {
+      return { ok: true, alreadyVerified: true, next: success.next };
     }
     return { ok: true, retryAfter: retryAfterOf(res.json) };
   }
   return {
     ok: false,
     blocked: false,
-    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    code: codeOf(res.json),
     message: errorMessage(res.json) ?? GENERIC_MESSAGE,
   };
 }
@@ -155,11 +180,11 @@ export async function sendEmailAttachCode(email: string): Promise<SendResult> {
 export async function verifyEmailAttachCode(email: string, code: string): Promise<VerifyResult> {
   const res = await post("/api/auth/email-attach/verify", { email, code });
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
-  const next = res.json?.next;
-  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
+  const success = successOf(res.json);
+  if (success && typeof success.next === "string") return { ok: true, next: success.next };
   return {
     ok: false,
-    code: typeof res.json?.code === "string" ? res.json.code : undefined,
+    code: codeOf(res.json),
     message: errorMessage(res.json) ?? GENERIC_MESSAGE,
   };
 }
@@ -258,16 +283,16 @@ export async function verifyPhoneLoginCode(
 export async function confirmAge(): Promise<VerifyResult> {
   const res = await post("/api/auth/age-confirm", {});
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
-  const next = res.json?.next;
-  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
-  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+  const success = successOf(res.json);
+  if (success && typeof success.next === "string") return { ok: true, next: success.next };
+  return { ok: false, code: codeOf(res.json), message: errorMessage(res.json) ?? GENERIC_MESSAGE };
 }
 
 /** POST /api/auth/consent - accepts the current legal versions, idempotent. */
 export async function acceptConsent(): Promise<VerifyResult> {
   const res = await post("/api/auth/consent", {});
   if (!res) return { ok: false, message: OFFLINE_MESSAGE };
-  const next = res.json?.next;
-  if (res.json?.ok === true && typeof next === "string") return { ok: true, next };
-  return { ok: false, message: errorMessage(res.json) ?? GENERIC_MESSAGE };
+  const success = successOf(res.json);
+  if (success && typeof success.next === "string") return { ok: true, next: success.next };
+  return { ok: false, code: codeOf(res.json), message: errorMessage(res.json) ?? GENERIC_MESSAGE };
 }

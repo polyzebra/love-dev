@@ -22,6 +22,7 @@ const LIVE = new Set([
   "identity-invariants.test.ts",
   "phone-sync.test.ts",
   "bearer-live.test.ts",
+  "api-v1.test.ts",
 ]);
 
 const UNIT = new Set([
@@ -32,6 +33,7 @@ const UNIT = new Set([
   "login-routes.test.ts",
   "notifications-web-surface.test.ts",
   "auth-transport.test.ts",
+  "api-contract.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";
