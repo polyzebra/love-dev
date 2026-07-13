@@ -527,3 +527,30 @@ Two schedulers exist; either alone is enough, running both is harmless
 
 Admins can also trigger the sweep on demand: `POST /api/admin/auth-cleanup`
 (permission `users:delete`, mirrored to `AdminLog` as `auth.cleanup`).
+
+## Bearer token transport (Phase 0C)
+
+`auth()` in `src/lib/auth.ts` is the single canonical authentication
+boundary and resolves TWO transports into one principal:
+
+- **Cookies** (Supabase SSR) - the browser session, behaviour unchanged.
+- **`Authorization: Bearer <Supabase access token>`** - native/API
+  clients. A client authenticates with Supabase directly (supabase-js
+  native session) and sends its `access_token` on every API call.
+
+Rules (implemented in `src/lib/auth/transport.ts`, unit-tested in
+`tests/auth-transport.test.ts`, live-tested in `tests/bearer-live.test.ts`):
+
+- Verification is exclusively `supabase.auth.getUser(token)` - Supabase
+  Auth checks signature, expiry and revocation server-side. Token
+  contents are never decoded or trusted locally, and never logged.
+- A present-but-malformed Authorization header rejects the request even
+  if a valid cookie session exists (no silent fallback).
+- An invalid/expired bearer token rejects the same way.
+- Cookie and bearer credentials resolving to DIFFERENT users reject
+  (`conflicting identities` - never a silent pick); the same user, or a
+  stale unresolvable cookie next to a valid bearer, proceeds as bearer.
+- Cookie cleanup (sign-out of dead sessions) runs only on the cookie
+  transport - a bearer request never mutates the caller's cookie jar.
+- Downstream (`requireSession`, `requirePermission`, services) is
+  transport-blind: same 401/403 envelopes, same principal shape.

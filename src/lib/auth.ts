@@ -1,7 +1,9 @@
 import { cache } from "react";
+import { cookies, headers } from "next/headers";
 import { db } from "@/lib/db";
 import { supabaseServer } from "@/lib/supabase/server";
 import { isIdentityBlocked } from "@/lib/auth/identity";
+import { decideIdentity, parseAuthorizationHeader } from "@/lib/auth/transport";
 import type { Role } from "@/generated/prisma/enums";
 
 /**
@@ -47,11 +49,51 @@ export type AppSession = {
 
 export const auth = cache(async (): Promise<AppSession | null> => {
   const supabase = await supabaseServer();
-  // getUser() validates the JWT against Supabase Auth - source of truth
+
+  // ---- Transport resolution (ONE canonical boundary) -----------------
+  // Two transports resolve to the same principal: the browser's Supabase
+  // SSR cookies (unchanged) and `Authorization: Bearer <access token>`
+  // for native/API clients. Every verification goes through Supabase
+  // Auth (`getUser`), which checks signature, expiry and revocation
+  // server-side - token contents are never decoded or logged locally.
+  // The decision rules (malformed rejects, conflicting identities
+  // reject, matching identities proceed) live in lib/auth/transport.ts.
+  const bearer = parseAuthorizationHeader((await headers()).get("authorization"));
+  if (bearer.kind === "malformed") return null;
+
+  const cookieStore = await cookies();
+  const hasCookieCredentials = cookieStore
+    .getAll()
+    .some((c) => c.name.startsWith("sb-") && c.name.includes("-auth-token"));
+
   const t0 = Date.now();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] = null;
+  let transport: "cookie" | "bearer" = "cookie";
+
+  if (bearer.kind === "token") {
+    const bearerRes = await supabase.auth.getUser(bearer.token);
+    const bearerUser = bearerRes.data.user;
+    // Conflict check only when cookie credentials also exist.
+    let cookieUserId: string | null = null;
+    if (hasCookieCredentials && bearerUser?.id) {
+      const cookieRes = await supabase.auth.getUser().catch(() => null);
+      cookieUserId = cookieRes?.data.user?.id ?? null;
+    }
+    const decision = decideIdentity({
+      bearer,
+      bearerUserId: bearerUser?.id ?? null,
+      cookieUserId,
+      hasCookieCredentials,
+    });
+    if (!decision.ok) return null;
+    user = bearerUser;
+    transport = "bearer";
+  } else {
+    // getUser() validates the cookie JWT against Supabase Auth.
+    const cookieRes = await supabase.auth.getUser();
+    user = cookieRes.data.user;
+  }
+
   if (process.env.PERF_TRACE) {
     console.info(`[trace:auth] getUser ${Date.now() - t0}ms at=${Date.now()}`);
   }
@@ -82,8 +124,11 @@ export const auth = cache(async (): Promise<AppSession | null> => {
   const appUser = await db.user.findUnique({ where: { id: user.id } });
   const blocked = appUser ? false : user.email ? await isIdentityBlocked(user.email) : false;
   if (!appUser || blocked || appUser.status === "DELETED") {
-    console.warn(`[auth:guard] invalid app user for auth.uid=${user.id} - signing out`);
-    await supabase.auth.signOut().catch(() => {});
+    console.warn(`[auth:guard] invalid app user for auth.uid=${user.id} - rejecting`);
+    // Cookie cleanup belongs to the cookie transport ONLY: a bearer
+    // request must never sign out (mutate) whatever cookie session the
+    // same browser/agent may hold.
+    if (transport === "cookie") await supabase.auth.signOut().catch(() => {});
     return null;
   }
   db.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } }).catch(() => {});
