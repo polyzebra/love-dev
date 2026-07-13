@@ -107,6 +107,37 @@ export function upgradePlansFor(tier: PlanTierName): Plan[] {
   return PLANS.filter((p) => planRank(p.tier) > planRank(tier));
 }
 
+/**
+ * What a member on `tier` loses when their plan ends and the account
+ * returns to Tirvea Free - DERIVED from the real entitlement tables
+ * (SWIPE_LIMITS / FIRST_MESSAGE_LIMITS), so the list can never promise
+ * or threaten anything the product doesn't actually enforce. Neutral
+ * information, no fear tactics.
+ */
+export function downgradeLossesFor(tier: PlanTierName): string[] {
+  if (tier === "FREE") return [];
+  const paid = SWIPE_LIMITS[tier];
+  const free = SWIPE_LIMITS.FREE;
+  const losses: string[] = [];
+  if (paid.likesPerDay === Infinity && free.likesPerDay !== Infinity) {
+    losses.push(`Unlimited likes (Free has ${free.likesPerDay} a day)`);
+  }
+  if (paid.undo && !free.undo) {
+    losses.push("Rewind - taking back an accidental pass");
+  }
+  if (paid.superLikesPerDay > free.superLikesPerDay) {
+    losses.push(
+      `${paid.superLikesPerDay} Super Likes a day (Free has ${free.superLikesPerDay})`,
+    );
+  }
+  if (FIRST_MESSAGE_LIMITS[tier] > FIRST_MESSAGE_LIMITS.FREE) {
+    losses.push(
+      `${FIRST_MESSAGE_LIMITS[tier]} first messages a day (Free has ${FIRST_MESSAGE_LIMITS.FREE})`,
+    );
+  }
+  return losses;
+}
+
 export const INTEREST_CATALOGUE: { category: string; items: string[] }[] = [
   {
     category: "Going out",

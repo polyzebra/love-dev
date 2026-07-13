@@ -25,3 +25,13 @@ export type ChangePlanInput = z.infer<typeof changePlanSchema>;
 export const checkoutStatusQuerySchema = z.object({
   session_id: z.string().min(1).max(200),
 });
+
+/**
+ * POST /api/billing/portal optional body - names a portal deep-link flow
+ * and nothing else. The customer id always comes from the stored row.
+ */
+export const portalSchema = z.strictObject({
+  flow: z.enum(["payment_method_update"]).optional(),
+});
+
+export type PortalInput = z.infer<typeof portalSchema>;

@@ -6,18 +6,22 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * "Manage billing" / "Change plan" - opens the Stripe billing portal for
- * the STORED customer (POST /api/billing/portal carries no body). Same
- * calm loading contract as CheckoutButton: size reserved via stacked
- * labels, aria-busy, inline error, retry allowed, no redirect on failure.
+ * "Manage billing" / "Update payment method" - opens the Stripe billing
+ * portal for the STORED customer (POST /api/billing/portal; an optional
+ * `flow` deep-links a specific portal flow). Same calm loading contract
+ * as CheckoutButton: size reserved via stacked labels, aria-busy, inline
+ * error, retry allowed, no redirect on failure.
  */
 export function ManageBillingButton({
   label = "Manage billing",
   variant = "outline",
+  flow,
   className,
 }: {
   label?: string;
   variant?: "default" | "outline" | "secondary";
+  /** Deep-link a portal flow (e.g. "payment_method_update"). */
+  flow?: "payment_method_update";
   className?: string;
 }) {
   const [busy, setBusy] = useState(false);
@@ -28,7 +32,15 @@ export function ManageBillingButton({
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch("/api/billing/portal", { method: "POST" });
+      const res = await fetch("/api/billing/portal", {
+        method: "POST",
+        ...(flow
+          ? {
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ flow }),
+            }
+          : {}),
+      });
       const payload = (await res.json().catch(() => null)) as {
         data?: { url?: string };
         error?: { message?: string };

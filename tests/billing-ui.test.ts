@@ -119,8 +119,10 @@ check("page is force-dynamic and never cached", () => {
   assert.ok(!/unstable_cache|revalidate\s*=/.test(subPage), "no cache/revalidate APIs");
 });
 
-check("reads fresh Subscription AND Payment rows on every render", () => {
-  assert.match(subPage, /db\.subscription\.findUnique/);
+check("reads fresh state on every render - Stripe is the source of truth, not the local DB", () => {
+  // reconcileBilling re-syncs the subscription AND invoice history from
+  // Stripe on view (throttled), then falls back to the cached row.
+  assert.match(subPage, /reconcileBilling\(user\.id\)/);
   assert.match(subPage, /db\.payment\.findMany/);
 });
 
@@ -149,7 +151,7 @@ check("'No payments yet' only when the Payment list is truly empty", () => {
 
 check("cancelAtPeriodEnd and PAST_DUE grace states have honest copy", () => {
   assert.match(subPage, /cancelAtPeriodEnd/);
-  assert.match(subPage, /Cancels on/);
+  assert.match(subPage, /stays active until/);
   assert.match(subPage, /PAST_DUE/);
   assert.match(subPage, /didn(?:'|&apos;)t go through/);
 });
@@ -355,6 +357,82 @@ check("pricing page is plan-aware: current tier + live-sub state feed the spotli
   assert.match(pricingPage, /hasLiveSubscription\(subscription\)/);
   assert.match(pricingPage, /currentTier=\{currentTier\}/);
   assert.match(pricingPage, /hasLiveSub=\{hasLiveSub\}/);
+});
+
+// ---------------------------------------------------------------------------
+console.log("subscription lifecycle - every state has an honest surface");
+// ---------------------------------------------------------------------------
+
+const resumeButton = read("src", "components", "billing", "resume-subscription-button.tsx");
+const retryButton = read("src", "components", "billing", "retry-payment-button.tsx");
+const actionButton = read("src", "components", "billing", "billing-action-button.tsx");
+const constantsFull = read("src", "lib", "constants", "index.ts");
+
+check("all six lifecycle states exist with their spec'd badges", () => {
+  for (const s of ['"FREE"', '"ACTIVE"', '"TRIAL"', '"ENDING"', '"PAYMENT_REQUIRED"', '"EXPIRED"']) {
+    assert.ok(subPage.includes(s), `lifecycle state ${s} missing`);
+  }
+  for (const label of ['"Active"', '"Trial"', '"Ending"', '"Payment required"', '"Free plan"']) {
+    assert.ok(subPage.includes(label), `badge ${label} missing`);
+  }
+});
+
+check("ENDING: stays-active-until hero, countdown, resume + manage, derived lose-list", () => {
+  assert.match(subPage, /stays active until/);
+  assert.match(subPage, /automatically returns to Tirvea Free/);
+  assert.match(subPage, /days left/);
+  assert.match(subPage, /<ResumeSubscriptionButton/);
+  assert.match(subPage, /you will[\s\S]{0,40}lose:/);
+  // The list derives from the entitlement tables, never hand-written fear copy.
+  assert.match(subPage, /downgradeLossesFor\(/);
+  assert.match(constantsFull, /export function downgradeLossesFor/);
+  assert.ok(
+    !/miss out|don't lose|last chance|hurry/i.test(stripComments(subPage)),
+    "no fear tactics",
+  );
+});
+
+check("resume = ONE Stripe subscription update, never a portal detour or new checkout", () => {
+  assert.match(resumeButton, /\/api\/billing\/resume/);
+  assert.ok(!/\/api\/billing\/portal/.test(stripComments(resumeButton)));
+  assert.ok(!/checkout/i.test(stripComments(resumeButton)));
+});
+
+check("PAYMENT REQUIRED: honest explanation + update payment method + retry", () => {
+  assert.match(subPage, /We couldn(?:'|&apos;)t renew your subscription\./);
+  assert.match(subPage, /Update payment method/);
+  assert.match(subPage, /<RetryPaymentButton/);
+  assert.match(subPage, /flow="payment_method_update"/);
+  assert.match(retryButton, /\/api\/billing\/retry-payment/);
+});
+
+check("EXPIRED: the prior plan's end is told from kept Stripe state, upgrade path returns", () => {
+  assert.match(subPage, /planForPriceId\(subscription\?\.stripePriceId\)/);
+  assert.match(subPage, /membership ended/);
+  assert.match(subPage, /Upgrade again anytime/);
+});
+
+check("TRIAL: countdown to the first billing date", () => {
+  assert.match(subPage, /Trial ends in \$\{daysUntil\(trialEnd\)\} days/);
+});
+
+check("action buttons keep the calm CTA contract (size reserved, aria-busy, inline error)", () => {
+  const stacked = actionButton.match(/col-start-1 row-start-1/g) ?? [];
+  assert.ok(stacked.length >= 2);
+  assert.match(actionButton, /aria-busy=\{busy\}/);
+  assert.match(actionButton, /aria-live="polite"/);
+  assert.match(actionButton, /router\.refresh\(\)/);
+  assert.match(actionButton, /res\.status === 401/);
+});
+
+check("payment history: date, plan, amount, currency, paid state, receipt AND invoice links", () => {
+  assert.match(subPage, /money\(p\.amountCents, p\.currency\)/);
+  assert.match(subPage, /p\.currency\.toUpperCase\(\)/);
+  assert.match(subPage, /p\.receiptUrl/);
+  assert.match(subPage, /p\.invoiceUrl/);
+  assert.match(subPage, />[\s]*Receipt[\s]*</);
+  assert.match(subPage, />[\s]*Invoice[\s]*</);
+  assert.match(subPage, /PAYMENT_LABEL\[p\.status\]/);
 });
 
 console.log(`\nbilling-ui: ${passed} checks passed`);

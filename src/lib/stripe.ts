@@ -47,6 +47,9 @@ export type StripeSubscription = {
   customer: string;
   status: string;
   cancel_at_period_end?: boolean;
+  /** Set for date-based cancellations AND mirrored by Stripe when
+   * cancel_at_period_end is true - presence means "scheduled to end". */
+  cancel_at?: number | null;
   canceled_at?: number | null;
   trial_start?: number | null;
   trial_end?: number | null;
@@ -55,7 +58,23 @@ export type StripeSubscription = {
   current_period_start?: number;
   current_period_end?: number;
   items?: { data?: StripeSubscriptionItem[] };
+  /** Present while a payment-gated plan change awaits its invoice. */
+  pending_update?: Record<string, unknown> | null;
   metadata?: Record<string, string>;
+};
+
+export type StripeInvoice = {
+  id: string;
+  customer?: string | null;
+  status?: "draft" | "open" | "paid" | "uncollectible" | "void" | null;
+  amount_paid?: number;
+  amount_due?: number;
+  currency?: string;
+  created?: number;
+  attempted?: boolean;
+  hosted_invoice_url?: string | null;
+  invoice_pdf?: string | null;
+  lines?: { data?: { price?: { id?: string } | null; pricing?: { price_details?: { price?: string } } }[] };
 };
 
 export type StripeCheckoutSession = {
@@ -63,6 +82,8 @@ export type StripeCheckoutSession = {
   url?: string | null;
   customer?: string | null;
   subscription?: string | null;
+  /** Invoice behind the first charge - payment rows key on it when present. */
+  invoice?: string | null;
   status?: "open" | "complete" | "expired" | null;
   payment_status?: "paid" | "unpaid" | "no_payment_required" | null;
   amount_total?: number | null;
@@ -119,11 +140,24 @@ export interface StripeClient {
    * same subscription id, same customer, same billing cycle - only the
    * item's price changes, prorated per prorationBehavior. */
   updateSubscriptionPrice(params: UpdateSubscriptionPriceParams): Promise<StripeSubscription>;
+  /** Set/clear a scheduled cancellation on the EXISTING subscription
+   * (resume path clears it) - never creates or replaces anything. */
+  updateSubscriptionCancellation(params: {
+    subscriptionId: string;
+    cancelAtPeriodEnd: boolean;
+    idempotencyKey: string;
+  }): Promise<StripeSubscription>;
   /** Newest-first, all statuses - callers pick the relevant one. */
   listSubscriptions(customerId: string): Promise<StripeSubscription[]>;
+  /** Newest-first invoices for a customer (payment history + dunning retry). */
+  listInvoices(customerId: string, status?: string): Promise<StripeInvoice[]>;
+  /** Attempt collection of an open invoice with the saved payment method. */
+  payInvoice(id: string, idempotencyKey: string): Promise<StripeInvoice>;
   createPortalSession(params: {
     customer: string;
     returnUrl: string;
+    /** Deep-link straight to a portal flow (e.g. updating the card). */
+    flow?: "payment_method_update";
   }): Promise<StripePortalSession>;
   retrievePrice(id: string): Promise<StripePrice>;
 }
@@ -224,6 +258,13 @@ function restClient(secretKey: string): StripeClient {
         },
         p.idempotencyKey,
       ),
+    updateSubscriptionCancellation: (p) =>
+      request<StripeSubscription>(
+        "POST",
+        `/subscriptions/${encodeURIComponent(p.subscriptionId)}`,
+        { cancel_at_period_end: p.cancelAtPeriodEnd },
+        p.idempotencyKey,
+      ),
     listSubscriptions: async (customerId) => {
       const page = await request<{ data?: StripeSubscription[] }>("GET", "/subscriptions", {
         customer: customerId,
@@ -232,10 +273,26 @@ function restClient(secretKey: string): StripeClient {
       });
       return page.data ?? [];
     },
-    createPortalSession: ({ customer, returnUrl }) =>
+    listInvoices: async (customerId, status) => {
+      const page = await request<{ data?: StripeInvoice[] }>("GET", "/invoices", {
+        customer: customerId,
+        limit: 24,
+        ...(status ? { status } : {}),
+      });
+      return page.data ?? [];
+    },
+    payInvoice: (id, idempotencyKey) =>
+      request<StripeInvoice>(
+        "POST",
+        `/invoices/${encodeURIComponent(id)}/pay`,
+        {},
+        idempotencyKey,
+      ),
+    createPortalSession: ({ customer, returnUrl, flow }) =>
       request<StripePortalSession>("POST", "/billing_portal/sessions", {
         customer,
         return_url: returnUrl,
+        ...(flow ? { flow_data: { type: flow } } : {}),
       }),
     retrievePrice: (id) =>
       request<StripePrice>("GET", `/prices/${encodeURIComponent(id)}`),

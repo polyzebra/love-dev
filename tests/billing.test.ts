@@ -23,6 +23,7 @@ import { createHmac } from "node:crypto";
 // Type-only: erased at runtime, so env setup below still runs first.
 import type {
   StripeClient,
+  StripeInvoice,
   StripeSubscription,
   StripeCheckoutSession,
   UpdateSubscriptionPriceParams,
@@ -63,6 +64,7 @@ async function main() {
   const {
     setStripeClient,
     StripeApiError,
+    planForPriceId,
     validateStripeEnvStatic,
     validateStripeEnvDeep,
     resetStripeEnvDeepCache,
@@ -78,6 +80,9 @@ async function main() {
     planChangeIdempotencyKey,
     PLAN_CHANGE_PRORATION_BEHAVIOR,
     hasLiveSubscription,
+    resumeSubscription,
+    retryPayment,
+    reconcileBilling,
     BillingError,
   } = await import("../src/lib/services/billing");
   const { PLANS, planRank, upgradePlansFor } = await import("../src/lib/constants");
@@ -100,8 +105,17 @@ async function main() {
   const sessions = new Map<string, StripeCheckoutSession>();
   const subscriptions = new Map<string, StripeSubscription>();
   const idempotencySessions = new Map<string, string>();
-  const portalCalls: { customer: string; returnUrl: string }[] = [];
+  const portalCalls: { customer: string; returnUrl: string; flow?: string }[] = [];
   const planChangeCalls: UpdateSubscriptionPriceParams[] = [];
+  const cancellationCalls: {
+    subscriptionId: string;
+    cancelAtPeriodEnd: boolean;
+    idempotencyKey: string;
+  }[] = [];
+  const invoices = new Map<string, StripeInvoice>();
+  const payInvoiceCalls: string[] = [];
+  /** Scripted outcome for the next payInvoice call. */
+  let payInvoiceOutcome: "paid" | "declined" = "paid";
   const priceCatalogue = new Map<string, { currency: string; unit_amount: number; interval: string }>([
     [PLUS_PRICE, { currency: "eur", unit_amount: 1499, interval: "month" }],
     [GOLD_PRICE, { currency: "eur", unit_amount: 2999, interval: "month" }],
@@ -156,11 +170,46 @@ async function main() {
       item.price = { id: p.priceId };
       return s;
     },
+    async updateSubscriptionCancellation(p) {
+      cancellationCalls.push(p);
+      const s = subscriptions.get(p.subscriptionId);
+      if (!s) throw new StripeApiError(404, "resource_missing", "No such subscription");
+      if (s.status === "canceled") {
+        throw new StripeApiError(400, "invalid_request", "Canceled subscriptions cannot be updated");
+      }
+      s.cancel_at_period_end = p.cancelAtPeriodEnd;
+      s.cancel_at = p.cancelAtPeriodEnd
+        ? (s.items?.data?.[0]?.current_period_end ?? null)
+        : null;
+      return s;
+    },
     async listSubscriptions(customerId) {
       return [...subscriptions.values()].filter((s) => s.customer === customerId);
     },
-    async createPortalSession({ customer, returnUrl }) {
-      portalCalls.push({ customer, returnUrl });
+    async listInvoices(customerId, status) {
+      return [...invoices.values()]
+        .filter((inv) => inv.customer === customerId)
+        .filter((inv) => (status ? inv.status === status : true))
+        .sort((a, b) => (b.created ?? 0) - (a.created ?? 0));
+    },
+    async payInvoice(id) {
+      payInvoiceCalls.push(id);
+      const inv = invoices.get(id);
+      if (!inv) throw new StripeApiError(404, "resource_missing", "No such invoice");
+      if (payInvoiceOutcome === "declined") {
+        inv.attempted = true;
+        throw new StripeApiError(402, "card_declined", "Your card was declined.");
+      }
+      inv.status = "paid";
+      inv.amount_paid = inv.amount_due ?? 0;
+      // Like Stripe: collecting the open invoice reactivates the sub.
+      for (const s of subscriptions.values()) {
+        if (s.customer === inv.customer && s.status === "past_due") s.status = "active";
+      }
+      return inv;
+    },
+    async createPortalSession({ customer, returnUrl, flow }) {
+      portalCalls.push({ customer, returnUrl, flow });
       return { id: `bps_test_${++seq}`, url: `https://billing.stripe.com/session/${customer}` };
     },
     async retrievePrice(id) {
@@ -170,6 +219,35 @@ async function main() {
     },
   };
   setStripeClient(spy);
+
+  /** Register an invoice at "Stripe" (checkout charges and renewals). */
+  function registerInvoice(
+    customer: string,
+    opts: {
+      priceId: string;
+      amountCents: number;
+      status?: StripeInvoice["status"];
+      attempted?: boolean;
+    },
+  ): StripeInvoice {
+    const id = `in_test_${++seq}`;
+    const paid = (opts.status ?? "paid") === "paid";
+    const inv: StripeInvoice = {
+      id,
+      customer,
+      status: opts.status ?? "paid",
+      amount_paid: paid ? opts.amountCents : 0,
+      amount_due: opts.amountCents,
+      currency: "eur",
+      created: Math.floor(Date.now() / 1000) + seq, // unique, newest-first sortable
+      attempted: opts.attempted ?? paid,
+      hosted_invoice_url: `https://invoice.stripe.com/i/${id}`,
+      invoice_pdf: `https://pay.stripe.com/receipts/${id}.pdf`,
+      lines: { data: [{ price: { id: opts.priceId } }] },
+    };
+    invoices.set(id, inv);
+    return inv;
+  }
 
   /** Script a subscription at "Stripe" and mark the session complete. */
   function completeCheckout(
@@ -204,12 +282,22 @@ async function main() {
       },
     };
     subscriptions.set(id, sub);
+    // Stripe raises an invoice for the first charge; the session carries
+    // its id, so payment rows key on the invoice (never duplicated by a
+    // later invoice.paid for the same charge).
+    const amount = opts.priceId === GOLD_PRICE ? 2999 : 1499;
+    const invoice = registerInvoice(session.customer!, {
+      priceId: opts.priceId,
+      amountCents: amount,
+      status: (opts.status ?? "active") === "active" ? "paid" : "open",
+    });
     sessions.set(sessionId, {
       ...session,
       status: "complete",
       payment_status: "paid",
       subscription: id,
-      amount_total: opts.priceId === GOLD_PRICE ? 2999 : 1499,
+      invoice: invoice.id,
+      amount_total: amount,
       currency: "eur",
     });
     return sub;
@@ -730,6 +818,294 @@ async function main() {
     });
 
     // -----------------------------------------------------------------------
+    // Lifecycle: portal cancel -> resume -> expire, dunning retry,
+    // invoice-backed payment history, reconcile-on-view
+    // -----------------------------------------------------------------------
+    const harry = await seedUser("harry");
+    const harrySession = (await startCheckout(harry, "GOLD", testEmail("harry"))).sessionId;
+    const harrySub = completeCheckout(harrySession, { priceId: GOLD_PRICE });
+    const harryCustomer = harrySub.customer;
+
+    await check("portal cancel: cancel_at_period_end flows back via webhook reconciliation", async () => {
+      await syncStripeSubscription({
+        stripeCustomerId: harryCustomer,
+        stripeSubscriptionId: harrySub.id,
+      });
+      // The user cancels in the Stripe portal - Stripe flags the sub...
+      const s = subscriptions.get(harrySub.id)!;
+      s.cancel_at_period_end = true;
+      s.cancel_at = s.items?.data?.[0]?.current_period_end ?? null;
+      // ...and the webhook lands.
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.updated",
+        data: { object: { id: harrySub.id, customer: harryCustomer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      const row = await subRow(harry);
+      assert.equal(row.cancelAtPeriodEnd, true);
+      assert.equal(row.tier, "GOLD");
+      assert.equal(row.status, "ACTIVE");
+      // Scheduled-to-end stays entitled until it actually ends.
+      assert.equal((await getUserEntitlements(harry)).plan, "GOLD");
+    });
+
+    await check("resume clears cancel_at_period_end on the SAME subscription - nothing new is created", async () => {
+      const before = await subRow(harry);
+      const subCount = subscriptions.size;
+      const custCount = customers.size;
+      const result = await resumeSubscription(harry);
+      assert.equal(result.cancelAtPeriodEnd, false);
+      assert.equal(result.plan, "GOLD");
+      const call = cancellationCalls[cancellationCalls.length - 1];
+      assert.equal(call.subscriptionId, harrySub.id);
+      assert.equal(call.cancelAtPeriodEnd, false);
+      const row = await subRow(harry);
+      assert.equal(row.cancelAtPeriodEnd, false);
+      assert.equal(row.providerSubId, before.providerSubId, "same subscription");
+      assert.equal(row.providerCustomerId, before.providerCustomerId, "same customer");
+      assert.equal(subscriptions.size, subCount, "no duplicate subscription");
+      assert.equal(customers.size, custCount, "no duplicate customer");
+    });
+
+    await check("resume guards: not scheduled -> not_ending; no subscription -> no_subscription", async () => {
+      await assert.rejects(
+        () => resumeSubscription(harry),
+        (e: unknown) => e instanceof BillingError && e.code === "not_ending",
+      );
+      const nora = await seedUser("nora");
+      await assert.rejects(
+        () => resumeSubscription(nora),
+        (e: unknown) => e instanceof BillingError && e.code === "no_subscription",
+      );
+    });
+
+    await check("portal resume reconciles the same way (webhook only)", async () => {
+      const s = subscriptions.get(harrySub.id)!;
+      s.cancel_at_period_end = true;
+      s.cancel_at = s.items?.data?.[0]?.current_period_end ?? null;
+      await syncStripeSubscription({ stripeCustomerId: harryCustomer, stripeSubscriptionId: harrySub.id });
+      assert.equal((await subRow(harry)).cancelAtPeriodEnd, true);
+      // Resumed in the portal:
+      s.cancel_at_period_end = false;
+      s.cancel_at = null;
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.updated",
+        data: { object: { id: harrySub.id, customer: harryCustomer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      assert.equal((await subRow(harry)).cancelAtPeriodEnd, false);
+    });
+
+    await check("cancel_at (date-based) also reads as scheduled-to-end", async () => {
+      const s = subscriptions.get(harrySub.id)!;
+      s.cancel_at = Math.floor(Date.now() / 1000) + 10 * 24 * 3600;
+      s.cancel_at_period_end = false; // date-based, not period-end-based
+      await syncStripeSubscription({ stripeCustomerId: harryCustomer, stripeSubscriptionId: harrySub.id });
+      assert.equal((await subRow(harry)).cancelAtPeriodEnd, true);
+      s.cancel_at = null;
+      await syncStripeSubscription({ stripeCustomerId: harryCustomer, stripeSubscriptionId: harrySub.id });
+      assert.equal((await subRow(harry)).cancelAtPeriodEnd, false);
+    });
+
+    await check("reconcile-on-view: a portal cancellation is visible with NO webhook at all", async () => {
+      const s = subscriptions.get(harrySub.id)!;
+      s.cancel_at_period_end = true; // portal cancel; webhook never arrives
+      // Age the cache beyond the 60s throttle so the page re-syncs.
+      await db.subscription.update({
+        where: { userId: harry },
+        data: { syncedAt: new Date(Date.now() - 120_000) },
+      });
+      const row = await reconcileBilling(harry);
+      assert.equal(row?.cancelAtPeriodEnd, true, "Stripe is the source of truth");
+      // Fresh syncs are throttled: a change inside the window serves cache.
+      s.cancel_at_period_end = false;
+      const cached = await reconcileBilling(harry);
+      assert.equal(cached?.cancelAtPeriodEnd, true, "cached row inside throttle window");
+      // restore for later checks
+      await db.subscription.update({
+        where: { userId: harry },
+        data: { syncedAt: new Date(Date.now() - 120_000) },
+      });
+      await reconcileBilling(harry);
+      assert.equal((await subRow(harry)).cancelAtPeriodEnd, false);
+    });
+
+    await check("reconcile-on-view heals payment history from Stripe invoices", async () => {
+      // harry's first charge exists ONLY at Stripe (his checkout webhook
+      // "never arrived") - the billing page backfills it from invoices.
+      const row = await subRow(harry);
+      assert.equal(await db.payment.count({ where: { userId: harry } }), 1);
+      const payment = await db.payment.findFirstOrThrow({ where: { userId: harry } });
+      assert.equal(payment.status, "SUCCEEDED");
+      assert.equal(payment.amountCents, 2999);
+      assert.equal(payment.currency, "eur");
+      assert.equal(payment.description, "Tirvea Gold");
+      assert.ok(payment.invoiceUrl?.includes("invoice.stripe.com"));
+      assert.ok(payment.receiptUrl?.includes(".pdf"));
+      assert.ok(row);
+    });
+
+    await check("expired: subscription.deleted keeps the PRIOR plan story, grants nothing", async () => {
+      const s = subscriptions.get(harrySub.id)!;
+      s.status = "canceled";
+      s.canceled_at = Math.floor(Date.now() / 1000);
+      const event = {
+        id: nextEventId(),
+        type: "customer.subscription.deleted",
+        data: { object: { id: harrySub.id, customer: harryCustomer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      const row = await subRow(harry);
+      assert.equal(row.tier, "FREE");
+      assert.equal(row.status, "CANCELED");
+      assert.ok(row.canceledAt, "when it ended is recorded");
+      assert.ok(row.currentPeriodEnd, "period end kept for the 'ended on' story");
+      // The page derives "your GOLD membership ended" from the kept price id.
+      assert.equal(planForPriceId(row.stripePriceId), "GOLD");
+      assert.equal((await getUserEntitlements(harry)).plan, "FREE", "no entitlement leak");
+    });
+
+    await check("resume after expiry is refused - the path back is checkout", async () => {
+      await assert.rejects(
+        () => resumeSubscription(harry),
+        (e: unknown) => e instanceof BillingError && e.code === "no_subscription",
+      );
+    });
+
+    // --- Dunning: failed payment -> retry ---------------------------------
+    const iris = await seedUser("iris");
+    const irisSession = (await startCheckout(iris, "PLUS", testEmail("iris"))).sessionId;
+    const irisSub = completeCheckout(irisSession, { priceId: PLUS_PRICE });
+    const irisCustomer = irisSub.customer;
+
+    await check("invoice.payment_failed records a FAILED payment row + PAST_DUE", async () => {
+      await syncStripeSubscription({ stripeCustomerId: irisCustomer, stripeSubscriptionId: irisSub.id });
+      const renewal = registerInvoice(irisCustomer, {
+        priceId: PLUS_PRICE,
+        amountCents: 1499,
+        status: "open",
+        attempted: true,
+      });
+      subscriptions.get(irisSub.id)!.status = "past_due";
+      const event = {
+        id: nextEventId(),
+        type: "invoice.payment_failed",
+        data: { object: { ...renewal, subscription: irisSub.id } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      const row = await subRow(iris);
+      assert.equal(row.status, "PAST_DUE");
+      const failed = await db.payment.findUniqueOrThrow({
+        where: { providerPaymentId: renewal.id },
+      });
+      assert.equal(failed.status, "FAILED");
+      assert.equal(failed.amountCents, 1499);
+      assert.equal(failed.description, "Tirvea Plus");
+    });
+
+    await check("retry payment: declined card answers payment_failed and changes nothing", async () => {
+      payInvoiceOutcome = "declined";
+      await assert.rejects(
+        () => retryPayment(iris),
+        (e: unknown) => e instanceof BillingError && e.code === "payment_failed",
+      );
+      assert.equal((await subRow(iris)).status, "PAST_DUE");
+    });
+
+    await check("retry payment: success collects the invoice and reactivates via the shared sync", async () => {
+      payInvoiceOutcome = "paid";
+      const openInvoice = [...invoices.values()].find(
+        (i) => i.customer === irisCustomer && i.status === "open",
+      )!;
+      const result = await retryPayment(iris);
+      assert.equal(payInvoiceCalls[payInvoiceCalls.length - 1], openInvoice.id);
+      assert.equal(result.status, "ACTIVE");
+      const flipped = await db.payment.findUniqueOrThrow({
+        where: { providerPaymentId: openInvoice.id },
+      });
+      assert.equal(flipped.status, "SUCCEEDED", "FAILED row flips to paid, no duplicate");
+      assert.equal((await getUserEntitlements(iris)).plan, "PLUS");
+    });
+
+    await check("retry payment with nothing outstanding answers no_open_invoice", async () => {
+      await assert.rejects(
+        () => retryPayment(iris),
+        (e: unknown) => e instanceof BillingError && e.code === "no_open_invoice",
+      );
+    });
+
+    // --- Payment history: invoices are the source, never duplicated -------
+    await check("checkout charge + its invoice.paid webhook = ONE payment row", async () => {
+      const event = {
+        id: nextEventId(),
+        type: "checkout.session.completed",
+        data: { object: { ...sessions.get(irisSession)! } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      const checkoutInvoiceId = sessions.get(irisSession)!.invoice!;
+      const paidEvent = {
+        id: nextEventId(),
+        type: "invoice.paid",
+        data: { object: { ...invoices.get(checkoutInvoiceId)!, subscription: irisSub.id } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(paidEvent))).status, 200);
+      assert.equal(
+        await db.payment.count({
+          where: { userId: iris, providerPaymentId: checkoutInvoiceId },
+        }),
+        1,
+        "keyed by invoice id - the same charge never appears twice",
+      );
+    });
+
+    await check("invoice.paid records renewals (not just the first checkout)", async () => {
+      const before = await db.payment.count({ where: { userId: iris } });
+      const renewal = registerInvoice(irisCustomer, { priceId: PLUS_PRICE, amountCents: 1499 });
+      const event = {
+        id: nextEventId(),
+        type: "invoice.paid",
+        data: { object: { ...renewal, subscription: irisSub.id } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(event))).status, 200);
+      assert.equal(await db.payment.count({ where: { userId: iris } }), before + 1);
+      const row = await db.payment.findUniqueOrThrow({
+        where: { providerPaymentId: renewal.id },
+      });
+      assert.equal(row.description, "Tirvea Plus");
+      assert.ok(row.invoiceUrl && row.receiptUrl, "invoice and receipt links kept");
+    });
+
+    await check("pending_update applied/expired events reconcile via refetch-latest", async () => {
+      // A payment-gated change rolled back at Stripe: refetch-latest just
+      // lands whatever Stripe now says.
+      subscriptions.get(irisSub.id)!.items!.data![0].price = { id: GOLD_PRICE };
+      const applied = {
+        id: nextEventId(),
+        type: "customer.subscription.pending_update_applied",
+        data: { object: { id: irisSub.id, customer: irisCustomer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(applied))).status, 200);
+      assert.equal((await subRow(iris)).tier, "GOLD");
+      subscriptions.get(irisSub.id)!.items!.data![0].price = { id: PLUS_PRICE };
+      const expired = {
+        id: nextEventId(),
+        type: "customer.subscription.pending_update_expired",
+        data: { object: { id: irisSub.id, customer: irisCustomer } },
+      };
+      assert.equal((await webhookPOST(signedWebhookRequest(expired))).status, 200);
+      assert.equal((await subRow(iris)).tier, "PLUS");
+    });
+
+    await check("portal deep-link: payment_method_update flow reaches Stripe", async () => {
+      await createPortalSession(iris, "payment_method_update");
+      assert.equal(portalCalls[portalCalls.length - 1].flow, "payment_method_update");
+      await createPortalSession(iris);
+      assert.equal(portalCalls[portalCalls.length - 1].flow, undefined);
+    });
+
+    // -----------------------------------------------------------------------
     // Env validation
     // -----------------------------------------------------------------------
     await check("case 19a: identical PLUS/GOLD price ids fail validation", () => {
@@ -795,6 +1171,7 @@ async function main() {
       skip("unauthenticated GET /api/billing/checkout-status answers 401", "dev server not running");
       skip("unauthenticated POST /api/billing/portal answers 401", "dev server not running");
       skip("unauthenticated POST /api/billing/change-plan answers 401", "dev server not running");
+      skip("unauthenticated POST /api/billing/resume and /retry-payment answer 401", "dev server not running");
     } else {
       await check("case 3: unauthenticated POST /api/billing/checkout answers 401", async () => {
         const res = await fetch(`${base}/api/billing/checkout`, {
@@ -819,6 +1196,12 @@ async function main() {
           body: JSON.stringify({ plan: "GOLD" }),
         });
         assert.equal(res.status, 401);
+      });
+      await check("unauthenticated POST /api/billing/resume and /retry-payment answer 401", async () => {
+        for (const path of ["/api/billing/resume", "/api/billing/retry-payment"]) {
+          const res = await fetch(`${base}${path}`, { method: "POST" });
+          assert.equal(res.status, 401, path);
+        }
       });
     }
 

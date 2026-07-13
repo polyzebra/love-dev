@@ -1,28 +1,39 @@
 import { db } from "@/lib/db";
 import { siteUrl } from "@/lib/auth/url";
-import { planRank } from "@/lib/constants";
+import { PLANS, planRank } from "@/lib/constants";
 import {
   getStripeClient,
   planForPriceId,
+  stripeConfigured,
   stripePriceIdFor,
   validateStripeEnvStatic,
   StripeApiError,
   type PaidPlan,
   type StripeCheckoutSession,
+  type StripeInvoice,
   type StripeSubscription,
 } from "@/lib/stripe";
-import type { PlanTier, SubscriptionStatus } from "@/generated/prisma/enums";
+import type { PaymentStatus, PlanTier, SubscriptionStatus } from "@/generated/prisma/enums";
 
 /**
  * Canonical Stripe subscription lifecycle - the ONE place billing state
- * changes. Four entry points, one truth:
+ * changes. Entry points, one truth:
  *
  *   startCheckout()          creates a Checkout Session (CHECKOUT_PENDING)
  *   changePlan()             in-place upgrade of an EXISTING subscription
  *                            (Stripe subscription update - never a second
  *                            subscription)
- *   syncStripeSubscription() refetch-latest sync, used by BOTH the webhook
- *                            and checkout-status reconciliation
+ *   resumeSubscription()     clears cancel_at_period_end on the EXISTING
+ *                            subscription (undo a scheduled cancellation)
+ *   retryPayment()           attempts collection of the open invoice
+ *                            behind a PAST_DUE subscription
+ *   syncStripeSubscription() refetch-latest sync, used by the webhook,
+ *                            checkout-status reconciliation AND the
+ *                            billing page (reconcileBilling)
+ *   reconcileBilling()       page-load freshness: Stripe is the source of
+ *                            truth, the local row is a cache - portal
+ *                            cancellations/resumes show up even before
+ *                            their webhook lands
  *   processStripeEvent()     idempotent webhook dispatch (StripeEvent ledger)
  *
  * Security invariants (asserted by tests/billing.test.ts):
@@ -48,6 +59,9 @@ export class BillingError extends Error {
       | "no_subscription"
       | "invalid_plan_change"
       | "payment_past_due"
+      | "not_ending"
+      | "no_open_invoice"
+      | "payment_failed"
       | "not_found",
     message: string,
   ) {
@@ -64,6 +78,9 @@ export const BILLING_ERROR_STATUS: Record<BillingError["code"], number> = {
   no_subscription: 409,
   invalid_plan_change: 409,
   payment_past_due: 409,
+  not_ending: 409,
+  no_open_invoice: 409,
+  payment_failed: 402,
   not_found: 404,
 };
 
@@ -323,6 +340,140 @@ export async function changePlan(userId: string, plan: PaidPlan): Promise<Change
 }
 
 // ---------------------------------------------------------------------------
+// Resume - clear a scheduled cancellation on the EXISTING subscription
+// ---------------------------------------------------------------------------
+
+export type ResumeResult = {
+  plan: PlanTier;
+  status: SubscriptionStatus;
+  cancelAtPeriodEnd: boolean;
+};
+
+/**
+ * Undo a scheduled cancellation (portal- or Stripe-side
+ * cancel_at_period_end/cancel_at): one Stripe subscription UPDATE that
+ * clears the flag on the SAME subscription - no new subscription, no new
+ * customer, billing cycle untouched. Only valid while the subscription
+ * is still alive and actually scheduled to end.
+ */
+export async function resumeSubscription(userId: string): Promise<ResumeResult> {
+  const client = requireClient();
+  const row = await db.subscription.findUnique({ where: { userId } });
+  if (!hasLiveSubscription(row) || !row.providerSubId || !row.providerCustomerId) {
+    throw new BillingError(
+      "no_subscription",
+      "There's no active subscription to resume - start a checkout instead.",
+    );
+  }
+
+  let sub: StripeSubscription;
+  try {
+    sub = await client.retrieveSubscription(row.providerSubId);
+  } catch (error) {
+    if (error instanceof StripeApiError && error.status === 404) {
+      throw new BillingError("no_subscription", "Your subscription could not be found at Stripe.");
+    }
+    throw error;
+  }
+  if (sub.customer !== row.providerCustomerId) {
+    console.error(
+      `[billing:resume] subscription ${sub.id} belongs to ${sub.customer}, not ${row.providerCustomerId} - refusing`,
+    );
+    throw new BillingError("no_subscription", "Your subscription could not be verified.");
+  }
+  if (sub.status === "canceled") {
+    // Too late - the subscription already ended. The path back is checkout.
+    await syncStripeSubscription({
+      stripeCustomerId: row.providerCustomerId,
+      stripeSubscriptionId: sub.id,
+      sourceEventId: `resume-late:${sub.id}`,
+    });
+    throw new BillingError(
+      "no_subscription",
+      "That membership has already ended - you can start a new one anytime.",
+    );
+  }
+  if (!sub.cancel_at_period_end && !sub.cancel_at) {
+    throw new BillingError("not_ending", "Your membership isn't scheduled to end.");
+  }
+
+  await client.updateSubscriptionCancellation({
+    subscriptionId: sub.id,
+    cancelAtPeriodEnd: false,
+    idempotencyKey: `resume_${userId}_${Math.floor(Date.now() / CHECKOUT_IDEMPOTENCY_WINDOW_MS)}`,
+  });
+
+  const updated = await syncStripeSubscription({
+    stripeCustomerId: row.providerCustomerId,
+    stripeSubscriptionId: sub.id,
+    sourceEventId: `resume:${sub.id}`,
+  });
+  if (!updated) {
+    throw new BillingError("no_subscription", "Your subscription could not be verified.");
+  }
+  return { plan: updated.tier, status: updated.status, cancelAtPeriodEnd: updated.cancelAtPeriodEnd };
+}
+
+// ---------------------------------------------------------------------------
+// Retry payment - collect the open invoice behind a PAST_DUE subscription
+// ---------------------------------------------------------------------------
+
+export type RetryPaymentResult = { plan: PlanTier; status: SubscriptionStatus };
+
+/**
+ * Attempt collection of the newest OPEN invoice with the saved payment
+ * method. Success flows back through the same sync as the webhook (the
+ * subscription returns to active); a declined card answers an honest
+ * payment_failed - the fix is updating the card, and nothing is retried
+ * behind the user's back.
+ */
+export async function retryPayment(userId: string): Promise<RetryPaymentResult> {
+  const client = requireClient();
+  const row = await db.subscription.findUnique({ where: { userId } });
+  if (!row?.providerCustomerId) {
+    throw new BillingError("no_customer", "No billing profile exists for this account yet.");
+  }
+
+  const open = await client.listInvoices(row.providerCustomerId, "open");
+  const invoice = open[0];
+  if (!invoice) {
+    // Nothing outstanding - make sure the row reflects that.
+    await syncStripeSubscription({
+      stripeCustomerId: row.providerCustomerId,
+      stripeSubscriptionId: row.providerSubId ?? null,
+      sourceEventId: "retry-noop",
+    });
+    throw new BillingError("no_open_invoice", "There's no outstanding payment on your account.");
+  }
+
+  try {
+    await client.payInvoice(
+      invoice.id,
+      `retrypay_${userId}_${invoice.id}_${Math.floor(Date.now() / CHECKOUT_IDEMPOTENCY_WINDOW_MS)}`,
+    );
+  } catch (error) {
+    if (error instanceof StripeApiError && error.status < 500) {
+      throw new BillingError(
+        "payment_failed",
+        "The payment didn't go through. Updating your payment method usually fixes this.",
+      );
+    }
+    throw error;
+  }
+
+  const updated = await syncStripeSubscription({
+    stripeCustomerId: row.providerCustomerId,
+    stripeSubscriptionId: row.providerSubId ?? null,
+    sourceEventId: `retrypay:${invoice.id}`,
+  });
+  await reconcileInvoicePayments(userId, row.providerCustomerId);
+  return {
+    plan: updated?.tier ?? row.tier,
+    status: updated?.status ?? row.status,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Shared sync - webhook AND reconciliation call THIS
 // ---------------------------------------------------------------------------
 
@@ -449,7 +600,9 @@ export async function syncStripeSubscription(args: SyncArgs) {
       stripePriceId: priceId,
       currentPeriodStart: period.start,
       currentPeriodEnd: period.end,
-      cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
+      // cancel_at covers date-based cancellations; Stripe mirrors it when
+      // cancel_at_period_end is set, so either means "scheduled to end".
+      cancelAtPeriodEnd: (sub.cancel_at_period_end ?? false) || sub.cancel_at != null,
       canceledAt: toDate(sub.canceled_at),
       trialStart: toDate(sub.trial_start),
       trialEnd: toDate(sub.trial_end),
@@ -561,7 +714,10 @@ export async function clearPendingCheckout(sessionId: string): Promise<void> {
  * portal come back as customer.subscription.updated with a new price id
  * and remap through the trusted price map in syncStripeSubscription.
  */
-export async function createPortalSession(userId: string): Promise<{ url: string }> {
+export async function createPortalSession(
+  userId: string,
+  flow?: "payment_method_update",
+): Promise<{ url: string }> {
   const client = requireClient();
   const row = await db.subscription.findUnique({ where: { userId } });
   if (!row?.providerCustomerId) {
@@ -570,8 +726,92 @@ export async function createPortalSession(userId: string): Promise<{ url: string
   const session = await client.createPortalSession({
     customer: row.providerCustomerId,
     returnUrl: `${siteUrl()}/settings/subscription`,
+    flow,
   });
   return { url: session.url };
+}
+
+// ---------------------------------------------------------------------------
+// Payment history from Stripe INVOICES (the source of truth for charges)
+// ---------------------------------------------------------------------------
+
+function invoicePriceId(inv: StripeInvoice): string | null {
+  const line = inv.lines?.data?.[0];
+  return line?.price?.id ?? line?.pricing?.price_details?.price ?? null;
+}
+
+/** "Tirvea Gold" etc. via the trusted price map; never a guessed label. */
+function invoicePlanLabel(inv: StripeInvoice): string {
+  const tier = planForPriceId(invoicePriceId(inv));
+  return PLANS.find((p) => p.tier === tier)?.name ?? "Subscription";
+}
+
+/**
+ * One Payment row per Stripe INVOICE (providerPaymentId = invoice id).
+ * Later events for the same invoice UPDATE the row - a failed attempt
+ * that eventually collects flips FAILED -> SUCCEEDED, and the first
+ * checkout charge (recorded by checkout.session.completed under the same
+ * invoice id) is never duplicated by its invoice.paid event.
+ */
+export async function recordInvoicePayment(userId: string, inv: StripeInvoice): Promise<void> {
+  if (!inv.id) return;
+  const paid = inv.status === "paid";
+  const status: PaymentStatus = paid ? "SUCCEEDED" : "FAILED";
+  const amountCents = paid ? (inv.amount_paid ?? 0) : (inv.amount_due ?? 0);
+  const data = {
+    amountCents,
+    currency: inv.currency ?? "eur",
+    status,
+    description: invoicePlanLabel(inv),
+    invoiceUrl: inv.hosted_invoice_url ?? null,
+    receiptUrl: inv.invoice_pdf ?? null,
+  };
+  await db.payment.upsert({
+    where: { providerPaymentId: inv.id },
+    create: { userId, provider: "STRIPE", providerPaymentId: inv.id, ...data },
+    update: data,
+  });
+}
+
+/** Pull recent invoices from Stripe and (re)materialise Payment rows -
+ * heals history written before invoice recording existed and covers
+ * webhook gaps. Only settled outcomes are recorded: paid always, open
+ * only after a real collection attempt failed. */
+async function reconcileInvoicePayments(userId: string, customerId: string): Promise<void> {
+  const client = getStripeClient();
+  if (!client) return;
+  const invoices = await client.listInvoices(customerId);
+  for (const inv of invoices) {
+    if (inv.status === "paid" || (inv.status === "open" && inv.attempted)) {
+      await recordInvoicePayment(userId, inv);
+    }
+  }
+}
+
+/**
+ * Billing-page freshness: Stripe is the source of truth and the local
+ * row is a cache. Re-syncs the subscription AND the invoice history on
+ * view (throttled to one roundtrip a minute), so a cancellation or
+ * resume made in the Stripe portal is visible immediately - even before
+ * its webhook lands. Any Stripe hiccup falls back to the cached row;
+ * this path never breaks the page.
+ */
+export async function reconcileBilling(userId: string) {
+  const row = await db.subscription.findUnique({ where: { userId } });
+  if (!row?.providerCustomerId || !stripeConfigured()) return row;
+  if (row.syncedAt && Date.now() - row.syncedAt.getTime() < 60_000) return row;
+  try {
+    const updated = await syncStripeSubscription({
+      stripeCustomerId: row.providerCustomerId,
+      stripeSubscriptionId: row.providerSubId ?? null,
+      sourceEventId: "reconcile:billing-page",
+    });
+    await reconcileInvoicePayments(userId, row.providerCustomerId);
+    return updated ?? row;
+  } catch (error) {
+    console.error("[billing:reconcile] Stripe unreachable - serving cached row:", error);
+    return row;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -651,7 +891,11 @@ async function dispatchStripeEvent(event: StripeWebhookEvent): Promise<boolean> 
     case "customer.subscription.updated":
     case "customer.subscription.deleted":
     case "customer.subscription.paused":
-    case "customer.subscription.resumed": {
+    case "customer.subscription.resumed":
+    // Payment-gated plan changes: refetch-latest lands the applied (or
+    // rolled-back) state without modelling pending_update ourselves.
+    case "customer.subscription.pending_update_applied":
+    case "customer.subscription.pending_update_expired": {
       const customer = str(object.customer);
       if (!customer) return false;
       await syncStripeSubscription({
@@ -672,6 +916,14 @@ async function dispatchStripeEvent(event: StripeWebhookEvent): Promise<boolean> 
         stripeSubscriptionId: refs.subscription,
         sourceEventId: event.id,
       });
+      // Payment history: every settled invoice becomes (or updates) a
+      // Payment row - renewals included, not just the first checkout.
+      if (event.type !== "invoice.payment_action_required") {
+        const row = await db.subscription.findUnique({
+          where: { providerCustomerId: refs.customer },
+        });
+        if (row) await recordInvoicePayment(row.userId, object as StripeInvoice);
+      }
       return true;
     }
 
@@ -715,16 +967,22 @@ async function recordCheckoutPayment(
       `[billing:webhook] session ${sessionId} metadata userId does not match customer mapping - using mapping (event ${event.id})`,
     );
   }
+  // Key by the session's INVOICE when Stripe provides it - invoice.paid
+  // for the same charge then updates this row instead of duplicating it.
+  const paymentKey = str(object.invoice) ?? sessionId;
+  const metadataPlan = (object.metadata as Record<string, unknown> | undefined)?.plan;
+  const planLabel =
+    PLANS.find((p) => p.tier === metadataPlan)?.name ?? "Subscription";
   await db.payment.upsert({
-    where: { providerPaymentId: sessionId },
+    where: { providerPaymentId: paymentKey },
     create: {
       userId: row.userId,
       provider: "STRIPE",
-      providerPaymentId: sessionId,
+      providerPaymentId: paymentKey,
       amountCents: typeof object.amount_total === "number" ? object.amount_total : 0,
       currency: str(object.currency) ?? "eur",
       status: "SUCCEEDED",
-      description: "Subscription checkout",
+      description: planLabel,
       invoiceUrl: str(object.hosted_invoice_url),
     },
     update: {},

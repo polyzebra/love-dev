@@ -5,6 +5,7 @@ import {
   CreditCard,
   ExternalLink,
   Hourglass,
+  Minus,
   Receipt,
   RotateCcw,
   Sparkles,
@@ -13,14 +14,17 @@ import {
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { PLANS, upgradePlansFor } from "@/lib/constants";
+import { PLANS, downgradeLossesFor, upgradePlansFor } from "@/lib/constants";
 import { effectiveTier } from "@/lib/services/entitlements";
-import { hasLiveSubscription } from "@/lib/services/billing";
+import { hasLiveSubscription, reconcileBilling } from "@/lib/services/billing";
+import { planForPriceId } from "@/lib/stripe";
 import type { PaymentStatus } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Badge } from "@/components/ui/badge";
 import { ManageBillingButton } from "@/components/billing/manage-billing-button";
+import { ResumeSubscriptionButton } from "@/components/billing/resume-subscription-button";
+import { RetryPaymentButton } from "@/components/billing/retry-payment-button";
 import { PricingSpotlight } from "@/components/marketing/pricing-spotlight";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Reveal } from "@/components/fx/reveal";
@@ -35,6 +39,15 @@ const formatDate = (d: Date) =>
   d.toLocaleDateString("en-IE", { day: "numeric", month: "long", year: "numeric" });
 
 const price = (cents: number) => `€${(cents / 100).toFixed(2)}`;
+
+const money = (cents: number, currency: string) =>
+  new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(cents / 100);
+
+const daysUntil = (d: Date) =>
+  Math.max(0, Math.ceil((d.getTime() - Date.now()) / (24 * 3600 * 1000)));
 
 /** Payment timeline registers - same icon/badge vocabulary as the appeal timeline. */
 const PAYMENT_ICON: Record<PaymentStatus, { icon: LucideIcon; className: string }> = {
@@ -51,76 +64,115 @@ const PAYMENT_BADGE: Record<PaymentStatus, "secondary" | "destructive" | "outlin
   REFUNDED: "outline",
 };
 
+const PAYMENT_LABEL: Record<PaymentStatus, string> = {
+  SUCCEEDED: "paid",
+  FAILED: "failed",
+  PENDING: "pending",
+  REFUNDED: "refunded",
+};
+
 /**
- * The billing home. Everything shown here is persisted, Stripe-verified
- * state (Subscription/Payment rows) - the page reads the database on
- * every render and displays the EFFECTIVE plan (same status policy the
- * entitlement gates use), so what the user sees is what the product
- * enforces. Plan naming is exact: Tirvea Free / Tirvea Plus / Tirvea Gold.
- *
- * Design register: the membership hero reuses the pricing spotlight
- * surface (border-glow glass stage) and the profile page's editorial
- * type; the upgrade section IS the pricing spotlight (embedded variant);
- * the payment history matches the appeal-timeline register.
+ * The complete subscription lifecycle, one state at a time. Stripe is
+ * the source of truth: the page re-syncs the subscription AND the
+ * invoice history on view (reconcileBilling), so a cancellation or
+ * resume made in the Stripe portal renders correctly even before its
+ * webhook lands.
  */
+type Lifecycle = "FREE" | "ACTIVE" | "TRIAL" | "ENDING" | "PAYMENT_REQUIRED" | "EXPIRED";
+
 export default async function SubscriptionSettingsPage() {
   const user = await requireUser();
-  const [subscription, payments] = await Promise.all([
-    db.subscription.findUnique({ where: { userId: user.id } }),
-    db.payment.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 12,
-    }),
-  ]);
+  const subscription = await reconcileBilling(user.id);
+  const payments = await db.payment.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
 
   // Same policy as every entitlement gate (PAST_DUE grace, cancelAtPeriodEnd).
   const effective = effectiveTier(subscription);
-  const plan = PLANS.find((p) => p.tier === effective) ?? PLANS[0];
-  const paid = effective !== "FREE";
-
-  // THE shared predicate from services/billing.ts - the same test that
-  // makes POST /checkout answer 409 decides which upgrade path the page
-  // offers: checkout (no live sub) vs in-place plan change (live sub).
   const hasLiveSub = hasLiveSubscription(subscription);
-  const hasBillingProfile = Boolean(subscription?.providerCustomerId);
 
-  const pastDue = subscription?.status === "PAST_DUE";
+  // The paid plan a dead subscription USED to hold (row keeps the price
+  // id as history) - powers the honest "your Gold membership ended" story.
+  const priorTier = planForPriceId(subscription?.stripePriceId);
 
-  // Upgrade cards derive from the canonical FREE < PLUS < GOLD hierarchy:
-  // strictly-higher tiers than the plan the user holds. Gold members get
-  // no upgrade section at all; past-due members fix their payment first.
-  const upgradeTargets = upgradePlansFor(hasLiveSub ? subscription.tier : "FREE");
-  const showUpgrades = upgradeTargets.length > 0 && !pastDue;
-  const paidPlanName =
-    PLANS.find((p) => p.tier === subscription?.tier)?.name ?? plan.name;
+  const lifecycle: Lifecycle = (() => {
+    if (!subscription) return "FREE";
+    const s = subscription;
+    if (s.tier !== "FREE" && ["PAST_DUE", "UNPAID", "INCOMPLETE"].includes(s.status)) {
+      return "PAYMENT_REQUIRED";
+    }
+    if (hasLiveSub) {
+      if (s.cancelAtPeriodEnd) return "ENDING";
+      if (s.status === "TRIALING") return "TRIAL";
+      return "ACTIVE";
+    }
+    if (
+      ["CANCELED", "INCOMPLETE_EXPIRED"].includes(s.status) &&
+      priorTier &&
+      priorTier !== "FREE"
+    ) {
+      return "EXPIRED";
+    }
+    return "FREE";
+  })();
 
-  const statusLine = !paid
-    ? pastDue
-      ? `${paidPlanName} is paused because your last payment failed. Update your payment method to bring it back.`
-      : "You're on the free plan. Upgrade whenever you're ready - cancel in two taps."
-    : subscription?.cancelAtPeriodEnd
-      ? subscription.currentPeriodEnd
-        ? `Cancels on ${formatDate(subscription.currentPeriodEnd)}. You keep ${plan.name} until then.`
-        : `Cancels at the end of the current period. You keep ${plan.name} until then.`
-      : subscription?.status === "TRIALING"
-        ? subscription.trialEnd
-          ? `Trial - your first billing date is ${formatDate(subscription.trialEnd)}.`
-          : "Your trial is active."
-        : subscription?.currentPeriodEnd
-          ? `Renews on ${formatDate(subscription.currentPeriodEnd)}.`
-          : plan.tagline;
+  // Which plan the hero talks about: the held plan while any relationship
+  // with Stripe is alive, Free otherwise. (effective, not row tier, keeps
+  // an out-of-grace PAST_DUE honest about entitlements elsewhere.)
+  const heroTier =
+    lifecycle === "FREE" || lifecycle === "EXPIRED" ? "FREE" : subscription!.tier;
+  const plan = PLANS.find((p) => p.tier === heroTier) ?? PLANS[0];
+  const paid = heroTier !== "FREE";
+  const priorPlanName = PLANS.find((p) => p.tier === priorTier)?.name ?? null;
+
+  const periodEnd = subscription?.currentPeriodEnd ?? null;
+  const endedOn = periodEnd ?? subscription?.canceledAt ?? null;
+  const trialEnd = subscription?.trialEnd ?? null;
 
   // The membership chip - one calm word about where the plan stands.
-  const membershipChip = pastDue
-    ? { label: "Payment past due", className: "text-warning" }
-    : !paid
-      ? { label: "Free plan", className: "text-muted-foreground" }
-      : subscription?.cancelAtPeriodEnd
-        ? { label: "Ends soon", className: "text-muted-foreground" }
-        : subscription?.status === "TRIALING"
-          ? { label: "Trial", className: "text-gold" }
-          : { label: "Active", className: "text-gold" };
+  const membershipChip: Record<Lifecycle, { label: string; className: string }> = {
+    ACTIVE: { label: "Active", className: "text-gold" },
+    TRIAL: { label: "Trial", className: "text-gold" },
+    ENDING: { label: "Ending", className: "text-warning" },
+    PAYMENT_REQUIRED: { label: "Payment required", className: "text-warning" },
+    EXPIRED: { label: "Free plan", className: "text-muted-foreground" },
+    FREE: { label: "Free plan", className: "text-muted-foreground" },
+  };
+  const chip = membershipChip[lifecycle];
+
+  // One honest sentence per state, under the plan name.
+  const statusLine =
+    lifecycle === "ACTIVE"
+      ? periodEnd
+        ? `Renews on ${formatDate(periodEnd)}.`
+        : plan.tagline
+      : lifecycle === "TRIAL"
+        ? trialEnd
+          ? `Trial ends in ${daysUntil(trialEnd)} days - your first billing date is ${formatDate(trialEnd)}.`
+          : "Your trial is active."
+        : lifecycle === "PAYMENT_REQUIRED"
+          ? "We couldn't renew your subscription."
+          : lifecycle === "EXPIRED"
+            ? "You're on the free plan. Upgrade again anytime - cancel in two taps."
+            : lifecycle === "FREE"
+              ? "You're on the free plan. Upgrade whenever you're ready - cancel in two taps."
+              : null; // ENDING renders its own hero block below
+
+  // Upgrade cards: canonical hierarchy, only while it makes sense to
+  // offer more - never while ending (the job is resuming, not upselling)
+  // or while a payment needs fixing.
+  const upgradeTargets =
+    lifecycle === "ACTIVE" || lifecycle === "TRIAL"
+      ? upgradePlansFor(subscription!.tier)
+      : lifecycle === "FREE" || lifecycle === "EXPIRED"
+        ? upgradePlansFor("FREE")
+        : [];
+  const showUpgrades = upgradeTargets.length > 0;
+
+  const hasBillingProfile = Boolean(subscription?.providerCustomerId);
+  const losses = lifecycle === "ENDING" ? downgradeLossesFor(subscription!.tier) : [];
 
   return (
     <>
@@ -154,13 +206,13 @@ export default async function SubscriptionSettingsPage() {
               <span
                 className={cn(
                   "glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest",
-                  membershipChip.className,
+                  chip.className,
                 )}
               >
-                {(paid && !pastDue && !subscription?.cancelAtPeriodEnd) && (
+                {(lifecycle === "ACTIVE" || lifecycle === "TRIAL") && (
                   <Sparkles className="size-3" aria-hidden="true" />
                 )}
-                {membershipChip.label}
+                {chip.label}
               </span>
             </div>
 
@@ -178,29 +230,108 @@ export default async function SubscriptionSettingsPage() {
               )}
             </div>
 
-            <p className="max-w-md text-sm text-muted-foreground md:text-base">{statusLine}</p>
-
-            {/* Dunning warning while the paid tier is still honored (grace). */}
-            {paid && pastDue && (
-              <div className="glass rounded-2xl px-5 py-4 text-sm">
-                <p className="font-medium">Your last payment didn&apos;t go through.</p>
-                <p className="text-muted-foreground">
-                  We&apos;ll retry for a few days. Update your payment method in billing to keep{" "}
-                  {plan.name}.
-                </p>
+            {/* ============ ENDING - scheduled cancellation ============ */}
+            {lifecycle === "ENDING" ? (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground md:text-base">
+                    Your {plan.name} membership stays active until
+                  </p>
+                  <p className="mt-1 font-display text-3xl font-medium tracking-tight md:text-4xl">
+                    {periodEnd ? formatDate(periodEnd) : "the end of your billing period"}
+                  </p>
+                  {periodEnd && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {daysUntil(periodEnd)} days left. After that your account
+                      automatically returns to Tirvea Free.
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-start gap-3">
+                  <ResumeSubscriptionButton />
+                  <ManageBillingButton />
+                </div>
+                {losses.length > 0 && (
+                  <div className="glass rounded-2xl px-5 py-4 text-sm">
+                    <p className="font-medium">
+                      After {periodEnd ? formatDate(periodEnd) : "your plan ends"} you will
+                      lose:
+                    </p>
+                    <ul className="mt-2 space-y-1.5">
+                      {losses.map((loss) => (
+                        <li key={loss} className="flex items-start gap-2 text-muted-foreground">
+                          <Minus className="mt-1 size-3.5 shrink-0" aria-hidden="true" />
+                          <span>{loss}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Everything on Tirvea Free keeps working - your profile, matches and
+                      chats stay exactly as they are.
+                    </p>
+                  </div>
+                )}
               </div>
+            ) : (
+              <>
+                {statusLine && (
+                  <p className="max-w-md text-sm text-muted-foreground md:text-base">
+                    {statusLine}
+                  </p>
+                )}
+
+                {/* ============ EXPIRED - the plan that ended ============ */}
+                {lifecycle === "EXPIRED" && priorPlanName && (
+                  <div className="glass rounded-2xl px-5 py-4 text-sm">
+                    <p className="font-medium">
+                      Your {priorPlanName} membership ended
+                      {endedOn ? ` on ${formatDate(endedOn)}` : ""}.
+                    </p>
+                    <p className="text-muted-foreground">
+                      Upgrade again anytime - your profile, matches and chats never went
+                      anywhere.
+                    </p>
+                  </div>
+                )}
+
+                {/* ============ PAYMENT REQUIRED - dunning, honestly ============ */}
+                {lifecycle === "PAYMENT_REQUIRED" && (
+                  <div className="glass rounded-2xl px-5 py-4 text-sm">
+                    <p className="font-medium">Your last payment didn&apos;t go through.</p>
+                    <p className="text-muted-foreground">
+                      Update your payment method and retry - or we&apos;ll keep retrying for
+                      a few days.{" "}
+                      {effective !== "FREE"
+                        ? `You keep ${plan.name} in the meantime.`
+                        : `${plan.name} is paused until the payment succeeds.`}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-start gap-3 pt-1">
+                  {lifecycle === "PAYMENT_REQUIRED" ? (
+                    <>
+                      <ManageBillingButton
+                        label="Update payment method"
+                        variant="default"
+                        flow="payment_method_update"
+                      />
+                      <RetryPaymentButton />
+                    </>
+                  ) : (
+                    hasBillingProfile && <ManageBillingButton />
+                  )}
+                </div>
+              </>
             )}
 
             {hasBillingProfile && (
-              <div className="space-y-3 pt-1">
-                <ManageBillingButton />
-                {/* No Stripe brand asset ships in this repo - the lucide
-                    credit-card glyph stands in as the payment mark. */}
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <CreditCard className="size-3.5" aria-hidden="true" />
-                  Billed securely via Stripe
-                </p>
-              </div>
+              /* No Stripe brand asset ships in this repo - the lucide
+                 credit-card glyph stands in as the payment mark. */
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <CreditCard className="size-3.5" aria-hidden="true" />
+                Billed securely via Stripe
+              </p>
             )}
           </div>
         </section>
@@ -230,14 +361,14 @@ export default async function SubscriptionSettingsPage() {
             </div>
             <PricingSpotlight
               variant="embedded"
-              currentTier={hasLiveSub ? subscription.tier : "FREE"}
+              currentTier={hasLiveSub ? subscription!.tier : "FREE"}
               hasLiveSub={hasLiveSub}
             />
           </section>
         </Reveal>
       )}
 
-      {/* ============ PAYMENT HISTORY - appeal-timeline register ============ */}
+      {/* ============ PAYMENT HISTORY - Stripe invoices, materialised ============ */}
       <Reveal>
         <section aria-labelledby="payments-heading" className="mt-10">
           <div className="mb-3 px-1">
@@ -261,10 +392,15 @@ export default async function SubscriptionSettingsPage() {
           ) : (
             <div className="overflow-hidden rounded-3xl border border-border bg-card/80 shadow-card">
               {payments.map((p, i) => {
-                const receipt = p.receiptUrl ?? p.invoiceUrl;
                 const { icon: Icon, className } = PAYMENT_ICON[p.status];
-                const row = (
-                  <>
+                return (
+                  <div
+                    key={p.id}
+                    className={cn(
+                      "flex min-h-11 flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4",
+                      i > 0 && "border-t",
+                    )}
+                  >
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-foreground/5">
                       <Icon className={`size-5 ${className}`} aria-hidden="true" />
                     </span>
@@ -278,40 +414,46 @@ export default async function SubscriptionSettingsPage() {
                           month: "short",
                           year: "numeric",
                         })}
+                        {" · "}
+                        {p.currency.toUpperCase()}
                       </span>
                     </span>
                     <span className="flex shrink-0 flex-col items-end gap-1">
                       <span className="text-sm font-medium tabular-nums">
-                        {price(p.amountCents)}
+                        {money(p.amountCents, p.currency)}
                       </span>
                       <Badge variant={PAYMENT_BADGE[p.status]} className="rounded-full">
-                        {p.status.toLowerCase()}
+                        {PAYMENT_LABEL[p.status]}
                       </Badge>
                     </span>
-                  </>
-                );
-                const rowClass = cn(
-                  "flex min-h-11 items-center gap-4 px-5 py-4",
-                  i > 0 && "border-t",
-                );
-                return receipt ? (
-                  <Link
-                    key={p.id}
-                    href={receipt}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Open receipt - ${p.description ?? "Subscription"}, ${price(p.amountCents)}`}
-                    className={cn(rowClass, "transition-colors hover:bg-muted")}
-                  >
-                    {row}
-                    <ExternalLink
-                      className="size-4 shrink-0 text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                  </Link>
-                ) : (
-                  <div key={p.id} className={rowClass}>
-                    {row}
+                    {(p.receiptUrl || p.invoiceUrl) && (
+                      <span className="flex w-full shrink-0 items-center justify-end gap-4 text-xs sm:w-auto">
+                        {p.receiptUrl && (
+                          <Link
+                            href={p.receiptUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-11 items-center gap-1 text-muted-foreground underline-offset-4 hover:underline"
+                            aria-label={`Download receipt - ${p.description ?? "Subscription"}`}
+                          >
+                            Receipt
+                            <ExternalLink className="size-3" aria-hidden="true" />
+                          </Link>
+                        )}
+                        {p.invoiceUrl && (
+                          <Link
+                            href={p.invoiceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-11 items-center gap-1 text-muted-foreground underline-offset-4 hover:underline"
+                            aria-label={`Open invoice - ${p.description ?? "Subscription"}`}
+                          >
+                            Invoice
+                            <ExternalLink className="size-3" aria-hidden="true" />
+                          </Link>
+                        )}
+                      </span>
+                    )}
                   </div>
                 );
               })}
