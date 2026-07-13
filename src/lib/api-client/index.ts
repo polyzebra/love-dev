@@ -52,7 +52,7 @@ export function createTirveaClient(options: TirveaClientOptions = {}) {
   const doFetch = options.fetch ?? fetch;
 
   async function raw<T>(
-    method: "GET" | "POST" | "PATCH" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
     path: string,
     opts: {
       body?: unknown;
@@ -169,6 +169,11 @@ export function createTirveaClient(options: TirveaClientOptions = {}) {
         }),
       changePlan: (plan: "PLUS" | "GOLD") =>
         raw("POST", "/billing/change-plan", { body: { plan }, schema: changePlanOutcome }),
+      /** Honest restore-purchases read: reports records, mutates nothing. */
+      restorePurchases: () =>
+        raw("GET", "/billing/purchases", {
+          schema: z.object({ payments: z.number(), subscriptionTier: z.string().nullable() }),
+        }),
       changePlanStatus: () =>
         raw("GET", "/billing/change-plan/status", {
           schema: z.object({
@@ -183,6 +188,23 @@ export function createTirveaClient(options: TirveaClientOptions = {}) {
             status: z.string(),
             clientSecret: z.string().optional(),
           }),
+        }),
+    },
+
+    settings: {
+      /** The caller's own settings row. */
+      get: () => raw<Record<string, unknown>>("GET", "/me/settings"),
+      /** Partial update; unknown fields are rejected server-side (422). */
+      update: (patch: Record<string, boolean | number | string | null>) =>
+        raw<Record<string, unknown>>("PATCH", "/me/settings", { body: patch }),
+    },
+
+    profile: {
+      /** Replace the full prompt-answer set (max 4, curated order). */
+      savePrompts: (prompts: Array<{ key: string; answer: string }>) =>
+        raw("PUT", "/profile/prompts", {
+          body: prompts,
+          schema: z.object({ count: z.number() }),
         }),
     },
 
