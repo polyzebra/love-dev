@@ -81,9 +81,9 @@ collected"; skip if not.
 
 **Two providers, clean separation (question 6 answered):**
 
-- **Stripe Identity** (unchanged): document authenticity + selfie<->document
-  - liveness at identity time. It cannot do ongoing comparison; nothing
-    else can replace its document verification.
+- **Stripe Identity** (unchanged): document authenticity, selfie-to-document
+  match and liveness at identity time. It cannot do ongoing comparison;
+  nothing else can replace its document verification.
 - **AWS Rekognition** (`aws_rekognition_faces`, the stub already named in
   `face-match-providers.ts`): everything the face layer needs -
   - **Video liveness**: Rekognition Face Liveness - available in
