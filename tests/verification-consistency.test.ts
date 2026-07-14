@@ -158,6 +158,41 @@ check("no surface derives verification state on its own any more", () => {
   assert.ok(card.includes('title="Under review"'), "card copy aligned");
 });
 
+check("UNCONFIGURED: one compact Coming soon row, NO card, NO second message", () => {
+  // Row: honest unavailable state with no interactive control.
+  for (const surface of ["profile", "settings"] as const) {
+    const row = photoVerificationRow("not_verified", { configured: false, surface });
+    assert.equal(row.label, "Photo verification");
+    assert.equal(row.state, "unavailable");
+    assert.equal(row.value, "Coming soon");
+    assert.equal(row.action, null, "no dead CTA when unavailable");
+  }
+  // Page: the card is gated on BOTH unverified and configured...
+  const page = code("app", "(app)", "profile", "page.tsx");
+  assert.ok(
+    page.includes("!verification.photoVerified && verificationConfigured &&"),
+    "PhotoVerifyCard renders only when a provider is configured",
+  );
+  // ...so the card no longer needs (or has) its own unavailable branch:
+  // the mapper's "Coming soon" is the ONLY unavailable copy on the page.
+  const card = code("components", "profile", "photo-verify-card.tsx");
+  assert.ok(!card.includes("Coming soon"), "no duplicate Coming soon inside the card");
+  assert.ok(!/\bconfigured\b/.test(card), "card takes no configured prop");
+});
+
+check("CONFIGURED + not_verified: Verify row AND the full card render", () => {
+  const row = photoVerificationRow("not_verified", { configured: true, surface: "profile" });
+  assert.equal(row.action?.label, "Verify");
+  const page = code("app", "(app)", "profile", "page.tsx");
+  // The card's only render gates are verified-ness and configured-ness -
+  // every in-flight/retry state keeps the card (its state-specific body).
+  assert.ok(page.includes("<PhotoVerifyCard state={verificationUx} />"));
+  assert.ok(
+    !/PhotoVerifyCard[^/]*configured=/.test(page),
+    "page passes no configured prop - the gate is the render condition",
+  );
+});
+
 check("navigation always targets the ONE flow implementation", () => {
   for (const state of ALL_STATES) {
     for (const surface of ["profile", "settings"] as const) {

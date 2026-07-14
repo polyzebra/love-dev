@@ -130,11 +130,14 @@ export default async function ProfilePage() {
           </RevealItem>
         </RevealGroup>
 
-        {/* Photo verification nudge - only while unverified. Selfie capture
-            happens on the provider's side; no biometrics are ever stored. */}
-        {!verification.photoVerified && (
+        {/* Photo verification nudge - only while unverified AND a provider
+            is configured. Unconfigured environments keep just the compact
+            "Coming soon" status row above (one unavailable message, no dead
+            CTA). Selfie capture happens on the provider's side; no
+            biometrics are ever stored. */}
+        {!verification.photoVerified && verificationConfigured && (
           <Reveal>
-            <PhotoVerifyCard state={verificationUx} configured={verificationConfigured} />
+            <PhotoVerifyCard state={verificationUx} />
           </Reveal>
         )}
       </PhotoManager>

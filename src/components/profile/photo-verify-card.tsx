@@ -38,21 +38,16 @@ const HOW_IT_WORKS = [
 
 /**
  * Photo verification flow on the profile page. Renders every UX state from
- * deriveVerificationUxState (the parent hides it entirely once verified):
- * explainer modal -> consent -> provider session start -> pending /
- * manual-review / retry / failed states, with an honest "not configured"
- * state when no provider env exists. Selfie capture happens on the
+ * deriveVerificationUxState (the parent hides it entirely once verified OR
+ * when no provider is configured - the compact status row's "Coming soon"
+ * is the ONE unavailable message, so this card never needs an unconfigured
+ * branch): explainer modal -> consent -> provider session start -> pending /
+ * manual-review / retry / failed states. Selfie capture happens on the
  * provider's side only; Tirvea never stores biometric data.
  */
 export const PHOTO_VERIFICATION_ANCHOR = "photo-verification";
 
-export function PhotoVerifyCard({
-  state,
-  configured,
-}: {
-  state: VerificationUxState;
-  configured: boolean;
-}) {
+export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [step, setStep] = useState<"closed" | "explainer" | "consent">("closed");
@@ -219,21 +214,14 @@ export function PhotoVerifyCard({
               </li>
             ))}
           </ul>
-          {configured ? (
-            <Button
-              size="sm"
-              className="mt-4 rounded-full px-5"
-              disabled={pending}
-              onClick={() => setStep("explainer")}
-            >
-              {retry ? "Try again" : "Start verification"}
-            </Button>
-          ) : (
-            <p className="bg-foreground/5 text-muted-foreground mt-4 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium">
-              <Hourglass className="size-3.5" aria-hidden="true" />
-              Coming soon - verification isn&apos;t available just yet
-            </p>
-          )}
+          <Button
+            size="sm"
+            className="mt-4 rounded-full px-5"
+            disabled={pending}
+            onClick={() => setStep("explainer")}
+          >
+            {retry ? "Try again" : "Start verification"}
+          </Button>
         </div>
       </div>
 
