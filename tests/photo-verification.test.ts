@@ -262,11 +262,16 @@ async function main() {
   await check(
     "settings action deep-links to /profile#photo-verification; quiet when unconfigured",
     () => {
+      // The deep link and the honest "Coming soon" value now live in the
+      // ONE shared mapper (consistency fix) - pin the mapper + its
+      // settings-surface output instead of literals in the page.
       const page = src("app", "(app)", "settings", "account", "page.tsx");
-      assert.ok(page.includes('"/profile#photo-verification"'));
-      assert.ok(!page.includes('href: "/profile" }'), "bare /profile hop removed");
+      assert.ok(page.includes("photoVerificationRow(photoUx"), "canonical mapper drives the row");
       assert.ok(page.includes("isPhotoVerificationConfigured"), "availability-aware");
-      assert.ok(page.includes('"Coming soon"'), "honest unavailable value");
+      assert.ok(!page.includes('href: "/profile" }'), "bare /profile hop stays gone");
+      const mapper = src("components", "shared", "verification-status-row.tsx");
+      assert.ok(mapper.includes('"/profile#photo-verification"'), "settings surface deep-links");
+      assert.ok(mapper.includes('"Coming soon"'), "honest unavailable value");
     },
   );
 
