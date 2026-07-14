@@ -448,7 +448,12 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     data.communityTags.length +
     data.interestCategoryIds.filter((id) => INTEREST_GROUP_IDS.has(id)).length;
 
-  /** Live profile glow - grows as the profile gets richer. */
+  /** Live WIZARD glow over in-progress form data - a UX motivation
+   *  device, deliberately NOT the canonical completion score. The saved
+   *  profile's completionPct is computed exclusively by
+   *  computeCompletion (lib/services/profile.ts) at write time; this
+   *  number scores required-onboarding inputs the canonical function
+   *  collapses into its base-30 and never persists anywhere. */
   const profileScore = useMemo(() => {
     let score = 0;
     if (data.displayName.trim().length >= 2) score += 10;

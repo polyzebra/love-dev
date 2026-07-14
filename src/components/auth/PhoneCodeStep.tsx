@@ -3,7 +3,7 @@
 import { PHONE_OTP_LENGTH } from "@/lib/auth/otp";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { loadPhoneTools, usePhoneTools, type PhoneTools } from "@/lib/auth/phone-tools";
+import { loadPhoneTools, usePhoneTools } from "@/lib/auth/phone-tools";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthFormStack } from "@/components/auth/AuthFormStack";
 import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
