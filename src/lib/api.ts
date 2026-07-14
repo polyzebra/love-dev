@@ -24,6 +24,12 @@ export function apiError(
   message: string,
   fields?: Record<string, string[]>,
 ) {
+  if (status >= 500) {
+    // Observability (Phase 0M): safe machine code only - the message is
+    // user-facing copy and fields never carry values, but neither is
+    // needed to alert on 5xx rates.
+    console.error(`[api] error status=${status} code=${code}`);
+  }
   return NextResponse.json({ error: { code, message, fields } }, { status });
 }
 
@@ -119,7 +125,15 @@ export async function requirePermission(permission: Permission) {
  */
 export async function guardRate(key: string, preset: RateLimitPreset) {
   const rl = await rateLimit(key, preset);
-  if (!rl.ok) return tooManyRequests(rl);
+  if (!rl.ok) {
+    // Observability (Phase 0M): the action segment only - principals
+    // (user ids / IP hashes) never reach logs.
+    console.warn(
+      `[rate-limit] blocked action=${key.split(":")[0]}` +
+        `${rl.degraded ? " degraded=true" : ""} retryInMs=${Math.max(0, rl.resetAt - Date.now())}`,
+    );
+    return tooManyRequests(rl);
+  }
   return null;
 }
 

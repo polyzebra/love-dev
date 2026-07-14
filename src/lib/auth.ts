@@ -85,7 +85,12 @@ export const auth = cache(async (): Promise<AppSession | null> => {
       cookieUserId,
       hasCookieCredentials,
     });
-    if (!decision.ok) return null;
+    if (!decision.ok) {
+      // Observability (Phase 0M): rejection REASON only - never token
+      // material, never identifiers. Request logs correlate by line.
+      console.warn(`[auth] transport=bearer rejected reason=${decision.reason}`);
+      return null;
+    }
     user = bearerUser;
     transport = "bearer";
   } else {
