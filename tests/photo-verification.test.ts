@@ -248,13 +248,15 @@ async function main() {
 
   await check("profile photo row anchors in-page; no circular Settings hop", () => {
     const page = src("app", "(app)", "profile", "page.tsx");
-    assert.ok(page.includes('"#photo-verification"'), "in-page anchor action");
+    // Since the consistency fix the row comes from the ONE shared mapper
+    // (photoVerificationRow, surface "profile" -> #photo-verification) -
+    // pin the mapper usage instead of the old literal tuple.
     assert.ok(
-      page.includes(
-        '["photo", "Photo verified", verification.photoVerified, "#photo-verification"]',
-      ),
-      "photo row targets the card",
+      page.includes("photoVerificationRow(verificationUx"),
+      "canonical mapper drives the row",
     );
+    assert.ok(page.includes('surface: "profile"'), "profile surface anchors in-page");
+    assert.ok(!page.includes('["photo", "Photo verified"'), "boolean-derived row stays gone");
   });
 
   await check(
