@@ -202,6 +202,12 @@ export function mapStripeIdentityStatus(
       return "expired";
     case "requires_input":
       return session.last_error?.code ? "rejected" : "pending";
+    default:
+      // A Stripe API update could introduce states this build has never
+      // seen. "pending" is the SAFE unknown: applyVerificationOutcome
+      // no-ops on it, so nothing is invented until the code learns the
+      // new state. Never a verdict from an unknown value.
+      return "pending";
   }
 }
 

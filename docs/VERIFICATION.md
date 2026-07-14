@@ -45,8 +45,18 @@ verified; only webhook/poll reconciliation stamps the canonical verdict.
 
 All three prod vars must be present or availability stays false (503,
 "Coming soon" UI). Register the Stripe webhook endpoint at
-`https://tirvea.com/api/webhooks/verification` with the
-`identity.verification_session.*` events, TEST MODE first.
+`https://tirvea.com/api/webhooks/verification` subscribed to exactly
+`identity.verification_session.verified`, `.requires_input`,
+`.processing`, `.canceled` - TEST MODE first. Test and live mode issue
+DIFFERENT endpoint secrets (`whsec_...`): set the test-mode secret in
+`STRIPE_IDENTITY_WEBHOOK_SECRET` for the rehearsal, then swap in the
+live-mode secret (never billing's webhook secret) at go-live.
+
+Test-user lifecycle for E2E rehearsals:
+`npx tsx scripts/reset-test-user.ts <email>` audits (dry run by
+default); `--confirm` deletes. Refuses anything but obvious test
+identities (@example.com, @test.tirvea.app, test-/e2e-/qa- prefixes,
++test aliases).
 
 ## UX
 
@@ -73,3 +83,7 @@ full status+event mapping, real signature accept/reject, unrelated-event
 no-op, finality rule, UX/navigation pins, and the full HTTP loop (start
 -> forged-webhook 401 no-mutation -> approved -> canonical stamp ->
 duplicate idempotent -> 409 restart -> status verified).
+`tests/verification-e2e-guards.test.ts` (12 checks): unknown-Stripe-state
+safety, wrong-provider session no-op, explore-profile target regression
+(the where-clobber the E2E caught), reset-CLI allowlist/dry-run/confirm
+lifecycle.
