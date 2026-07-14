@@ -86,10 +86,12 @@ check("VERIFIED: verified state, no action, card hidden", () => {
     assert.equal(row.action, null);
   }
   const page = code("app", "(app)", "profile", "page.tsx");
+  // Face layer (2026-07-15): the card renders while UNVERIFIED (identity
+  // flow) OR when a verified user's profile-photo check needs attention
+  // (faceCardState) - a plainly-verified profile still shows NO card.
   assert.ok(
-    page.includes("!verification.photoVerified && (") ||
-      page.includes("{!verification.photoVerified &&"),
-    "PhotoVerifyCard renders only while unverified",
+    page.includes("(!verification.photoVerified && verificationConfigured) || faceCardState"),
+    "PhotoVerifyCard gate: identity flow while unverified, face attention when verified",
   );
 });
 
@@ -171,9 +173,16 @@ check("UNCONFIGURED: one compact Coming soon row, NO card, NO second message", (
   }
   // Page: the card is gated on BOTH unverified and configured...
   const page = code("app", "(app)", "profile", "page.tsx");
+  // Both arms of the gate require a configured provider (faceCardState
+  // is only non-null when verificationConfigured) - unconfigured
+  // environments still render NO card at all.
   assert.ok(
-    page.includes("!verification.photoVerified && verificationConfigured &&"),
+    page.includes("(!verification.photoVerified && verificationConfigured) || faceCardState"),
     "PhotoVerifyCard renders only when a provider is configured",
+  );
+  assert.ok(
+    /verification\.photoVerified &&\s*\n?\s*verificationConfigured &&/.test(page),
+    "faceCardState arm is provider-gated too",
   );
   // ...so the card no longer needs (or has) its own unavailable branch:
   // the mapper's "Coming soon" is the ONLY unavailable copy on the page.
