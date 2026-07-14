@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { formatRelativeTime, cn } from "@/lib/utils";
+import { MarkNotificationsRead } from "@/components/app/mark-notifications-read";
 
 export const metadata: Metadata = { title: "Notifications" };
 
@@ -23,24 +24,19 @@ const ICONS = {
  *  subscription and system events in one push-ready stream. */
 export default async function NotificationsPage() {
   const user = await requireUser();
-  // One batched transaction instead of two awaits. Order still matters
-  // (the list must show pre-read state so unread styling survives this
-  // very render), so this is NOT a Promise.all candidate - the batch
-  // keeps SELECT-before-UPDATE while collapsing the two roundtrips.
-  const [notifications] = await db.$transaction([
-    db.notification.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    }),
-    db.notification.updateMany({
-      where: { userId: user.id, readAt: null },
-      data: { readAt: new Date() },
-    }),
-  ]);
+  // Pure read (Phase 0M): the render never mutates. Read-marking is an
+  // explicit client-fired mutation (<MarkNotificationsRead/> -> POST
+  // /api/notifications/read) AFTER paint, so the unread styling below
+  // reflects exactly what the user is looking at.
+  const notifications = await db.notification.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
 
   return (
     <>
+      <MarkNotificationsRead />
       <PageHeader
         title="Notifications"
         description="Everything that happened while you were away."

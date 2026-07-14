@@ -832,3 +832,16 @@ export async function prunePresence(now: Date = new Date()): Promise<number> {
   });
   return result.count;
 }
+
+/**
+ * Explicit read-marking for the notification centre (Phase 0M): pages
+ * render pure reads; the CLIENT calls POST /api/notifications/read after
+ * paint. Idempotent - only unread rows change.
+ */
+export async function markNotificationsRead(userId: string): Promise<number> {
+  const result = await db.notification.updateMany({
+    where: { userId, readAt: null },
+    data: { readAt: new Date() },
+  });
+  return result.count;
+}

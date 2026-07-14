@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { assertParticipant, markRead } from "@/lib/services/chat";
+import { assertParticipant, markRead, listThreadMessages } from "@/lib/services/chat";
 import { ChatThread, type ThreadMessage } from "@/components/app/chat-thread";
 import { ChatActions } from "@/components/app/chat-actions";
 import { ProfilePeek } from "@/components/app/profile-peek";
@@ -33,7 +33,7 @@ export default async function ConversationPage({
   // them as one parallel batch and gate on the check before using any of
   // it. markRead stays AFTER the gate: its participant.update throws for
   // non-participants and its SEEN sweep must never run for outsiders.
-  const [participant, other, myProfile, messages] = await Promise.all([
+  const [participant, other, myProfile, threadPage] = await Promise.all([
     assertParticipant(conversationId, userId),
     db.participant.findFirst({
       where: { conversationId, userId: { not: userId } },
@@ -79,13 +79,9 @@ export default async function ConversationPage({
         interests: { select: { interest: { select: { slug: true } } } },
       },
     }),
-    db.message.findMany({
-      where: { conversationId, deletedAt: null },
-      orderBy: { createdAt: "asc" },
-      take: 100,
-      select: { id: true, senderId: true, body: true, status: true, createdAt: true },
-    }),
+    listThreadMessages(conversationId, { take: 100 }),
   ]);
+  const messages = threadPage.messages;
   if (!participant) notFound();
 
   await markRead(conversationId, userId);

@@ -11,7 +11,7 @@ import { canEngage, sweepExpiredRestrictions } from "@/lib/services/trust-safety
 import { parseBody } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { sendMessageSchema } from "@/lib/validators/chat";
-import { assertParticipant, markRead, sendMessage } from "@/lib/services/chat";
+import { assertParticipant, listThreadMessages, markRead, sendMessage } from "@/lib/services/chat";
 import { schedulePushDispatch } from "@/lib/services/notify";
 import { db } from "@/lib/db";
 
@@ -29,23 +29,10 @@ export async function GET(req: Request, { params }: Params) {
   const cursor = url.searchParams.get("cursor");
   const take = Math.min(Number(url.searchParams.get("take") ?? 50), 100);
 
-  const messages = await db.message.findMany({
-    where: { conversationId, deletedAt: null },
-    include: {
-      replyTo: { select: { id: true, body: true, senderId: true } },
-      attachments: true,
-    },
-    orderBy: { createdAt: "desc" },
-    take,
-    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-  });
-
+  const page = await listThreadMessages(conversationId, { take, cursor });
   await markRead(conversationId, user.id);
 
-  return ok({
-    messages: messages.reverse(),
-    nextCursor: messages.length === take ? messages[0]?.id : null,
-  });
+  return ok(page);
 }
 
 export async function POST(req: Request, { params }: Params) {

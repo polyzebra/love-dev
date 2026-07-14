@@ -156,6 +156,32 @@ export async function sendMessage(params: {
   return message;
 }
 
+/**
+ * THE thread read model (Phase 0M): one place owns which messages are
+ * visible (deletedAt null) and how they are ordered. The GET route and
+ * the SSR page both consume this - the visibility rule lives nowhere else.
+ */
+export async function listThreadMessages(
+  conversationId: string,
+  opts: { take: number; cursor?: string | null } = { take: 50 },
+) {
+  const messages = await db.message.findMany({
+    where: { conversationId, deletedAt: null },
+    include: {
+      replyTo: { select: { id: true, body: true, senderId: true } },
+      attachments: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: opts.take,
+    ...(opts.cursor ? { cursor: { id: opts.cursor }, skip: 1 } : {}),
+  });
+  return {
+    // Chronological for rendering; nextCursor pages further back.
+    messages: messages.reverse(),
+    nextCursor: messages.length === opts.take ? messages[0]?.id : null,
+  };
+}
+
 export async function markRead(conversationId: string, userId: string) {
   const at = new Date();
   const [, updated] = await db.$transaction([
