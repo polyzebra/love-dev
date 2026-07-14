@@ -1,5 +1,13 @@
 # Profile-Photo Verification (Face Match Layer)
 
+> **Status: NOT production-ready.** The trusted reference-source path is
+> decided but not yet implemented - see
+> [FACE-REFERENCE-AUDIT.md](FACE-REFERENCE-AUDIT.md) (verdict: separate
+> Tirvea-owned video-selfie liveness via AWS Rekognition, eu-west-1;
+> the Stripe selfie was REJECTED as a persistent reference source).
+> `FACE_MATCH_PROVIDER` stays unset in production until that audit's
+> implementation plan and DPIA/DPA items are complete.
+
 ## Architecture
 
 Two SEPARATE verifications, deliberately never merged:
