@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/notifications",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/face-checks",
+      "schedule": "*/10 * * * *"
     }
   ],
   "ignoreCommand": "bash -c 'if [ \"$VERCEL_ENV\" = \"production\" ] && [ \"$CI_DEPLOYS_ONLY\" = \"1\" ]; then echo \"Production builds only via CI (CI_DEPLOYS_ONLY=1)\"; exit 0; else exit 1; fi'"

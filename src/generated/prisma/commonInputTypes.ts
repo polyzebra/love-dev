@@ -1075,6 +1075,74 @@ export type EnumAppearanceModeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
 }
 
+export type EnumProfilePhotoVerificationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProfilePhotoVerificationStatus | Prisma.EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel> | $Enums.ProfilePhotoVerificationStatus
+}
+
+export type EnumFaceBadgeStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBadgeStatus | Prisma.EnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel> | $Enums.FaceBadgeStatus
+}
+
+export type EnumProfilePhotoVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProfilePhotoVerificationStatus | Prisma.EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProfilePhotoVerificationStatusWithAggregatesFilter<$PrismaModel> | $Enums.ProfilePhotoVerificationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel>
+}
+
+export type EnumFaceBadgeStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBadgeStatus | Prisma.EnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBadgeStatusWithAggregatesFilter<$PrismaModel> | $Enums.FaceBadgeStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
+}
+
+export type EnumFaceCheckClassificationFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckClassification | Prisma.EnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckClassificationFilter<$PrismaModel> | $Enums.FaceCheckClassification
+}
+
+export type EnumFaceCheckDecisionFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckDecision | Prisma.EnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel> | $Enums.FaceCheckDecision
+}
+
+export type EnumFaceCheckClassificationWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckClassification | Prisma.EnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckClassificationWithAggregatesFilter<$PrismaModel> | $Enums.FaceCheckClassification
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceCheckClassificationFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceCheckClassificationFilter<$PrismaModel>
+}
+
+export type EnumFaceCheckDecisionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckDecision | Prisma.EnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckDecisionWithAggregatesFilter<$PrismaModel> | $Enums.FaceCheckDecision
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -2082,6 +2150,74 @@ export type NestedEnumAppearanceModeWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAppearanceModeFilter<$PrismaModel>
+}
+
+export type NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProfilePhotoVerificationStatus | Prisma.EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel> | $Enums.ProfilePhotoVerificationStatus
+}
+
+export type NestedEnumFaceBadgeStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBadgeStatus | Prisma.EnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel> | $Enums.FaceBadgeStatus
+}
+
+export type NestedEnumProfilePhotoVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProfilePhotoVerificationStatus | Prisma.EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProfilePhotoVerificationStatusWithAggregatesFilter<$PrismaModel> | $Enums.ProfilePhotoVerificationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProfilePhotoVerificationStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceBadgeStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBadgeStatus | Prisma.EnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBadgeStatus[] | Prisma.ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBadgeStatusWithAggregatesFilter<$PrismaModel> | $Enums.FaceBadgeStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceCheckClassificationFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckClassification | Prisma.EnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckClassificationFilter<$PrismaModel> | $Enums.FaceCheckClassification
+}
+
+export type NestedEnumFaceCheckDecisionFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckDecision | Prisma.EnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel> | $Enums.FaceCheckDecision
+}
+
+export type NestedEnumFaceCheckClassificationWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckClassification | Prisma.EnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckClassification[] | Prisma.ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckClassificationWithAggregatesFilter<$PrismaModel> | $Enums.FaceCheckClassification
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceCheckClassificationFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceCheckClassificationFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceCheckDecisionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceCheckDecision | Prisma.EnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceCheckDecision[] | Prisma.ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceCheckDecisionWithAggregatesFilter<$PrismaModel> | $Enums.FaceCheckDecision
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
 }
 
 

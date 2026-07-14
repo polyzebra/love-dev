@@ -14,6 +14,7 @@ import {
   XCircle,
 } from "lucide-react";
 import type { VerificationUxState } from "@/lib/services/photo-verification";
+import { FACE_STATE_COPY } from "@/lib/verification-presentation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,11 +51,16 @@ export const PHOTO_VERIFICATION_ANCHOR = "photo-verification";
 export function PhotoVerifyCard({
   state,
   workflowStatus = null,
+  facePresentation = null,
 }: {
   state: VerificationUxState;
   /** Raw Verification.status - WORDING only (expired vs rejected retry
    *  copy). Never used to derive behavior; `state` stays canonical. */
   workflowStatus?: "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED" | "EXPIRED" | null;
+  /** Face-layer presentation for VERIFIED users (profile-photo checks) -
+   *  null renders the identity flow exactly as before. */
+  facePresentation?:
+    "checking_profile_photos" | "photo_update_review" | "action_required" | "manual_review" | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -172,6 +178,42 @@ export function PhotoVerifyCard({
         toast.error("Network error. Check your connection and try again.");
       }
     });
+  }
+
+  // -------------------------------------------------- face-layer states
+  // (identity already verified - profile-photo verification refines what
+  // the user sees; no provider vocabulary, no similarity scores)
+  if (
+    facePresentation === "checking_profile_photos" ||
+    facePresentation === "photo_update_review"
+  ) {
+    const copy = FACE_STATE_COPY[facePresentation];
+    return wrap(
+      <StateCard
+        icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
+        title={copy.title}
+        body={copy.body}
+      />,
+    );
+  }
+  if (facePresentation === "action_required") {
+    const copy = FACE_STATE_COPY.action_required;
+    return wrap(
+      <StateCard
+        icon={<XCircle className="text-muted-foreground size-5" aria-hidden="true" />}
+        title={copy.title}
+        body={copy.body}
+      />,
+    );
+  }
+  if (facePresentation === "manual_review") {
+    return wrap(
+      <StateCard
+        icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
+        title="Verification under review"
+        body="A member of our team is reviewing your verification. Nothing else is needed from you."
+      />,
+    );
   }
 
   // ------------------------------------------------------------------ states

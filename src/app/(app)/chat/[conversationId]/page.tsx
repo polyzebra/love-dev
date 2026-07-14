@@ -15,6 +15,7 @@ import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline as presenceOnline } from "@/lib/presence";
 import { promptLabel } from "@/config/prompts";
 import { categoriesForProfile } from "@/lib/discovery/taxonomy";
+import { isPubliclyVerified } from "@/lib/services/verification";
 
 export const metadata: Metadata = { title: "Conversation" };
 
@@ -131,7 +132,7 @@ export default async function ConversationPage({
     sharedInterests: otherInterests
       .filter((i) => mySlugs.has(i.interest.slug))
       .map((i) => i.interest.label),
-    isVerified: Boolean(other?.user.photoVerifiedAt),
+    isVerified: other ? isPubliclyVerified(other.user) : false,
     isOnline: online,
     photoUrl: other?.user.photos[0]?.url ?? null,
     sameCity:

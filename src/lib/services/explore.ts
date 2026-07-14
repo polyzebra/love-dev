@@ -12,6 +12,7 @@ import {
 } from "@/lib/discovery/taxonomy";
 import type { Prisma } from "@/generated/prisma/client";
 import { PHOTO_VERIFIED_WHERE } from "@/lib/services/verification";
+import { isPubliclyVerified } from "@/lib/services/verification";
 
 /**
  * Explore - discovery categories driven by the canonical taxonomy
@@ -277,7 +278,7 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
       const shared = p.interests.filter((i) => mySlugs.has(i.interest.slug)).length;
       // Canonical photo-verified verdict (User.photoVerifiedAt - the full
       // row is already loaded by the `include` above; see lib/services/verification.ts)
-      const verified = u.photoVerifiedAt !== null;
+      const verified = isPubliclyVerified(u);
       const recent = now - u.lastActiveAt.getTime() < 24 * 3600_000;
       const score =
         (u.explorePreferences.length > 0 ? 50 : 0) + // explicit category membership
@@ -367,7 +368,7 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
     relationshipGoal: p.relationshipGoal,
     replySignal: signals.get(target.id) ?? null,
     // Canonical photo-verified verdict (full row is loaded via `include`)
-    isVerified: target.photoVerifiedAt !== null,
+    isVerified: isPubliclyVerified(target),
     isOnline: Date.now() - target.lastActiveAt.getTime() < 5 * 60_000,
     photos: target.photos,
     prompts: p.prompts.map((pr) => ({ label: promptLabel(pr.promptKey), answer: pr.answer })),

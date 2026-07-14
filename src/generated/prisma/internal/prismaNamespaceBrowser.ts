@@ -92,7 +92,10 @@ export const ModelName = {
   AuthVerificationEvent: 'AuthVerificationEvent',
   ProfilePrompt: 'ProfilePrompt',
   UserSettings: 'UserSettings',
-  ApiIdempotencyKey: 'ApiIdempotencyKey'
+  ApiIdempotencyKey: 'ApiIdempotencyKey',
+  ProfilePhotoVerification: 'ProfilePhotoVerification',
+  PhotoFaceCheck: 'PhotoFaceCheck',
+  VerificationAuditEvent: 'VerificationAuditEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -158,6 +161,7 @@ export const UserScalarFieldEnum = {
   photoVerifiedAt: 'photoVerifiedAt',
   photoVerificationProvider: 'photoVerificationProvider',
   photoVerificationSession: 'photoVerificationSession',
+  faceBadgeSuspendedAt: 'faceBadgeSuspendedAt',
   lastActiveAt: 'lastActiveAt',
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
@@ -846,6 +850,68 @@ export const ApiIdempotencyKeyScalarFieldEnum = {
 } as const
 
 export type ApiIdempotencyKeyScalarFieldEnum = (typeof ApiIdempotencyKeyScalarFieldEnum)[keyof typeof ApiIdempotencyKeyScalarFieldEnum]
+
+
+export const ProfilePhotoVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  referenceId: 'referenceId',
+  referenceVersion: 'referenceVersion',
+  status: 'status',
+  badgeStatus: 'badgeStatus',
+  riskLevel: 'riskLevel',
+  consentVersion: 'consentVersion',
+  consentAt: 'consentAt',
+  identitySessionId: 'identitySessionId',
+  lastRunAt: 'lastRunAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfilePhotoVerificationScalarFieldEnum = (typeof ProfilePhotoVerificationScalarFieldEnum)[keyof typeof ProfilePhotoVerificationScalarFieldEnum]
+
+
+export const PhotoFaceCheckScalarFieldEnum = {
+  id: 'id',
+  verificationId: 'verificationId',
+  userId: 'userId',
+  photoId: 'photoId',
+  photoVersion: 'photoVersion',
+  isCoverAtCheck: 'isCoverAtCheck',
+  classification: 'classification',
+  decision: 'decision',
+  faceCount: 'faceCount',
+  ownerDetected: 'ownerDetected',
+  similarityScore: 'similarityScore',
+  confidenceBand: 'confidenceBand',
+  qualityScore: 'qualityScore',
+  manipulationRisk: 'manipulationRisk',
+  failureReason: 'failureReason',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoFaceCheckScalarFieldEnum = (typeof PhotoFaceCheckScalarFieldEnum)[keyof typeof PhotoFaceCheckScalarFieldEnum]
+
+
+export const VerificationAuditEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  verificationId: 'verificationId',
+  eventType: 'eventType',
+  actorType: 'actorType',
+  actorId: 'actorId',
+  previousStatus: 'previousStatus',
+  newStatus: 'newStatus',
+  reasonCode: 'reasonCode',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationAuditEventScalarFieldEnum = (typeof VerificationAuditEventScalarFieldEnum)[keyof typeof VerificationAuditEventScalarFieldEnum]
 
 
 export const SortOrder = {

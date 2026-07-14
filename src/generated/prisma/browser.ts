@@ -227,3 +227,18 @@ export type UserSettings = Prisma.UserSettingsModel
  * 
  */
 export type ApiIdempotencyKey = Prisma.ApiIdempotencyKeyModel
+/**
+ * Model ProfilePhotoVerification
+ * 
+ */
+export type ProfilePhotoVerification = Prisma.ProfilePhotoVerificationModel
+/**
+ * Model PhotoFaceCheck
+ * 
+ */
+export type PhotoFaceCheck = Prisma.PhotoFaceCheckModel
+/**
+ * Model VerificationAuditEvent
+ * 
+ */
+export type VerificationAuditEvent = Prisma.VerificationAuditEventModel

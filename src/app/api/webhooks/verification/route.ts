@@ -8,6 +8,11 @@ import {
 } from "@/lib/services/photo-verification";
 import { notifyUser } from "@/lib/services/notify";
 import { sendSafetyNotice } from "@/lib/services/safety-notices";
+import { after } from "next/server";
+import {
+  enqueueProfilePhotoVerification,
+  runProfilePhotoVerification,
+} from "@/lib/services/face-verification";
 
 /**
  * POST /api/webhooks/verification - provider callback for photo
@@ -80,6 +85,15 @@ export async function POST(req: Request) {
         where: { id: result.userId, status: "PHOTO_REVIEW_REQUIRED" },
         data: { status: "ACTIVE" },
       });
+      // Profile-photo verification (face layer): identity is now proven -
+      // enqueue the gallery check. Cheap row write here; the expensive
+      // image analysis runs AFTER the webhook response (never inside it).
+      const approvedUserId = result.userId;
+      await enqueueProfilePhotoVerification(approvedUserId, "identity_verified", {
+        identitySessionId: event.sessionId,
+        consent: true,
+      });
+      after(() => runProfilePhotoVerification(approvedUserId));
     } else if (event.status === "rejected") {
       await sendSafetyNotice(
         result.userId,

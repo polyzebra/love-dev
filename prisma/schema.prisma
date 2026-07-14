@@ -375,6 +375,11 @@ model User {
   photoVerifiedAt           DateTime?
   photoVerificationProvider String?
   photoVerificationSession  String?
+  // Face-badge suspension (profile-photo verification layer): the PUBLIC
+  // badge is photoVerifiedAt && faceBadgeSuspendedAt == null. Suspension
+  // never touches photoVerifiedAt - identity stays verified; only the
+  // badge visibility is withheld while profile photos are in question.
+  faceBadgeSuspendedAt      DateTime?
 
   lastActiveAt      DateTime  @default(now())
   // onboardingDone doubles as the spec's "onboarding completed" boolean
@@ -408,19 +413,21 @@ model User {
   blocksMade      Block[]  @relation("BlocksMade")
   blocksReceived  Block[]  @relation("BlocksReceived")
 
-  subscription         Subscription?
-  settings             UserSettings?
-  payments             Payment[]
-  notifications        Notification[]
-  notificationDevices     NotificationDevice[]
-  apiIdempotencyKeys   ApiIdempotencyKey[]
-  conversationPresence ConversationPresence[]
-  explorePreferences   UserExplorePreference[]
-  adminLogs            AdminLog[]              @relation("AdminActor")
-  authEvents           AuthVerificationEvent[]
-  moderationCases      ModerationCase[]        @relation("ModerationCases")
-  violations           AccountViolation[]      @relation("AccountViolations")
-  appeals              Appeal[]                @relation("Appeals")
+  subscription             Subscription?
+  settings                 UserSettings?
+  payments                 Payment[]
+  notifications            Notification[]
+  notificationDevices      NotificationDevice[]
+  apiIdempotencyKeys       ApiIdempotencyKey[]
+  conversationPresence     ConversationPresence[]
+  explorePreferences       UserExplorePreference[]
+  adminLogs                AdminLog[]                @relation("AdminActor")
+  authEvents               AuthVerificationEvent[]
+  moderationCases          ModerationCase[]          @relation("ModerationCases")
+  violations               AccountViolation[]        @relation("AccountViolations")
+  appeals                  Appeal[]                  @relation("Appeals")
+  profilePhotoVerification ProfilePhotoVerification?
+  verificationAuditEvents  VerificationAuditEvent[]
 
   @@index([status, lastActiveAt])
   @@index([role])
@@ -541,6 +548,7 @@ model Photo {
   user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   moderationEvents  PhotoModerationEvent[]
   moderationResults PhotoModerationResult[]
+  faceChecks        PhotoFaceCheck[]
 
   @@index([userId, position])
   @@index([moderation])
@@ -995,24 +1003,24 @@ model AccountViolation {
 // but an APPROVED one closes the story) - enforced in appeals.ts inside the
 // submit transaction, same pattern as FirstMessage.
 model Appeal {
-  id           String       @id @default(cuid())
-  violationId  String
-  userId       String
-  status       AppealStatus @default(SUBMITTED)
-  appealText   String       @db.Text
+  id                   String       @id @default(cuid())
+  violationId          String
+  userId               String
+  status               AppealStatus @default(SUBMITTED)
+  appealText           String       @db.Text
   /**
    * STAFF-ONLY. Never selected into any user read model (asserted in tests).
    */
-  adminNotes   String?
-  reviewedById String?
-  reviewedAt   DateTime?
+  adminNotes           String?
+  reviewedById         String?
+  reviewedAt           DateTime?
   /**
    * Set when staff moved the appeal to NEEDS_INFO; drives the 14-day
    * auto-expiry sweep. Cleared when the user responds.
    */
   needsInfoRequestedAt DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
 
   violation AccountViolation @relation(fields: [violationId], references: [id], onDelete: Cascade)
   user      User             @relation("Appeals", fields: [userId], references: [id], onDelete: Cascade)
@@ -1252,17 +1260,17 @@ model NotificationDelivery {
 // the email outbox worker before every send; rows are only removed by a
 // deliberate admin action, never automatically.
 model SuppressedEmail {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id              String   @id @default(cuid())
+  email           String   @unique
   /**
    * "hard_bounce" | "complaint" | "manual"
    */
-  reason    String
+  reason          String
   /**
    * Provider message id of the delivery that triggered the suppression.
    */
   sourceMessageId String?
-  createdAt DateTime @default(now())
+  createdAt       DateTime @default(now())
 
   @@index([createdAt])
 }
@@ -1516,4 +1524,125 @@ model ApiIdempotencyKey {
 
   @@unique([userId, scope, key])
   @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Profile-photo verification (face match) - SEPARATE from identity
+// verification. Stripe verifies the document+selfie (Verification type
+// PHOTO + User.photoVerifiedAt, canonical and unchanged); this layer
+// verifies that the PROFILE GALLERY belongs to that verified person.
+// PRIVACY: no embeddings/templates/biometric vectors are ever stored -
+// only the provider's opaque reference id and derived classifications.
+// ---------------------------------------------------------------------------
+
+enum ProfilePhotoVerificationStatus {
+  QUEUED // enqueued, waiting for the worker/cron
+  CHECKING // face comparisons in flight
+  AUTO_VERIFIED // cover matched, no high-risk gallery mismatches
+  MANUAL_REVIEW // uncertain cover / mixed results - human decides
+  REJECTED // confident cover mismatch or no valid profile face
+  SUSPENDED // aggregate risk or staff action - badge withheld
+}
+
+enum FaceBadgeStatus {
+  NONE // no face verification yet (or feature off)
+  ACTIVE // badge visible
+  REVIEWING // temporarily reviewing (new cover/photos in check)
+  SUSPENDED // withheld pending review/re-challenge
+}
+
+enum FaceCheckClassification {
+  OWNER_MATCHED // verified user recognised
+  NO_FACE // no face visible (lifestyle/pet/travel - allowed)
+  GROUP_PHOTO // several people, owner identified among them
+  OTHER_PERSON_ONLY // face(s) present but owner not found
+  UNCERTAIN // insufficient quality/confidence
+  MANIPULATION_RISK // possible AI generation / manipulation / screenshot
+}
+
+enum FaceCheckDecision {
+  PENDING // queued, not yet compared
+  PASSED // classification acceptable for this slot (cover vs gallery)
+  ALLOWED // acceptable without a match (no-face gallery photos)
+  FLAGGED // needs human review
+  REJECTED // photo may not be published / must be replaced
+}
+
+model ProfilePhotoVerification {
+  id                String                         @id @default(cuid())
+  userId            String                         @unique
+  provider          String? // face-match provider name (e.g. "mock")
+  // Opaque provider-side reference handle (created from the Stripe
+  // identity selfie). NEVER an embedding - deleting it at the provider
+  // destroys the biometric data.
+  referenceId       String?
+  referenceVersion  Int                            @default(0)
+  status            ProfilePhotoVerificationStatus @default(QUEUED)
+  badgeStatus       FaceBadgeStatus                @default(NONE)
+  riskLevel         Int                            @default(0) // aggregate mismatch score
+  consentVersion    String? // biometric consent version accepted at start
+  consentAt         DateTime?
+  identitySessionId String? // Stripe session the reference derives from
+  lastRunAt         DateTime?
+  expiresAt         DateTime? // reference re-challenge horizon
+  createdAt         DateTime                       @default(now())
+  updatedAt         DateTime                       @updatedAt
+
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checks PhotoFaceCheck[]
+
+  @@index([status])
+  @@index([badgeStatus])
+}
+
+model PhotoFaceCheck {
+  id               String                  @id @default(cuid())
+  verificationId   String
+  userId           String
+  photoId          String
+  // Immutable version pin: a check is valid ONLY for this exact stored
+  // image version (Photo.mediaVersion). Replaced/recropped bytes bump
+  // mediaVersion and invalidate this row.
+  photoVersion     Int
+  isCoverAtCheck   Boolean                 @default(false)
+  classification   FaceCheckClassification
+  decision         FaceCheckDecision       @default(PENDING)
+  faceCount        Int?
+  ownerDetected    Boolean?
+  // Calibration data (internal only - never shown to users): band is the
+  // coarse presentation value; the raw score exists for threshold tuning.
+  similarityScore  Float?
+  confidenceBand   String? // "confident" | "uncertain" | "mismatch"
+  qualityScore     Float?
+  manipulationRisk Float?
+  failureReason    String? // reason code, e.g. "cover_other_person"
+  reviewedById     String?
+  reviewedAt       DateTime?
+  createdAt        DateTime                @default(now())
+
+  verification ProfilePhotoVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  photo        Photo                    @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@unique([photoId, photoVersion, verificationId])
+  @@index([userId, createdAt])
+  @@index([decision])
+}
+
+model VerificationAuditEvent {
+  id             String   @id @default(cuid())
+  userId         String
+  verificationId String? // ProfilePhotoVerification id when applicable
+  eventType      String // enqueue | run | auto_verified | manual_review | ...
+  actorType      String // "system" | "admin" | "user"
+  actorId        String?
+  previousStatus String?
+  newStatus      String?
+  reasonCode     String?
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
 }

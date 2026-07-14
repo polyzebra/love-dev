@@ -473,3 +473,48 @@ export const AppearanceMode = {
 } as const
 
 export type AppearanceMode = (typeof AppearanceMode)[keyof typeof AppearanceMode]
+
+
+export const ProfilePhotoVerificationStatus = {
+  QUEUED: 'QUEUED',
+  CHECKING: 'CHECKING',
+  AUTO_VERIFIED: 'AUTO_VERIFIED',
+  MANUAL_REVIEW: 'MANUAL_REVIEW',
+  REJECTED: 'REJECTED',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type ProfilePhotoVerificationStatus = (typeof ProfilePhotoVerificationStatus)[keyof typeof ProfilePhotoVerificationStatus]
+
+
+export const FaceBadgeStatus = {
+  NONE: 'NONE',
+  ACTIVE: 'ACTIVE',
+  REVIEWING: 'REVIEWING',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type FaceBadgeStatus = (typeof FaceBadgeStatus)[keyof typeof FaceBadgeStatus]
+
+
+export const FaceCheckClassification = {
+  OWNER_MATCHED: 'OWNER_MATCHED',
+  NO_FACE: 'NO_FACE',
+  GROUP_PHOTO: 'GROUP_PHOTO',
+  OTHER_PERSON_ONLY: 'OTHER_PERSON_ONLY',
+  UNCERTAIN: 'UNCERTAIN',
+  MANIPULATION_RISK: 'MANIPULATION_RISK'
+} as const
+
+export type FaceCheckClassification = (typeof FaceCheckClassification)[keyof typeof FaceCheckClassification]
+
+
+export const FaceCheckDecision = {
+  PENDING: 'PENDING',
+  PASSED: 'PASSED',
+  ALLOWED: 'ALLOWED',
+  FLAGGED: 'FLAGGED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type FaceCheckDecision = (typeof FaceCheckDecision)[keyof typeof FaceCheckDecision]

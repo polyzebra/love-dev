@@ -4,6 +4,7 @@ import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { moderatePhoto } from "@/lib/services/moderation";
 import { assertUploadAllowed } from "@/lib/services/trust-safety";
+import { after } from "next/server";
 import {
   deletePhotoObjects,
   makeBlurDataUrl,
@@ -182,6 +183,14 @@ export async function POST(req: Request) {
     // applies the verdict to Photo.status / Photo.moderation transactionally
     // and records a PhotoModerationEvent. Never throws for provider failures.
     await moderatePhoto(photo.id);
+
+    // Profile-photo verification (face layer): a NEW photo of a verified
+    // user re-enters review before its face-check verdict exists. Cheap
+    // enqueue here; analysis runs post-response (never in-request).
+    const { onProfilePhotosChanged, runProfilePhotoVerification } =
+      await import("@/lib/services/face-verification");
+    await onProfilePhotosChanged(user.id, "photo_uploaded");
+    after(() => runProfilePhotoVerification(user.id));
 
     return created(photo);
   } catch {

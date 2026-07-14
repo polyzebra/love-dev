@@ -2,6 +2,7 @@ import { notFound, ok, requireSession } from "@/lib/api";
 import { db } from "@/lib/db";
 import { deletePhotoObjects } from "@/lib/services/photos";
 import { resolveCasesForDeletedPhoto } from "@/lib/services/trust-safety";
+import { after } from "next/server";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -43,6 +44,13 @@ export async function DELETE(_req: Request, { params }: Params) {
       await db.photo.update({ where: { id: next.id }, data: { isCover: true } });
     }
   }
+
+  // Deleting the cover promotes a new one - the face layer must re-verify
+  // the NEW cover before the badge can rest on it.
+  const { onProfilePhotosChanged, runProfilePhotoVerification } =
+    await import("@/lib/services/face-verification");
+  await onProfilePhotosChanged(user.id, photo.isCover ? "cover_changed" : "photo_deleted");
+  after(() => runProfilePhotoVerification(user.id));
 
   return ok({ deleted: true });
 }

@@ -65,6 +65,11 @@ export async function isIdentityBlocked(email: string, provider?: string): Promi
  * is NOT a ban: nothing is written to BlockedIdentity here.
  */
 export async function teardownAccount(userId: string, reason: string): Promise<void> {
+  // Face layer: destroy provider-side biometric material FIRST (the row
+  // deletion below would otherwise orphan the provider reference).
+  const { deleteFaceVerificationData } = await import("@/lib/services/face-verification");
+  await deleteFaceVerificationData(userId).catch(() => {});
+
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
   const heldPhone = user.phoneE164 ?? user.phone;

@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { VerificationActions } from "./verification-actions";
+import { FaceCheckActions } from "./face-check-actions";
 import { formatAgo } from "@/lib/utils";
 import { requireAdminPage } from "@/lib/auth/require-user";
 
@@ -51,6 +52,35 @@ export default async function AdminVerificationPage() {
     orderBy: { createdAt: "asc" },
     take: 50,
   });
+  // Profile-photo verification (face layer) review queue. Staff see
+  // classifications + confidence BANDS + reason codes - never raw
+  // similarity values, never identity documents (those stay at Stripe).
+  const faceQueue = await db.profilePhotoVerification.findMany({
+    where: { status: { in: ["MANUAL_REVIEW", "REJECTED", "SUSPENDED"] } },
+    orderBy: { updatedAt: "asc" },
+    take: 20,
+    select: {
+      id: true,
+      status: true,
+      badgeStatus: true,
+      riskLevel: true,
+      user: { select: { email: true, profile: { select: { displayName: true } } } },
+      checks: {
+        orderBy: [{ isCoverAtCheck: "desc" }, { createdAt: "desc" }],
+        take: 6,
+        select: {
+          id: true,
+          isCoverAtCheck: true,
+          classification: true,
+          decision: true,
+          confidenceBand: true,
+          failureReason: true,
+          photoVersion: true,
+          photo: { select: { url: true, status: true } },
+        },
+      },
+    },
+  });
 
   const recentSection = recentlyVerified.length > 0 && (
     <section className="mb-6">
@@ -77,11 +107,74 @@ export default async function AdminVerificationPage() {
     </section>
   );
 
+  const faceSection = faceQueue.length > 0 && (
+    <section className="mb-6">
+      <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase">
+        Profile photo checks
+      </p>
+      <div className="grid gap-4 md:grid-cols-2">
+        {faceQueue.map((job) => {
+          const rejectable = job.checks.find((c) => c.decision === "FLAGGED") ?? null;
+          return (
+            <Card key={job.id} className="rounded-3xl">
+              <CardContent className="space-y-3 py-5">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="rounded-full">
+                    {job.status === "MANUAL_REVIEW"
+                      ? "Needs review"
+                      : job.status === "REJECTED"
+                        ? "Cover rejected"
+                        : "Badge suspended"}
+                  </Badge>
+                  <span className="text-muted-foreground text-xs">risk {job.riskLevel}</span>
+                </div>
+                <p className="text-sm">
+                  <span className="font-medium">{job.user.profile?.displayName ?? "-"}</span>{" "}
+                  <span className="text-muted-foreground">· {job.user.email}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {job.checks.map((check) => (
+                    <div key={check.id} className="w-20">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={check.photo.url}
+                        alt={check.classification}
+                        className="size-20 rounded-xl object-cover"
+                      />
+                      <p className="text-muted-foreground mt-1 truncate text-[10px]">
+                        {check.isCoverAtCheck ? "cover · " : ""}
+                        {check.classification.toLowerCase()}
+                        {check.confidenceBand ? ` · ${check.confidenceBand}` : ""}
+                      </p>
+                      {check.failureReason && (
+                        <p className="text-destructive truncate text-[10px]">
+                          {check.failureReason}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <FaceCheckActions
+                  verificationId={job.id}
+                  suspended={job.status === "SUSPENDED"}
+                  rejectableCheck={
+                    rejectable ? { id: rejectable.id, label: rejectable.classification } : null
+                  }
+                />
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
+  );
+
   if (queue.length === 0) {
     return (
       <>
         <PageHeader title="Verification" description="Photo and ID verification reviews." />
         {recentSection}
+        {faceSection}
         <EmptyState
           icon={BadgeCheck}
           title="Queue clear"
@@ -98,6 +191,7 @@ export default async function AdminVerificationPage() {
         description={`${queue.length} awaiting review · oldest first`}
       />
       {recentSection}
+      {faceSection}
       <div className="grid gap-4 md:grid-cols-2">
         {queue.map((item) => (
           <Card key={item.id} className="rounded-3xl">

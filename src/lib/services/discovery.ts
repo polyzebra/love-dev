@@ -6,6 +6,7 @@ import { getReplySignals } from "@/lib/services/signals";
 import { promptLabel } from "@/config/prompts";
 import { GOAL_LINES } from "@/lib/discovery/taxonomy";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
+import { isPubliclyVerified } from "@/lib/services/verification";
 
 /**
  * Discovery feed. Excludes: self, already-swiped, blocked (either way),
@@ -181,7 +182,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       city: c.city,
       occupation: c.occupation,
       distanceKm,
-      isVerified: c.user.photoVerifiedAt !== null,
+      isVerified: isPubliclyVerified(c.user),
       isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,
       isBoosted: c.isBoosted,
       interests: c.interests.map((i) => i.interest.label),
@@ -197,7 +198,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
           viewerScoring,
           toScoringProfile(c),
           {
-            isVerified: c.user.photoVerifiedAt !== null,
+            isVerified: isPubliclyVerified(c.user),
             lastActiveAt: c.user.lastActiveAt,
             createdAt: c.user.createdAt,
             isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,

@@ -425,7 +425,10 @@ export const ModelName = {
   AuthVerificationEvent: 'AuthVerificationEvent',
   ProfilePrompt: 'ProfilePrompt',
   UserSettings: 'UserSettings',
-  ApiIdempotencyKey: 'ApiIdempotencyKey'
+  ApiIdempotencyKey: 'ApiIdempotencyKey',
+  ProfilePhotoVerification: 'ProfilePhotoVerification',
+  PhotoFaceCheck: 'PhotoFaceCheck',
+  VerificationAuditEvent: 'VerificationAuditEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -441,7 +444,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3553,6 +3556,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProfilePhotoVerification: {
+      payload: Prisma.$ProfilePhotoVerificationPayload<ExtArgs>
+      fields: Prisma.ProfilePhotoVerificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfilePhotoVerificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfilePhotoVerificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfilePhotoVerificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfilePhotoVerificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>
+        }
+        findMany: {
+          args: Prisma.ProfilePhotoVerificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>[]
+        }
+        create: {
+          args: Prisma.ProfilePhotoVerificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>
+        }
+        createMany: {
+          args: Prisma.ProfilePhotoVerificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfilePhotoVerificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfilePhotoVerificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>
+        }
+        update: {
+          args: Prisma.ProfilePhotoVerificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfilePhotoVerificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfilePhotoVerificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfilePhotoVerificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfilePhotoVerificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfilePhotoVerificationPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfilePhotoVerificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfilePhotoVerification>
+        }
+        groupBy: {
+          args: Prisma.ProfilePhotoVerificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfilePhotoVerificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfilePhotoVerificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfilePhotoVerificationCountAggregateOutputType> | number
+        }
+      }
+    }
+    PhotoFaceCheck: {
+      payload: Prisma.$PhotoFaceCheckPayload<ExtArgs>
+      fields: Prisma.PhotoFaceCheckFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhotoFaceCheckFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhotoFaceCheckFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>
+        }
+        findFirst: {
+          args: Prisma.PhotoFaceCheckFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhotoFaceCheckFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>
+        }
+        findMany: {
+          args: Prisma.PhotoFaceCheckFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>[]
+        }
+        create: {
+          args: Prisma.PhotoFaceCheckCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>
+        }
+        createMany: {
+          args: Prisma.PhotoFaceCheckCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhotoFaceCheckCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>[]
+        }
+        delete: {
+          args: Prisma.PhotoFaceCheckDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>
+        }
+        update: {
+          args: Prisma.PhotoFaceCheckUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>
+        }
+        deleteMany: {
+          args: Prisma.PhotoFaceCheckDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhotoFaceCheckUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhotoFaceCheckUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>[]
+        }
+        upsert: {
+          args: Prisma.PhotoFaceCheckUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhotoFaceCheckPayload>
+        }
+        aggregate: {
+          args: Prisma.PhotoFaceCheckAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhotoFaceCheck>
+        }
+        groupBy: {
+          args: Prisma.PhotoFaceCheckGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotoFaceCheckGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhotoFaceCheckCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhotoFaceCheckCountAggregateOutputType> | number
+        }
+      }
+    }
+    VerificationAuditEvent: {
+      payload: Prisma.$VerificationAuditEventPayload<ExtArgs>
+      fields: Prisma.VerificationAuditEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VerificationAuditEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VerificationAuditEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>
+        }
+        findFirst: {
+          args: Prisma.VerificationAuditEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VerificationAuditEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>
+        }
+        findMany: {
+          args: Prisma.VerificationAuditEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>[]
+        }
+        create: {
+          args: Prisma.VerificationAuditEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>
+        }
+        createMany: {
+          args: Prisma.VerificationAuditEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VerificationAuditEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>[]
+        }
+        delete: {
+          args: Prisma.VerificationAuditEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>
+        }
+        update: {
+          args: Prisma.VerificationAuditEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.VerificationAuditEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VerificationAuditEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VerificationAuditEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.VerificationAuditEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationAuditEventPayload>
+        }
+        aggregate: {
+          args: Prisma.VerificationAuditEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVerificationAuditEvent>
+        }
+        groupBy: {
+          args: Prisma.VerificationAuditEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationAuditEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VerificationAuditEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationAuditEventCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3639,6 +3864,7 @@ export const UserScalarFieldEnum = {
   photoVerifiedAt: 'photoVerifiedAt',
   photoVerificationProvider: 'photoVerificationProvider',
   photoVerificationSession: 'photoVerificationSession',
+  faceBadgeSuspendedAt: 'faceBadgeSuspendedAt',
   lastActiveAt: 'lastActiveAt',
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
@@ -4327,6 +4553,68 @@ export const ApiIdempotencyKeyScalarFieldEnum = {
 } as const
 
 export type ApiIdempotencyKeyScalarFieldEnum = (typeof ApiIdempotencyKeyScalarFieldEnum)[keyof typeof ApiIdempotencyKeyScalarFieldEnum]
+
+
+export const ProfilePhotoVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  referenceId: 'referenceId',
+  referenceVersion: 'referenceVersion',
+  status: 'status',
+  badgeStatus: 'badgeStatus',
+  riskLevel: 'riskLevel',
+  consentVersion: 'consentVersion',
+  consentAt: 'consentAt',
+  identitySessionId: 'identitySessionId',
+  lastRunAt: 'lastRunAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfilePhotoVerificationScalarFieldEnum = (typeof ProfilePhotoVerificationScalarFieldEnum)[keyof typeof ProfilePhotoVerificationScalarFieldEnum]
+
+
+export const PhotoFaceCheckScalarFieldEnum = {
+  id: 'id',
+  verificationId: 'verificationId',
+  userId: 'userId',
+  photoId: 'photoId',
+  photoVersion: 'photoVersion',
+  isCoverAtCheck: 'isCoverAtCheck',
+  classification: 'classification',
+  decision: 'decision',
+  faceCount: 'faceCount',
+  ownerDetected: 'ownerDetected',
+  similarityScore: 'similarityScore',
+  confidenceBand: 'confidenceBand',
+  qualityScore: 'qualityScore',
+  manipulationRisk: 'manipulationRisk',
+  failureReason: 'failureReason',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoFaceCheckScalarFieldEnum = (typeof PhotoFaceCheckScalarFieldEnum)[keyof typeof PhotoFaceCheckScalarFieldEnum]
+
+
+export const VerificationAuditEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  verificationId: 'verificationId',
+  eventType: 'eventType',
+  actorType: 'actorType',
+  actorId: 'actorId',
+  previousStatus: 'previousStatus',
+  newStatus: 'newStatus',
+  reasonCode: 'reasonCode',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationAuditEventScalarFieldEnum = (typeof VerificationAuditEventScalarFieldEnum)[keyof typeof VerificationAuditEventScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5061,6 +5349,62 @@ export type EnumAppearanceModeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 export type ListEnumAppearanceModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppearanceMode[]'>
     
 
+
+/**
+ * Reference to a field of type 'ProfilePhotoVerificationStatus'
+ */
+export type EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfilePhotoVerificationStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ProfilePhotoVerificationStatus[]'
+ */
+export type ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfilePhotoVerificationStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceBadgeStatus'
+ */
+export type EnumFaceBadgeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBadgeStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceBadgeStatus[]'
+ */
+export type ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBadgeStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceCheckClassification'
+ */
+export type EnumFaceCheckClassificationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceCheckClassification'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceCheckClassification[]'
+ */
+export type ListEnumFaceCheckClassificationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceCheckClassification[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceCheckDecision'
+ */
+export type EnumFaceCheckDecisionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceCheckDecision'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceCheckDecision[]'
+ */
+export type ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceCheckDecision[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -5213,6 +5557,9 @@ export type GlobalOmitConfig = {
   profilePrompt?: Prisma.ProfilePromptOmit
   userSettings?: Prisma.UserSettingsOmit
   apiIdempotencyKey?: Prisma.ApiIdempotencyKeyOmit
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationOmit
+  photoFaceCheck?: Prisma.PhotoFaceCheckOmit
+  verificationAuditEvent?: Prisma.VerificationAuditEventOmit
 }
 
 /* Types for Logging */

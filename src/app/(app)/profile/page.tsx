@@ -30,6 +30,7 @@ import {
   VerificationStatusRow,
 } from "@/components/shared/verification-status-row";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
+import { deriveVerificationPresentation } from "@/lib/verification-presentation";
 
 export const metadata: Metadata = { title: "Profile" };
 
@@ -71,6 +72,34 @@ export default async function ProfilePage() {
     verification: photoWorkflow,
   });
   const verificationConfigured = isPhotoVerificationConfigured();
+  // Face layer (profile-photo verification): one unique-row read; null
+  // while the layer is dormant. Refines the presentation for VERIFIED
+  // users (checking photos / photo update / action required).
+  const faceJob = verification.photoVerified
+    ? await db.profilePhotoVerification.findUnique({
+        where: { userId: user.id },
+        select: { status: true, lastRunAt: true },
+      })
+    : null;
+  const facePresentation = deriveVerificationPresentation(verificationUx, faceJob, {
+    workflowStatus: photoWorkflow?.status ?? null,
+  });
+  // With identity verified, the presentation is one of: verified /
+  // checking_profile_photos / photo_update_review / manual_review /
+  // action_required - the guard narrows the type for the card prop.
+  const FACE_CARD_STATES = [
+    "checking_profile_photos",
+    "photo_update_review",
+    "action_required",
+    "manual_review",
+  ] as const;
+  type FaceCardState = (typeof FACE_CARD_STATES)[number];
+  const faceCardState: FaceCardState | null =
+    verification.photoVerified &&
+    verificationConfigured &&
+    (FACE_CARD_STATES as readonly string[]).includes(facePresentation)
+      ? (facePresentation as FaceCardState)
+      : null;
   const photos = profile.user.photos;
   const age = calculateAge(profile.birthDate);
   const prompts = profile.prompts;
@@ -135,11 +164,12 @@ export default async function ProfilePage() {
             "Coming soon" status row above (one unavailable message, no dead
             CTA). Selfie capture happens on the provider's side; no
             biometrics are ever stored. */}
-        {!verification.photoVerified && verificationConfigured && (
+        {((!verification.photoVerified && verificationConfigured) || faceCardState) && (
           <Reveal>
             <PhotoVerifyCard
               state={verificationUx}
               workflowStatus={photoWorkflow?.status ?? null}
+              facePresentation={faceCardState}
             />
           </Reveal>
         )}

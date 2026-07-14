@@ -698,6 +698,14 @@ export async function syncPhotoVerificationState(userId: string): Promise<{
               where: { id: result.userId, status: "PHOTO_REVIEW_REQUIRED" },
               data: { status: "ACTIVE" },
             });
+            // Face layer: identity proven via the poll path too - same
+            // enqueue as the webhook (run happens via after()/cron).
+            const { enqueueProfilePhotoVerification } =
+              await import("@/lib/services/face-verification");
+            await enqueueProfilePhotoVerification(result.userId, "identity_verified", {
+              identitySessionId: row.providerSessionId,
+              consent: true,
+            });
           } else if (outcome === "rejected") {
             const { sendSafetyNotice } = await import("@/lib/services/safety-notices");
             await sendSafetyNotice(

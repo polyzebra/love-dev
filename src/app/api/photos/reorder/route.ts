@@ -2,6 +2,7 @@ import { z } from "zod";
 import { apiError, ok, parseBody, requireSession } from "@/lib/api";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { after } from "next/server";
 
 const reorderSchema = z.object({
   order: z
@@ -45,6 +46,13 @@ export async function PATCH(req: Request) {
       }),
     ),
   );
+
+  // Reorder can crown a NEW cover (index 0) - re-verify before the badge
+  // rests on it; unchanged photo versions keep their stored verdicts.
+  const { onProfilePhotosChanged, runProfilePhotoVerification } =
+    await import("@/lib/services/face-verification");
+  await onProfilePhotosChanged(user.id, "cover_changed");
+  after(() => runProfilePhotoVerification(user.id));
 
   return ok({ reordered: true, order: data.order });
 }

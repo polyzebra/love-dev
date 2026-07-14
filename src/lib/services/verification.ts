@@ -32,11 +32,25 @@ import type { VerificationStatus, VerificationType } from "@/generated/prisma/en
  * getVerificationState(userId) only when no user query exists yet.
  */
 
+/**
+ * PUBLIC badge verdict - the ONE rule for what other members see:
+ * identity verified AND the face-badge not suspended by the
+ * profile-photo verification layer (face-verification.ts). Suspension
+ * withholds the badge without ever un-verifying the identity.
+ */
+export function isPubliclyVerified(user: {
+  photoVerifiedAt: Date | null;
+  faceBadgeSuspendedAt?: Date | null;
+}): boolean {
+  return user.photoVerifiedAt !== null && !user.faceBadgeSuspendedAt;
+}
+
 /** Select fragment - extend an existing user query instead of re-querying. */
 export const VERIFICATION_USER_SELECT = {
   emailVerified: true,
   phoneVerifiedAt: true,
   photoVerifiedAt: true,
+  faceBadgeSuspendedAt: true,
   verifications: {
     where: { type: { in: ["PHOTO", "IDENTITY"] } },
     select: { type: true, status: true, updatedAt: true },
