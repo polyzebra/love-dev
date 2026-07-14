@@ -25,7 +25,10 @@ import { calculateAge, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PhotoManager } from "@/components/profile/photo-manager";
 import { PhotoVerifyCard } from "@/components/profile/photo-verify-card";
-import { VerificationStatusRow } from "@/components/shared/verification-status-row";
+import {
+  photoVerificationRow,
+  VerificationStatusRow,
+} from "@/components/shared/verification-status-row";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -98,26 +101,33 @@ export default async function ProfilePage() {
       >
         {/* ================= TRUST ================= */}
         <RevealGroup className="grid gap-2.5 sm:grid-cols-3">
-          {(
-            [
-              // The photo action anchors to the REAL flow card further down
-              // THIS page (never the circular Settings hop); email/phone
-              // verification genuinely lives in the account settings hub.
-              ["email", "Email verified", verification.emailVerified, "/settings/account"],
-              ["phone", "Phone verified", verification.phoneVerified, "/settings/account"],
-              ["photo", "Photo verified", verification.photoVerified, "#photo-verification"],
-            ] as const
-          ).map(([type, label, done, href]) => {
+          {[
+            // Email/phone are boolean verdicts (no workflow states);
+            // their flows live in the account settings hub.
+            ["email", "Email verified", verification.emailVerified] as const,
+            ["phone", "Phone verified", verification.phoneVerified] as const,
+          ].map(([type, label, done]) => {
             return (
               <RevealItem key={type}>
                 <VerificationStatusRow
                   label={label}
                   state={done ? "verified" : "todo"}
-                  action={done ? null : { label: "Verify", href }}
+                  action={done ? null : { label: "Verify", href: "/settings/account" }}
                 />
               </RevealItem>
             );
           })}
+          {/* Photo has a full workflow: this row reads the SAME canonical
+              UX state as the PhotoVerifyCard below (one mapper - the row
+              and the card can never disagree). */}
+          <RevealItem>
+            <VerificationStatusRow
+              {...photoVerificationRow(verificationUx, {
+                configured: verificationConfigured,
+                surface: "profile",
+              })}
+            />
+          </RevealItem>
         </RevealGroup>
 
         {/* Photo verification nudge - only while unverified. Selfie capture

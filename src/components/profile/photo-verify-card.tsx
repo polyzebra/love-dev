@@ -177,7 +177,7 @@ export function PhotoVerifyCard({
     return wrap(
       <StateCard
         icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
-        title="A person is taking a look"
+        title="Under review"
         body="Your verification needs a quick manual review by our team. Nothing else is needed from you - we'll email you the result."
       />,
     );

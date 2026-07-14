@@ -41,6 +41,7 @@ const UNIT = new Set([
   "architecture.test.ts",
   "thread-store.test.ts",
   "verification-notice.test.ts",
+  "verification-consistency.test.ts",
   "auth-url.test.ts",
   "billing-ui.test.ts",
   "login-routes.test.ts",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { VerificationUxState } from "@/lib/services/photo-verification";
 import { BadgeCheck, CircleAlert, CircleDashed, Hourglass, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -21,6 +22,77 @@ export const VERIFICATION_STATE_ICON: Record<
   todo: { icon: CircleDashed, className: "text-muted-foreground/40" },
   unavailable: { icon: CircleDashed, className: "text-muted-foreground/50" },
 };
+
+/**
+ * THE one mapping from the canonical photo-verification UX state to row
+ * presentation. Profile row, Settings row and PhotoVerifyCard all read
+ * the SAME VerificationUxState (deriveVerificationUxState) - this
+ * mapper is the only switch, so the surfaces can never disagree
+ * ("Photo verified -> Verify" next to "Verification in progress" is
+ * impossible by construction).
+ *
+ * The in-progress/review/retry actions always target the ONE flow card
+ * anchor; `failed` (staff-marked FINAL rejection) deliberately offers no
+ * retry anywhere - mirroring the card's final state.
+ */
+export function photoVerificationRow(
+  ux: VerificationUxState,
+  opts: { configured: boolean; surface: "profile" | "settings" },
+): {
+  label: string;
+  state: VerificationRowState;
+  value?: string;
+  action: { label: string; href: string } | null;
+} {
+  const anchor = opts.surface === "profile" ? "#photo-verification" : "/profile#photo-verification";
+  switch (ux) {
+    case "verified":
+      return { label: "Photo verified", state: "verified", value: "Verified", action: null };
+    case "pending":
+    case "verification_started":
+      return {
+        label: "Photo verification",
+        state: "pending",
+        value: "In progress",
+        action: opts.surface === "settings" ? { label: "View status", href: anchor } : null,
+      };
+    case "manual_review":
+      return {
+        label: "Photo verification",
+        state: "pending",
+        value: "Under review",
+        action: null,
+      };
+    case "retry_available":
+      return {
+        label: "Photo verification",
+        state: "needs-action",
+        value: "Didn't go through - try again",
+        action: opts.configured ? { label: "Try again", href: anchor } : null,
+      };
+    case "failed":
+      return {
+        label: "Photo verification",
+        state: "needs-action",
+        value: "Not completed",
+        action: null,
+      };
+    case "not_verified":
+      return opts.configured
+        ? {
+            label: "Photo verification",
+            state: "todo",
+            value: "Not verified",
+            action: { label: opts.surface === "profile" ? "Verify" : "Start", href: anchor },
+          }
+        : {
+            label: "Photo verification",
+            state: "unavailable",
+            value: "Coming soon",
+            action: null,
+          };
+  }
+}
 
 export function VerificationStatusRow({
   label,
@@ -65,8 +137,18 @@ export function VerificationStatusRow({
     <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
       <Icon className={`size-5 shrink-0 ${className}`} aria-hidden="true" />
       <span className={state === "verified" ? "" : "text-muted-foreground"}>{label}</span>
+      {value && state !== "verified" && state !== "todo" && (
+        <span className="text-muted-foreground/70 ml-auto truncate text-xs">{value}</span>
+      )}
       {action && (
-        <Button variant="link" size="sm" className="ml-auto h-auto p-0" asChild>
+        <Button
+          variant="link"
+          size="sm"
+          className={
+            value && state !== "verified" && state !== "todo" ? "h-auto p-0" : "ml-auto h-auto p-0"
+          }
+          asChild
+        >
           <Link href={action.href}>{action.label}</Link>
         </Button>
       )}

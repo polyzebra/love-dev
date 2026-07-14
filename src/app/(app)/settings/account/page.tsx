@@ -4,10 +4,12 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import {
+  deriveVerificationUxState,
   isPhotoVerificationConfigured,
   maybeReconcilePhotoVerification,
 } from "@/lib/services/photo-verification";
 import {
+  photoVerificationRow,
   VerificationStatusRow,
   type VerificationRowState,
 } from "@/components/shared/verification-status-row";
@@ -42,6 +44,20 @@ export default async function AccountSettingsPage() {
   // admin trust panel and badges read.
   const verification = user ? toVerificationState(user) : null;
   const photoConfigured = isPhotoVerificationConfigured();
+  // THE canonical UX state - identical inputs to the profile page and
+  // PhotoVerifyCard, so every surface renders the same verdict.
+  const photoWorkflow = await db.verification.findUnique({
+    where: { userId_type: { userId: viewer.id, type: "PHOTO" } },
+    select: { status: true, providerSessionId: true, reviewNote: true },
+  });
+  const photoUx = deriveVerificationUxState({
+    photoVerifiedAt: user?.photoVerifiedAt ?? null,
+    verification: photoWorkflow,
+  });
+  const photoRow = photoVerificationRow(photoUx, {
+    configured: photoConfigured,
+    surface: "settings",
+  });
   // Public verdict date only (photoVerifiedAt) - internal workflow
   // timestamps (statusChangedAt / lastReconciledAt) never leave admin.
   const verifiedOn = verification?.photoVerifiedAt
@@ -61,17 +77,6 @@ export default async function AccountSettingsPage() {
     action: { label: string; href: string } | null;
   };
 
-  // Workflow (not verdict) state for the photo row - PENDING/IN_REVIEW
-  // must read as pending, REJECTED/EXPIRED as "try again". The verdict
-  // itself stays canonical via toVerificationState.
-  const photoState: RowState = verification?.photoVerified
-    ? "verified"
-    : verification?.photoStatus === "PENDING" || verification?.photoStatus === "IN_REVIEW"
-      ? "pending"
-      : verification?.photoStatus === "REJECTED" || verification?.photoStatus === "EXPIRED"
-        ? "needs-action"
-        : "todo";
-
   const rows: Row[] = [
     {
       label: "Email",
@@ -88,37 +93,16 @@ export default async function AccountSettingsPage() {
       action: verification?.phoneVerified ? null : { label: "Add phone", href: "/auth/phone" },
     },
     {
-      label: "Photo verification",
+      // Canonical mapper output (shared with the profile row + card) -
+      // no local switch, so the surfaces can never disagree. The public
+      // verified date rides along.
+      label: photoRow.label,
       value:
-        photoState === "verified"
-          ? `Verified ${verifiedOn ?? ""}`.trim()
-          : photoState === "pending"
-            ? verification?.photoStatus === "IN_REVIEW"
-              ? "In review"
-              : "In progress"
-            : photoState === "needs-action" && photoConfigured
-              ? "Didn't go through - try again"
-              : photoConfigured
-                ? "Not verified"
-                : "Coming soon",
-      state:
-        photoConfigured || photoState === "verified" || photoState === "pending"
-          ? photoState
-          : "unavailable",
-      // The one real flow lives in the profile page's PhotoVerifyCard -
-      // the action deep-links straight to its anchor (no circular hop).
-      // Unconfigured = quiet unavailable state, never a dead CTA.
-      action:
-        photoState === "verified"
-          ? null
-          : photoState === "pending"
-            ? { label: "View status", href: "/profile#photo-verification" }
-            : photoConfigured
-              ? {
-                  label: photoState === "needs-action" ? "Try again" : "Start",
-                  href: "/profile#photo-verification",
-                }
-              : null,
+        photoUx === "verified" && verifiedOn
+          ? `Verified ${verifiedOn}`
+          : (photoRow.value ?? "Not verified"),
+      state: photoRow.state,
+      action: photoRow.action,
     },
     {
       label: "ID verification (optional)",
