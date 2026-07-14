@@ -138,6 +138,7 @@ export async function reviewVerification(opts: {
       where: { id: opts.verificationId },
       data: {
         status: opts.approve ? "APPROVED" : "REJECTED",
+        statusChangedAt: new Date(),
         reviewedById: opts.actorId,
       },
     });

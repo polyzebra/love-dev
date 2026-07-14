@@ -3,7 +3,10 @@ import Link from "next/link";
 import { BadgeCheck, CircleAlert, CircleDashed, Hourglass, type LucideIcon } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { isPhotoVerificationConfigured } from "@/lib/services/photo-verification";
+import {
+  isPhotoVerificationConfigured,
+  maybeReconcilePhotoVerification,
+} from "@/lib/services/photo-verification";
 import {
   VerificationStatusRow,
   type VerificationRowState,
@@ -21,6 +24,9 @@ export const metadata: Metadata = { title: "Account & verification" };
 
 export default async function AccountSettingsPage() {
   const viewer = await requireUser();
+  // Same webhook-loss recovery as the profile page - throttled shared
+  // claim, so back-to-back visits never double-poll the provider.
+  await maybeReconcilePhotoVerification(viewer.id);
   const user = await db.user.findUnique({
     where: { id: viewer.id },
     // phoneE164 is the canonical phone column (User.phone is write-only
@@ -36,6 +42,13 @@ export default async function AccountSettingsPage() {
   // admin trust panel and badges read.
   const verification = user ? toVerificationState(user) : null;
   const photoConfigured = isPhotoVerificationConfigured();
+  // Public verdict date only (photoVerifiedAt) - internal workflow
+  // timestamps (statusChangedAt / lastReconciledAt) never leave admin.
+  const verifiedOn = verification?.photoVerifiedAt
+    ? new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(
+        verification.photoVerifiedAt,
+      )
+    : null;
 
   // Four visual registers, never color-only: each pairs an icon with the
   // state text (verified / pending / needs another try / not available).
@@ -78,7 +91,7 @@ export default async function AccountSettingsPage() {
       label: "Photo verification",
       value:
         photoState === "verified"
-          ? "Verified"
+          ? `Verified ${verifiedOn ?? ""}`.trim()
           : photoState === "pending"
             ? verification?.photoStatus === "IN_REVIEW"
               ? "In review"

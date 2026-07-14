@@ -592,6 +592,14 @@ model Verification {
   providerSessionId String? // opaque reference on the provider side
   reviewedById      String?
   reviewNote        String?
+  // When `status` last CHANGED (webhook, reconciliation, admin review) -
+  // the audit timestamp. updatedAt cannot serve: reconciliation throttle
+  // writes (lastReconciledAt) bump it without any status change.
+  statusChangedAt   DateTime?
+  // Background-reconciliation throttle metadata: the atomic claim column
+  // (updateMany where stale) that keeps provider polling to at most one
+  // request per user per interval across all serverless instances.
+  lastReconciledAt  DateTime?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 

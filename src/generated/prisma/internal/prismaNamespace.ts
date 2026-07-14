@@ -3779,6 +3779,8 @@ export const VerificationScalarFieldEnum = {
   providerSessionId: 'providerSessionId',
   reviewedById: 'reviewedById',
   reviewNote: 'reviewNote',
+  statusChangedAt: 'statusChangedAt',
+  lastReconciledAt: 'lastReconciledAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

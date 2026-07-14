@@ -20,6 +20,7 @@ import { toVerificationState, VERIFICATION_USER_SELECT } from "@/lib/services/ve
 import {
   deriveVerificationUxState,
   isPhotoVerificationConfigured,
+  maybeReconcilePhotoVerification,
 } from "@/lib/services/photo-verification";
 import { promptLabel } from "@/config/prompts";
 import { calculateAge, cn } from "@/lib/utils";
@@ -35,6 +36,10 @@ const GOAL_LABELS: Record<string, string> = GOAL_LINES;
 
 export default async function ProfilePage() {
   const user = await requireUser();
+  // Webhook-loss recovery: if this user's verification is PENDING and
+  // stale, poll the provider once (atomic throttle) BEFORE any read, so
+  // a completed hosted flow shows its badge on THIS render.
+  await maybeReconcilePhotoVerification(user.id);
   const profile = await db.profile.findUnique({
     where: { userId: user.id },
     include: {

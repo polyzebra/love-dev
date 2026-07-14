@@ -53,14 +53,17 @@ export async function POST(req: Request) {
           userId: user.id,
           type: "PHOTO",
           status: "PENDING",
+          statusChangedAt: new Date(),
           provider: provider.name,
           providerSessionId: session.sessionId,
         },
         update: {
           status: "PENDING",
+          statusChangedAt: new Date(),
           provider: provider.name,
           providerSessionId: session.sessionId,
           reviewNote: null,
+          lastReconciledAt: null,
         },
       }),
     ]);

@@ -447,7 +447,11 @@ export async function applyVerificationOutcome(
 
     await tx.verification.update({
       where: { id: row.id },
-      data: { status: target, reviewNote: `provider:${providerName} webhook -> ${outcome}` },
+      data: {
+        status: target,
+        statusChangedAt: new Date(),
+        reviewNote: `provider:${providerName} webhook -> ${outcome}`,
+      },
     });
     // The verdict lives on User.photoVerifiedAt (canon - verification.ts):
     // stamped/cleared atomically with the workflow row, exactly like the
@@ -490,6 +494,62 @@ export type VerificationUxState =
  * provider is configured (or the row belongs to a different provider)
  * nothing is polled - the stored state is derived honestly.
  */
+/** Default background-reconciliation throttle (override via env). */
+export const VERIFICATION_RECONCILE_INTERVAL_MS = 5 * 60_000;
+
+function reconcileIntervalMs(): number {
+  const raw = Number(process.env.VERIFICATION_RECONCILE_INTERVAL_MS);
+  return Number.isFinite(raw) && raw >= 30_000 ? raw : VERIFICATION_RECONCILE_INTERVAL_MS;
+}
+
+/**
+ * Background reconciliation (webhook-loss recovery). Called from surfaces
+ * that already load verification state: when the user's PHOTO row is
+ * PENDING with a provider session and has not been reconciled within the
+ * interval, poll the provider ONCE through the existing
+ * syncPhotoVerificationState path (same idempotent applyVerificationOutcome
+ * as the webhook - approved stamps the canonical verdict immediately).
+ *
+ *  - the throttle is an ATOMIC DB claim (updateMany WHERE stale): across
+ *    every serverless instance at most one reconciliation per user per
+ *    interval wins; losers return false without any provider call
+ *  - verified users are excluded in the claim WHERE - a verified verdict
+ *    is never re-polled, never downgraded here
+ *  - silent by requirement: ANY failure (provider outage included) is
+ *    swallowed - the stored state renders and the next interval retries
+ * Returns true only when this call performed the reconciliation.
+ */
+export async function maybeReconcilePhotoVerification(
+  userId: string,
+  now: Date = new Date(),
+): Promise<boolean> {
+  try {
+    const provider = getPhotoVerificationProvider();
+    if (provider === notConfiguredProvider) return false;
+    const cutoff = new Date(now.getTime() - reconcileIntervalMs());
+    const claimed = await db.verification.updateMany({
+      where: {
+        userId,
+        type: "PHOTO",
+        status: "PENDING",
+        provider: provider.name,
+        providerSessionId: { not: null },
+        user: { photoVerifiedAt: null },
+        OR: [{ lastReconciledAt: null }, { lastReconciledAt: { lt: cutoff } }],
+      },
+      data: { lastReconciledAt: now },
+    });
+    if (claimed.count === 0) return false;
+    await syncPhotoVerificationState(userId);
+    return true;
+  } catch {
+    // Fail silently: reconciliation is a recovery path, never a feature
+    // the user waits on. The claim already advanced lastReconciledAt, so
+    // a flapping provider is polled at most once per interval.
+    return false;
+  }
+}
+
 export async function syncPhotoVerificationState(
   userId: string,
 ): Promise<{ state: VerificationUxState; configured: boolean }> {

@@ -31,6 +31,7 @@ const LIVE = new Set([
   "critical-flows.test.ts",
   "bio.test.ts",
   "photo-verification.test.ts",
+  "verification-hardening.test.ts",
 ]);
 
 const UNIT = new Set([
