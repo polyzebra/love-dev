@@ -136,7 +136,11 @@ export default async function ProfilePage() {
       {/* ================= IN THEIR WORDS ================= */}
       {profile.bio ? (
         <Reveal>
-          <ProfileSectionCard className="md:p-8">
+          {/* Editorial by design - the bio is the emotional centre of the
+              profile and reads as a personal story, never a settings card
+              (no glass, no border, no shadow). Every other module keeps
+              ProfileSectionCard. */}
+          <section className="px-2 py-4 md:px-6">
             <div className="flex items-baseline justify-between">
               <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
                 In my words
@@ -151,7 +155,7 @@ export default async function ProfilePage() {
             <blockquote className="font-display text-foreground/95 mt-3 text-2xl leading-snug whitespace-pre-wrap italic md:text-3xl">
               &ldquo;{profile.bio}&rdquo;
             </blockquote>
-          </ProfileSectionCard>
+          </section>
         </Reveal>
       ) : (
         <Reveal>

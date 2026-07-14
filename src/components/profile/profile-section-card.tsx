@@ -2,8 +2,9 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * THE shared premium card for profile content sections (In my words,
- * prompts, and any future section). One place owns the treatment:
+ * THE shared premium card for profile content sections (prompts and any
+ * future section - the FILLED bio is deliberately editorial/card-free;
+ * its empty-state CTA still uses this card). One place owns the treatment:
  * house glass material (background + shadow untouched), the profile
  * radius, and a whisper of accent on the border (accent-foreground at
  * 8% - inline so it deterministically wins over .glass's border
