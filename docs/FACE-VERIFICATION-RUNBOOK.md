@@ -95,6 +95,92 @@ is a separate explicit staff decision.
 | Vendor data-breach notice                           | rotate ALL references: `rotateReference(*, "policy_change")` batch + `DeleteCollection` at the vendor      | unset provider while assessing                                                                   | fresh enrolments after the all-clear; DPIA incident annex                                                                           |
 | Badge granted to a mismatch (false negative)        | staff Suspend badge + Escalate on the case; pull the PhotoFaceCheck rows (bands/reasons)                   | threshold review                                                                                 | recalibrate; the per-version pinning means only re-checks are affected                                                              |
 
+## Incident runbooks (Phase 13)
+
+Each: Detection -> Impact -> Immediate response -> Recovery -> Postmortem.
+
+**AWS (face provider) outage**
+
+- Detect: `provider_down` ops alert (breaker OPEN); metrics `providers.face_match:*` = UNAVAILABLE.
+- Impact: new/changed photos park in QUEUED; badges keep last state; NOTHING auto-rejected.
+- Respond: nothing destructive needed - confirm the breaker is open (no vendor traffic), watch queue depth.
+- Recover: breaker half-opens after the cool-down; cron drains QUEUED; dead-letter sweep escalates anything that kept failing to manual review.
+- Postmortem: `face_check_error`/`face_dead_letter` audit counts in the window; add a ProviderHealth graph snapshot.
+
+**Stripe Identity outage**
+
+- Detect: `provider_down` alert for stripe_identity; users report "Couldn't start verification"; ProviderHealth lastError HTTP 5xx.
+- Impact: new identity verifications fail to start (start endpoint 500s); existing badges unaffected; open sessions resume when Stripe returns.
+- Respond: confirm status.stripe.com; nothing to disable - the flow fails closed per attempt.
+- Recover: sessions reuse on retry (no duplicates); reconciler completes webhook-lost sessions.
+- Postmortem: correlate ProviderHealth error codes with Stripe's incident.
+
+**Provider credential leak**
+
+- Detect: unexpected vendor usage/billing, credential failure spikes after rotation, or disclosure report.
+- Impact: potential unauthorized vendor API use; NO biometric exfiltration path through Tirvea (references are vendor-side, opaque).
+- Respond: rotate the key at the vendor immediately; update the env in Vercel; redeploy. For AWS also invalidate the IAM key pair.
+- Recover: verify healthy calls resume; rotate ALL face references if key had reference-read scope (`rotateReference(*, "policy_change")`).
+- Postmortem: audit vendor-side access logs for the exposure window; review least-privilege scoping.
+
+**Queue backlog**
+
+- Detect: `queue_stalled` alert (oldest QUEUED beyond threshold); metrics queueDepth climbing.
+- Impact: badge grants delayed; nothing incorrect happens.
+- Respond: check cron execution (Vercel), provider health, and dead-letter counts - the three causes in practice.
+- Recover: manual cron invocation drains 10/tick; raise the sweep `take` temporarily if needed.
+- Postmortem: queue-depth timeline vs provider health.
+
+**Dead-letter recovery**
+
+- Detect: `rotation_or_run_failures` alert; `face_dead_letter` audit events.
+- Impact: affected users sit in manual review instead of auto-verification.
+- Respond: admin queue shows them with risk context - decide manually, or fix the root cause and re-enqueue (any photo change or admin approve re-enters the flow).
+- Recover: after the provider recovers, re-enqueue the cohort (enqueue is idempotent).
+- Postmortem: which failure class dominated (`ProviderHealth.lastError` prefixes).
+
+**Manual review overload**
+
+- Detect: manualReviewRate > 5% or queue page unwieldy.
+- Impact: reviewer latency; users wait in REVIEWING (badge preserved for photo updates).
+- Respond: check for a threshold regression or a fraud wave (risk flags distinguish them).
+- Recover: recalibrate thresholds (false-positive path) or staff up (fraud path).
+- Postmortem: FP% metric before/after.
+
+**False positive incident** (legitimate users rejected/suspended)
+
+- Detect: `false_positive_spike` alert (appeal-overturn rate), support tickets.
+- Impact: wrongly withheld badges; trust damage.
+- Respond: pause the layer if severe (unset FACE_MATCH_PROVIDER); triage the cohort via `face_check_run` audits in the window.
+- Recover: batch-restore (`UPDATE "User" SET "faceBadgeSuspendedAt" = NULL WHERE ...` for the cohort), re-run after recalibration; approve pending appeals.
+- Postmortem: which policy gate fired (reason codes), threshold delta, sample review.
+
+**False negative incident** (mismatch got a badge)
+
+- Detect: reports/impersonation complaints on a verified profile; duplicate-detection hit post-grant.
+- Impact: trust harm - highest-severity class.
+- Respond: staff Suspend badge + Escalate immediately; pull the check rows (bands/reasons).
+- Recover: request_new_selfie re-challenge; tighten thresholds if systemic.
+- Postmortem: FN% metric; adversarial sample added to the calibration set.
+
+**Rollback / restore / emergency disable**
+
+- Emergency disable: unset `FACE_MATCH_PROVIDER` (Vercel env + redeploy) - the layer is dormant instantly; badge = identity-only.
+- Rollback: revert the commits - everything is additive; migrations leave inert tables.
+- Restore: re-set the env; QUEUED work resumes; rotations re-enrol references lazily.
+
+## Business continuity / disaster recovery (Phase 17)
+
+| Scenario                           | Plan                                                                                                                                                                                                                                                                                        | RTO / RPO                                                                                                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Loss of AWS region (face provider) | Breaker opens; layer degrades to manual review + parked queue. Standing up a second region = new Collection + reference re-enrolment (references are NOT replicated by design - biometric minimisation).                                                                                    | RTO: badge pipeline 0 (degrades, never blocks the app); full auto-verification restored on region recovery or ~1 day for region migration. RPO: 0 (no data loss - references re-derivable). |
+| Loss of Stripe                     | New identity verifications pause (fail closed per attempt); existing badges unaffected. No same-day substitute by design (vendor migration below).                                                                                                                                          | RTO: dependent on Stripe; product remains usable throughout. RPO: 0.                                                                                                                        |
+| Database restore                   | Supabase PITR restores User/Verification/ProfilePhotoVerification consistently (all state is in ONE database - no cross-store drift). Provider-side references may then be ORPHANED: run a reconciliation rotation (`policy_change`) for rows whose referenceId predates the restore point. | RTO: Supabase PITR SLA. RPO: Supabase PITR granularity (minutes).                                                                                                                           |
+| Queue restore                      | The queue IS database rows - restored with the database. Cron self-heals: QUEUED rows are re-swept; idempotent version-pinned checks make replays safe.                                                                                                                                     | Same as database.                                                                                                                                                                           |
+| Cron failure                       | after() covers the primary path; cron is recovery-only. Detection: queue_stalled alert. Manual invocation with CRON_SECRET is the workaround.                                                                                                                                               | RTO: minutes (manual trigger).                                                                                                                                                              |
+| Vendor migration                   | The FaceComparisonProvider seam is the contract: implement the new adapter, set modelVersion, flip FACE_MATCH_PROVIDER - the lifecycle sweep auto-rotates every reference to the new vendor (reason provider_upgrade), a few per tick. Zero user action, gradual, reversible.               | Full fleet rotation at sweep pace (configurable); no downtime.                                                                                                                              |
+| Maximum tolerated downtime         | Verification is NOT on the critical product path: browsing/matching/chat run without it. MTD for verification itself: 72h (badge staleness acceptable); MTD for wrongful-suspension states: 4h (reputational).                                                                              | -                                                                                                                                                                                           |
+
 ## Production readiness checklist
 
 - [ ] Real provider adapter implemented + calibrated (FACE-REFERENCE-AUDIT §8)

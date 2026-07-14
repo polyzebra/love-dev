@@ -13,13 +13,13 @@ project's configured **Site URL**, which was still `http://localhost:3000`.
 No code change can override that fallback - the dashboard values below are
 mandatory:
 
-| Setting | Value |
-| --- | --- |
-| Site URL | `https://tirvea.com` - **MUST be this.** It was `http://localhost:3000`; that is exactly why users landed on `localhost:3000/?code=...` |
-| Redirect URLs | `https://tirvea.com/**` (**required** - without it every app `redirectTo` is ignored and Supabase falls back to Site URL) |
-| | `https://tirvea.com/auth/callback` |
-| | `https://tirvea.com/auth/confirm` |
-| | `http://localhost:3000/**` (dev only - REMOVE for launch review) |
+| Setting       | Value                                                                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Site URL      | `https://tirvea.com` - **MUST be this.** It was `http://localhost:3000`; that is exactly why users landed on `localhost:3000/?code=...` |
+| Redirect URLs | `https://tirvea.com/**` (**required** - without it every app `redirectTo` is ignored and Supabase falls back to Site URL)               |
+|               | `https://tirvea.com/auth/callback`                                                                                                      |
+|               | `https://tirvea.com/auth/confirm`                                                                                                       |
+|               | `http://localhost:3000/**` (dev only - REMOVE for launch review)                                                                        |
 
 How to read a bad redirect in production:
 
@@ -30,7 +30,7 @@ How to read a bad redirect in production:
   localhost redirect: `NEXT_PUBLIC_SITE_URL` is missing/wrong in Vercel.
   Since the 2026-07 hardening, `src/lib/auth/url.ts` blocks localhost
   origins in production builds (logs `[auth:url] localhost redirect blocked
-  in production` and falls back to `https://tirvea.com`), so this variant
+in production` and falls back to `https://tirvea.com`), so this variant
   should no longer be reachable - but fix the env var regardless.
 
 ## 2. Google Cloud Console (OAuth client)
@@ -76,19 +76,19 @@ environment, and `NEXT_PUBLIC_*` values are BAKED INTO THE BUNDLE at build
 time - after changing any of them you must REDEPLOY (a plain restart is not
 enough).
 
-| Variable | Notes |
-| --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://tirvea.com` - canonical origin for every auth redirect; the source of truth for `src/lib/auth/url.ts` |
-| `NEXT_PUBLIC_APP_URL` | `https://tirvea.com` - metadataBase (`src/app/layout.tsx`); never localhost in production |
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon public key (browser-safe) |
-| `SUPABASE_SERVICE_ROLE_KEY` | **server-only** - never expose with `NEXT_PUBLIC_`, never import into client components |
-| `AUTH_HASH_SALT` | long random string; salts the SHA-256 hashes of IP/user-agent in the auth audit trail. Without it a dev constant is used and a warning logs |
-| `TWILIO_ACCOUNT_SID` | Twilio Console -> Account Info. All three TWILIO_* vars set = Twilio Verify becomes THE phone provider (see section 5) |
-| `TWILIO_AUTH_TOKEN` | **server-only** - the account's auth token (basic-auth secret for the Verify REST API) |
-| `TWILIO_VERIFY_SERVICE_SID` | the `VA...` SID of the Verify service (see section 5 for creating one) |
-| `SUPABASE_PHONE_ENABLED` | `"true"` ONLY once an SMS provider (Twilio) is configured in Supabase Phone Auth - fallback provider when the TWILIO_* trio is not set, see below |
-| `DATABASE_URL` / `DIRECT_URL` | Supabase Postgres (pooled / direct) |
+| Variable                        | Notes                                                                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`          | `https://tirvea.com` - canonical origin for every auth redirect; the source of truth for `src/lib/auth/url.ts`                                    |
+| `NEXT_PUBLIC_APP_URL`           | `https://tirvea.com` - metadataBase (`src/app/layout.tsx`); never localhost in production                                                         |
+| `NEXT_PUBLIC_SUPABASE_URL`      | `https://<project-ref>.supabase.co`                                                                                                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon public key (browser-safe)                                                                                                                    |
+| `SUPABASE_SERVICE_ROLE_KEY`     | **server-only** - never expose with `NEXT_PUBLIC_`, never import into client components                                                           |
+| `AUTH_HASH_SALT`                | long random string; salts the SHA-256 hashes of IP/user-agent in the auth audit trail. Without it a dev constant is used and a warning logs       |
+| `TWILIO_ACCOUNT_SID`            | Twilio Console -> Account Info. All three TWILIO_* vars set = Twilio Verify becomes THE phone provider (see section 5)                            |
+| `TWILIO_AUTH_TOKEN`             | **server-only** - the account's auth token (basic-auth secret for the Verify REST API)                                                            |
+| `TWILIO_VERIFY_SERVICE_SID`     | the `VA...` SID of the Verify service (see section 5 for creating one)                                                                            |
+| `SUPABASE_PHONE_ENABLED`        | `"true"` ONLY once an SMS provider (Twilio) is configured in Supabase Phone Auth - fallback provider when the TWILIO_* trio is not set, see below |
+| `DATABASE_URL` / `DIRECT_URL`   | Supabase Postgres (pooled / direct)                                                                                                               |
 
 ## 4. Email OTP template + expiry
 
@@ -233,17 +233,17 @@ vs `phone_otp_*`).
 
 **Full settings table (server env + dashboard):**
 
-| Setting | Where | Value | Purpose |
-| --- | --- | --- | --- |
-| `PHONE_LOGIN_ENABLED` | server env | `"true"` | THE phone-login switch: shows the `/login` button, opens `/login/phone(/verify)`. (The auth.users.phone mirror is NOT gated by it - see 5f) |
-| `SUPPORTED_PHONE_COUNTRIES` | server env | unset (default: all countries) | THE shared ISO base for every phone workflow (login, verification, change) |
-| `PHONE_LOGIN_COUNTRIES` | server env | unset (default: the shared base) | Narrow-only login override - intersection with the base; set only with a documented legal/provider reason |
-| `TWILIO_ACCOUNT_SID` | server env | `AC...` | Twilio Verify (backend phone-change flow) |
-| `TWILIO_AUTH_TOKEN` | server env | secret | Twilio Verify auth |
-| `TWILIO_VERIFY_SERVICE_SID` | server env | `VA...` | The Verify service; use the SAME SID in the Supabase SMS provider so codes come from one pool |
-| Phone provider | Supabase dashboard (Auth -> Sign In / Up) | ON | Without it `POST /auth/v1/otp {phone}` answers `400 phone_provider_disabled` |
-| SMS provider | Supabase dashboard | Twilio Verify + same Verify SID | GoTrue sends the login OTPs through it |
-| Confirm phone change | Supabase dashboard | OFF | The backfill's `updateUser({ phone })` must write silently, not text a second code |
+| Setting                     | Where                                     | Value                            | Purpose                                                                                                                                     |
+| --------------------------- | ----------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PHONE_LOGIN_ENABLED`       | server env                                | `"true"`                         | THE phone-login switch: shows the `/login` button, opens `/login/phone(/verify)`. (The auth.users.phone mirror is NOT gated by it - see 5f) |
+| `SUPPORTED_PHONE_COUNTRIES` | server env                                | unset (default: all countries)   | THE shared ISO base for every phone workflow (login, verification, change)                                                                  |
+| `PHONE_LOGIN_COUNTRIES`     | server env                                | unset (default: the shared base) | Narrow-only login override - intersection with the base; set only with a documented legal/provider reason                                   |
+| `TWILIO_ACCOUNT_SID`        | server env                                | `AC...`                          | Twilio Verify (backend phone-change flow)                                                                                                   |
+| `TWILIO_AUTH_TOKEN`         | server env                                | secret                           | Twilio Verify auth                                                                                                                          |
+| `TWILIO_VERIFY_SERVICE_SID` | server env                                | `VA...`                          | The Verify service; use the SAME SID in the Supabase SMS provider so codes come from one pool                                               |
+| Phone provider              | Supabase dashboard (Auth -> Sign In / Up) | ON                               | Without it `POST /auth/v1/otp {phone}` answers `400 phone_provider_disabled`                                                                |
+| SMS provider                | Supabase dashboard                        | Twilio Verify + same Verify SID  | GoTrue sends the login OTPs through it                                                                                                      |
+| Confirm phone change        | Supabase dashboard                        | OFF                              | The backfill's `updateUser({ phone })` must write silently, not text a second code                                                          |
 
 **Live E2E status (2026-07-09, provider still OFF in the dashboard):**
 `POST /api/auth/phone-login/send` with a valid IE number through the dev
@@ -263,14 +263,14 @@ proven by `tests/phone-login.test.ts` (spy-client suite, 12/12).
 
 - The ONLY thing that creates a session in this flow is native GoTrue:
   `signInWithOtp({ phone })` at send and `verifyOtp({ phone, token,
-  type: "sms" })` at verify, both called on the `@supabase/ssr` SERVER
+type: "sms" })` at verify, both called on the `@supabase/ssr` SERVER
   client (`supabaseServer()`), so the `sb-*` auth cookies are written by
   the library onto the verify response. There is no `setSession`, no
   `admin.createSession`/`generateLink`, no JWT minting and no custom
   `sb-*` cookie writes anywhere in `src/` - a phone match in the app DB
   is NEVER treated as authentication.
 - The admin phone sync (5f, `updateUserById(uid, { phone,
-  phone_confirm: true })`) is OWNERSHIP METADATA only: it mirrors an
+phone_confirm: true })`) is OWNERSHIP METADATA only: it mirrors an
   already-Twilio-approved number into `auth.users.phone` so future
   native OTP logins resolve to the same uid. It never issues tokens or
   cookies, and nothing reads `phoneSyncStatus` or `auth.users.phone` to
@@ -292,10 +292,10 @@ flag before BOTH prerequisites exist, or users get a dead provider:
 
 1. **Apple Developer** (Certificates, Identifiers & Profiles):
    - an App ID, plus a **Services ID** (this is the OAuth client id) with
-     *Sign in with Apple* enabled;
+     _Sign in with Apple_ enabled;
    - the Supabase callback registered as a Return URL:
      `https://<project-ref>.supabase.co/auth/v1/callback`;
-   - a *Sign in with Apple* private key (`.p8`) + its Key ID and the
+   - a _Sign in with Apple_ private key (`.p8`) + its Key ID and the
      10-char Team ID (used to mint the client-secret JWT, which Apple
      expires at most 6 months out - rotate it).
 2. **Supabase Dashboard** -> Authentication -> Providers -> **Apple**:
@@ -314,11 +314,11 @@ email. Phone-first accounts are born with a placeholder address
 (`src/lib/auth/email-attach-flow.ts`) is the email mirror of the
 authenticated phone-change flow - NOT the anonymous email login:
 
-- send   = `supabase.auth.updateUser({ email })` on the live session -
+- send = `supabase.auth.updateUser({ email })` on the live session -
   GoTrue's `email_change` flow emails a code to the NEW address.
 - verify = `supabase.auth.verifyOtp({ email, token, type: "email_change" })`
   - stamps `auth.users.email` + `email_confirmed_at`; the app then
-  rewrites `User.email` + `emailVerified` in one race-safe transaction.
+    rewrites `User.email` + `emailVerified` in one race-safe transaction.
 
 **DASHBOARD REQUIREMENT**: Supabase -> Authentication -> Providers ->
 Email -> **"Secure email change" MUST be OFF** for this single-OTP
@@ -365,7 +365,7 @@ login session mechanism" note in 5c).
    `phoneVerifiedAt` + `phoneSyncStatus = PENDING` (in-tx rival re-check,
    unique index settles races).
 4. The admin client runs `updateUserById(uid, { phone, phone_confirm:
-   true })`. `phone_confirm` is legitimate exactly because Twilio already
+true })`. `phone_confirm` is legitimate exactly because Twilio already
    approved. **GoTrue stores the phone WITHOUT the leading `+`**
    (`+353861234501` -> `353861234501`); write E.164, compare via
    `gotruePhone()`.
@@ -461,7 +461,6 @@ chunks.
 - `onboardingDone Boolean` = the spec's onboarding flag (already existed)
 - `phoneE164` is canonical; legacy `phone`/`phoneVerified` are kept mirrored until retired
 
-
 ## Email OTP length
 
 Supabase generates the email code at the length configured in
@@ -469,12 +468,13 @@ Authentication -> Email -> "Email OTP Length" (6-10 digits; GoTrue
 `otp_length`). This project's dashboard was found set to 8, which made
 6-box UI + `^\d{6}$` validation reject every real code. The app now
 mirrors the dashboard through ONE setting - `NEXT_PUBLIC_EMAIL_OTP_LENGTH`
+
 - consumed by the OTP boxes and the server validator alike; codes are
-never generated, stored or truncated by the app. Recommended end
-state: set the dashboard to 6 and drop the env override (6 is the
-default). Until then production must run with
-`NEXT_PUBLIC_EMAIL_OTP_LENGTH=8`. Phone codes stay 6 (Twilio Verify
-service default).
+  never generated, stored or truncated by the app. Recommended end
+  state: set the dashboard to 6 and drop the env override (6 is the
+  default). Until then production must run with
+  `NEXT_PUBLIC_EMAIL_OTP_LENGTH=8`. Phone codes stay 6 (Twilio Verify
+  service default).
 
 ## Pending auth users
 
@@ -485,7 +485,7 @@ pre-registration flow - the row is how Supabase ties the outstanding code
 to an identity.
 
 Tirvea therefore treats any `auth.users` row with **no confirmed email/phone
-and no app `User` row** as a *pending signup attempt*, not an account:
+and no app `User` row** as a _pending signup attempt_, not an account:
 
 - **Invisible in the product**: app `User` rows are created ONLY by
   `ensureAppUser()` (`src/lib/auth/identity.ts`), which runs from

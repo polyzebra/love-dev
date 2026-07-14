@@ -10,16 +10,16 @@ injected fakes.
 
 ## Required checks
 
-| Job | What it proves |
-|---|---|
-| quality | `prettier --check`, ESLint (0 errors), `tsc --noEmit`, forbidden-NEXT_PUBLIC guard (`scripts/check-public-env.mjs`) |
-| unit | 5 no-DB source-contract suites (`npm run test:unit`) |
-| prisma | `prisma validate`; committed generated client has zero drift vs `prisma generate`; migration history replays onto an empty DB; `migrate diff --exit-code` proves migrations ≡ schema |
-| integration | 16 Prisma-backed suites against the ephemeral DB (`npm run test:integration`); plus the 4 live-Supabase suites when `CI_SUPABASE_*` secrets exist |
-| build | `next build` with no env (env validation is lazy by design — verified) |
-| audit | `npm audit --omit=dev --audit-level=high` — production deps must be free of HIGH/CRITICAL advisories; moderates are reported, not blocking; dev-only deps do not gate |
-| secrets | gitleaks v8.24.3 (pinned) filesystem scan of the checkout, `--redact` |
-| deploy | see below |
+| Job         | What it proves                                                                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| quality     | `prettier --check`, ESLint (0 errors), `tsc --noEmit`, forbidden-NEXT_PUBLIC guard (`scripts/check-public-env.mjs`)                                                                  |
+| unit        | 5 no-DB source-contract suites (`npm run test:unit`)                                                                                                                                 |
+| prisma      | `prisma validate`; committed generated client has zero drift vs `prisma generate`; migration history replays onto an empty DB; `migrate diff --exit-code` proves migrations ≡ schema |
+| integration | 16 Prisma-backed suites against the ephemeral DB (`npm run test:integration`); plus the 4 live-Supabase suites when `CI_SUPABASE_*` secrets exist                                    |
+| build       | `next build` with no env (env validation is lazy by design — verified)                                                                                                               |
+| audit       | `npm audit --omit=dev --audit-level=high` — production deps must be free of HIGH/CRITICAL advisories; moderates are reported, not blocking; dev-only deps do not gate                |
+| secrets     | gitleaks v8.24.3 (pinned) filesystem scan of the checkout, `--redact`                                                                                                                |
+| deploy      | see below                                                                                                                                                                            |
 
 Local aggregate: `npm run ci` (format:check → lint → typecheck →
 db:validate → check:public-env → test:unit → build).
@@ -59,13 +59,13 @@ From that moment a red check blocks production.
 
 GitHub repository secrets:
 
-| Secret | Purpose | Needed for |
-|---|---|---|
-| `VERCEL_TOKEN` | Vercel CLI auth for the gated deploy | deploy job |
-| `VERCEL_ORG_ID` | Vercel scope | deploy job |
-| `VERCEL_PROJECT_ID` | Vercel project | deploy job |
-| `CI_SUPABASE_URL` | throwaway/staging Supabase project URL | live test lane (optional) |
-| `CI_SUPABASE_ANON_KEY` | its anon key | live test lane (optional) |
+| Secret                         | Purpose                                                             | Needed for                |
+| ------------------------------ | ------------------------------------------------------------------- | ------------------------- |
+| `VERCEL_TOKEN`                 | Vercel CLI auth for the gated deploy                                | deploy job                |
+| `VERCEL_ORG_ID`                | Vercel scope                                                        | deploy job                |
+| `VERCEL_PROJECT_ID`            | Vercel project                                                      | deploy job                |
+| `CI_SUPABASE_URL`              | throwaway/staging Supabase project URL                              | live test lane (optional) |
+| `CI_SUPABASE_ANON_KEY`         | its anon key                                                        | live test lane (optional) |
 | `CI_SUPABASE_SERVICE_ROLE_KEY` | its service-role key — use a dedicated CI project, never production | live test lane (optional) |
 
 Vercel project env (Production): `CI_DEPLOYS_ONLY=1` — the enforcement

@@ -18,12 +18,12 @@
 All admin access flows through central helpers - never ad-hoc
 `role === "..."` checks:
 
-| Surface | Helper | Failure behavior |
-| --- | --- | --- |
-| `/admin` layout + pages | `getCurrentAdmin()` / `getCurrentAdmin("super")` in `src/lib/auth/require-user.ts` | unauthenticated -> redirect `/login`; signed-in non-admin -> renders the calm **Access Denied** page (`src/app/admin/access-denied.tsx`), no redirect away |
-| Page guards outside the layout | `requireAdmin()` / `requireSuperAdmin()` (same file) | redirect `/login` or `/admin` |
-| `/api/admin/*` routes | `requirePermission("<permission>")` in `src/lib/api.ts` | 401 unauthenticated / 403 forbidden |
-| Admin server actions | `requireActor("<permission>")` in `src/app/admin/actions.ts` (wraps `hasPermission`) | throws Forbidden |
+| Surface                        | Helper                                                                               | Failure behavior                                                                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/admin` layout + pages        | `getCurrentAdmin()` / `getCurrentAdmin("super")` in `src/lib/auth/require-user.ts`   | unauthenticated -> redirect `/login`; signed-in non-admin -> renders the calm **Access Denied** page (`src/app/admin/access-denied.tsx`), no redirect away |
+| Page guards outside the layout | `requireAdmin()` / `requireSuperAdmin()` (same file)                                 | redirect `/login` or `/admin`                                                                                                                              |
+| `/api/admin/*` routes          | `requirePermission("<permission>")` in `src/lib/api.ts`                              | 401 unauthenticated / 403 forbidden                                                                                                                        |
+| Admin server actions           | `requireActor("<permission>")` in `src/app/admin/actions.ts` (wraps `hasPermission`) | throws Forbidden                                                                                                                                           |
 
 Suspended/banned accounts cannot reach any of these: `auth()`
 (`src/lib/auth.ts`) refuses to mint a session for `SUSPENDED`/`DELETED`

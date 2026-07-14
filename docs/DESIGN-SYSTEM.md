@@ -18,25 +18,26 @@ Theme values live on `:root` (dark) and `.light`; utilities come from
 `@theme inline`. Semantic aliases added in Phase A (same values, clearer
 intent):
 
-| Semantic | Alias of | Utility |
-| --- | --- | --- |
-| background | `--background` | `bg-background` |
-| surface | `--card` | `bg-surface` (= `bg-card`) |
-| surface-elevated | `--popover` | `bg-surface-elevated` |
-| text primary | `--foreground` | `text-foreground` |
-| text secondary | `--muted-foreground` | `text-muted-foreground` |
-| text muted | (convention) | `text-muted-foreground/70` |
-| border | `--border` | `border-border` (default on `*`) |
-| border-strong | `--input` | `border-border-strong` (= `border-input`) |
-| brand | `--primary` #e11d48 | `bg-brand` / `text-brand` |
-| brand-bright | `--brand-bright` #fb4a6e | `from-brand-bright` (CTA gradient top) |
-| brand-hover | `--brand-hover` #be123c | `to-brand-hover` (darker stop) |
-| brand-active | `--brand-active` #a3123a | `to-brand-active` (CTA gradient base) |
-| success / warning / info | `--success` / `--warning` / `--info` | `text-success` etc. |
-| danger | `--destructive` | `bg-danger` (= `bg-destructive`) |
-| focus-ring | derived | see Focus below - prefer `ring-foreground/20` |
+| Semantic                 | Alias of                             | Utility                                       |
+| ------------------------ | ------------------------------------ | --------------------------------------------- |
+| background               | `--background`                       | `bg-background`                               |
+| surface                  | `--card`                             | `bg-surface` (= `bg-card`)                    |
+| surface-elevated         | `--popover`                          | `bg-surface-elevated`                         |
+| text primary             | `--foreground`                       | `text-foreground`                             |
+| text secondary           | `--muted-foreground`                 | `text-muted-foreground`                       |
+| text muted               | (convention)                         | `text-muted-foreground/70`                    |
+| border                   | `--border`                           | `border-border` (default on `*`)              |
+| border-strong            | `--input`                            | `border-border-strong` (= `border-input`)     |
+| brand                    | `--primary` #e11d48                  | `bg-brand` / `text-brand`                     |
+| brand-bright             | `--brand-bright` #fb4a6e             | `from-brand-bright` (CTA gradient top)        |
+| brand-hover              | `--brand-hover` #be123c              | `to-brand-hover` (darker stop)                |
+| brand-active             | `--brand-active` #a3123a             | `to-brand-active` (CTA gradient base)         |
+| success / warning / info | `--success` / `--warning` / `--info` | `text-success` etc.                           |
+| danger                   | `--destructive`                      | `bg-danger` (= `bg-destructive`)              |
+| focus-ring               | derived                              | see Focus below - prefer `ring-foreground/20` |
 
 Notes:
+
 - The brand scale is THEME-INVARIANT: brand moments render identically in
   light and dark. Every other alias inherits the intentional per-theme
   values of the token it aliases (no auto-inversion anywhere).
@@ -100,7 +101,7 @@ numerals in admin KPIs are sanctioned.
 - Easings: `EASE_LUXE`/`standardEase` (expo-out house curve), `subtleEase`
   (small fades).
 - Durations: `DURATIONS.instant .1 / fast .16 / standard .24 /
-  deliberate .34`.
+deliberate .34`.
 - Springs: `SPRING.soft|standard|snappy|bounce`; aliases `softSpring`,
   `cardSpring`, plus `sheetSpring` (260/30) for large surfaces.
 - Animate: modals/sheets, tab indicators, card stack, match moment

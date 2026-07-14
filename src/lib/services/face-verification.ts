@@ -365,10 +365,13 @@ export async function runProfilePhotoVerification(
       job.referenceId && (job.referenceStatus === "ACTIVE" || job.referenceStatus === "EXPIRING");
     let referenceId = referenceUsable ? job.referenceId : null;
     if (!referenceId) {
-      const ref = await provider.createReference({
-        userId,
-        identitySessionId: job.identitySessionId,
-      });
+      const { withResilience } = await import("@/lib/services/provider-resilience");
+      const ref = await withResilience(`face_match:${provider.name}`, () =>
+        provider.createReference({
+          userId,
+          identitySessionId: job.identitySessionId,
+        }),
+      );
       referenceId = ref.referenceId;
       const ttlDays = faceMatchPolicy().referenceTtlDays;
       await db.profilePhotoVerification.update({
@@ -451,10 +454,13 @@ export async function runProfilePhotoVerification(
       }
 
       const input = { image: bytes, photoId: photo.id, photoVersion: photo.mediaVersion };
-      const [cmp, manipulation] = await Promise.all([
-        provider.compareReferenceToPhoto(referenceId, input),
-        provider.assessManipulationRisk(input),
-      ]);
+      const { withResilience: resilient } = await import("@/lib/services/provider-resilience");
+      const [cmp, manipulation] = await resilient(`face_match:${provider.name}`, () =>
+        Promise.all([
+          provider.compareReferenceToPhoto(referenceId, input),
+          provider.assessManipulationRisk(input),
+        ]),
+      );
       const verdict = classifyComparison(cmp, manipulation.risk, { isCover: photo.isCover });
 
       await db.photoFaceCheck.upsert({

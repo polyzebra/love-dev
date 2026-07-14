@@ -8,13 +8,13 @@ truth is the code paths listed below.
 Through **PhotoFrame** (`src/components/shared/photo-frame.tsx` - the
 only profile-photo renderer):
 
-| Surface | File | Mode | Variant | Lazy |
-| --- | --- | --- | --- | --- |
-| Swipe top card + peek | `src/components/app/swipe-deck.tsx` | fill | card | eager |
-| Fullscreen viewer | `src/components/explore/profile-viewer.tsx` | fill | full | eager |
-| Explore person card | `src/components/explore/person-card.tsx` | 4:5 | gallery | lazy |
-| Profile hero + gallery | `src/components/profile/photo-manager.tsx` | 4:5 | card / gallery | hero eager, tiles lazy |
-| Matches grid | `src/app/(app)/matches/page.tsx` | 4:5 | gallery | lazy |
+| Surface                | File                                        | Mode | Variant        | Lazy                   |
+| ---------------------- | ------------------------------------------- | ---- | -------------- | ---------------------- |
+| Swipe top card + peek  | `src/components/app/swipe-deck.tsx`         | fill | card           | eager                  |
+| Fullscreen viewer      | `src/components/explore/profile-viewer.tsx` | fill | full           | eager                  |
+| Explore person card    | `src/components/explore/person-card.tsx`    | 4:5  | gallery        | lazy                   |
+| Profile hero + gallery | `src/components/profile/photo-manager.tsx`  | 4:5  | card / gallery | hero eager, tiles lazy |
+| Matches grid           | `src/app/(app)/matches/page.tsx`            | 4:5  | gallery        | lazy                   |
 
 Deliberate non-PhotoFrame renders: circular `Avatar` primitives (chat
 lists, profile peek - not photo frames), admin moderation thumbs
@@ -29,12 +29,12 @@ Upload -> in-memory Buffer only -> sharp `.rotate()` (bakes EXIF
 orientation, strips metadata) -> four WebP derivatives (quality 84,
 effort 5; WebP has no progressive mode):
 
-| Variant | Size | Used by |
-| --- | --- | --- |
-| thumb | 320x400 | lists, admin queue |
-| gallery | 720x900 | grids/tiles |
-| card | 1080x1350 | swipe, profile hero |
-| full | 1800x2700 | fullscreen viewer only |
+| Variant | Size      | Used by                |
+| ------- | --------- | ---------------------- |
+| thumb   | 320x400   | lists, admin queue     |
+| gallery | 720x900   | grids/tiles            |
+| card    | 1080x1350 | swipe, profile hero    |
+| full    | 1800x2700 | fullscreen viewer only |
 
 The original is never persisted - not to disk, not to storage.
 Pipeline also computes `blurhash`, `dominantColor`, and records
@@ -77,12 +77,12 @@ scores are never invented.
 
 ## Graceful fallbacks (missing env/service)
 
-| Missing | Behaviour |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` / `ANON_KEY` | Upload route returns 503 "Photo storage not configured"; nothing crashes. |
+| Missing                                     | Behaviour                                                                                                                                                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL` / `ANON_KEY`     | Upload route returns 503 "Photo storage not configured"; nothing crashes.                                                                                                                              |
 | `MODERATION_API_URL` / `MODERATION_API_KEY` | `nullProvider` auto-approves with labels `["unmoderated"]`, a warn log and an honest moderation event - no fake AI scores. A misbehaving external provider degrades to "review", never auto-publishes. |
-| HEIC upload (sharp build without HEVC) | Clean 422 `invalid_image`, no crash. |
-| Legacy rows without variant URLs | PhotoFrame falls back `galleryUrl -> url`; demo profiles keep absolute stock URLs. |
+| HEIC upload (sharp build without HEVC)      | Clean 422 `invalid_image`, no crash.                                                                                                                                                                   |
+| Legacy rows without variant URLs            | PhotoFrame falls back `galleryUrl -> url`; demo profiles keep absolute stock URLs.                                                                                                                     |
 
 ## Deletion
 

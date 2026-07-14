@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { sweepQueuedFaceChecks } from "@/lib/services/face-verification";
 import { sweepReferenceLifecycle } from "@/lib/services/face-reference";
+import { sweepDeadLetterJobs } from "@/lib/services/provider-resilience";
+import { evaluateVerificationAlerts } from "@/lib/services/verification-metrics";
 
 export const dynamic = "force-dynamic";
 
@@ -29,5 +31,9 @@ export async function GET(req: Request) {
   // Reference lifecycle: EXPIRING marks, expiry + provider-upgrade
   // rotations (rotations re-enter the queue; next sweep re-enrols).
   const lifecycle = await sweepReferenceLifecycle(25);
-  return NextResponse.json({ data: { processed, lifecycle } });
+  // Dead-letter: repeatedly-failing jobs escalate to humans (never
+  // auto-rejected); alert rules fire at most once/day each.
+  const deadLettered = await sweepDeadLetterJobs(20);
+  const alerts = await evaluateVerificationAlerts().catch(() => []);
+  return NextResponse.json({ data: { processed, lifecycle, deadLettered, alerts } });
 }

@@ -11,32 +11,32 @@ future Bearer-token clients enabled, no Capacitor/Expo/native code.
 
 ## 1. Toolchain baseline
 
-| Check | Result |
-|---|---|
-| `npx tsc --noEmit` | CLEAN — 0 errors |
-| `npm run lint` | 0 errors, 2 pre-existing warnings (`(app)/layout.tsx` unused `db`, `privacy-actions.tsx` unused `router`) |
-| `npm run build` | Compiles clean (Next 16.2.10, webpack), 0 errors |
-| Working tree | clean at `bb11a60` |
+| Check              | Result                                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| `npx tsc --noEmit` | CLEAN — 0 errors                                                                                          |
+| `npm run lint`     | 0 errors, 2 pre-existing warnings (`(app)/layout.tsx` unused `db`, `privacy-actions.tsx` unused `router`) |
+| `npm run build`    | Compiles clean (Next 16.2.10, webpack), 0 errors                                                          |
+| Working tree       | clean at `bb11a60`                                                                                        |
 
 ### Test baseline — 25/25 suites pass (exit 0)
 
 Run individually via `npx tsx tests/<file>` against the real `.env` DB.
 
-| Suite | Result | Suite | Result |
-|---|---|---|---|
-| admin-authz | 15 passed, 1 skipped | notifications-web-surface | 15 |
-| age-consent | 16 | otp-policy | 29 |
-| auth-cleanup | 9 | phone-countries | 22 |
-| auth-form-stack | 42 | phone-login | 15 |
-| auth-hardening | 25 | phone-release | 15 |
-| auth-url | 13 | phone-sync | 14 |
-| billing-ui | 51 | phone-verification | 14 |
-| billing | 69 (4 route-401 checks skip without dev server) | photo-pipeline | 5 (route E2E section env-gated) |
-| email-attach | 13 | risk-scam-engines | 28 |
-| identity-event | 4 | safety-email | 15 |
-| identity-invariants | 8 | safety-ops | 28 |
-| login-routes | 9 | trust-safety | 44 |
-| notifications | 30 | **Total** | **≈549 checks** |
+| Suite               | Result                                          | Suite                     | Result                          |
+| ------------------- | ----------------------------------------------- | ------------------------- | ------------------------------- |
+| admin-authz         | 15 passed, 1 skipped                            | notifications-web-surface | 15                              |
+| age-consent         | 16                                              | otp-policy                | 29                              |
+| auth-cleanup        | 9                                               | phone-countries           | 22                              |
+| auth-form-stack     | 42                                              | phone-login               | 15                              |
+| auth-hardening      | 25                                              | phone-release             | 15                              |
+| auth-url            | 13                                              | phone-sync                | 14                              |
+| billing-ui          | 51                                              | phone-verification        | 14                              |
+| billing             | 69 (4 route-401 checks skip without dev server) | photo-pipeline            | 5 (route E2E section env-gated) |
+| email-attach        | 13                                              | risk-scam-engines         | 28                              |
+| identity-event      | 4                                               | safety-email              | 15                              |
+| identity-invariants | 8                                               | safety-ops                | 28                              |
+| login-routes        | 9                                               | trust-safety              | 44                              |
+| notifications       | 30                                              | **Total**                 | **≈549 checks**                 |
 
 ### Bundle composition (client)
 
@@ -52,20 +52,20 @@ Run individually via `npx tsx tests/<file>` against the real `.env` DB.
 
 ### API routes — 90 `route.ts` under `src/app/api/**`
 
-| Group | Routes | Guard |
-|---|---|---|
-| auth (OTP send/verify: email, phone, phone-login, email-attach; consent, age-confirm, identity-event) | 11 | public OTP entries behind fail-closed limits; rest `requireSession` |
-| account (delete, export, status) | 3 | `requireSession` (status: `allowRestricted`) |
-| billing (checkout, checkout-status, portal, resume, retry-payment, change-plan +preview +status) | 8 | `requireSession` |
-| swipes / discover / matches / first-messages / explore / me | 10 | `requireSession` |
-| conversations / messages / presence | 4 | `requireSession` |
-| profile / onboarding / photos / media / verification | 10 | `requireSession` |
-| blocks / reports / appeals | 6 | `requireSession` (appeals: `allowRestricted`) |
-| push (status, subscribe, unsubscribe, test) + analytics | 5 | `requireSession` |
-| admin/** | ~26 | `requirePermission(<perm>)`; `admin/bootstrap` header-secret |
-| cron (auth-cleanup, notifications) | 2 | `Authorization: Bearer ${CRON_SECRET}` |
-| webhooks (stripe, email/Svix, supabase-auth, verification) | 4 | signature over raw body |
-| health, version-adjacent | 1 | public |
+| Group                                                                                                 | Routes | Guard                                                               |
+| ----------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------- |
+| auth (OTP send/verify: email, phone, phone-login, email-attach; consent, age-confirm, identity-event) | 11     | public OTP entries behind fail-closed limits; rest `requireSession` |
+| account (delete, export, status)                                                                      | 3      | `requireSession` (status: `allowRestricted`)                        |
+| billing (checkout, checkout-status, portal, resume, retry-payment, change-plan +preview +status)      | 8      | `requireSession`                                                    |
+| swipes / discover / matches / first-messages / explore / me                                           | 10     | `requireSession`                                                    |
+| conversations / messages / presence                                                                   | 4      | `requireSession`                                                    |
+| profile / onboarding / photos / media / verification                                                  | 10     | `requireSession`                                                    |
+| blocks / reports / appeals                                                                            | 6      | `requireSession` (appeals: `allowRestricted`)                       |
+| push (status, subscribe, unsubscribe, test) + analytics                                               | 5      | `requireSession`                                                    |
+| admin/**                                                                                              | ~26    | `requirePermission(<perm>)`; `admin/bootstrap` header-secret        |
+| cron (auth-cleanup, notifications)                                                                    | 2      | `Authorization: Bearer ${CRON_SECRET}`                              |
+| webhooks (stripe, email/Svix, supabase-auth, verification)                                            | 4      | signature over raw body                                             |
+| health, version-adjacent                                                                              | 1      | public                                                              |
 
 Response envelope: `{data}` / `{error:{code,message,fields?}}` via
 `src/lib/api.ts` helpers everywhere EXCEPT auth OTP send/verify routes
@@ -121,7 +121,7 @@ and cron (`{error:{code}}` partial). No versioning (`/api/*`).
   (push display + click routing only, NO fetch handler).
 - Schema: `PushSubscription` (endpoint+p256dh+auth — Web Push shape),
   `NotificationDelivery.idempotencyKey`, `UserSettings.inAppSounds/
-  inAppVibrations` (native-only columns, already accepted by
+inAppVibrations` (native-only columns, already accepted by
   `settingsPatchSchema`). Native plan documented in
   `docs/NOTIFICATIONS-NATIVE.md`.
 
@@ -191,7 +191,7 @@ Rollback conventions for every WS: single-commit revert restores prior behaviour
 
 **No mobile-specific code is required for Phase 0.** Every workstream is
 server/web-repo work: no Capacitor/Expo/React Native packages, no `ios/`
-or `android/` directories, no mobile UI. The only mobile-*adjacent*
+or `android/` directories, no mobile UI. The only mobile-_adjacent_
 artifacts are additive schema/validator shapes for future native push
 tokens (WS4), which are plain Postgres columns and zod unions.
 
