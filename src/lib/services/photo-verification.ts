@@ -59,16 +59,39 @@ export class VerificationWebhookError extends Error {
   }
 }
 
+/** Read-only session detail for presentation + session reuse (UX task
+ *  2026-07-14). providerStatus is the provider's RAW status vocabulary
+ *  (e.g. Stripe "requires_input" vs "processing" - both map to our
+ *  "pending"), url is the still-active hosted flow link when one exists.
+ *  Purely descriptive: never applies outcomes, never mutates anything. */
+export type VerificationSessionDetail = {
+  status: VerificationSessionStatus;
+  providerStatus: string | null;
+  url: string | null;
+};
+
 export interface PhotoVerificationProvider {
   /** Persisted into User.photoVerificationProvider / Verification.provider. */
   readonly name: string;
   createSession(userId: string): Promise<VerificationStart>;
   getStatus(sessionId: string): Promise<VerificationSessionStatus>;
+  /** Optional read-only describe (status + raw sub-state + hosted URL).
+   *  Providers without it fall back to getStatus with no URL/sub-state. */
+  describeSession?(sessionId: string): Promise<VerificationSessionDetail>;
   /** Verify + parse one webhook delivery. Throws VerificationWebhookError. */
   handleWebhook(input: VerificationWebhookInput): Promise<VerificationWebhookEvent>;
   /** Back-compat aliases (existing route). */
   start(userId: string): Promise<VerificationStart>;
   status(sessionId: string): Promise<VerificationSessionStatus>;
+}
+
+/** describeSession when available, else getStatus wrapped with no detail. */
+export async function describeProviderSession(
+  provider: PhotoVerificationProvider,
+  sessionId: string,
+): Promise<VerificationSessionDetail> {
+  if (provider.describeSession) return provider.describeSession(sessionId);
+  return { status: await provider.getStatus(sessionId), providerStatus: null, url: null };
 }
 
 /** Typed error: verification requested while no provider is wired up. */
@@ -86,6 +109,7 @@ function makeProvider(
   impl: {
     createSession(userId: string): Promise<VerificationStart>;
     getStatus(sessionId: string): Promise<VerificationSessionStatus>;
+    describeSession?(sessionId: string): Promise<VerificationSessionDetail>;
     handleWebhook(input: VerificationWebhookInput): Promise<VerificationWebhookEvent>;
   },
 ): PhotoVerificationProvider {
@@ -93,6 +117,7 @@ function makeProvider(
     name,
     createSession: impl.createSession,
     getStatus: impl.getStatus,
+    describeSession: impl.describeSession,
     handleWebhook: impl.handleWebhook,
     start: impl.createSession,
     status: impl.getStatus,
@@ -246,6 +271,25 @@ const stripeIdentityProvider: PhotoVerificationProvider = makeProvider("stripe_i
     );
     return mapStripeIdentityStatus(session);
   },
+  async describeSession(sessionId: string): Promise<VerificationSessionDetail> {
+    if (!stripeIdentityConfigured()) {
+      throw new VerificationNotConfiguredError(
+        "Stripe Identity requires STRIPE_SECRET_KEY and STRIPE_IDENTITY_WEBHOOK_SECRET.",
+      );
+    }
+    // Same read the dashboard uses: while the session is requires_input the
+    // hosted `url` stays live and can be REOPENED - reusing it is how we
+    // avoid minting duplicate VerificationSessions for one user.
+    const session = await stripeIdentityRequest(
+      "GET",
+      `/identity/verification_sessions/${encodeURIComponent(sessionId)}`,
+    );
+    return {
+      status: mapStripeIdentityStatus(session),
+      providerStatus: typeof session.status === "string" ? session.status : null,
+      url: typeof session.url === "string" && session.url ? session.url : null,
+    };
+  },
   async handleWebhook(input: VerificationWebhookInput): Promise<VerificationWebhookEvent> {
     const secret = process.env.STRIPE_IDENTITY_WEBHOOK_SECRET?.trim();
     if (!secret) {
@@ -344,6 +388,18 @@ export const mockVerificationProvider: PhotoVerificationProvider = makeProvider(
   },
   async getStatus(sessionId: string): Promise<VerificationSessionStatus> {
     return mockSessionStatus.get(sessionId) ?? "pending";
+  },
+  async describeSession(sessionId: string): Promise<VerificationSessionDetail> {
+    const status = mockSessionStatus.get(sessionId) ?? "pending";
+    // Mock mirrors Stripe's open-session sub-state (requires_input) so the
+    // reuse path and the "Complete your verification" presentation are
+    // exercised in dev/tests. No URL: mock has no hosted page, and a fake
+    // link would send dev browsers to a dead domain.
+    return {
+      status,
+      providerStatus: status === "pending" ? "requires_input" : status,
+      url: null,
+    };
   },
   async handleWebhook(input: VerificationWebhookInput): Promise<VerificationWebhookEvent> {
     const secret = process.env.VERIFICATION_WEBHOOK_SECRET?.trim();
@@ -556,11 +612,16 @@ export async function maybeReconcilePhotoVerification(
   }
 }
 
-export async function syncPhotoVerificationState(
-  userId: string,
-): Promise<{ state: VerificationUxState; configured: boolean }> {
+export async function syncPhotoVerificationState(userId: string): Promise<{
+  state: VerificationUxState;
+  configured: boolean;
+  /** Open-session detail (raw provider sub-state + reopenable hosted URL)
+   *  when the state is an in-flight session - presentation only. */
+  session: { providerStatus: string | null; url: string | null } | null;
+}> {
   const provider = getPhotoVerificationProvider();
   const configured = provider !== notConfiguredProvider;
+  let session: { providerStatus: string | null; url: string | null } | null = null;
 
   const read = () =>
     db.user.findUnique({
@@ -587,7 +648,13 @@ export async function syncPhotoVerificationState(
     row.provider === provider.name
   ) {
     try {
-      const outcome = await provider.getStatus(row.providerSessionId);
+      const detail = await describeProviderSession(provider, row.providerSessionId);
+      const outcome = detail.status;
+      if (outcome === "pending") {
+        // Still open at the provider - surface the sub-state + reopenable
+        // URL so the UI can say "finish it" vs "we're checking" honestly.
+        session = { providerStatus: detail.providerStatus, url: detail.url };
+      }
       if (outcome !== "pending") {
         const result = await applyVerificationOutcome(
           provider.name,
@@ -636,7 +703,8 @@ export async function syncPhotoVerificationState(
         }
       : null,
   });
-  return { state, configured };
+  // Detail only makes sense while the state is still an open session.
+  return { state, configured, session: state === "pending" ? session : null };
 }
 
 /**

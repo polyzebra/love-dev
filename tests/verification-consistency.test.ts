@@ -51,14 +51,16 @@ check("NOT_VERIFIED: Verify on profile, Start in settings", () => {
   assert.equal(profile.state, settings.state, "same visual state");
 });
 
-check("IN PROGRESS (pending + session_created): no Verify CTA anywhere", () => {
+check("SESSION OPEN (pending + session_created): no Verify CTA anywhere", () => {
   for (const state of ["pending", "verification_started"] as const) {
     const profile = photoVerificationRow(state, { ...cfg, surface: "profile" });
     const settings = photoVerificationRow(state, { ...cfg, surface: "settings" });
     assert.equal(profile.state, "pending", state);
-    assert.equal(profile.value, "In progress");
-    assert.equal(profile.action, null, "profile row has NO CTA while in progress");
-    assert.equal(settings.value, "In progress");
+    // Rows can't know the provider sub-state (finish-it vs checking), so
+    // they say "Session open" - true for both - and never "In progress".
+    assert.equal(profile.value, "Session open");
+    assert.equal(profile.action, null, "profile row has NO start CTA while a session is open");
+    assert.equal(settings.value, "Session open");
     assert.deepEqual(settings.action, {
       label: "View status",
       href: "/profile#photo-verification",
@@ -155,7 +157,7 @@ check("no surface derives verification state on its own any more", () => {
   assert.ok(settings.includes("deriveVerificationUxState"), "settings reads the canonical state");
   assert.ok(settings.includes("photoVerificationRow(photoUx"), "settings uses the mapper");
   const card = src("components", "profile", "photo-verify-card.tsx");
-  assert.ok(card.includes('title="Under review"'), "card copy aligned");
+  assert.ok(card.includes('title="Verification under review"'), "card copy aligned");
 });
 
 check("UNCONFIGURED: one compact Coming soon row, NO card, NO second message", () => {
@@ -186,7 +188,8 @@ check("CONFIGURED + not_verified: Verify row AND the full card render", () => {
   const page = code("app", "(app)", "profile", "page.tsx");
   // The card's only render gates are verified-ness and configured-ness -
   // every in-flight/retry state keeps the card (its state-specific body).
-  assert.ok(page.includes("<PhotoVerifyCard state={verificationUx} />"));
+  assert.ok(page.includes("<PhotoVerifyCard"), "card rendered");
+  assert.ok(page.includes("state={verificationUx}"), "card driven by the canonical state");
   assert.ok(
     !/PhotoVerifyCard[^/]*configured=/.test(page),
     "page passes no configured prop - the gate is the render condition",

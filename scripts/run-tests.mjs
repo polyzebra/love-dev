@@ -33,6 +33,7 @@ const LIVE = new Set([
   "photo-verification.test.ts",
   "verification-hardening.test.ts",
   "verification-e2e-guards.test.ts",
+  "verification-continue.test.ts",
 ]);
 
 const UNIT = new Set([

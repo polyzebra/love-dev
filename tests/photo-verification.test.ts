@@ -33,6 +33,25 @@ function skip(name: string, why: string) {
 }
 const src = (...parts: string[]) => readFileSync(path.join(process.cwd(), "src", ...parts), "utf8");
 
+/** The dev server resolves .env the Next.js way (LAST duplicate wins,
+ *  unlike tsx/dotenv's first-wins) - so the server may run the LIVE
+ *  stripe_identity provider while this process thinks "mock". HTTP
+ *  verification checks must then SKIP: signed mock webhooks would 401,
+ *  and start calls would create real, billable VerificationSessions. */
+function devServerRunsMock(base: string): boolean {
+  if (!/localhost|127\.0\.0\.1/.test(base)) return false;
+  // Explicit opt-in for a purpose-launched mock server (process env beats
+  // .env in Next, so the .env heuristic below can't see it).
+  if (process.env.TEST_ASSUME_MOCK === "1") return true;
+  try {
+    const env = readFileSync(path.join(process.cwd(), ".env"), "utf8");
+    const matches = [...env.matchAll(/^VERIFICATION_PROVIDER\s*=\s*"?([^"\n]*)"?/gm)];
+    return matches.length > 0 && matches[matches.length - 1][1].trim() === "mock";
+  } catch {
+    return false;
+  }
+}
+
 /** Stripe-Signature header exactly as Stripe builds it. */
 function stripeSig(rawBody: string, secret: string, at = new Date()): string {
   const t = Math.floor(at.getTime() / 1000);
@@ -314,6 +333,12 @@ async function main() {
     reachable && (await fetch(`${BASE}/api/verification/photo/status`)).status === 401;
   if (!reachable) {
     skip("HTTP loop", "dev server not running");
+    await db.$disconnect();
+    console.log(`\n${passed} checks passed`);
+    return;
+  }
+  if (!devServerRunsMock(BASE)) {
+    skip("HTTP loop", "dev server provider is not mock - refusing to create real sessions");
     await db.$disconnect();
     console.log(`\n${passed} checks passed`);
     return;

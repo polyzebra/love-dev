@@ -13,6 +13,9 @@ export async function GET() {
   const { user, response } = await requireSession();
   if (response) return response;
 
-  const { state, configured } = await syncPhotoVerificationState(user.id);
-  return ok({ state, configured });
+  const { state, configured, session } = await syncPhotoVerificationState(user.id);
+  // session (raw provider sub-state + reopenable hosted URL) lets the UI
+  // distinguish "finish your verification" from "we're checking" and
+  // reopen the SAME hosted session instead of minting a duplicate.
+  return ok({ state, configured, session });
 }

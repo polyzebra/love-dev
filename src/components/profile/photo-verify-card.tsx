@@ -47,11 +47,47 @@ const HOW_IT_WORKS = [
  */
 export const PHOTO_VERIFICATION_ANCHOR = "photo-verification";
 
-export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
+export function PhotoVerifyCard({
+  state,
+  workflowStatus = null,
+}: {
+  state: VerificationUxState;
+  /** Raw Verification.status - WORDING only (expired vs rejected retry
+   *  copy). Never used to derive behavior; `state` stays canonical. */
+  workflowStatus?: "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED" | "EXPIRED" | null;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [step, setStep] = useState<"closed" | "explainer" | "consent">("closed");
   const anchorRef = useRef<HTMLDivElement>(null);
+  // Live sub-state of an OPEN session (Stripe: requires_input = the user
+  // still has to finish; processing = Stripe is checking). Fetched once on
+  // mount from the existing status endpoint - both sub-states are one
+  // canonical "pending"; this only picks honest wording + the reopenable
+  // hosted URL. null until (or unless) the fetch resolves.
+  const [openSession, setOpenSession] = useState<{
+    providerStatus: string | null;
+    url: string | null;
+  } | null>(null);
+  useEffect(() => {
+    if (state !== "pending") return;
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/verification/photo/status");
+        if (!res.ok) return;
+        const body = (await res.json()) as {
+          data?: { session?: { providerStatus: string | null; url: string | null } | null };
+        };
+        if (alive && body.data?.session) setOpenSession(body.data.session);
+      } catch {
+        // Wording falls back to the resume variant; no error surface needed.
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [state]);
 
   // Deep links (#photo-verification from Settings or the profile trust
   // row) land ON the card: scroll it into view and move focus to the
@@ -92,13 +128,21 @@ export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
           toast.error("Couldn't start verification. Please try again later.");
           return;
         }
-        const body = (await res.json()) as { data?: { url?: string | null } };
+        const body = (await res.json()) as {
+          data?: { url?: string | null; reused?: boolean };
+        };
         if (body.data?.url) {
+          // Reused sessions return the SAME still-active hosted URL, so
+          // continuing never mints a duplicate verification session.
           window.location.assign(body.data.url);
           return;
         }
         setStep("closed");
-        toast.success("Verification started. We'll update your badge once it completes.");
+        toast.success(
+          body.data?.reused
+            ? "Your verification session is still open. We'll update your badge once it completes."
+            : "Verification started. We'll update your badge once it completes.",
+        );
         router.refresh();
       } catch {
         toast.error("Network error. Check your connection and try again.");
@@ -132,15 +176,74 @@ export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
 
   // ------------------------------------------------------------------ states
   if (state === "pending" || state === "verification_started") {
+    // Honest sub-state wording: "processing" means the provider already
+    // has the document/selfie and is checking it; anything else means the
+    // session is open and WAITING FOR THE USER (Stripe requires_input, or
+    // sub-state unknown - resuming is always safe because the start
+    // endpoint reuses the open session instead of creating a duplicate).
+    const processing = openSession?.providerStatus === "processing";
+    if (processing) {
+      return wrap(
+        <StateCard
+          icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
+          title="Verification in progress"
+          body="We're checking your identity. This usually takes only a few minutes."
+        >
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full px-5"
+              disabled={pending}
+              onClick={checkStatus}
+            >
+              <RefreshCw className="size-4" aria-hidden="true" /> Check status
+            </Button>
+          </div>
+        </StateCard>,
+      );
+    }
     return wrap(
       <StateCard
-        icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
-        title="Verification in progress"
-        body={
-          state === "pending"
-            ? "We're waiting for the result from our verification partner. We'll update your badge the moment it lands."
-            : "Your verification session is open. Finish the selfie step to complete it - or check back here for the result."
-        }
+        icon={<Camera className="text-gold size-5" aria-hidden="true" />}
+        title="Complete your verification"
+        body="Your verification session is ready. Continue with Stripe to verify your identity."
+      >
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            className="rounded-full px-5"
+            disabled={pending}
+            onClick={() => {
+              // Reopen the SAME hosted session when its URL is already in
+              // hand; otherwise the start endpoint resolves it (reusing
+              // the open session, never creating a duplicate).
+              if (openSession?.url) window.location.assign(openSession.url);
+              else start();
+            }}
+          >
+            Continue verification
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="rounded-full px-5"
+            disabled={pending}
+            onClick={checkStatus}
+          >
+            <RefreshCw className="size-4" aria-hidden="true" /> Check status
+          </Button>
+        </div>
+      </StateCard>,
+    );
+  }
+
+  if (state === "manual_review") {
+    return wrap(
+      <StateCard
+        icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
+        title="Verification under review"
+        body="A member of our team is reviewing your verification. Nothing else is needed from you."
       >
         <div className="mt-4 flex flex-wrap gap-2">
           <Button
@@ -152,29 +255,8 @@ export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
           >
             <RefreshCw className="size-4" aria-hidden="true" /> Check status
           </Button>
-          {state === "verification_started" && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="rounded-full px-5"
-              disabled={pending}
-              onClick={start}
-            >
-              Resume verification
-            </Button>
-          )}
         </div>
       </StateCard>,
-    );
-  }
-
-  if (state === "manual_review") {
-    return wrap(
-      <StateCard
-        icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
-        title="Under review"
-        body="Your verification needs a quick manual review by our team. Nothing else is needed from you - we'll email you the result."
-      />,
     );
   }
 
@@ -188,8 +270,11 @@ export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
     );
   }
 
-  // not_verified / retry_available - the invitation card.
+  // not_verified / retry_available - the invitation card. Retry wording
+  // distinguishes an EXPIRED session ("nothing went wrong, it just lapsed")
+  // from a rejected attempt - same canonical state, honest copy.
   const retry = state === "retry_available";
+  const expired = retry && workflowStatus === "EXPIRED";
   return wrap(
     <section className="glass rounded-3xl p-5">
       <div className="flex items-start gap-3.5">
@@ -198,12 +283,17 @@ export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-display text-lg font-medium tracking-tight">
-            {retry ? "Try photo verification again" : "Get photo verified"}
+            {expired
+              ? "Verification expired"
+              : retry
+                ? "Try photo verification again"
+                : "Get photo verified"}
           </p>
           {retry && (
             <p className="text-muted-foreground mt-1 text-sm">
-              Your last attempt didn&apos;t go through - that happens. You can start a fresh one any
-              time.
+              {expired
+                ? "Your previous verification session expired before it was completed. Start again whenever you're ready."
+                : "Your last attempt didn't go through - that happens. You can start a fresh one any time."}
             </p>
           )}
           <ul className="mt-2 space-y-1.5">
@@ -220,7 +310,7 @@ export function PhotoVerifyCard({ state }: { state: VerificationUxState }) {
             disabled={pending}
             onClick={() => setStep("explainer")}
           >
-            {retry ? "Try again" : "Start verification"}
+            {expired ? "Start again" : retry ? "Try again" : "Start verification"}
           </Button>
         </div>
       </div>

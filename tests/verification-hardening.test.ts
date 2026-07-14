@@ -33,6 +33,26 @@ function skip(name: string, why: string) {
   console.log(`  skip - ${name} (${why})`);
 }
 const src = (...parts: string[]) => readFileSync(path.join(process.cwd(), "src", ...parts), "utf8");
+
+/** The dev server resolves .env the Next.js way (LAST duplicate wins,
+ *  unlike tsx/dotenv's first-wins) - so the server may run the LIVE
+ *  stripe_identity provider while this process thinks "mock". HTTP
+ *  verification checks must then SKIP: signed mock webhooks would 401,
+ *  and start calls would create real, billable VerificationSessions. */
+function devServerRunsMock(base: string): boolean {
+  if (!/localhost|127\.0\.0\.1/.test(base)) return false;
+  // Explicit opt-in for a purpose-launched mock server (process env beats
+  // .env in Next, so the .env heuristic below can't see it).
+  if (process.env.TEST_ASSUME_MOCK === "1") return true;
+  try {
+    const env = readFileSync(path.join(process.cwd(), ".env"), "utf8");
+    const matches = [...env.matchAll(/^VERIFICATION_PROVIDER\s*=\s*"?([^"\n]*)"?/gm)];
+    return matches.length > 0 && matches[matches.length - 1][1].trim() === "mock";
+  } catch {
+    return false;
+  }
+}
+
 /** Comment-stripped source - negative pins must not trip on prose. */
 const code = (...parts: string[]) =>
   src(...parts)
@@ -232,8 +252,15 @@ async function main() {
       () => false,
     );
     const mockSecret = process.env.VERIFICATION_WEBHOOK_SECRET?.trim();
-    if (!reachable || !mockSecret) {
-      skip("webhook interplay", !reachable ? "dev server not running" : "mock secret unset");
+    if (!reachable || !mockSecret || !devServerRunsMock(BASE)) {
+      skip(
+        "webhook interplay",
+        !reachable
+          ? "dev server not running"
+          : !mockSecret
+            ? "mock secret unset"
+            : "dev server provider is not mock",
+      );
     } else {
       const carol = await mkUser("carol", `4${RUN.slice(-4)}`);
       const sessionId = `mock_recon_${RUN}_d`;

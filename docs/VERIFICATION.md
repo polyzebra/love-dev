@@ -58,6 +58,19 @@ default); `--confirm` deletes. Refuses anything but obvious test
 identities (@example.com, @test.tirvea.app, test-/e2e-/qa- prefixes,
 +test aliases).
 
+## Session reuse (2026-07-14)
+
+`POST /api/verification/photo/start` RESUMES before it creates: an open
+session at the provider (Stripe `requires_input`/`processing`) returns
+the SAME session id and its still-active hosted URL (`reused: true`) -
+one user never accumulates duplicate VerificationSessions. A new session
+is created only when none exists or the previous one is terminal
+(canceled / expired / rejected). The status endpoint exposes the raw
+provider sub-state + reopenable URL (`session: {providerStatus, url}`)
+so the card can say "Complete your verification / Continue verification"
+(requires_input) vs "Verification in progress / Check status"
+(processing) honestly - both remain ONE canonical "pending" state.
+
 ## UX
 
 One flow: `PhotoVerifyCard` on `/profile`, anchored at

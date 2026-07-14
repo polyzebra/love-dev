@@ -50,10 +50,14 @@ export function photoVerificationRow(
       return { label: "Photo verified", state: "verified", value: "Verified", action: null };
     case "pending":
     case "verification_started":
+      // "Session open" is true for BOTH provider sub-states (user still
+      // finishing vs provider checking) - the rows can't know which from
+      // stored state alone, so they never claim "in progress"; the card
+      // (which asks the provider live) carries the precise wording.
       return {
         label: "Photo verification",
         state: "pending",
-        value: "In progress",
+        value: "Session open",
         action: opts.surface === "settings" ? { label: "View status", href: anchor } : null,
       };
     case "manual_review":

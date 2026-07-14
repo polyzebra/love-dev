@@ -137,7 +137,10 @@ export default async function ProfilePage() {
             biometrics are ever stored. */}
         {!verification.photoVerified && verificationConfigured && (
           <Reveal>
-            <PhotoVerifyCard state={verificationUx} />
+            <PhotoVerifyCard
+              state={verificationUx}
+              workflowStatus={photoWorkflow?.status ?? null}
+            />
           </Reveal>
         )}
       </PhotoManager>

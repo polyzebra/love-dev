@@ -118,9 +118,9 @@ export function VerificationNotifier({
         <Hourglass className="text-gold size-4" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">Photo verification in progress</p>
+        <p className="text-sm font-medium">Photo verification started</p>
         <p className="text-muted-foreground mt-0.5 text-sm">
-          We&apos;ll update your verified badge automatically once the result arrives.{" "}
+          We&apos;ll update your verified badge automatically once it completes.{" "}
           <Link
             href="/profile#photo-verification"
             className="text-primary-soft font-medium underline-offset-2 hover:underline"
