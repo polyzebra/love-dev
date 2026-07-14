@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -44,6 +44,8 @@ const HOW_IT_WORKS = [
  * state when no provider env exists. Selfie capture happens on the
  * provider's side only; Tirvea never stores biometric data.
  */
+export const PHOTO_VERIFICATION_ANCHOR = "photo-verification";
+
 export function PhotoVerifyCard({
   state,
   configured,
@@ -54,6 +56,31 @@ export function PhotoVerifyCard({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [step, setStep] = useState<"closed" | "explainer" | "consent">("closed");
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  // Deep links (#photo-verification from Settings or the profile trust
+  // row) land ON the card: scroll it into view and move focus to the
+  // wrapper (tabIndex -1) so screen readers announce it. Effect-on-mount
+  // against a ref - no timeouts, no brittleness; normal back behavior is
+  // untouched (we never write history).
+  useEffect(() => {
+    if (window.location.hash === `#${PHOTO_VERIFICATION_ANCHOR}` && anchorRef.current) {
+      anchorRef.current.scrollIntoView({ block: "start" });
+      anchorRef.current.focus({ preventScroll: true });
+    }
+  }, []);
+
+  const wrap = (content: React.ReactNode) => (
+    <div
+      id={PHOTO_VERIFICATION_ANCHOR}
+      ref={anchorRef}
+      tabIndex={-1}
+      aria-label="Photo verification"
+      className="scroll-mt-24 outline-none"
+    >
+      {content}
+    </div>
+  );
 
   function start() {
     startTransition(async () => {
@@ -110,7 +137,7 @@ export function PhotoVerifyCard({
 
   // ------------------------------------------------------------------ states
   if (state === "pending" || state === "verification_started") {
-    return (
+    return wrap(
       <StateCard
         icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
         title="Verification in progress"
@@ -142,33 +169,33 @@ export function PhotoVerifyCard({
             </Button>
           )}
         </div>
-      </StateCard>
+      </StateCard>,
     );
   }
 
   if (state === "manual_review") {
-    return (
+    return wrap(
       <StateCard
         icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
         title="A person is taking a look"
         body="Your verification needs a quick manual review by our team. Nothing else is needed from you - we'll email you the result."
-      />
+      />,
     );
   }
 
   if (state === "failed") {
-    return (
+    return wrap(
       <StateCard
         icon={<XCircle className="text-muted-foreground size-5" aria-hidden="true" />}
         title="Verification couldn't be completed"
         body="This attempt was final and can't be retried. Your profile stays fully usable - photo verification just won't show a badge."
-      />
+      />,
     );
   }
 
   // not_verified / retry_available - the invitation card.
   const retry = state === "retry_available";
-  return (
+  return wrap(
     <section className="glass rounded-3xl p-5">
       <div className="flex items-start gap-3.5">
         <span className="glass-chip flex size-11 shrink-0 items-center justify-center rounded-full">
@@ -276,7 +303,7 @@ export function PhotoVerifyCard({
           )}
         </DialogContent>
       </Dialog>
-    </section>
+    </section>,
   );
 }
 

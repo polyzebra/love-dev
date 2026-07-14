@@ -26,6 +26,7 @@ import { calculateAge, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PhotoManager } from "@/components/profile/photo-manager";
 import { PhotoVerifyCard } from "@/components/profile/photo-verify-card";
+import { VerificationStatusRow } from "@/components/shared/verification-status-row";
 import { Reveal, RevealGroup, RevealItem } from "@/components/fx/reveal";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -96,29 +97,21 @@ export default async function ProfilePage() {
         <RevealGroup className="grid gap-2.5 sm:grid-cols-3">
           {(
             [
-              ["email", "Email verified", verification.emailVerified],
-              ["phone", "Phone verified", verification.phoneVerified],
-              ["photo", "Photo verified", verification.photoVerified],
+              // The photo action anchors to the REAL flow card further down
+              // THIS page (never the circular Settings hop); email/phone
+              // verification genuinely lives in the account settings hub.
+              ["email", "Email verified", verification.emailVerified, "/settings/account"],
+              ["phone", "Phone verified", verification.phoneVerified, "/settings/account"],
+              ["photo", "Photo verified", verification.photoVerified, "#photo-verification"],
             ] as const
-          ).map(([type, label, done]) => {
+          ).map(([type, label, done, href]) => {
             return (
               <RevealItem key={type}>
-                <div className="glass flex items-center gap-2.5 rounded-3xl px-4 py-3.5 text-sm">
-                  {done ? (
-                    <BadgeCheck className="text-success size-5 shrink-0" aria-hidden="true" />
-                  ) : (
-                    <CircleDashed
-                      className="text-muted-foreground/40 size-5 shrink-0"
-                      aria-hidden="true"
-                    />
-                  )}
-                  <span className={done ? "" : "text-muted-foreground"}>{label}</span>
-                  {!done && (
-                    <Button variant="link" size="sm" className="ml-auto h-auto p-0" asChild>
-                      <Link href="/settings/account">Verify</Link>
-                    </Button>
-                  )}
-                </div>
+                <VerificationStatusRow
+                  label={label}
+                  state={done ? "verified" : "todo"}
+                  action={done ? null : { label: "Verify", href }}
+                />
               </RevealItem>
             );
           })}

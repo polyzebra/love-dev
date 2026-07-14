@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, MapPin, Sparkles } from "lucide-react";
+import { MapPin, Sparkles } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -10,6 +10,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { VerifiedBadge } from "@/components/shared/verified-badge";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { initialsOf } from "@/lib/utils";
 
@@ -55,10 +56,7 @@ export function ProfilePeek({
             {profile.displayName}
             {profile.age ? `, ${profile.age}` : ""}
             {profile.isVerified && (
-              <BadgeCheck
-                className="text-popover size-5 fill-sky-400"
-                aria-label="Photo verified"
-              />
+              <VerifiedBadge className="text-[18px]" iconClassName="text-popover fill-sky-400" />
             )}
           </DrawerTitle>
           {profile.city && (

@@ -1,5 +1,7 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
+import { siteUrl } from "@/lib/auth/url";
+import { verifyStripeSignature } from "@/lib/webhook-signatures";
 
 /**
  * Photo verification - provider abstraction.
@@ -113,31 +115,165 @@ export const notConfiguredProvider: PhotoVerificationProvider = makeProvider("no
   },
 });
 
+// ---------------------------------------------------------------------------
+// Stripe Identity - LIVE adapter. Fetch-based like lib/stripe.ts (the
+// project deliberately carries no Stripe SDK); the transport is
+// injectable so tests never touch the network. Signature verification
+// reuses the shared Stripe scheme (webhook-signatures.ts) with a
+// DEDICATED secret - never the billing webhook secret.
+// ---------------------------------------------------------------------------
+
+/** The slice of a Stripe Identity VerificationSession this adapter reads. */
+export type StripeIdentitySession = {
+  id: string;
+  status: "requires_input" | "processing" | "verified" | "canceled";
+  url?: string | null;
+  last_error?: { code?: string | null } | null;
+};
+
+export type StripeIdentityTransport = (
+  method: "GET" | "POST",
+  path: string,
+  params?: Record<string, string>,
+) => Promise<StripeIdentitySession>;
+
+let stripeIdentityTransportOverride: StripeIdentityTransport | null = null;
+
+/** Test seam: inject a fake Stripe Identity transport (null restores). */
+export function setStripeIdentityTransport(transport: StripeIdentityTransport | null): void {
+  stripeIdentityTransportOverride = transport;
+}
+
+function stripeIdentityConfigured(): boolean {
+  return Boolean(
+    process.env.STRIPE_SECRET_KEY?.trim() && process.env.STRIPE_IDENTITY_WEBHOOK_SECRET?.trim(),
+  );
+}
+
+async function stripeIdentityRequest(
+  method: "GET" | "POST",
+  path: string,
+  params?: Record<string, string>,
+): Promise<StripeIdentitySession> {
+  if (stripeIdentityTransportOverride) {
+    return stripeIdentityTransportOverride(method, path, params);
+  }
+  const key = process.env.STRIPE_SECRET_KEY?.trim();
+  if (!key) throw new VerificationNotConfiguredError("STRIPE_SECRET_KEY is not set.");
+  const body = method === "POST" && params ? new URLSearchParams(params).toString() : undefined;
+  const query = method === "GET" && params ? `?${new URLSearchParams(params)}` : "";
+  const res = await fetch(`https://api.stripe.com/v1${path}${query}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${key}`,
+      ...(body !== undefined ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+    },
+    body,
+  });
+  const json = (await res.json().catch(() => ({}))) as StripeIdentitySession & {
+    error?: { message?: string };
+  };
+  if (!res.ok) {
+    throw new Error(`Stripe Identity ${method} ${path} failed (${res.status})`);
+  }
+  return json;
+}
+
 /**
- * Stripe Identity stub adapter. When the integration lands: createSession()
- * creates a VerificationSession (type "document" + selfie check) and returns
- * its client URL; getStatus() maps session.status; handleWebhook() verifies
- * the Stripe-Signature header with STRIPE_WEBHOOK_SECRET and maps
- * identity.verification_session.* events. Until the SDK calls are written it
- * throws the typed error so nothing fake ever runs - the route turns it
- * into an honest 503.
+ * Stripe session -> Tirvea outcome vocabulary:
+ *   verified              -> approved   (canonical stamp)
+ *   processing            -> pending    (checks running - no-op)
+ *   canceled              -> expired    (retry available)
+ *   requires_input        -> rejected when last_error is present (the
+ *                            attempt failed: consent declined, document
+ *                            unreadable, selfie mismatch, ...);
+ *                            otherwise pending (the user simply has not
+ *                            finished the hosted flow - never a verdict)
  */
+export function mapStripeIdentityStatus(
+  session: Pick<StripeIdentitySession, "status" | "last_error">,
+): VerificationSessionStatus {
+  switch (session.status) {
+    case "verified":
+      return "approved";
+    case "processing":
+      return "pending";
+    case "canceled":
+      return "expired";
+    case "requires_input":
+      return session.last_error?.code ? "rejected" : "pending";
+  }
+}
+
+/** Stripe Identity event types this adapter understands. */
+const STRIPE_IDENTITY_EVENT_PREFIX = "identity.verification_session.";
+
 const stripeIdentityProvider: PhotoVerificationProvider = makeProvider("stripe_identity", {
-  async createSession(): Promise<VerificationStart> {
-    throw new VerificationNotConfiguredError(
-      "Stripe Identity is selected but the integration is not implemented yet.",
-    );
+  async createSession(userId: string): Promise<VerificationStart> {
+    if (!stripeIdentityConfigured()) {
+      throw new VerificationNotConfiguredError(
+        "Stripe Identity requires STRIPE_SECRET_KEY and STRIPE_IDENTITY_WEBHOOK_SECRET.",
+      );
+    }
+    // Document + matching-selfie check, hosted entirely by Stripe. The
+    // ONLY metadata is our internal user id (reconciliation) - never
+    // email/phone/PII. Stripe holds the images; Tirvea stores the
+    // session id and the outcome, nothing else (privacy promise).
+    const session = await stripeIdentityRequest("POST", "/identity/verification_sessions", {
+      type: "document",
+      "options[document][require_matching_selfie]": "true",
+      "options[document][require_live_capture]": "true",
+      "metadata[tirvea_user_id]": userId,
+      return_url: `${siteUrl()}/profile#photo-verification`,
+    });
+    return { sessionId: session.id, url: session.url ?? undefined };
   },
-  async getStatus(): Promise<VerificationSessionStatus> {
-    throw new VerificationNotConfiguredError(
-      "Stripe Identity is selected but the integration is not implemented yet.",
+  async getStatus(sessionId: string): Promise<VerificationSessionStatus> {
+    if (!stripeIdentityConfigured()) {
+      throw new VerificationNotConfiguredError(
+        "Stripe Identity requires STRIPE_SECRET_KEY and STRIPE_IDENTITY_WEBHOOK_SECRET.",
+      );
+    }
+    const session = await stripeIdentityRequest(
+      "GET",
+      `/identity/verification_sessions/${encodeURIComponent(sessionId)}`,
     );
+    return mapStripeIdentityStatus(session);
   },
-  async handleWebhook(): Promise<VerificationWebhookEvent> {
-    throw new VerificationWebhookError(
-      "not_configured",
-      "Stripe Identity webhooks are not implemented yet.",
-    );
+  async handleWebhook(input: VerificationWebhookInput): Promise<VerificationWebhookEvent> {
+    const secret = process.env.STRIPE_IDENTITY_WEBHOOK_SECRET?.trim();
+    if (!secret) {
+      throw new VerificationWebhookError(
+        "not_configured",
+        "STRIPE_IDENTITY_WEBHOOK_SECRET is not set - webhook rejected.",
+      );
+    }
+    if (!input.signature || !verifyStripeSignature(input.rawBody, input.signature, secret)) {
+      throw new VerificationWebhookError("bad_signature", "Stripe signature mismatch.");
+    }
+    let event: {
+      type?: unknown;
+      data?: { object?: StripeIdentitySession };
+    };
+    try {
+      event = JSON.parse(input.rawBody) as typeof event;
+    } catch {
+      throw new VerificationWebhookError("bad_payload", "Webhook body is not valid JSON.");
+    }
+    const object = event.data?.object;
+    // Unrelated event types (or identity events without a session object)
+    // are acknowledged as a no-op: "pending" short-circuits in
+    // applyVerificationOutcome before any lookup, so the route answers
+    // 200 and nothing mutates. Never an error - Stripe must not retry-loop
+    // on events we deliberately do not consume.
+    if (
+      typeof event.type !== "string" ||
+      !event.type.startsWith(STRIPE_IDENTITY_EVENT_PREFIX) ||
+      typeof object?.id !== "string"
+    ) {
+      return { sessionId: "ignored", status: "pending" };
+    }
+    return { sessionId: object.id, status: mapStripeIdentityStatus(object) };
   },
 });
 
@@ -246,7 +382,7 @@ export const mockVerificationProvider: PhotoVerificationProvider = makeProvider(
 
 export function getPhotoVerificationProvider(): PhotoVerificationProvider {
   const which = process.env.VERIFICATION_PROVIDER?.trim().toLowerCase();
-  if (which === "stripe_identity" && process.env.STRIPE_SECRET_KEY) return stripeIdentityProvider;
+  if (which === "stripe_identity" && stripeIdentityConfigured()) return stripeIdentityProvider;
   if (which === "persona" && process.env.PERSONA_API_KEY) return personaProvider;
   // Mock is dev/test tooling - never silently active in production.
   if (which === "mock" && process.env.NODE_ENV !== "production") return mockVerificationProvider;
@@ -449,6 +585,20 @@ export async function syncPhotoVerificationState(
  *  - retry_available   REJECTED/EXPIRED - the user may start again
  *  - failed            REJECTED with reviewNote "final" (provider hard-fail)
  */
+/**
+ * TECH DEBT (documented, deliberate): whether a REJECTED verification is
+ * FINAL (no retry offered) is inferred from the workflow row's reviewNote
+ * containing the marker word "final". Today nothing writes that marker
+ * automatically - only a staff member's manual review note can - so every
+ * provider rejection is retryable by default, which matches the product
+ * intent. A dedicated column/enum is the robust home for this bit; a
+ * schema change is not worth it until a second writer needs it. This
+ * helper is the ONE place the rule lives.
+ */
+export function isFinalRejection(reviewNote: string | null | undefined): boolean {
+  return Boolean(reviewNote?.includes("final"));
+}
+
 export function deriveVerificationUxState(source: {
   photoVerifiedAt: Date | null;
   verification: {
@@ -470,7 +620,7 @@ export function deriveVerificationUxState(source: {
       // rather than inventing a verdict verification.ts does not hold.
       return "pending";
     case "REJECTED":
-      return row.reviewNote?.includes("final") ? "failed" : "retry_available";
+      return isFinalRejection(row.reviewNote) ? "failed" : "retry_available";
     case "EXPIRED":
       return "retry_available";
   }

@@ -3,6 +3,11 @@ import Link from "next/link";
 import { BadgeCheck, CircleAlert, CircleDashed, Hourglass, type LucideIcon } from "lucide-react";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
+import { isPhotoVerificationConfigured } from "@/lib/services/photo-verification";
+import {
+  VerificationStatusRow,
+  type VerificationRowState,
+} from "@/components/shared/verification-status-row";
 import {
   toVerificationState,
   TRUST_WEIGHTS,
@@ -30,10 +35,11 @@ export default async function AccountSettingsPage() {
   // Canonical verification state - same accessor the profile hero,
   // admin trust panel and badges read.
   const verification = user ? toVerificationState(user) : null;
+  const photoConfigured = isPhotoVerificationConfigured();
 
   // Four visual registers, never color-only: each pairs an icon with the
   // state text (verified / pending / needs another try / not available).
-  type RowState = "verified" | "pending" | "needs-action" | "todo" | "unavailable";
+  type RowState = VerificationRowState;
   type Row = {
     label: string;
     value: string;
@@ -77,17 +83,29 @@ export default async function AccountSettingsPage() {
             ? verification?.photoStatus === "IN_REVIEW"
               ? "In review"
               : "In progress"
-            : photoState === "needs-action"
+            : photoState === "needs-action" && photoConfigured
               ? "Didn't go through - try again"
-              : "Not verified",
-      state: photoState,
-      // The verification flow card lives on the profile page.
+              : photoConfigured
+                ? "Not verified"
+                : "Coming soon",
+      state:
+        photoConfigured || photoState === "verified" || photoState === "pending"
+          ? photoState
+          : "unavailable",
+      // The one real flow lives in the profile page's PhotoVerifyCard -
+      // the action deep-links straight to its anchor (no circular hop).
+      // Unconfigured = quiet unavailable state, never a dead CTA.
       action:
         photoState === "verified"
           ? null
           : photoState === "pending"
-            ? { label: "View status", href: "/profile" }
-            : { label: photoState === "needs-action" ? "Try again" : "Start", href: "/profile" },
+            ? { label: "View status", href: "/profile#photo-verification" }
+            : photoConfigured
+              ? {
+                  label: photoState === "needs-action" ? "Try again" : "Start",
+                  href: "/profile#photo-verification",
+                }
+              : null,
     },
     {
       label: "ID verification (optional)",
@@ -98,14 +116,6 @@ export default async function AccountSettingsPage() {
       action: null,
     },
   ];
-
-  const STATE_ICON: Record<RowState, { icon: LucideIcon; className: string }> = {
-    verified: { icon: BadgeCheck, className: "text-success" },
-    pending: { icon: Hourglass, className: "text-gold" },
-    "needs-action": { icon: CircleAlert, className: "text-muted-foreground" },
-    todo: { icon: CircleDashed, className: "text-muted-foreground/50" },
-    unavailable: { icon: CircleDashed, className: "text-muted-foreground/50" },
-  };
 
   return (
     <>
@@ -167,25 +177,16 @@ export default async function AccountSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="divide-y">
-          {rows.map((row) => {
-            const { icon: Icon, className } = STATE_ICON[row.state];
-            return (
-              <div key={row.label} className="flex items-center gap-3 py-3.5 first:pt-0 last:pb-0">
-                <Icon className={`size-5 shrink-0 ${className}`} aria-hidden="true" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{row.label}</p>
-                  <p className="text-muted-foreground truncate text-sm" title={row.value}>
-                    {row.value}
-                  </p>
-                </div>
-                {row.action && (
-                  <Button variant="outline" className="h-11 shrink-0 rounded-full px-4" asChild>
-                    <Link href={row.action.href}>{row.action.label}</Link>
-                  </Button>
-                )}
-              </div>
-            );
-          })}
+          {rows.map((row) => (
+            <VerificationStatusRow
+              key={row.label}
+              variant="list"
+              label={row.label}
+              state={row.state}
+              value={row.value}
+              action={row.action}
+            />
+          ))}
         </CardContent>
       </Card>
 

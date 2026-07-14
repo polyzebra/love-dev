@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { BadgeCheck, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { VerifiedBadge } from "@/components/shared/verified-badge";
 import { OnlineDot } from "@/components/shared/online-dot";
 import { PhotoFrame } from "@/components/shared/photo-frame";
 import { initialsOf } from "@/lib/utils";
@@ -60,9 +61,9 @@ export function ExplorePersonCard({ person }: { person: PersonCardData }) {
               {person.displayName}, {person.age}
             </span>
             {person.isVerified && (
-              <BadgeCheck
-                className="size-4 shrink-0 fill-sky-400 text-black/40"
-                aria-label="Photo verified"
+              <VerifiedBadge
+                className="shrink-0 text-[14px]"
+                iconClassName="fill-sky-400 text-black/40"
               />
             )}
             <OnlineDot online={person.isOnline} className="ml-auto shrink-0" />
