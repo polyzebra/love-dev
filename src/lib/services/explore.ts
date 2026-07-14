@@ -324,7 +324,12 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
 
   const [target, me] = await Promise.all([
     db.user.findFirst({
-      where: { id: targetId, ...visibleWhere(viewerId, blockedIds) },
+      // AND-combine: visibleWhere carries its own `id` key (notIn viewer/
+      // blocked), so a naive spread CLOBBERS the target constraint and
+      // findFirst returns the first visible user in the table - the
+      // explore viewer showed the wrong profile. Caught by the fresh-user
+      // E2E (public badge assertion returned someone else's profile).
+      where: { AND: [{ id: targetId }, visibleWhere(viewerId, blockedIds)] },
       include: {
         profile: {
           include: {
