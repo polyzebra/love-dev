@@ -71,7 +71,7 @@ export function ProfilePeek({
 
         <div className="space-y-6 px-6 pb-10">
           {profile.bio && (
-            <p className="font-display text-foreground/90 text-center text-lg leading-relaxed italic">
+            <p className="font-display text-foreground/90 text-center text-lg leading-relaxed whitespace-pre-wrap italic">
               &ldquo;{profile.bio}&rdquo;
             </p>
           )}

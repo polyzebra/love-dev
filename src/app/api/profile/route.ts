@@ -1,4 +1,4 @@
-import { guardRate, notFound, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, guardRate, notFound, ok, requireSession, validationError } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { profileUpdateSchema } from "@/lib/validators/profile";
 import { db } from "@/lib/db";
@@ -24,11 +24,24 @@ export async function PATCH(req: Request) {
   const limited = await guardRate(`profile-write:${user.id}`, RATE_LIMITS.profileWrite);
   if (limited) return limited;
 
-  const { data, response: invalid } = await parseBody(req, profileUpdateSchema);
-  if (invalid) return invalid;
+  // Presence-aware parse: profileUpdateSchema inherits field DEFAULTS
+  // from the onboarding schema, so a naive partial parse would fabricate
+  // values for absent keys (languages: [], prompts: [], ...) and a
+  // bio-only PATCH would silently wipe unrelated fields. Only keys the
+  // client actually sent may reach the update.
+  let json: unknown;
+  try {
+    json = await req.json();
+  } catch {
+    return apiError(400, "invalid_json", "Request body must be valid JSON.");
+  }
+  const parsed = profileUpdateSchema.safeParse(json);
+  if (!parsed.success) return validationError(parsed.error);
+  const present = new Set(Object.keys(json as Record<string, unknown>));
 
-  const { interests, prompts, ...fields } = data;
+  const { interests, prompts, ...allFields } = parsed.data;
   void interests; // interest edits go through the onboarding/profile service
+  const fields = Object.fromEntries(Object.entries(allFields).filter(([key]) => present.has(key)));
 
   const updated = await db.profile.update({
     where: { userId: user.id },
@@ -37,7 +50,7 @@ export async function PATCH(req: Request) {
   });
 
   // Prompts are a relation - replace the whole answered set when provided
-  if (prompts) {
+  if (prompts && present.has("prompts")) {
     await db.$transaction([
       db.profilePrompt.deleteMany({ where: { profileId: updated.id } }),
       ...(prompts.length > 0

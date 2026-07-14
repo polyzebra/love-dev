@@ -136,10 +136,18 @@ export default async function ProfilePage() {
       {profile.bio ? (
         <Reveal>
           <section className="px-2 py-4 md:px-6">
-            <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
-              In my words
-            </p>
-            <blockquote className="font-display text-foreground/95 mt-3 text-2xl leading-snug italic md:text-3xl">
+            <div className="flex items-baseline justify-between">
+              <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
+                In my words
+              </p>
+              <Link
+                href="/profile/bio"
+                className="text-muted-foreground hover:text-foreground text-xs font-medium underline-offset-2 transition-colors hover:underline"
+              >
+                Edit
+              </Link>
+            </div>
+            <blockquote className="font-display text-foreground/95 mt-3 text-2xl leading-snug whitespace-pre-wrap italic md:text-3xl">
               &ldquo;{profile.bio}&rdquo;
             </blockquote>
           </section>
@@ -150,7 +158,7 @@ export default async function ProfilePage() {
             <p className="text-muted-foreground text-sm">
               No bio yet - profiles with a story get far more matches.{" "}
               <Link
-                href="/settings"
+                href="/profile/bio"
                 className="text-primary-soft font-medium underline-offset-2 hover:underline"
               >
                 Write yours

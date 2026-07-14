@@ -72,7 +72,17 @@ export const onboardingSchema = z
     gender: genderEnum,
     interestedIn: z.array(genderEnum).min(1, "Choose at least one"),
     relationshipGoal: relationshipGoalEnum,
-    bio: z.string().trim().max(BIO_MAX_LENGTH).optional().default(""),
+    // Canonical "no bio" is NULL (never ""): trims, accepts explicit null
+    // (the editor's Clear), and folds empty input to null. DB mirrors the
+    // cap with a CHECK constraint (migration 20260713230000).
+    bio: z
+      .string()
+      .trim()
+      .max(BIO_MAX_LENGTH)
+      .nullable()
+      .optional()
+      .default("")
+      .transform((value) => (value && value.length > 0 ? value : null)),
     city: z.string().trim().min(1, "Choose your city").max(80),
     country: z.enum(["IE", "GB"]),
     heightCm: z.coerce.number().int().min(120).max(230).optional().nullable(),

@@ -200,6 +200,12 @@ export function createTirveaClient(options: TirveaClientOptions = {}) {
     },
 
     profile: {
+      /** Set (or clear with null) the caller's bio. Empty stores null. */
+      updateBio: (bio: string | null) =>
+        raw("PATCH", "/profile", {
+          body: { bio },
+          schema: z.object({ bio: z.string().nullable() }).passthrough(),
+        }),
       /** Replace the full prompt-answer set (max 4, curated order). */
       savePrompts: (prompts: Array<{ key: string; answer: string }>) =>
         raw("PUT", "/profile/prompts", {
