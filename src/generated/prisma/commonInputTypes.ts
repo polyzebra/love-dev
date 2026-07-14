@@ -1089,6 +1089,20 @@ export type EnumFaceBadgeStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel> | $Enums.FaceBadgeStatus
 }
 
+export type EnumFaceReferenceStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceStatus | Prisma.EnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel> | $Enums.FaceReferenceStatus | null
+}
+
+export type EnumDuplicateIdentityClassFilter<$PrismaModel = never> = {
+  equals?: $Enums.DuplicateIdentityClass | Prisma.EnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  in?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDuplicateIdentityClassFilter<$PrismaModel> | $Enums.DuplicateIdentityClass
+}
+
 export type EnumProfilePhotoVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.ProfilePhotoVerificationStatus | Prisma.EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
@@ -1107,6 +1121,26 @@ export type EnumFaceBadgeStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
+}
+
+export type EnumFaceReferenceStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceStatus | Prisma.EnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumFaceReferenceStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.FaceReferenceStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel>
+}
+
+export type EnumDuplicateIdentityClassWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DuplicateIdentityClass | Prisma.EnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  in?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDuplicateIdentityClassWithAggregatesFilter<$PrismaModel> | $Enums.DuplicateIdentityClass
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDuplicateIdentityClassFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDuplicateIdentityClassFilter<$PrismaModel>
 }
 
 export type EnumFaceCheckClassificationFilter<$PrismaModel = never> = {
@@ -2166,6 +2200,20 @@ export type NestedEnumFaceBadgeStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel> | $Enums.FaceBadgeStatus
 }
 
+export type NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceStatus | Prisma.EnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel> | $Enums.FaceReferenceStatus | null
+}
+
+export type NestedEnumDuplicateIdentityClassFilter<$PrismaModel = never> = {
+  equals?: $Enums.DuplicateIdentityClass | Prisma.EnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  in?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDuplicateIdentityClassFilter<$PrismaModel> | $Enums.DuplicateIdentityClass
+}
+
 export type NestedEnumProfilePhotoVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.ProfilePhotoVerificationStatus | Prisma.EnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.ProfilePhotoVerificationStatus[] | Prisma.ListEnumProfilePhotoVerificationStatusFieldRefInput<$PrismaModel>
@@ -2184,6 +2232,26 @@ export type NestedEnumFaceBadgeStatusWithAggregatesFilter<$PrismaModel = never> 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFaceBadgeStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceReferenceStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceStatus | Prisma.EnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.FaceReferenceStatus[] | Prisma.ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumFaceReferenceStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.FaceReferenceStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceReferenceStatusNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumDuplicateIdentityClassWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DuplicateIdentityClass | Prisma.EnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  in?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DuplicateIdentityClass[] | Prisma.ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDuplicateIdentityClassWithAggregatesFilter<$PrismaModel> | $Enums.DuplicateIdentityClass
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDuplicateIdentityClassFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDuplicateIdentityClassFilter<$PrismaModel>
 }
 
 export type NestedEnumFaceCheckClassificationFilter<$PrismaModel = never> = {

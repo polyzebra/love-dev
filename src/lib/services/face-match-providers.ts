@@ -65,6 +65,11 @@ export type ManipulationAssessment = {
 
 export interface FaceComparisonProvider {
   readonly name: string;
+  /** Vendor model/version the references are built with - persisted on
+   *  the job row so a provider upgrade can trigger rotation. */
+  readonly modelVersion?: string;
+  /** Processing region (EU pinning evidence for the DPIA). */
+  readonly region?: string;
   detectFaces(input: FaceDetectInput): Promise<FaceDetection>;
   /** Create (or replace) the user's reference from the verified identity
    *  selfie. Returns the provider's opaque handle. */
@@ -73,6 +78,11 @@ export interface FaceComparisonProvider {
   assessManipulationRisk(input: FaceDetectInput): Promise<ManipulationAssessment>;
   /** Destroy the biometric material at the vendor (GDPR deletion path). */
   deleteReference(referenceId: string): Promise<void>;
+  /** Optional duplicate-likeness search: other references resembling this
+   *  one, as opaque ids + coarse bands. Never raw scores. */
+  searchLikeness?(
+    referenceId: string,
+  ): Promise<Array<{ referenceId: string; band: "confident" | "uncertain" }>>;
 }
 
 export class FaceMatchNotConfiguredError extends Error {
@@ -125,8 +135,23 @@ function marker(image: Buffer): string {
   return m?.[1] ?? "owner";
 }
 
+/** Test seam: stage likeness matches for the mock provider. */
+const mockLikeness = new Map<
+  string,
+  Array<{ referenceId: string; band: "confident" | "uncertain" }>
+>();
+export function setMockLikenessMatches(
+  referenceId: string,
+  matches: Array<{ referenceId: string; band: "confident" | "uncertain" }> | null,
+): void {
+  if (matches === null) mockLikeness.delete(referenceId);
+  else mockLikeness.set(referenceId, matches);
+}
+
 export const mockFaceMatchProvider: FaceComparisonProvider = {
   name: "mock",
+  modelVersion: "mock-1",
+  region: "eu-west-1",
   async detectFaces({ image }) {
     const kind = marker(image);
     if (kind === "none") return { faceCount: 0, dominantFaceRatio: null, qualityScore: 0.9 };
@@ -198,6 +223,9 @@ export const mockFaceMatchProvider: FaceComparisonProvider = {
   },
   async deleteReference() {
     // Nothing stored anywhere - deterministic hash, no state.
+  },
+  async searchLikeness(referenceId: string) {
+    return mockLikeness.get(referenceId) ?? [];
   },
 };
 

@@ -24,6 +24,13 @@ export async function GET() {
       riskLevel: true,
       lastRunAt: true,
       updatedAt: true,
+      // Lifecycle + duplicate classification - normalized values only
+      // (the provider referenceId is a vendor identifier and stays out).
+      referenceStatus: true,
+      referenceVersion: true,
+      providerModelVersion: true,
+      rotationReason: true,
+      duplicateClass: true,
       user: {
         select: {
           id: true,

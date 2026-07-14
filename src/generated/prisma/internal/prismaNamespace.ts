@@ -4569,6 +4569,13 @@ export const ProfilePhotoVerificationScalarFieldEnum = {
   identitySessionId: 'identitySessionId',
   lastRunAt: 'lastRunAt',
   expiresAt: 'expiresAt',
+  referenceStatus: 'referenceStatus',
+  providerModelVersion: 'providerModelVersion',
+  providerRegion: 'providerRegion',
+  lastValidatedAt: 'lastValidatedAt',
+  rotationReason: 'rotationReason',
+  duplicateClass: 'duplicateClass',
+  duplicateCheckedAt: 'duplicateCheckedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -5375,6 +5382,34 @@ export type EnumFaceBadgeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'FaceBadgeStatus[]'
  */
 export type ListEnumFaceBadgeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBadgeStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceReferenceStatus'
+ */
+export type EnumFaceReferenceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceReferenceStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceReferenceStatus[]'
+ */
+export type ListEnumFaceReferenceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceReferenceStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DuplicateIdentityClass'
+ */
+export type EnumDuplicateIdentityClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DuplicateIdentityClass'>
+    
+
+
+/**
+ * Reference to a field of type 'DuplicateIdentityClass[]'
+ */
+export type ListEnumDuplicateIdentityClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DuplicateIdentityClass[]'>
     
 
 

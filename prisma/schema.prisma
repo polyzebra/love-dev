@@ -1560,6 +1560,34 @@ enum FaceCheckClassification {
   MANIPULATION_RISK // possible AI generation / manipulation / screenshot
 }
 
+/**
+ * Reference lifecycle (Phase 3): a reference is usable ONLY while ACTIVE
+ * or EXPIRING - runs refuse EXPIRED/REVOKED/DELETED and require
+ * re-enrolment (rotation).
+ */
+enum FaceReferenceStatus {
+  ACTIVE
+  EXPIRING // within the renewal window - still valid, rotation nudged
+  EXPIRED // past expiresAt - NEVER reused
+  REVOKED // fraud investigation / policy - never reused
+  DELETED // destroyed at the provider (user request / teardown)
+  ROTATING // old reference destroyed, new enrolment pending
+}
+
+/**
+ * Duplicate identity classification (Phase 4) - explicit outcomes; only
+ * LIKELY_IMPERSONATION may suspend the badge automatically.
+ */
+enum DuplicateIdentityClass {
+  UNKNOWN // never checked / provider off
+  SELF_RESTORE // matches this user's own previous account/reference
+  LIKELY_DUPLICATE // same person, second account - policy question
+  LIKELY_IMPERSONATION // matches another user who was there FIRST
+  TWIN_RISK // high similarity + conflicting identity evidence
+  FAMILY_RESEMBLANCE // mid-band similarity, plausible relatives
+  LOW_CONFIDENCE // signal too weak to classify
+}
+
 enum FaceCheckDecision {
   PENDING // queued, not yet compared
   PASSED // classification acceptable for this slot (cover vs gallery)
@@ -1569,24 +1597,33 @@ enum FaceCheckDecision {
 }
 
 model ProfilePhotoVerification {
-  id                String                         @id @default(cuid())
-  userId            String                         @unique
-  provider          String? // face-match provider name (e.g. "mock")
+  id                   String                         @id @default(cuid())
+  userId               String                         @unique
+  provider             String? // face-match provider name (e.g. "mock")
   // Opaque provider-side reference handle (created from the Stripe
   // identity selfie). NEVER an embedding - deleting it at the provider
   // destroys the biometric data.
-  referenceId       String?
-  referenceVersion  Int                            @default(0)
-  status            ProfilePhotoVerificationStatus @default(QUEUED)
-  badgeStatus       FaceBadgeStatus                @default(NONE)
-  riskLevel         Int                            @default(0) // aggregate mismatch score
-  consentVersion    String? // biometric consent version accepted at start
-  consentAt         DateTime?
-  identitySessionId String? // Stripe session the reference derives from
-  lastRunAt         DateTime?
-  expiresAt         DateTime? // reference re-challenge horizon
-  createdAt         DateTime                       @default(now())
-  updatedAt         DateTime                       @updatedAt
+  referenceId          String?
+  referenceVersion     Int                            @default(0)
+  status               ProfilePhotoVerificationStatus @default(QUEUED)
+  badgeStatus          FaceBadgeStatus                @default(NONE)
+  riskLevel            Int                            @default(0) // aggregate mismatch score
+  consentVersion       String? // biometric consent version accepted at start
+  consentAt            DateTime?
+  identitySessionId    String? // Stripe session the reference derives from
+  lastRunAt            DateTime?
+  expiresAt            DateTime? // reference re-challenge horizon
+  // --- Reference lifecycle (Phase 3) ---
+  referenceStatus      FaceReferenceStatus? // null = never enrolled
+  providerModelVersion String? // vendor model the reference was built with
+  providerRegion       String? // processing region (EU pinning evidence)
+  lastValidatedAt      DateTime? // last successful use/validation of the reference
+  rotationReason       String? // provider_upgrade | reference_expiry | manual_review | fraud_investigation | user_request | policy_change
+  // --- Duplicate identity (Phase 4) ---
+  duplicateClass       DuplicateIdentityClass         @default(UNKNOWN)
+  duplicateCheckedAt   DateTime?
+  createdAt            DateTime                       @default(now())
+  updatedAt            DateTime                       @updatedAt
 
   user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   checks PhotoFaceCheck[]

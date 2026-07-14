@@ -509,6 +509,31 @@ export const FaceCheckClassification = {
 export type FaceCheckClassification = (typeof FaceCheckClassification)[keyof typeof FaceCheckClassification]
 
 
+export const FaceReferenceStatus = {
+  ACTIVE: 'ACTIVE',
+  EXPIRING: 'EXPIRING',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED',
+  DELETED: 'DELETED',
+  ROTATING: 'ROTATING'
+} as const
+
+export type FaceReferenceStatus = (typeof FaceReferenceStatus)[keyof typeof FaceReferenceStatus]
+
+
+export const DuplicateIdentityClass = {
+  UNKNOWN: 'UNKNOWN',
+  SELF_RESTORE: 'SELF_RESTORE',
+  LIKELY_DUPLICATE: 'LIKELY_DUPLICATE',
+  LIKELY_IMPERSONATION: 'LIKELY_IMPERSONATION',
+  TWIN_RISK: 'TWIN_RISK',
+  FAMILY_RESEMBLANCE: 'FAMILY_RESEMBLANCE',
+  LOW_CONFIDENCE: 'LOW_CONFIDENCE'
+} as const
+
+export type DuplicateIdentityClass = (typeof DuplicateIdentityClass)[keyof typeof DuplicateIdentityClass]
+
+
 export const FaceCheckDecision = {
   PENDING: 'PENDING',
   PASSED: 'PASSED',

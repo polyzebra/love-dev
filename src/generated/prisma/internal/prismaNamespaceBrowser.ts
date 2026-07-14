@@ -866,6 +866,13 @@ export const ProfilePhotoVerificationScalarFieldEnum = {
   identitySessionId: 'identitySessionId',
   lastRunAt: 'lastRunAt',
   expiresAt: 'expiresAt',
+  referenceStatus: 'referenceStatus',
+  providerModelVersion: 'providerModelVersion',
+  providerRegion: 'providerRegion',
+  lastValidatedAt: 'lastValidatedAt',
+  rotationReason: 'rotationReason',
+  duplicateClass: 'duplicateClass',
+  duplicateCheckedAt: 'duplicateCheckedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

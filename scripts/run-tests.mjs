@@ -35,6 +35,7 @@ const LIVE = new Set([
   "verification-e2e-guards.test.ts",
   "verification-continue.test.ts",
   "face-verification.test.ts",
+  "face-security.test.ts",
 ]);
 
 const UNIT = new Set([

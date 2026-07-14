@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sweepQueuedFaceChecks } from "@/lib/services/face-verification";
+import { sweepReferenceLifecycle } from "@/lib/services/face-reference";
 
 export const dynamic = "force-dynamic";
 
@@ -25,5 +26,8 @@ export async function GET(req: Request) {
     );
   }
   const processed = await sweepQueuedFaceChecks(10);
-  return NextResponse.json({ data: { processed } });
+  // Reference lifecycle: EXPIRING marks, expiry + provider-upgrade
+  // rotations (rotations re-enter the queue; next sweep re-enrols).
+  const lifecycle = await sweepReferenceLifecycle(25);
+  return NextResponse.json({ data: { processed, lifecycle } });
 }

@@ -61,10 +61,25 @@ export default async function AdminVerificationPage() {
     take: 20,
     select: {
       id: true,
+      userId: true,
       status: true,
       badgeStatus: true,
       riskLevel: true,
-      user: { select: { email: true, profile: { select: { displayName: true } } } },
+      referenceStatus: true,
+      referenceVersion: true,
+      providerModelVersion: true,
+      duplicateClass: true,
+      user: {
+        select: {
+          email: true,
+          profile: { select: { displayName: true } },
+          appeals: {
+            orderBy: { createdAt: "desc" },
+            take: 3,
+            select: { status: true, createdAt: true },
+          },
+        },
+      },
       checks: {
         orderBy: [{ isCoverAtCheck: "desc" }, { createdAt: "desc" }],
         take: 6,
@@ -107,6 +122,17 @@ export default async function AdminVerificationPage() {
     </section>
   );
 
+  // Risk bands + threat flags per queued job (normalized names only -
+  // the engine never emits raw vendor values).
+  const { computeVerificationRisk } = await import("@/lib/services/risk-engine");
+  const riskByUser = new Map<string, { band: string; signals: string[] }>();
+  for (const job of faceQueue) {
+    riskByUser.set(
+      job.userId,
+      await computeVerificationRisk(job.userId).catch(() => ({ band: "LOW", signals: [] })),
+    );
+  }
+
   const faceSection = faceQueue.length > 0 && (
     <section className="mb-6">
       <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase">
@@ -132,6 +158,30 @@ export default async function AdminVerificationPage() {
                   <span className="font-medium">{job.user.profile?.displayName ?? "-"}</span>{" "}
                   <span className="text-muted-foreground">· {job.user.email}</span>
                 </p>
+                <div className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                  <span>
+                    Risk:{" "}
+                    <span className="text-foreground font-medium">
+                      {riskByUser.get(job.userId)?.band ?? "LOW"}
+                    </span>
+                  </span>
+                  <span>
+                    Reference: {job.referenceStatus?.toLowerCase() ?? "none"} · v
+                    {job.referenceVersion}
+                    {job.providerModelVersion ? ` · ${job.providerModelVersion}` : ""}
+                  </span>
+                  <span>Duplicate: {job.duplicateClass.toLowerCase()}</span>
+                  {job.user.appeals.length > 0 && (
+                    <span>
+                      Appeals: {job.user.appeals.map((a) => a.status.toLowerCase()).join(", ")}
+                    </span>
+                  )}
+                </div>
+                {(riskByUser.get(job.userId)?.signals.length ?? 0) > 0 && (
+                  <p className="text-muted-foreground truncate text-[11px]">
+                    Flags: {riskByUser.get(job.userId)!.signals.slice(0, 6).join(" · ")}
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {job.checks.map((check) => (
                     <div key={check.id} className="w-20">

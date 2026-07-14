@@ -269,6 +269,20 @@ export async function reviewAppeal(input: {
     const reversal = await reverseViolation(appeal.violationId, { now });
     restoredStatus = reversal.restoredStatus;
     restoredPhotoIds = reversal.restoredPhotoIds;
+    // Face-verification violations additionally restore the badge and
+    // re-check on FRESH evidence (face-reference.ts owns that logic).
+    const reversedViolation = await db.accountViolation.findUnique({
+      where: { id: appeal.violationId },
+      select: { userId: true, violationType: true },
+    });
+    if (reversedViolation) {
+      const { onFaceViolationReversed } = await import("@/lib/services/face-reference");
+      await onFaceViolationReversed(
+        reversedViolation.userId,
+        reversedViolation.violationType,
+        input.actorId,
+      ).catch(() => undefined);
+    }
   }
 
   await audit({

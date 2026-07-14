@@ -358,8 +358,12 @@ export async function runProfilePhotoVerification(
   });
 
   try {
-    // Reference: create once from the verified identity selfie.
-    let referenceId = job.referenceId;
+    // Reference lifecycle guard: EXPIRED / REVOKED / DELETED references
+    // are NEVER reused (threat-model Phase 3). Only ACTIVE/EXPIRING pass;
+    // anything else (or none) forces a fresh enrolment.
+    const referenceUsable =
+      job.referenceId && (job.referenceStatus === "ACTIVE" || job.referenceStatus === "EXPIRING");
+    let referenceId = referenceUsable ? job.referenceId : null;
     if (!referenceId) {
       const ref = await provider.createReference({
         userId,
@@ -373,6 +377,10 @@ export async function runProfilePhotoVerification(
           referenceId,
           provider: provider.name,
           referenceVersion: { increment: 1 },
+          referenceStatus: "ACTIVE",
+          providerModelVersion: provider.modelVersion ?? null,
+          providerRegion: provider.region ?? null,
+          rotationReason: null,
           expiresAt: new Date(Date.now() + ttlDays * 24 * 3600 * 1000),
         },
       });
@@ -495,13 +503,32 @@ export async function runProfilePhotoVerification(
       });
     }
 
-    const decision = decideProfile(results);
+    let decision = decideProfile(results);
+    // Risk gate (threat-model Phase 2): a decision never rests on face
+    // comparison alone. CRITICAL composite risk blocks auto-verification
+    // and routes to a human - it never grants and never auto-rejects.
+    if (decision.status === "AUTO_VERIFIED") {
+      const { computeVerificationRisk } = await import("@/lib/services/risk-engine");
+      const risk = await computeVerificationRisk(userId).catch(() => null);
+      if (risk?.band === "CRITICAL") {
+        decision = { ...decision, status: "MANUAL_REVIEW", badgeStatus: "REVIEWING" };
+        await recordVerificationAudit({
+          userId,
+          verificationId: job.id,
+          eventType: "risk_gate_hold",
+          actorType: "system",
+          newStatus: "MANUAL_REVIEW",
+          reasonCode: "risk_critical",
+        });
+      }
+    }
     await db.profilePhotoVerification.update({
       where: { id: job.id },
       data: {
         status: decision.status,
         badgeStatus: decision.badgeStatus,
         riskLevel: decision.riskLevel,
+        lastValidatedAt: new Date(),
       },
     });
     // Public badge suspension rides ONE denormalized column so hot read
@@ -532,6 +559,19 @@ export async function runProfilePhotoVerification(
         body: "Your profile photos are confirmed - your badge is live.",
         dedupeKey: `face-check:${job.id}:v${job.referenceVersion}:auto`,
       });
+      // Duplicate-likeness search rides successful verifications (Phase 4;
+      // only LIKELY_IMPERSONATION may auto-suspend, inside runDuplicateCheck).
+      const { runDuplicateCheck } = await import("@/lib/services/face-reference");
+      await runDuplicateCheck(userId).catch(() => null);
+    } else if (decision.status === "REJECTED" || decision.status === "SUSPENDED") {
+      // Adverse outcomes are APPEALABLE: surface through the existing
+      // violation/appeal machine (immutable AppealEvent timeline).
+      const { createFaceViolation } = await import("@/lib/services/face-reference");
+      await createFaceViolation(
+        userId,
+        "PHOTO_MISMATCH",
+        decision.status === "REJECTED" ? "cover_not_confirmed" : "aggregate_mismatch_risk",
+      ).catch(() => null);
     }
     return decision;
   } catch (error) {
