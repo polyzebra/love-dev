@@ -5,16 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion, type PanInfo } from "motion/react";
 import { toast } from "sonner";
-import {
-  BadgeCheck,
-  Camera,
-  ChevronLeft,
-  ChevronRight,
-  Heart,
-  MapPin,
-  Settings,
-  Trash2,
-} from "lucide-react";
+import { BadgeCheck, Camera, Heart, MapPin, Settings, Trash2 } from "lucide-react";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { SPRING } from "@/lib/motion";
 import { Badge } from "@/components/ui/badge";
@@ -175,7 +166,7 @@ export function PhotoManager({
   }
 
   /**
-   * The ONE optimistic reorder commit - chevron buttons and drag-drop both
+   * The ONE optimistic reorder commit - drag-drop
    * land here: PATCH the new order, revert to `previous` + toast on failure.
    */
   async function commitOrder(next: ManagedPhoto[], previous: ManagedPhoto[]) {
@@ -200,24 +191,11 @@ export function PhotoManager({
     }
   }
 
-  async function movePhoto(index: number, direction: -1 | 1) {
-    const target = index + direction;
-    const a = photos[index];
-    const b = photos[target];
-    if (!a || !b) return;
-
-    const previous = photos;
-    const next = [...photos];
-    next[index] = b;
-    next[target] = a;
-    setPhotos(next);
-    await commitOrder(next, previous);
-  }
-
-  // ---- Drag to reorder (pointer-based swap; chevrons stay as the
-  // accessible fallback). Grid drag is axis-free, so Reorder.Group (single
-  // axis) is a poor fit - instead each tile is draggable and swaps with the
-  // grid cell under the pointer.
+  // ---- Drag to reorder (pointer-based swap - the ONLY reorder control
+  // since the profile polish removed the chevron buttons; keyboard users
+  // can re-pick the cover via delete/re-upload order). Grid drag is
+  // axis-free, so Reorder.Group (single axis) is a poor fit - instead each
+  // tile is draggable and swaps with the grid cell under the pointer.
   const tileRefs = useRef(new Map<string, HTMLDivElement>());
   const slotRects = useRef<DOMRect[]>([]);
   const dragStartOrder = useRef<ManagedPhoto[] | null>(null);
@@ -422,32 +400,6 @@ export function PhotoManager({
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
                   </button>
-                  {i > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!suppressClick.current) void movePhoto(i, -1);
-                      }}
-                      aria-label={
-                        i === 1 ? `Make photo ${i + 1} the cover` : `Move photo ${i + 1} earlier`
-                      }
-                      className={`${controlClass} absolute bottom-1.5 left-1.5 size-11`}
-                    >
-                      <ChevronLeft className="size-4" aria-hidden="true" />
-                    </button>
-                  )}
-                  {i < photos.length - 1 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!suppressClick.current) void movePhoto(i, 1);
-                      }}
-                      aria-label={i === 0 ? "Move cover photo later" : `Move photo ${i + 1} later`}
-                      className={`${controlClass} absolute right-1.5 bottom-1.5 size-11`}
-                    >
-                      <ChevronRight className="size-4" aria-hidden="true" />
-                    </button>
-                  )}
                 </PhotoFrame>
               </motion.div>
             ))}

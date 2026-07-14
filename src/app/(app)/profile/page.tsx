@@ -1,4 +1,5 @@
 import { GOAL_LINES } from "@/lib/discovery/taxonomy";
+import { ProfileSectionCard } from "@/components/profile/profile-section-card";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -135,7 +136,7 @@ export default async function ProfilePage() {
       {/* ================= IN THEIR WORDS ================= */}
       {profile.bio ? (
         <Reveal>
-          <section className="px-2 py-4 md:px-6">
+          <ProfileSectionCard className="md:p-8">
             <div className="flex items-baseline justify-between">
               <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
                 In my words
@@ -150,11 +151,11 @@ export default async function ProfilePage() {
             <blockquote className="font-display text-foreground/95 mt-3 text-2xl leading-snug whitespace-pre-wrap italic md:text-3xl">
               &ldquo;{profile.bio}&rdquo;
             </blockquote>
-          </section>
+          </ProfileSectionCard>
         </Reveal>
       ) : (
         <Reveal>
-          <section className="glass rounded-xl p-6 text-center">
+          <ProfileSectionCard className="text-center">
             <p className="text-muted-foreground text-sm">
               No bio yet - profiles with a story get far more matches.{" "}
               <Link
@@ -164,14 +165,14 @@ export default async function ProfilePage() {
                 Write yours
               </Link>
             </p>
-          </section>
+          </ProfileSectionCard>
         </Reveal>
       )}
 
       {/* ================= YOUR PROMPTS - editorial Q&A ================= */}
       {prompts.length > 0 && (
         <Reveal>
-          <section className="glass rounded-xl p-6 md:p-8">
+          <ProfileSectionCard className="md:p-8">
             <div className="mb-5 flex items-baseline justify-between">
               <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">
                 Your prompts
@@ -195,7 +196,7 @@ export default async function ProfilePage() {
                 </div>
               ))}
             </div>
-          </section>
+          </ProfileSectionCard>
         </Reveal>
       )}
       {prompts.length < 3 && (
