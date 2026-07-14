@@ -64,9 +64,15 @@ async function main() {
 
   console.log("stripe adapter - describeSession is read-only detail");
 
+  // The transport is injected, so a placeholder TEST key both isolates
+  // these checks from the machine's real key and passes the live-key
+  // guard (sk_live_ outside production requires ALLOW_LIVE_VERIFICATION).
+  const savedKey = process.env.STRIPE_SECRET_KEY;
+  const savedSecret = process.env.STRIPE_IDENTITY_WEBHOOK_SECRET;
+  process.env.STRIPE_SECRET_KEY = "sk_test_placeholder";
+  process.env.STRIPE_IDENTITY_WEBHOOK_SECRET = "whsec_placeholder";
+
   await check("describeSession returns mapped status + RAW sub-state + live url", async () => {
-    process.env.STRIPE_SECRET_KEY ||= "sk_test_placeholder";
-    process.env.STRIPE_IDENTITY_WEBHOOK_SECRET ||= "whsec_placeholder";
     const calls: string[] = [];
     setStripeIdentityTransport(async (method, path2) => {
       calls.push(`${method} ${path2}`);
@@ -111,6 +117,9 @@ async function main() {
       }
     },
   );
+
+  process.env.STRIPE_SECRET_KEY = savedKey;
+  process.env.STRIPE_IDENTITY_WEBHOOK_SECRET = savedSecret;
 
   await check("mock describeSession mirrors the open sub-state (no fake url)", async () => {
     const started = await mockVerificationProvider.createSession("user-x");

@@ -442,9 +442,32 @@ export const mockVerificationProvider: PhotoVerificationProvider = makeProvider(
   },
 });
 
+/** Warn once per process, not per request. */
+let warnedLiveKeyInDev = false;
+
 export function getPhotoVerificationProvider(): PhotoVerificationProvider {
   const which = process.env.VERIFICATION_PROVIDER?.trim().toLowerCase();
-  if (which === "stripe_identity" && stripeIdentityConfigured()) return stripeIdentityProvider;
+  if (which === "stripe_identity" && stripeIdentityConfigured()) {
+    // Outside production, a LIVE key creates real, billable verification
+    // sessions - refuse unless explicitly requested (`npm run dev:live`
+    // sets ALLOW_LIVE_VERIFICATION=1). Test keys (sk_test_) pass freely.
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.STRIPE_SECRET_KEY?.trim().startsWith("sk_live_") &&
+      process.env.ALLOW_LIVE_VERIFICATION !== "1"
+    ) {
+      if (!warnedLiveKeyInDev) {
+        warnedLiveKeyInDev = true;
+        console.warn(
+          "[verification] stripe_identity with a LIVE key outside production " +
+            "requires ALLOW_LIVE_VERIFICATION=1 (use `npm run dev:live`) - " +
+            "treating verification as not configured.",
+        );
+      }
+      return notConfiguredProvider;
+    }
+    return stripeIdentityProvider;
+  }
   if (which === "persona" && process.env.PERSONA_API_KEY) return personaProvider;
   // Mock is dev/test tooling - never silently active in production.
   if (which === "mock" && process.env.NODE_ENV !== "production") return mockVerificationProvider;

@@ -117,6 +117,53 @@ async function main() {
     restoreEnv();
   });
 
+  await check("LIVE key outside production is refused without the explicit flag", () => {
+    process.env.VERIFICATION_PROVIDER = "stripe_identity";
+    process.env.STRIPE_SECRET_KEY = "sk_live_x";
+    process.env.STRIPE_IDENTITY_WEBHOOK_SECRET = "whsec_x";
+    (process.env as Record<string, string>).NODE_ENV = "development";
+    delete process.env.ALLOW_LIVE_VERIFICATION;
+    assert.equal(
+      getPhotoVerificationProvider(),
+      notConfiguredProvider,
+      "no accidental billable sessions from local dev",
+    );
+    process.env.ALLOW_LIVE_VERIFICATION = "1";
+    assert.equal(getPhotoVerificationProvider().name, "stripe_identity", "dev:live opts in");
+    delete process.env.ALLOW_LIVE_VERIFICATION;
+    restoreEnv();
+  });
+
+  await check("test keys (sk_test_) never need the flag; production never needs it", () => {
+    process.env.VERIFICATION_PROVIDER = "stripe_identity";
+    process.env.STRIPE_IDENTITY_WEBHOOK_SECRET = "whsec_x";
+    process.env.STRIPE_SECRET_KEY = "sk_test_x";
+    (process.env as Record<string, string>).NODE_ENV = "development";
+    delete process.env.ALLOW_LIVE_VERIFICATION;
+    assert.equal(getPhotoVerificationProvider().name, "stripe_identity", "test mode is safe");
+    process.env.STRIPE_SECRET_KEY = "sk_live_x";
+    (process.env as Record<string, string>).NODE_ENV = "production";
+    assert.equal(getPhotoVerificationProvider().name, "stripe_identity", "prod unaffected");
+    restoreEnv();
+  });
+
+  await check("env files keep ONE line per key (loaders disagree on duplicates)", () => {
+    const dupes = (file: string) => {
+      const keys = readFileSync(path.join(process.cwd(), file), "utf8")
+        .split("\n")
+        .map((l) => /^([A-Z_][A-Z0-9_]*)=/.exec(l)?.[1])
+        .filter((k): k is string => Boolean(k));
+      return keys.filter((k, i) => keys.indexOf(k) !== i);
+    };
+    assert.deepEqual(dupes(".env.example"), [], ".env.example must model the rule");
+    try {
+      readFileSync(path.join(process.cwd(), ".env"));
+    } catch {
+      return; // no local .env (CI) - nothing more to lint
+    }
+    assert.deepEqual(dupes(".env"), [], "local .env has duplicate keys - loaders will diverge");
+  });
+
   console.log("stripe identity adapter (injected transport, real signatures)");
 
   process.env.VERIFICATION_PROVIDER = "stripe_identity";

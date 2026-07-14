@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "dev:live": "VERIFICATION_PROVIDER=stripe_identity ALLOW_LIVE_VERIFICATION=1 next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

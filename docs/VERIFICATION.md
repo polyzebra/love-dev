@@ -58,6 +58,29 @@ default); `--confirm` deletes. Refuses anything but obvious test
 identities (@example.com, @test.tirvea.app, test-/e2e-/qa- prefixes,
 +test aliases).
 
+## Developer workflows (deterministic env, 2026-07-14)
+
+One key = ONE line in `.env` - loaders disagree on duplicates (Next.js
+keeps the LAST value, dotenv/tsx/Prisma keep the FIRST), so duplicated
+keys silently run different values in different tools. Overrides go in
+the PROCESS env (npm scripts), which every loader respects.
+
+- **Local mock (default)**: `npm run dev` - `.env` pins
+  `VERIFICATION_PROVIDER="mock"`. Full state machine, signed mock
+  webhooks, zero external calls. `npm test` exercises the HTTP loops
+  against this server (suites skip them if the server isn't mock;
+  `TEST_ASSUME_MOCK=1` opts a purpose-launched mock server back in).
+- **Local live (explicit opt-in)**: `npm run dev:live` - process env
+  sets `VERIFICATION_PROVIDER=stripe_identity` +
+  `ALLOW_LIVE_VERIFICATION=1`. Without that flag, a LIVE key
+  (`sk_live_`) outside production is refused at provider selection
+  (sessions bill real money). Note: Stripe webhooks land on the
+  PRODUCTION endpoint, so local live completion arrives via the status
+  poll/reconciler, not webhooks.
+- **Production**: all config in Vercel env (never `.env`);
+  `NODE_ENV=production` needs no flag. Mock is refused in production
+  builds; a partial config stays honestly unavailable (503).
+
 ## Session reuse (2026-07-14)
 
 `POST /api/verification/photo/start` RESUMES before it creates: an open
