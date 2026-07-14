@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -21,7 +21,22 @@ import {
  * verification state. One-time semantics persist in localStorage keyed
  * by provider session id (the house client-state pattern), so a new
  * verification session automatically becomes eligible again.
+ *
+ * Storage is read hydration-safely via useSyncExternalStore (server
+ * snapshot = not dismissed/not acked); the only effect performs side
+ * effects (storage writes + the toast) and never sets state.
  */
+
+const subscribeNever = () => () => {};
+
+function readFlag(storage: () => Storage, key: string): boolean {
+  try {
+    return storage().getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function VerificationNotifier({
   state,
   sessionId,
@@ -30,46 +45,51 @@ export function VerificationNotifier({
   sessionId: string | null;
 }) {
   const pathname = usePathname();
-  // Storage is read in an effect (SSR-safe); until then nothing renders,
-  // which also means zero hydration mismatch and zero layout shift on
-  // pages where the banner will not show.
-  const [decision, setDecision] = useState<{ showBanner: boolean } | null>(null);
+  const [dismissedNow, setDismissedNow] = useState(false);
 
+  const dismissed = useSyncExternalStore(
+    subscribeNever,
+    () => (sessionId ? readFlag(() => sessionStorage, dismissKey(sessionId)) : false),
+    () => false,
+  );
+  const watched = useSyncExternalStore(
+    subscribeNever,
+    () => (sessionId ? readFlag(() => localStorage, watchKey(sessionId)) : false),
+    () => false,
+  );
+  const acked = useSyncExternalStore(
+    subscribeNever,
+    () => (sessionId ? readFlag(() => localStorage, ackKey(sessionId)) : false),
+    () => false,
+  );
+
+  const decision = decideVerificationNotice({
+    state,
+    sessionId,
+    pathname,
+    watched,
+    acked,
+    dismissed: dismissed || dismissedNow,
+  });
+
+  // Side effects only - no state updates here (storage writes + toast).
   useEffect(() => {
-    if (!state || !sessionId) {
-      setDecision({ showBanner: false });
-      return;
-    }
-    let watched = false;
-    let acked = false;
-    let dismissed = false;
-    try {
-      watched = localStorage.getItem(watchKey(sessionId)) === "1";
-      acked = localStorage.getItem(ackKey(sessionId)) === "1";
-      dismissed = sessionStorage.getItem(dismissKey(sessionId)) === "1";
-    } catch {
-      // Storage unavailable: banner still works, one-time falls back to
-      // once-per-mount.
-    }
-
-    const d = decideVerificationNotice({ state, sessionId, pathname, watched, acked, dismissed });
-
-    if (d.markWatched) {
+    if (!sessionId) return;
+    if (decision.markWatched) {
       try {
         localStorage.setItem(watchKey(sessionId), "1");
       } catch {}
     }
-
-    if (d.toast) {
-      const copy = TOAST_COPY[d.toast];
-      const kind = d.toast;
+    if (decision.toast) {
+      const copy = TOAST_COPY[decision.toast];
+      const kind = decision.toast;
       try {
         localStorage.setItem(ackKey(sessionId), "1");
       } catch {}
       // queueMicrotask: on a full document load this effect can run BEFORE
       // the root layout's <Toaster> sibling subscribes (child effects flush
-      // first), and sonner does not replay pre-subscription toasts. A
-      // microtask lands after the whole commit's effects - no timers.
+      // first), and sonner drops pre-subscription toasts. A microtask lands
+      // after the whole commit's effects - no timers.
       queueMicrotask(() => {
         if (kind === "verified") {
           toast.success(copy.title, { description: copy.body, duration: 4000 });
@@ -78,11 +98,9 @@ export function VerificationNotifier({
         }
       });
     }
+  }, [decision.markWatched, decision.toast, sessionId]);
 
-    setDecision({ showBanner: d.showBanner });
-  }, [state, sessionId, pathname]);
-
-  if (!decision?.showBanner || !sessionId) return null;
+  if (!decision.showBanner || !sessionId) return null;
 
   return (
     <div
@@ -119,7 +137,7 @@ export function VerificationNotifier({
           try {
             sessionStorage.setItem(dismissKey(sessionId), "1");
           } catch {}
-          setDecision({ showBanner: false });
+          setDismissedNow(true);
         }}
       >
         <X className="size-4" aria-hidden="true" />
