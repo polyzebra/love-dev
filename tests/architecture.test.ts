@@ -165,6 +165,44 @@ check("rate limiting: store interface + injectable limiter factory", () => {
   assert.ok(rl.includes("export function createRateLimiter"));
 });
 
+console.log("canonical read/score models (Phase 0M)");
+
+check("completionPct is written ONLY through computeCompletion", () => {
+  // Tripwire: the exact file set allowed to touch completionPct (writers
+  // must use the canonical scorer; everything else is a documented
+  // read). A NEW file touching the field fails here and gets reviewed
+  // against the same rule - that is the point.
+  const touching = filesUnder(SRC)
+    .filter((f) => !f.includes("generated"))
+    .filter((f) => /\bcompletionPct\b/.test(codeOf(f)))
+    .map(rel)
+    .sort();
+  const WRITERS = ["src/app/api/profile/route.ts", "src/lib/services/profile.ts"];
+  const READERS = [
+    "src/app/(app)/profile/page.tsx",
+    "src/components/profile/photo-manager.tsx",
+    "src/lib/services/explore.ts",
+    "src/lib/services/fraud-signals.ts",
+  ];
+  assert.deepEqual(touching, [...WRITERS, ...READERS].sort());
+  for (const f of WRITERS) {
+    assert.ok(
+      codeOf(path.join(process.cwd(), f)).includes("computeCompletion("),
+      `${f} writes completionPct without the canonical scorer`,
+    );
+  }
+});
+
+check("thread visibility rule lives only in the chat service", () => {
+  const offenders = filesUnder(path.join(SRC, "app")).filter(
+    (f) =>
+      /deletedAt:\s*null/.test(codeOf(f)) &&
+      /message/i.test(codeOf(f)) &&
+      f.includes("conversation"),
+  );
+  assert.deepEqual(offenders.map(rel), [], "pages/routes use listThreadMessages");
+});
+
 console.log("future package boundaries (Phase 0L - extraction readiness)");
 
 /** Import specifiers of one file (comment-stripped). */
