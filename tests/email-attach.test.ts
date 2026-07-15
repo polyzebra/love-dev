@@ -6,7 +6,8 @@
  * Talks to the real database from .env. Users, auth.users rows, blocked
  * identities and audit events are namespaced per run and removed in
  * `finally`. ZERO real emails and zero live GoTrue calls: every case
- * injects a spy auth client for updateUser/verifyOtp.
+ * injects a spy client for the Tirvea-owned OTP pipeline
+ * (generateEmailChangeOtp / sendOtpEmail / verifyOtp / commitEmailChange).
  *
  * The matrix:
  *   1.  GATE: a new phone-LOGIN account (placeholder email) has
@@ -18,18 +19,19 @@
  *   2.  Junk input pre-client: invalid shape, our own placeholder domain
  *       -> invalid_email; disposable + blocklisted -> ONE neutral
  *       not_allowed; zero client calls for all of them
- *   3.  CASE 1 happy path: send (updateUser({email}) called once,
- *       audited) + immediate resend -> neutral limited send (no client
- *       call); verify (verifyOtp type "email_change") replaces the
- *       placeholder + stamps emailVerified and the ladder continues
- *       (/auth/age)
+ *   3.  CASE 1 happy path: send (generateEmailChangeOtp mints a code +
+ *       sendOtpEmail delivers it via Resend, NO Supabase email) +
+ *       immediate resend -> neutral limited send (no client call); verify
+ *       (verifyOtp type "email_change" proves possession, then
+ *       commitEmailChange stamps auth.users) replaces the placeholder +
+ *       stamps emailVerified and the ladder continues (/auth/age)
  *   4.  CASE 2: the address is already verified on THIS account ->
  *       alreadyVerified success, no OTP, zero client calls
  *   5.  CASE 3 / account takeover: an address owned by another LIVE
  *       account -> email_in_use with the EXACT spec copy, no OTP at
  *       send AND no code burn at verify, owner untouched, no transfer
- *   6.  GoTrue-level holder (auth.users only): updateUser answers
- *       email_exists -> email_in_use
+ *   6.  GoTrue-level holder (auth.users only): generateLink answers
+ *       email_exists -> email_in_use (delivery never reached)
  *   7.  Wrong/expired codes + failure lock after 5 fails (locked
  *       attempts never reach the client, placeholder unchanged)
  *   8.  Concurrent attach race for one free address -> exactly one
@@ -67,24 +69,43 @@ async function main() {
   type AuthClient = import("../src/lib/auth/email-attach-flow").EmailAttachAuthClient;
 
   /**
-   * Spy auth client. `verifyAs` controls verifyOtp's returned uid (the
-   * live session's auth user); an error code string = failure.
+   * Spy auth client for the Tirvea-owned OTP pipeline. `verifyAs` controls
+   * verifyOtp's returned uid (the live session's auth user); an error code
+   * string = failure at that step.
    */
   function spyClient(opts?: {
     verifyAs?: string;
     verifyError?: string;
-    sendError?: string;
-    /** Override the email verifyOtp reports as committed on auth.users.
-     *  Simulates "Secure email change" ON, where the new-side OTP verifies
-     *  but auth.users.email is NOT yet stamped (stays the old value). */
-    verifyEmail?: string;
+    /** generateLink failure: "email_exists" -> email_in_use, else send_failed. */
+    genError?: string;
+    /** Resend delivery failure -> send_failed. */
+    deliveryError?: string;
+    /** Override the email the admin commit reports as stamped on auth.users.
+     *  Simulates a commit that did NOT land (e.g. a misconfigured backend):
+     *  verifyOtp proves possession but auth.users.email stays the old value. */
+    commitEmail?: string;
+    /** Admin commit hard error -> not_committed. */
+    commitError?: string;
   }) {
-    const calls: { method: "updateUser" | "verifyOtp"; email?: string; type?: string }[] = [];
+    const calls: {
+      method: "generateEmailChangeOtp" | "sendOtpEmail" | "verifyOtp" | "commitEmailChange";
+      email?: string;
+      type?: string;
+    }[] = [];
     const client: AuthClient = {
-      async updateUser({ email }) {
-        calls.push({ method: "updateUser", email });
+      async generateEmailChangeOtp({ newEmail }) {
+        calls.push({ method: "generateEmailChangeOtp", email: newEmail });
+        if (opts?.genError) {
+          return { code: null, error: { code: opts.genError, message: opts.genError } };
+        }
+        return { code: "123456", error: null };
+      },
+      async sendOtpEmail({ to }) {
+        calls.push({ method: "sendOtpEmail", email: to });
         return {
-          error: opts?.sendError ? { code: opts.sendError, message: opts.sendError } : null,
+          error: opts?.deliveryError
+            ? { code: opts.deliveryError, message: opts.deliveryError }
+            : null,
         };
       },
       async verifyOtp({ email, type }) {
@@ -96,13 +117,20 @@ async function main() {
           };
         }
         return {
-          data: {
-            user: {
-              id: opts?.verifyAs ?? randomUUID(),
-              email: opts?.verifyEmail !== undefined ? opts.verifyEmail : email,
-            },
-            session: {},
-          },
+          data: { user: { id: opts?.verifyAs ?? randomUUID(), email }, session: {} },
+          error: null,
+        };
+      },
+      async commitEmailChange({ email }) {
+        calls.push({ method: "commitEmailChange", email });
+        if (opts?.commitError) {
+          return {
+            committedEmail: null,
+            error: { code: opts.commitError, message: opts.commitError },
+          };
+        }
+        return {
+          committedEmail: opts?.commitEmail !== undefined ? opts.commitEmail : email,
           error: null,
         };
       },
@@ -289,7 +317,7 @@ async function main() {
     const happyId = await createPhoneFirstUser("5103");
     const happyEmail = testEmail("happy");
     await check(
-      "send: updateUser({email}) called once, audited; resend -> neutral limited",
+      "send: generateLink mints a code + branded Resend delivery, audited; resend -> neutral limited",
       async () => {
         const spy = spyClient();
         const sent = await sendEmailAttach({
@@ -300,7 +328,12 @@ async function main() {
         });
         assert.equal(sent.kind, "sent");
         assert.ok(sent.kind === "sent" && !sent.limited);
-        assert.deepEqual(spy.calls, [{ method: "updateUser", email: happyEmail }]);
+        // No Supabase email is ever triggered: the code is minted
+        // (generateLink) then delivered by Tirvea's own Resend pipeline.
+        assert.deepEqual(spy.calls, [
+          { method: "generateEmailChangeOtp", email: happyEmail },
+          { method: "sendOtpEmail", email: happyEmail },
+        ]);
         const audit = await db.authVerificationEvent.findFirst({
           where: { type: "email_attach_send", email: happyEmail, userId: happyId },
         });
@@ -313,7 +346,32 @@ async function main() {
         });
         assert.equal(again.kind, "sent", "limited resend keeps the neutral shape");
         assert.ok(again.kind === "sent" && again.limited && again.retryAfter >= 1);
-        assert.equal(spy.calls.length, 1, "limited resend must not reach the client");
+        assert.equal(
+          spy.calls.length,
+          2,
+          "limited resend must not reach the client (still just the first send's mint+deliver)",
+        );
+      },
+    );
+    await check(
+      "send: branded delivery failure -> send_failed (code minted but not delivered)",
+      async () => {
+        const spy = spyClient({ deliveryError: "resend_500" });
+        const outcome = await sendEmailAttach({
+          user: sessionUser(happyId),
+          email: testEmail("delivery-fail"),
+          client: spy.client,
+          req: fakeReq("203.0.113.63"),
+        });
+        assert.equal(outcome.kind, "send_failed", "a dead transport is surfaced, not hidden");
+        assert.deepEqual(
+          spy.calls.map((c) => c.method),
+          ["generateEmailChangeOtp", "sendOtpEmail"],
+        );
+        const audit = await db.authVerificationEvent.findFirst({
+          where: { type: "email_attach_send_error", userId: happyId },
+        });
+        assert.ok(audit, "delivery failure audited (transport error only, never the code)");
       },
     );
     await check(
@@ -328,8 +386,11 @@ async function main() {
           req: fakeReq("203.0.113.61"),
         });
         assert.equal(outcome.kind, "attached");
+        // Possession proven (verifyOtp), then the address is force-committed
+        // onto auth.users (admin), before the app row is ever touched.
         assert.deepEqual(spy.calls, [
           { method: "verifyOtp", email: happyEmail, type: "email_change" },
+          { method: "commitEmailChange", email: happyEmail },
         ]);
         const row = await db.user.findUniqueOrThrow({ where: { id: happyId } });
         assert.equal(row.email, happyEmail, "placeholder replaced");
@@ -344,16 +405,16 @@ async function main() {
     );
 
     await check(
-      "Secure-email-change ON (OTP ok, Auth email NOT committed) -> not_committed, app row UNCHANGED",
+      "commit does not land (Auth email NOT stamped) -> not_committed, app row UNCHANGED",
       async () => {
         // Fresh phone-first account so we can prove the placeholder is kept.
         const uid = await createPhoneFirstUser("5199");
         const placeholder = phonePlaceholderEmail(uid);
         const target = testEmail("securechange");
-        // verifyOtp succeeds but reports the OLD placeholder as the committed
-        // email (Secure email change requires BOTH sides; new-side alone
-        // does not stamp auth.users.email).
-        const spy = spyClient({ verifyAs: uid, verifyEmail: placeholder });
+        // verifyOtp proves possession, but the admin commit reports the OLD
+        // placeholder as auth.users.email (the change did not stick). The
+        // flow must refuse to move the app row ahead of Auth.
+        const spy = spyClient({ verifyAs: uid, commitEmail: placeholder });
         const outcome = await verifyEmailAttach({
           user: sessionUser(uid),
           email: target,
@@ -441,15 +502,19 @@ async function main() {
 
     // ------------------------------------------------------------ case 6
     console.log("6. GoTrue-level holder (auth.users only)");
-    await check("updateUser answers email_exists -> email_in_use", async () => {
-      const spy = spyClient({ sendError: "email_exists" });
+    await check("generateLink answers email_exists -> email_in_use (no delivery)", async () => {
+      const spy = spyClient({ genError: "email_exists" });
       const outcome = await sendEmailAttach({
         user: sessionUser(attackerId),
         email: testEmail("auth-only"),
         client: spy.client,
       });
       assert.equal(outcome.kind, "email_in_use");
-      assert.equal(spy.calls.length, 1);
+      // Only the mint was attempted; a conflict must never reach delivery.
+      assert.deepEqual(
+        spy.calls.map((c) => c.method),
+        ["generateEmailChangeOtp"],
+      );
     });
 
     // ------------------------------------------------------------ case 7

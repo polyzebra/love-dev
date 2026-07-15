@@ -9,16 +9,28 @@ there is no repo/Management-token path, so these must be pasted by hand.
 Regression that caused this doc: the **Change Email Address** template
 was still shipping `{{ .ConfirmationURL }}` (subject "Confirm your new
 email address") while the app asked for a code — so the new address got a
-link and code entry could never succeed. Fix = the HTML below.
+link and code entry could never succeed.
 
-Also required (Authentication → Providers → Email):
-**"Secure email change" MUST be OFF** — see §5e of AUTH-SETUP.md and
-`email-attach-flow.ts`. When ON, `updateUser({ email })` demands
-confirmation from BOTH the old and new addresses; a phone-first account's
-old address is an unroutable placeholder, so the change can never
-complete, and single-side verify leaves `auth.users.email` unchanged.
-(The app now fails safe here — verify returns `change_not_completed` and
-never advances the app row — but the flow only _works_ with this OFF.)
+> **UPDATE — change-email no longer depends on this template.** The
+> email-attach / change-email flow now OWNS its delivery so it can never
+> regress to a Supabase default template again: it mints the 6-digit code
+> with `admin.generateLink({ type: "email_change_new" })` (which sends no
+> Supabase email) and delivers a branded code through Tirvea's own Resend
+> pipeline (`services/email.ts` → `renderEmailAttachOtpEmail`), then
+> force-commits the address with `admin.updateUserById({ email,
+email_confirm })`. See `src/lib/auth/email-attach-client.ts`.
+> Consequences: **section 3 below is now dormant** (kept only in case
+> Supabase's Change-Email email is ever re-enabled — the app does not use
+> it), and **"Secure email change" is no longer a hard requirement** (the
+> admin commit lands the change regardless of that toggle), though leaving
+> it OFF keeps GoTrue's state clean. Signup / login (sections 1–2) still
+> use Supabase templates and DO require `{{ .Token }}`.
+>
+> Delivery prerequisite (Resend): `EMAIL_FROM`'s domain (`tirvea.app`)
+> must be a **verified domain on the Resend key in `RESEND_API_KEY`**, and
+> that key must be allowed to send from it. A restricted/mis-scoped key
+> makes the branded send fail (`send_failed`) — the code is correct but no
+> email goes out.
 
 ---
 
@@ -119,7 +131,7 @@ Tirvea's password reset is **link-based** by design
 | Flow                  | Send                                                 | Template                    | verifyOtp type             | UI shows         |
 | --------------------- | ---------------------------------------------------- | --------------------------- | -------------------------- | ---------------- |
 | Signup / login        | `signInWithOtp({ email })`                           | Confirm signup / Magic Link | `"email"`                  | code             |
-| Change email (attach) | `updateUser({ email })`                              | Change Email Address        | `"email_change"`           | code             |
+| Change email (attach) | `generateLink` + Resend (Tirvea-owned)               | none (app-branded)          | `"email_change"` + commit  | code             |
 | Password reset        | reset email                                          | Reset Password              | — (link session)           | link             |
 | Phone                 | `updateUser({ phone })` / `signInWithOtp({ phone })` | SMS                         | `"phone_change"` / `"sms"` | code (unchanged) |
 

@@ -196,6 +196,44 @@ function escapeHtml(value: string): string {
 export type RenderedEmail = { subject: string; text: string; html: string };
 
 /**
+ * Branded change-email OTP email (email-attach flow). Tirvea owns this
+ * delivery so the 6-digit experience can never regress to Supabase's
+ * default "confirm your new email" LINK template. The code is DISPLAYED,
+ * never linked, because the UI accepts a typed code. Mirrors the
+ * signup/login code email so the product reads as one experience.
+ */
+export function renderEmailAttachOtpEmail(code: string): RenderedEmail {
+  // Codes are digits from GoTrue; strip any markup character defensively
+  // so a malformed value can never inject into the HTML shell.
+  const safe = code.replace(/[<>&"']/g, "");
+  const subject = "Confirm your new Tirvea email address";
+  const text = [
+    "Confirm your new email address",
+    "",
+    "Enter this code in Tirvea to confirm this email address on your account:",
+    "",
+    `    ${safe}`,
+    "",
+    "This code expires shortly. Never share it with anyone.",
+    "",
+    "If you didn't request this change, you can ignore this email - your account is unchanged.",
+    "",
+    "- The Tirvea Team",
+  ].join("\n");
+  const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#faf7f5;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c1917;">
+  <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;padding:32px;border:1px solid #e7e0dc;">
+    <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#be123c;">Tirvea</p>
+    <h1 style="margin:0 0 12px;font-size:19px;line-height:1.35;">Confirm your new email address</h1>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#44403c;">Enter this code in Tirvea to confirm this email address on your account:</p>
+    <div style="font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;padding:20px;background:#f5f2f0;border-radius:12px;margin:0 0 24px;color:#1c1917;">${safe}</div>
+    <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#78716c;">This code expires shortly. Never share it with anyone.</p>
+    <p style="margin:0;font-size:13px;line-height:1.5;color:#78716c;">If you didn't request this change, you can ignore this email - your account is unchanged.</p>
+  </div>
+</body></html>`;
+  return { subject, text, html };
+}
+
+/**
  * Render one notification into an email. The notification title/body are
  * already the calm, legally-safe user copy (safety-notices.ts); this only
  * adds the shell + the deep link. `url` must be a same-origin path.

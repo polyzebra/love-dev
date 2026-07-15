@@ -4,6 +4,7 @@ import { requireSession, withUnavailableGuard, authOk, authError } from "@/lib/a
 import { supabaseServer } from "@/lib/supabase/server";
 import { emailSchema } from "@/lib/validators/auth";
 import { sendEmailAttach, EMAIL_IN_USE_MESSAGE } from "@/lib/auth/email-attach-flow";
+import { realEmailAttachClient } from "@/lib/auth/email-attach-client";
 import { authNextStep } from "@/lib/auth/gate";
 
 const bodySchema = z.object({ email: emailSchema });
@@ -59,7 +60,7 @@ export const POST = withUnavailableGuard("auth:email-attach/send", async (req: R
   const outcome = await sendEmailAttach({
     user,
     email: parsed.data.email,
-    client: supabase.auth,
+    client: realEmailAttachClient(supabase),
     req,
   });
 

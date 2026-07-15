@@ -17,18 +17,24 @@ import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
  * a real address on the CURRENT session's account (replacing a
  * phone-first account's placeholder email); that one signs users in.
  *
- * MECHANISM (the supported way to attach+verify an email on the current
- * auth user, per installed @supabase/auth-js types):
- *   send   = supabase.auth.updateUser({ email }) on the live session -
- *            GoTrue enters its email_change flow and emails a code to
- *            the NEW address.
+ * MECHANISM - Tirvea OWNS the OTP email end to end so it can never
+ * regress to Supabase's default "confirm your new email" LINK template:
+ *   send   = admin.generateLink({ type: "email_change_new" }) mints a
+ *            6-digit code for the move to the NEW address but sends NO
+ *            Supabase email; we then deliver a BRANDED code through
+ *            Tirvea's own Resend pipeline (email.ts).
  *   verify = supabase.auth.verifyOtp({ email, token, type: "email_change" })
- *            (EmailOtpType includes "email_change") - GoTrue stamps
- *            auth.users.email + email_confirmed_at.
- * DASHBOARD REQUIREMENT: "Secure email change" MUST be OFF (see
- * docs/AUTH-SETUP.md). When ON, GoTrue demands confirmations from BOTH
- * addresses - and a phone-first account's current email is an
- * unroutable placeholder, so the flow could never complete.
+ *            proves the caller holds the code, then admin.updateUserById
+ *            ({ email, email_confirm }) FORCE-COMMITS the address onto
+ *            auth.users - independent of dashboard settings, no email.
+ * This deliberately keeps Supabase's email TEMPLATES out of the loop for
+ * this flow: the previous branded 6-digit experience lived in a Supabase
+ * template that silently reverted to the default link, so delivery now
+ * runs through the Resend infrastructure the app already owns.
+ * Because the commit is an admin write, the flow no longer depends on the
+ * "Secure email change" dashboard toggle (which, when ON, would otherwise
+ * leave a phone-first account's unroutable placeholder blocking the
+ * change); if the commit does not stick we fail closed (not_committed).
  *
  * INVARIANTS (one-email-one-account, no merges, no transfers):
  *  1. Normalize + reject junk (invalid shape, disposable, our own
@@ -61,9 +67,36 @@ export const EMAIL_IN_USE_MESSAGE =
 type AuthClientError = { code?: string; message: string; status?: number } | null;
 
 export interface EmailAttachAuthClient {
-  updateUser(attributes: { email: string }): Promise<{ error: AuthClientError }>;
+  /**
+   * Mint a 6-digit email_change OTP for the CURRENT auth user's move to
+   * `newEmail`, WITHOUT sending any Supabase email (admin.generateLink
+   * returns the token; delivery is Tirvea's own, via sendOtpEmail). A null
+   * code (with error) signals failure - `error.code === "email_exists"`
+   * means a GoTrue-only holder owns the address.
+   */
+  generateEmailChangeOtp(params: { userId: string; newEmail: string }): Promise<{
+    code: string | null;
+    error: AuthClientError;
+  }>;
+  /**
+   * Deliver the branded 6-digit code to the new address through Tirvea's
+   * OWN email pipeline (Resend) - never Supabase's default template. The
+   * code MUST NOT be logged.
+   */
+  sendOtpEmail(params: { to: string; code: string }): Promise<{ error: AuthClientError }>;
+  /** Prove the caller possesses the code (GoTrue verifyOtp, email_change). */
   verifyOtp(params: { email: string; token: string; type: "email_change" }): Promise<{
     data: { user: { id: string; email?: string | null } | null; session: object | null };
+    error: AuthClientError;
+  }>;
+  /**
+   * Force-commit the new address onto auth.users (admin updateUserById +
+   * email_confirm) - independent of the "Secure email change" setting and
+   * emitting no Supabase email. Returns the address auth.users now holds
+   * so the caller can confirm the commit stuck before touching the app row.
+   */
+  commitEmailChange(params: { userId: string; email: string }): Promise<{
+    committedEmail: string | null;
     error: AuthClientError;
   }>;
 }
@@ -210,14 +243,17 @@ export async function sendEmailAttach(opts: {
     return { kind: "sent", retryAfter: cooldown.retryAfter, limited: true };
   }
 
-  // (4) Only now may GoTrue run: updateUser({ email }) on the LIVE
-  // session starts the email_change flow and emails the code to the new
-  // address ("Secure email change" OFF - single-OTP attach).
-  const { error } = await opts.client.updateUser({ email });
-  if (error) {
+  // (4) Only now may the provider run. Mint the code via GoTrue WITHOUT
+  // triggering a Supabase email (generateLink returns the token), then
+  // deliver a BRANDED 6-digit code through Tirvea's own Resend pipeline.
+  // This is why the new address gets a code and never Supabase's default
+  // "confirm your new email" link - the Supabase template is out of the
+  // loop for this flow entirely.
+  const gen = await opts.client.generateEmailChangeOtp({ userId: user.id, newEmail: email });
+  if (gen.error || !gen.code) {
     // GoTrue-level holder (an auth.users row we have no app row for,
     // e.g. a pending sign-up): same explicit conflict as CASE 3.
-    if (error.code === "email_exists") {
+    if (gen.error?.code === "email_exists") {
       await recordAuthEvent({
         type: "email_attach_conflict",
         email,
@@ -227,13 +263,32 @@ export async function sendEmailAttach(opts: {
       });
       return { kind: "email_in_use", holderId: "auth_users_only" };
     }
-    console.error(`[auth:email-attach/send] updateUser failed: ${error.message}`);
+    console.error(
+      `[auth:email-attach/send] generateLink failed: ${gen.error?.message ?? "no code returned"}`,
+    );
     await recordAuthEvent({
       type: "email_attach_send_error",
       email,
       userId: user.id,
       req,
-      metadata: { code: error.code ?? error.message },
+      metadata: { code: gen.error?.code ?? gen.error?.message ?? "no_code" },
+    });
+    return { kind: "send_failed" };
+  }
+
+  // Deliver via Tirvea's Resend pipeline. NEVER log the code - only the
+  // transport error ever surfaces in logs or the audit trail.
+  const delivery = await opts.client.sendOtpEmail({ to: email, code: gen.code });
+  if (delivery.error) {
+    console.error(
+      `[auth:email-attach/send] branded OTP email delivery failed: ${delivery.error.message}`,
+    );
+    await recordAuthEvent({
+      type: "email_attach_send_error",
+      email,
+      userId: user.id,
+      req,
+      metadata: { code: delivery.error.code ?? "delivery_failed" },
     });
     return { kind: "send_failed" };
   }
@@ -354,20 +409,21 @@ export async function verifyEmailAttach(opts: {
     return { kind: "invalid_code" };
   }
 
-  // Auth-commit guard: the OTP verified, but the change is only real once
-  // GoTrue has stamped the NEW address onto auth.users.email. With
-  // "Secure email change" ON, verifying only the new-side token leaves
-  // auth.users.email unchanged (new_email stays pending) - committing the
-  // app row now would drift App.email ahead of Auth. Never update the
-  // application email before Supabase Auth confirms the change.
-  const committedEmail = data.user.email?.trim().toLowerCase() ?? null;
-  if (committedEmail !== email) {
+  // Auth-commit: verifyOtp proved the caller holds the code; now stamp the
+  // NEW address onto auth.users via the admin client (email_confirm). This
+  // lands the change regardless of the "Secure email change" dashboard
+  // setting and sends no Supabase email. The change is only real once
+  // auth.users holds the address - never advance the app row before then,
+  // and fail closed (not_committed) if the commit does not stick.
+  const commit = await opts.client.commitEmailChange({ userId: user.id, email });
+  const committedEmail = commit.committedEmail?.trim().toLowerCase() ?? null;
+  if (commit.error || committedEmail !== email) {
     await recordAuthEvent({
       type: "email_attach_verify_fail",
       email,
       userId: user.id,
       req,
-      metadata: { code: "auth_email_not_committed" },
+      metadata: { code: commit.error?.code ?? "auth_email_not_committed" },
     });
     return { kind: "not_committed" };
   }
