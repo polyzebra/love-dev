@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EmailAttachAuthClient } from "@/lib/auth/email-attach-flow";
-import { pickEmailProvider, renderEmailAttachOtpEmail } from "@/lib/services/email";
+import { mintEmailChangeOtp, sendBrandedOtpEmail } from "@/lib/auth/otp-email";
 
 /**
  * Production wiring for the AUTHENTICATED email-attach / change-email flow.
@@ -28,42 +28,15 @@ import { pickEmailProvider, renderEmailAttachOtpEmail } from "@/lib/services/ema
  */
 export function realEmailAttachClient(ssr: SupabaseClient): EmailAttachAuthClient {
   return {
-    async generateEmailChangeOtp({ userId, newEmail }) {
-      const { supabaseAdmin } = await import("@/lib/supabase/admin");
-      const admin = supabaseAdmin();
-      // generateLink(email_change_new) needs the CURRENT auth email exactly
-      // as auth.users holds it (the phone-first placeholder). Resolve it
-      // server-side rather than trusting the app row.
-      const current = await admin.auth.admin.getUserById(userId);
-      const currentEmail = current.data.user?.email;
-      if (current.error || !currentEmail) {
-        return {
-          code: null,
-          error: current.error ?? { message: "current auth user has no email" },
-        };
-      }
-      const { data, error } = await admin.auth.admin.generateLink({
-        // "email_change_new" is a valid GoTrue link type but not in the
-        // installed auth-js union - assert the shape locally.
-        type: "email_change_new",
-        email: currentEmail,
-        newEmail,
-      } as Parameters<typeof admin.auth.admin.generateLink>[0]);
-      if (error) return { code: null, error };
-      const code = (data?.properties as { email_otp?: string } | undefined)?.email_otp ?? null;
-      return { code, error: null };
+    // Both the mint and the delivery are the SHARED OTP path (otp-email.ts):
+    // identical branded email + sender as signup/login, no Supabase email.
+    generateEmailChangeOtp({ userId, newEmail }) {
+      return mintEmailChangeOtp(userId, newEmail);
     },
 
     async sendOtpEmail({ to, code }) {
-      const rendered = renderEmailAttachOtpEmail(code);
-      const result = await pickEmailProvider().send({
-        to,
-        subject: rendered.subject,
-        text: rendered.text,
-        html: rendered.html,
-      });
-      if (result.ok) return { error: null };
-      return { error: { code: result.errorCode, message: result.errorMessage } };
+      const { error } = await sendBrandedOtpEmail(to, code);
+      return { error };
     },
 
     async verifyOtp(params) {

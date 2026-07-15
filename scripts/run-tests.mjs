@@ -55,6 +55,7 @@ const UNIT = new Set([
   "notifications-web-surface.test.ts",
   "auth-transport.test.ts",
   "api-contract.test.ts",
+  "otp-email.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

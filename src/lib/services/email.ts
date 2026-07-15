@@ -25,6 +25,8 @@ export type EmailMessage = {
   subject: string;
   text: string;
   html?: string;
+  /** Sender override. Defaults to EMAIL_FROM. OTP mail uses OTP_EMAIL_FROM. */
+  from?: string;
   /** Stable key so a provider-side retry cannot double-send. */
   idempotencyKey?: string;
 };
@@ -101,7 +103,7 @@ export const resendEmailProvider: EmailProvider = {
           ...(message.idempotencyKey ? { "Idempotency-Key": message.idempotencyKey } : {}),
         },
         body: JSON.stringify({
-          from: emailFrom(),
+          from: message.from?.trim() || emailFrom(),
           to: message.to,
           subject: message.subject,
           text: message.text,
@@ -196,41 +198,133 @@ function escapeHtml(value: string): string {
 export type RenderedEmail = { subject: string; text: string; html: string };
 
 /**
- * Branded change-email OTP email (email-attach flow). Tirvea owns this
- * delivery so the 6-digit experience can never regress to Supabase's
- * default "confirm your new email" LINK template. The code is DISPLAYED,
- * never linked, because the UI accepts a typed code. Mirrors the
- * signup/login code email so the product reads as one experience.
+ * The sender for EVERY 6-digit OTP email (signup, login, resend, email
+ * attach, change email). One branded address, overridable via env for
+ * environments whose Resend key is verified for a different domain.
  */
-export function renderEmailAttachOtpEmail(code: string): RenderedEmail {
+export const OTP_EMAIL_FROM = process.env.EMAIL_OTP_FROM?.trim() || "Tirvea <noreply@tirvea.com>";
+
+/** Support address shown in the OTP email footer. */
+export const OTP_SUPPORT_EMAIL = "support@tirvea.com";
+
+/** The canonical OTP subject - identical across every flow. */
+export const OTP_EMAIL_SUBJECT = "Your Tirvea verification code";
+
+/**
+ * THE canonical branded OTP email - the single source of truth for every
+ * Tirvea flow that shows a 6-digit code screen (signup, login, resend,
+ * email attach, change email, and their resends). There is exactly ONE
+ * renderer and ONE subject so every flow produces an IDENTICAL email; the
+ * code is DISPLAYED, never linked (no magic link, no ConfirmationURL), so
+ * an OTP screen can never be paired with a link email. Password reset is
+ * deliberately NOT an OTP flow and does not use this.
+ *
+ * Presentation: large centered code, responsive (max-width + fluid),
+ * dark-mode friendly (prefers-color-scheme), accessible (semantic
+ * heading, high contrast, the code exposed to assistive tech as text).
+ */
+/**
+ * Deliver the canonical branded 6-digit OTP email - the SINGLE function
+ * every flow (signup, login, resend, email attach, change email) calls to
+ * send a code. Identical subject, HTML, footer and sender everywhere,
+ * because it renders through renderOtpEmail and sends from OTP_EMAIL_FROM.
+ * The OTP code is NEVER logged by callers.
+ */
+export async function sendBrandedOtpEmail(
+  to: string,
+  code: string,
+): Promise<{ ok: boolean; error: { code?: string; message: string } | null }> {
+  const rendered = renderOtpEmail(code);
+  const result = await pickEmailProvider().send({
+    to,
+    from: OTP_EMAIL_FROM,
+    subject: rendered.subject,
+    text: rendered.text,
+    html: rendered.html,
+  });
+  if (result.ok) return { ok: true, error: null };
+  return { ok: false, error: { code: result.errorCode, message: result.errorMessage } };
+}
+
+export function renderOtpEmail(code: string): RenderedEmail {
   // Codes are digits from GoTrue; strip any markup character defensively
   // so a malformed value can never inject into the HTML shell.
   const safe = code.replace(/[<>&"']/g, "");
-  const subject = "Confirm your new Tirvea email address";
   const text = [
-    "Confirm your new email address",
+    "Tirvea",
     "",
-    "Enter this code in Tirvea to confirm this email address on your account:",
+    "Your verification code",
+    "",
+    "Use this code to continue with Tirvea.",
     "",
     `    ${safe}`,
     "",
-    "This code expires shortly. Never share it with anyone.",
+    "This code expires in 10 minutes.",
+    "Never share this code with anyone.",
     "",
-    "If you didn't request this change, you can ignore this email - your account is unchanged.",
+    "If you didn't request this code, you can safely ignore this email.",
     "",
-    "- The Tirvea Team",
+    `Need help? ${OTP_SUPPORT_EMAIL}`,
   ].join("\n");
-  const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#faf7f5;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c1917;">
-  <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;padding:32px;border:1px solid #e7e0dc;">
-    <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#be123c;">Tirvea</p>
-    <h1 style="margin:0 0 12px;font-size:19px;line-height:1.35;">Confirm your new email address</h1>
-    <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#44403c;">Enter this code in Tirvea to confirm this email address on your account:</p>
-    <div style="font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;padding:20px;background:#f5f2f0;border-radius:12px;margin:0 0 24px;color:#1c1917;">${safe}</div>
-    <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#78716c;">This code expires shortly. Never share it with anyone.</p>
-    <p style="margin:0;font-size:13px;line-height:1.5;color:#78716c;">If you didn't request this change, you can ignore this email - your account is unchanged.</p>
-  </div>
-</body></html>`;
-  return { subject, text, html };
+  const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <title>${OTP_EMAIL_SUBJECT}</title>
+    <style>
+      :root { color-scheme: light dark; supported-color-schemes: light dark; }
+      body { margin: 0; padding: 0; background: #faf7f5; }
+      .wrap { width: 100%; background: #faf7f5; padding: 24px 0; }
+      .card {
+        max-width: 480px; margin: 0 auto; background: #ffffff;
+        border: 1px solid #e7e0dc; border-radius: 16px; padding: 40px 32px;
+        font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #1c1917;
+      }
+      .brand { margin: 0 0 24px; font-size: 15px; font-weight: 700; letter-spacing: .2px; color: #be123c; }
+      .h1 { margin: 0 0 12px; font-size: 20px; line-height: 1.3; font-weight: 600; color: #1c1917; }
+      .lead { margin: 0 0 28px; font-size: 15px; line-height: 1.6; color: #44403c; }
+      .code {
+        font-size: 34px; font-weight: 700; letter-spacing: 10px; text-align: center;
+        padding: 22px 12px; background: #f5f2f0; border-radius: 12px; margin: 0 0 28px;
+        color: #1c1917; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      }
+      .meta { margin: 0 0 6px; font-size: 13px; line-height: 1.6; color: #78716c; }
+      .hr { border: none; border-top: 1px solid #ece7e3; margin: 28px 0 20px; }
+      .foot { margin: 0; font-size: 13px; line-height: 1.6; color: #78716c; }
+      .foot a { color: #be123c; text-decoration: none; }
+      @media (prefers-color-scheme: dark) {
+        body, .wrap { background: #1c1917 !important; }
+        .card { background: #262322 !important; border-color: #3a3634 !important; color: #f5f2f0 !important; }
+        .h1 { color: #f5f2f0 !important; }
+        .lead { color: #d6d1cd !important; }
+        .code { background: #1c1917 !important; color: #f5f2f0 !important; }
+        .meta, .foot { color: #a8a29e !important; }
+        .hr { border-top-color: #3a3634 !important; }
+        .brand, .foot a { color: #fb7185 !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap" role="article" aria-roledescription="email" aria-label="${OTP_EMAIL_SUBJECT}">
+      <div class="card">
+        <p class="brand">Tirvea</p>
+        <h1 class="h1">Your verification code</h1>
+        <p class="lead">Use this code to continue with Tirvea.</p>
+        <div class="code" role="text" aria-label="Your verification code is ${safe.split("").join(" ")}">${safe}</div>
+        <p class="meta">This code expires in 10 minutes.</p>
+        <p class="meta">Never share this code with anyone.</p>
+        <p class="meta">If you didn't request this code, you can safely ignore this email.</p>
+        <hr class="hr" />
+        <p class="foot">Need help? <a href="mailto:${OTP_SUPPORT_EMAIL}">${OTP_SUPPORT_EMAIL}</a></p>
+      </div>
+    </div>
+  </body>
+</html>`;
+  return { subject: OTP_EMAIL_SUBJECT, text, html };
 }
 
 /**

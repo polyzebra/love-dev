@@ -1,22 +1,30 @@
 import { z } from "zod";
-import { supabaseServer } from "@/lib/supabase/server";
 import { withUnavailableGuard, authOk, authError } from "@/lib/api";
 import { emailSchema } from "@/lib/validators/auth";
 import { isDisposableEmail } from "@/lib/auth/disposable-domains";
 import { checkOtpSendIpLimit, resendCooldown } from "@/lib/auth/rate-limit";
 import { ipHashFrom, recordAuthEvent } from "@/lib/auth/audit";
+import { mintEmailLoginOtp, sendBrandedOtpEmail } from "@/lib/auth/otp-email";
 
 const bodySchema = z.object({ email: emailSchema });
 
 /**
  * POST /api/auth/email/send { email } -> { ok: true, retryAfter }
  *
- * Sends a 6-digit sign-in code. The response is ALWAYS the same neutral
- * 200 - disposable domains, rate limits and provider hiccups are never
- * revealed to the caller (they differ only in the audit trail). Account
- * enumeration gets nothing here. `retryAfter` (seconds) is the one thing
- * every caller learns: when the resend unlocks - it is identical whether
- * the code went out or the limiter swallowed the request.
+ * Sends a 6-digit sign-in code (signup OR login - unified). The code is
+ * minted with admin.generateLink({ type: "magiclink" }) - which
+ * auto-creates a new auth user and issues an email_otp for an existing
+ * one, exactly like signInWithOtp({ shouldCreateUser }) did, but WITHOUT
+ * any Supabase email - then delivered by Tirvea's own branded OTP email
+ * (the single canonical renderer). No Supabase template is ever used;
+ * verify stays verifyOtp({ type: "email" }).
+ *
+ * The response is ALWAYS the same neutral 200 - disposable domains, rate
+ * limits, mint and delivery failures are never revealed to the caller
+ * (they differ only in the audit trail). Account enumeration gets nothing
+ * here. `retryAfter` (seconds) is the one thing every caller learns: when
+ * the resend unlocks - it is identical whether the code went out or the
+ * limiter swallowed the request.
  *
  * Infrastructure failures (the DB-backed limiter cannot reach the
  * database, etc.) answer a clear 503 instead of an anonymous 500 - the
@@ -70,19 +78,29 @@ export const POST = withUnavailableGuard("auth:email/send", async (req: Request)
     return neutral;
   }
 
-  const supabase = await supabaseServer();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: true },
-  });
-  if (error) {
-    // Provider-side failure (their rate limit, SMTP trouble): still neutral
-    console.error(`[auth:email/send] signInWithOtp failed: ${error.message}`);
+  // Mint the code (magiclink: auto-creates new users, no Supabase email)
+  // then deliver the canonical branded OTP email. A mint OR delivery
+  // failure stays neutral - the caller never learns which, and the OTP
+  // code is never logged.
+  const minted = await mintEmailLoginOtp(email);
+  if (minted.error || !minted.code) {
+    console.error(`[auth:email/send] generateLink(magiclink) failed: ${minted.error?.message}`);
     await recordAuthEvent({
       type: "email_otp_send_error",
       email,
       req,
-      metadata: { code: error.code ?? null },
+      metadata: { code: minted.error?.code ?? "no_code" },
+    });
+    return neutral;
+  }
+  const delivery = await sendBrandedOtpEmail(email, minted.code);
+  if (!delivery.ok) {
+    console.error(`[auth:email/send] branded OTP delivery failed: ${delivery.error?.message}`);
+    await recordAuthEvent({
+      type: "email_otp_send_error",
+      email,
+      req,
+      metadata: { code: delivery.error?.code ?? "delivery_failed" },
     });
     return neutral;
   }
