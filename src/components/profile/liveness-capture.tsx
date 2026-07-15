@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { Camera, RefreshCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LIVENESS_COPY, type LivenessCaptureState } from "@/lib/verification-presentation";
+import dynamic from "next/dynamic";
+
+// Heavy AWS Amplify SDK: dynamically imported so it never ships to other
+// routes (TASK 4). Mounted only during an active capture.
+const LivenessDetector = dynamic(
+  () => import("@/components/profile/liveness-detector").then((m) => m.LivenessDetector),
+  { ssr: false },
+);
 
 /**
  * Video-selfie liveness capture (Phase 23). Loaded via next/dynamic from
@@ -146,6 +154,17 @@ export function LivenessCapture({
         <div className="min-w-0 flex-1">
           <p className="font-display text-lg font-medium tracking-tight">{copy.title}</p>
           <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{copy.body}</p>
+
+          {flowId && (state === "capture_submitted" || state === "liveness_processing") && (
+            <div className="mt-3">
+              <LivenessDetector
+                flowId={flowId}
+                onComplete={() => setState("liveness_processing")}
+                onFailed={() => setState("capture_failed")}
+                onUnavailable={() => setState("provider_unavailable")}
+              />
+            </div>
+          )}
 
           {state === "consent_required" && (
             <div className="bg-foreground/5 text-muted-foreground mt-3 flex items-start gap-3 rounded-2xl p-4 text-sm leading-relaxed">

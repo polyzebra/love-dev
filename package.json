@@ -26,11 +26,13 @@
     "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check"
   },
   "dependencies": {
+    "@aws-amplify/ui-react-liveness": "^3.6.7",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.110.0",
+    "aws-amplify": "^6.18.0",
     "blurhash": "^2.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
