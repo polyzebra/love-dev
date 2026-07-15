@@ -191,10 +191,24 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
  * logs or analytics (client rule), and this accessor refuses foreign,
  * expired, invalidated or consumed flows.
  */
+export type LivenessCaptureHandle = {
+  sessionId: string;
+  region: string;
+  /** Short-lived STS streaming credentials for FaceLivenessDetectorCore's
+   *  credentialProvider (NO Cognito). Scoped to StartFaceLivenessSession
+   *  only; issued once per capture to the flow owner. */
+  credentials: {
+    accessKeyId: string;
+    secretAccessKey: string;
+    sessionToken: string;
+    expiration: string;
+  };
+};
+
 export async function getLivenessCaptureHandle(
   flowId: string,
   userId: string,
-): Promise<{ sessionId: string; region: string } | null> {
+): Promise<LivenessCaptureHandle | null> {
   const environment = faceEnvironment();
   const session = await db.livenessSession.findUnique({ where: { flowId } });
   if (
@@ -208,7 +222,31 @@ export async function getLivenessCaptureHandle(
     return null;
   }
   const { getFaceMatchProvider } = await import("@/lib/services/face-match-providers");
-  return { sessionId: session.sessionId, region: getFaceMatchProvider().region ?? "eu-west-1" };
+  const { assumeLivenessStreamingRole, livenessStreamingConfigured } =
+    await import("@/lib/services/aws-sts");
+  // Mock provider needs no real streaming creds (dev/tests): a placeholder
+  // keeps the flow exercisable. Real providers REQUIRE the STS role.
+  const region = getFaceMatchProvider().region ?? "eu-west-1";
+  if (!livenessStreamingConfigured()) {
+    if (getFaceMatchProvider().name === "mock") {
+      return {
+        sessionId: session.sessionId,
+        region,
+        credentials: {
+          accessKeyId: "MOCK",
+          secretAccessKey: "MOCK",
+          sessionToken: "MOCK",
+          expiration: new Date(Date.now() + 900_000).toISOString(),
+        },
+      };
+    }
+    return null; // streaming role not configured for a real provider
+  }
+  // Owner-scoped: the session id already proved ownership above; the STS
+  // session name is a non-PII hash of (flow, user).
+  const credentials = await assumeLivenessStreamingRole(`${flowId}:${userId}`);
+  if (!credentials) return null;
+  return { sessionId: session.sessionId, region, credentials };
 }
 
 /** Invalidate all open sessions for a user (rotation / re-challenge). */

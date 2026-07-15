@@ -47,6 +47,62 @@ NOT granted at runtime: `CreateCollection`, `DeleteCollection`,
 credential — the `purgeAllReferences()` path refuses without the admin
 pair.
 
+Runtime ALSO gets a single narrowly-scoped `sts:AssumeRole` for the
+browser streaming role (below) — nothing wider:
+
+```json
+{
+  "Sid": "AssumeLivenessStreamingRole",
+  "Effect": "Allow",
+  "Action": "sts:AssumeRole",
+  "Resource": "arn:aws:iam::<ACCOUNT_ID>:role/TirveaFaceLivenessStreaming"
+}
+```
+
+## Browser streaming role — `TirveaFaceLivenessStreaming` (NO Cognito)
+
+The AWS Face Liveness capture streams video directly from the browser to
+Rekognition (`StartFaceLivenessSession`), which needs temporary AWS
+credentials client-side. We mint them via **STS AssumeRole** (not a
+Cognito Identity Pool). Supabase remains the only auth provider; these
+AWS credentials are server-minted, per-capture, short-lived (<=15 min),
+and issued only to the authenticated flow owner. The role grants EXACTLY
+one action:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LivenessStreamingOnly",
+      "Effect": "Allow",
+      "Action": "rekognition:StartFaceLivenessSession",
+      "Resource": "*",
+      "Condition": { "StringEquals": { "aws:RequestedRegion": "eu-west-1" } }
+    }
+  ]
+}
+```
+
+Trust policy (only the runtime principal may assume it):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::<ACCOUNT_ID>:user/tirvea-face-services" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+The credentials handed to the browser can therefore ONLY start a liveness
+stream — never `IndexFaces` / `SearchFaces` / `DeleteFaces` / collection
+admin. Env: `FACE_LIVENESS_ROLE_ARN`, `FACE_LIVENESS_STS_TTL_SECONDS`.
+
 ## Admin credential (`AWS_ADMIN_ACCESS_KEY_ID` / `AWS_ADMIN_SECRET_ACCESS_KEY`)
 
 Used only by the ops CLI (collection create/validate, emergency purge).

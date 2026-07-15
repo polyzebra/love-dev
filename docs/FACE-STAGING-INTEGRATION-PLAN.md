@@ -18,9 +18,12 @@ production collection. Do NOT enable `FACE_MATCH_PROVIDER` in production.
   `FACE_MATCH_PROVIDER=aws_rekognition_faces`, `FACE_LIVENESS_ENABLED=1`,
   `FACE_LEGAL_APPROVAL_VERSION=staging-only`.
 - A dedicated test account (not a real member).
-- The Amplify `FaceLivenessDetector` component wired into
+- The Amplify `FaceLivenessDetectorCore` component (NO Cognito) wired into
   `LivenessCapture` (behind the existing dynamic import) — this is the one
-  remaining build step; the endpoints + state machine already exist.
+  remaining build step; the endpoints (incl. the STS-backed owner-scoped
+  capture handle) + state machine already exist. Provision the
+  `TirveaFaceLivenessStreaming` STS role (docs/AWS-IAM-VERIFICATION.md);
+  no Cognito Identity Pool.
 
 ## Session-config verification (the M-2 core question)
 

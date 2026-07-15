@@ -8,7 +8,7 @@
  */
 import "dotenv/config";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
@@ -187,7 +187,11 @@ async function main() {
       const foreign = await getLivenessCaptureHandle(flow, bob);
       assert.equal(foreign, null, "foreign user cannot get another's sessionId");
       await invalidateOpenLivenessSessions(alice);
-      assert.equal(await getLivenessCaptureHandle(flow, alice), null, "invalidated flow yields no handle");
+      assert.equal(
+        await getLivenessCaptureHandle(flow, alice),
+        null,
+        "invalidated flow yields no handle",
+      );
     });
     await check("no sessionId/flow id in client URLs, hash, storage (source pin)", () => {
       const card = stripped(src("components", "profile", "liveness-capture.tsx"));
@@ -538,6 +542,90 @@ async function main() {
         }
       },
     );
+
+    // ------------------------------------------- STS streaming (NO Cognito)
+    console.log("STS AssumeRole streaming credentials (no Cognito)");
+    await check("AssumeRole request is well-formed; parses short-lived creds", async () => {
+      const { assumeLivenessStreamingRole, setStsTransport, livenessStreamingConfigured } =
+        await import("../src/lib/services/aws-sts");
+      const saved = {
+        arn: process.env.FACE_LIVENESS_ROLE_ARN,
+        ak: process.env.AWS_ACCESS_KEY_ID,
+        sk: process.env.AWS_SECRET_ACCESS_KEY,
+      };
+      process.env.FACE_LIVENESS_ROLE_ARN =
+        "arn:aws:iam::111122223333:role/TirveaFaceLivenessStreaming";
+      process.env.AWS_ACCESS_KEY_ID = "AKIATEST";
+      process.env.AWS_SECRET_ACCESS_KEY = "s";
+      assert.equal(livenessStreamingConfigured(), true);
+      let captured: Record<string, string> = {};
+      setStsTransport(async (params) => {
+        captured = params;
+        return `<AssumeRoleResponse><AssumeRoleResult><Credentials>
+          <AccessKeyId>ASIAEXAMPLE</AccessKeyId>
+          <SecretAccessKey>secretbytes</SecretAccessKey>
+          <SessionToken>tok</SessionToken>
+          <Expiration>2026-01-01T00:15:00Z</Expiration>
+          </Credentials></AssumeRoleResult></AssumeRoleResponse>`;
+      });
+      try {
+        const creds = await assumeLivenessStreamingRole("flow:user");
+        assert.equal(captured.Action, "AssumeRole");
+        assert.equal(captured.RoleArn, process.env.FACE_LIVENESS_ROLE_ARN);
+        assert.match(
+          captured.RoleSessionName,
+          /^tirvea-live-[0-9a-f]{16}$/,
+          "non-PII session name",
+        );
+        assert.ok(Number(captured.DurationSeconds) >= 900);
+        assert.equal(creds?.accessKeyId, "ASIAEXAMPLE");
+        assert.equal(creds?.sessionToken, "tok");
+      } finally {
+        setStsTransport(null);
+        const restore = (k: string, v: string | undefined) => {
+          if (v === undefined) delete process.env[k];
+          else process.env[k] = v;
+        };
+        restore("FACE_LIVENESS_ROLE_ARN", saved.arn);
+        restore("AWS_ACCESS_KEY_ID", saved.ak);
+        restore("AWS_SECRET_ACCESS_KEY", saved.sk);
+      }
+    });
+    await check("capture handle issues creds to the owner only; denies foreign", async () => {
+      const { getLivenessCaptureHandle } = await import("../src/lib/services/face-liveness");
+      const owner = await mkUser("stsowner", "20");
+      const intruder = await mkUser("stsintruder", "21");
+      await enqueueProfilePhotoVerification(owner, "identity_verified", { consent: true });
+      const created = await createBoundLivenessSession(owner);
+      assert.ok(!("error" in created), "session created for owner");
+      const flow = (created as { flowId: string }).flowId;
+      const mine = await getLivenessCaptureHandle(flow, owner);
+      assert.ok(
+        mine?.credentials?.accessKeyId,
+        "owner gets streaming credentials (mock placeholder in dev)",
+      );
+      assert.equal(await getLivenessCaptureHandle(flow, intruder), null, "foreign user gets none");
+    });
+    await check("no Cognito anywhere in the codebase (source pin)", () => {
+      const walk = (dir: string): string[] =>
+        readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
+          d.name === "generated" || d.name === "node_modules"
+            ? []
+            : d.isDirectory()
+              ? walk(path.join(dir, d.name))
+              : d.name.endsWith(".ts") || d.name.endsWith(".tsx")
+                ? [path.join(dir, d.name)]
+                : [],
+        );
+      for (const f of walk(path.join(process.cwd(), "src"))) {
+        const body = readFileSync(f, "utf8");
+        // "NO Cognito" annotations are allowed; an actual dependency is not.
+        assert.ok(
+          !/CognitoIdentity|@aws-amplify\/auth|IdentityPoolId|fromCognitoIdentityPool/.test(body),
+          `${f} has no Cognito dependency`,
+        );
+      }
+    });
 
     // ---------------------------------------------------------------- M-1
     console.log("M-1 consent accuracy");

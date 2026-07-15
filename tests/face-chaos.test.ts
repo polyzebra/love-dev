@@ -358,6 +358,7 @@ async function main() {
         "moderation-providers.ts",
         "billing.ts",
         "aws-rekognition.ts",
+        "aws-sts.ts",
       ]);
       for (const file of services) {
         if (adapterFiles.has(file)) continue;

@@ -17,23 +17,33 @@ import { LIVENESS_COPY, type LivenessCaptureState } from "@/lib/verification-pre
  * Tirvea's servers. Only an opaque flowId lives in component state - it
  * is never written to the URL, storage, history or analytics (C-1).
  *
- * Vendor SDK integration (TASK 1) - documented drop-in, not yet
- * committed because it needs (a) `npm i @aws-amplify/ui-react-liveness
- * aws-amplify`, (b) a Cognito Identity Pool for the browser's streaming
- * credentials, and (c) a real human capture to test - none available in
- * CI. When those land, mount the detector in "capture_submitted":
+ * Vendor SDK integration (TASK 1) - NO Cognito. Documented drop-in
+ * (needs `npm i @aws-amplify/ui-react-liveness aws-amplify` + a real human
+ * capture to test - unavailable in CI). Mount FaceLivenessDetectorCore
+ * with a credentialProvider fed by our OWNER-SCOPED capture handle, which
+ * returns short-lived STS AssumeRole credentials (Supabase stays the only
+ * auth provider; AWS creds are minted server-side, scoped to
+ * StartFaceLivenessSession, and issued per-capture to the flow owner):
  *
- *   const { FaceLivenessDetector } = await import("@aws-amplify/ui-react-liveness");
- *   // fetch the OWNER-SCOPED capture handle (never a URL/storage value):
- *   const h = await fetch(`/api/verification/liveness/${flowId}/capture`).then(r=>r.json());
- *   <FaceLivenessDetector sessionId={h.data.sessionId} region={h.data.region}
+ *   const { FaceLivenessDetectorCore } = await import("@aws-amplify/ui-react-liveness");
+ *   const h = (await fetch(`/api/verification/liveness/${flowId}/capture`).then(r=>r.json())).data;
+ *   <FaceLivenessDetectorCore
+ *     sessionId={h.sessionId}
+ *     region={h.region}
+ *     config={{ credentialProvider: async () => ({
+ *       accessKeyId: h.credentials.accessKeyId,
+ *       secretAccessKey: h.credentials.secretAccessKey,
+ *       sessionToken: h.credentials.sessionToken,
+ *       expiration: new Date(h.credentials.expiration),
+ *     }) }}
  *     onAnalysisComplete={async () => setState("liveness_processing")}
  *     onError={() => setState("capture_failed")} />
  *
- * The sessionId is transient (capture stream only), owner-scoped, and
- * confers no authority - result consumption stays flowId-bound. Until the
- * detector mounts, this renders the full state machine + capture handoff
- * so states, a11y, consent, retry and degradation are exercisable.
+ * The sessionId + STS creds are transient (capture stream only), never
+ * placed in URL/storage/logs, and confer no authority - result
+ * consumption stays flowId-bound. Until the detector mounts, this renders
+ * the full state machine + capture handoff so states, a11y, consent,
+ * retry and degradation stay exercisable.
  */
 export function LivenessCapture({
   consentVersion,
