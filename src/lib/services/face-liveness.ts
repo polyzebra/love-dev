@@ -180,6 +180,37 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
   return { state: "checking_profile_photos" };
 }
 
+/**
+ * Owner-scoped capture handle (TASK 1 / C-1 refinement). The AWS Amplify
+ * FaceLivenessDetector MUST receive the raw sessionId in the browser to
+ * stream the capture - so "sessionId never reaches the browser" is
+ * softened to: the sessionId is released ONLY to the authenticated owner
+ * of the flow, transiently, for the capture stream. It confers NO
+ * authority - result consumption stays flowId+owner+environment bound in
+ * consumeLivenessFlow. The sessionId is never placed in URLs, storage,
+ * logs or analytics (client rule), and this accessor refuses foreign,
+ * expired, invalidated or consumed flows.
+ */
+export async function getLivenessCaptureHandle(
+  flowId: string,
+  userId: string,
+): Promise<{ sessionId: string; region: string } | null> {
+  const environment = faceEnvironment();
+  const session = await db.livenessSession.findUnique({ where: { flowId } });
+  if (
+    !session ||
+    session.userId !== userId ||
+    session.environment !== environment ||
+    session.invalidatedAt ||
+    ["INVALIDATED", "EXPIRED", "CONSUMED"].includes(session.status) ||
+    session.expiresAt < new Date()
+  ) {
+    return null;
+  }
+  const { getFaceMatchProvider } = await import("@/lib/services/face-match-providers");
+  return { sessionId: session.sessionId, region: getFaceMatchProvider().region ?? "eu-west-1" };
+}
+
 /** Invalidate all open sessions for a user (rotation / re-challenge). */
 export async function invalidateOpenLivenessSessions(userId: string): Promise<void> {
   await db.livenessSession.updateMany({

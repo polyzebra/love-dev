@@ -177,6 +177,18 @@ async function main() {
       });
       assert.equal((await consumeLivenessFlow(flow, bob)).state, "denied");
     });
+    await check("capture handle (Amplify sessionId) released ONLY to the owner", async () => {
+      const { getLivenessCaptureHandle } = await import("../src/lib/services/face-liveness");
+      const created = await createBoundLivenessSession(alice);
+      const flow = (created as { flowId: string }).flowId;
+      const mine = await getLivenessCaptureHandle(flow, alice);
+      assert.ok(mine?.sessionId, "owner gets the capture handle");
+      assert.equal(mine!.region, "eu-west-1");
+      const foreign = await getLivenessCaptureHandle(flow, bob);
+      assert.equal(foreign, null, "foreign user cannot get another's sessionId");
+      await invalidateOpenLivenessSessions(alice);
+      assert.equal(await getLivenessCaptureHandle(flow, alice), null, "invalidated flow yields no handle");
+    });
     await check("no sessionId/flow id in client URLs, hash, storage (source pin)", () => {
       const card = stripped(src("components", "profile", "liveness-capture.tsx"));
       assert.ok(!/location\.hash/.test(card), "no URL hash writes");
