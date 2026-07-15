@@ -237,19 +237,36 @@ export async function evaluateVerificationAlerts(): Promise<string[]> {
   };
   const metrics = await computeVerificationMetrics(1);
   const fired: string[] = [];
-  const { raiseOpsAlert } = await import("@/lib/services/provider-resilience");
+  const { raiseOpsAlert, resolveOpsAlert } = await import("@/lib/services/provider-resilience");
   const fire = async (kind: string, detail: string) => {
     fired.push(kind);
     await raiseOpsAlert(kind, detail);
   };
+  // Resolved notifications: kinds that fired within the last day but are
+  // clear this evaluation get a one-time "resolved" on the external channel.
+  const resolveIfWasFiring = async (kind: string) => {
+    const wasFiring = await db.verificationAuditEvent.findFirst({
+      where: {
+        eventType: "ops_alert",
+        reasonCode: kind,
+        createdAt: { gte: new Date(Date.now() - 24 * 3600 * 1000) },
+      },
+      select: { id: true },
+    });
+    if (wasFiring) await resolveOpsAlert(kind);
+  };
 
+  let anyProviderTrouble = false;
   for (const [provider, state] of Object.entries(metrics.providers)) {
     if (state === "UNAVAILABLE") {
+      anyProviderTrouble = true;
       await fire("provider_down", `${provider} is UNAVAILABLE - verifications are parking safely.`);
     } else if (state === "DEGRADED") {
+      anyProviderTrouble = true;
       await fire("provider_degraded", `${provider} is DEGRADED - watch the queue.`);
     }
   }
+  if (!anyProviderTrouble) await resolveIfWasFiring("provider_down");
   const stallMin = num(process.env.ALERT_QUEUE_STALL_MINUTES, 60);
   if ((metrics.face.oldestQueuedMinutes ?? 0) > stallMin) {
     await fire(

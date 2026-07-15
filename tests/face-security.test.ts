@@ -38,6 +38,9 @@ const code = (...parts: string[]) =>
 async function main() {
   process.env.VERIFICATION_PROVIDER = "mock";
   process.env.FACE_MATCH_PROVIDER = "mock";
+  // rollout gates (Phase 32) - this suite exercises the gated features
+  process.env.FACE_DUPLICATE_SEARCH_ENABLED = "1";
+  process.env.FACE_AUTO_SUSPEND_ENABLED = "1";
 
   const { bandFromScore, scoreFaceSignals, computeVerificationRisk } =
     await import("../src/lib/services/risk-engine");
@@ -118,20 +121,12 @@ async function main() {
   // ------------------------------------------- duplicate classification
   console.log("duplicate identity classification (pure matrix)");
 
-  await check("all seven outcomes are reachable and correctly ordered", () => {
+  await check("duplicate matrix: evidence-based outcomes (Phase 29 revision)", () => {
     assert.equal(classifyDuplicateMatch({ band: "confident", other: null }), "UNKNOWN");
     assert.equal(
       classifyDuplicateMatch({
-        band: "confident",
-        other: { sameLegalIdentity: true, verifiedFirst: true, flaggedForImpersonation: false },
-      }),
-      "SELF_RESTORE",
-      "own restored account is benign even when it verified first",
-    );
-    assert.equal(
-      classifyDuplicateMatch({
         band: "uncertain",
-        other: { sameLegalIdentity: false, verifiedFirst: true, flaggedForImpersonation: false },
+        other: { verifiedFirst: true, flaggedForImpersonation: false, birthDateMatches: false },
       }),
       "FAMILY_RESEMBLANCE",
       "mid-band similarity defaults to relatives, not fraud",
@@ -139,7 +134,7 @@ async function main() {
     assert.equal(
       classifyDuplicateMatch({
         band: "confident",
-        other: { sameLegalIdentity: false, verifiedFirst: true, flaggedForImpersonation: false },
+        other: { verifiedFirst: true, flaggedForImpersonation: false, birthDateMatches: false },
       }),
       "LIKELY_IMPERSONATION",
       "confident match to a FIRST-verified other account",
@@ -147,7 +142,7 @@ async function main() {
     assert.equal(
       classifyDuplicateMatch({
         band: "confident",
-        other: { sameLegalIdentity: false, verifiedFirst: false, flaggedForImpersonation: true },
+        other: { verifiedFirst: false, flaggedForImpersonation: true, birthDateMatches: false },
       }),
       "LIKELY_IMPERSONATION",
       "confident match to an impersonation-flagged account",
@@ -155,14 +150,25 @@ async function main() {
     assert.equal(
       classifyDuplicateMatch({
         band: "confident",
-        other: { sameLegalIdentity: false, verifiedFirst: false, flaggedForImpersonation: false },
+        other: { verifiedFirst: false, flaggedForImpersonation: false, birthDateMatches: true },
+      }),
+      "TWIN_RISK",
+      "matching birth dates = evidence-based twin signal (now emitted)",
+    );
+    assert.equal(
+      classifyDuplicateMatch({
+        band: "confident",
+        other: { verifiedFirst: false, flaggedForImpersonation: false, birthDateMatches: false },
       }),
       "LIKELY_DUPLICATE",
-      "confident match where THIS user was first: duplicate/twin - human question",
+      "confident match, this user first, no twin evidence - human question",
     );
+    // SELF_RESTORE is deprecated from AUTOMATIC classification (Phase 29):
+    // the classifier can no longer emit it - restores resolve via manual
+    // review/appeal. The enum value survives for historical rows only.
     assert.equal(worstDuplicateClass([]), "UNKNOWN");
     assert.equal(
-      worstDuplicateClass(["SELF_RESTORE", "LIKELY_IMPERSONATION", "FAMILY_RESEMBLANCE"]),
+      worstDuplicateClass(["TWIN_RISK", "LIKELY_IMPERSONATION", "FAMILY_RESEMBLANCE"]),
       "LIKELY_IMPERSONATION",
       "worst outcome wins aggregation",
     );
@@ -361,6 +367,11 @@ async function main() {
         });
         // stage a confident match to a LATER-verified, unflagged account
         const late = await mkUser("late", "04", new Date(Date.now() + 60000));
+        // different birth date - otherwise the (correct) TWIN_RISK evidence fires
+        await db.profile.update({
+          where: { userId: late },
+          data: { birthDate: new Date("1990-09-09") },
+        });
         await db.profilePhotoVerification.create({
           data: {
             userId: late,

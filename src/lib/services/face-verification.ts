@@ -513,9 +513,9 @@ export async function runProfilePhotoVerification(
     // Risk gate (threat-model Phase 2): a decision never rests on face
     // comparison alone. CRITICAL composite risk blocks auto-verification
     // and routes to a human - it never grants and never auto-rejects.
+    const { computeVerificationRisk } = await import("@/lib/services/risk-engine");
+    const risk = await computeVerificationRisk(userId).catch(() => null);
     if (decision.status === "AUTO_VERIFIED") {
-      const { computeVerificationRisk } = await import("@/lib/services/risk-engine");
-      const risk = await computeVerificationRisk(userId).catch(() => null);
       if (risk?.band === "CRITICAL") {
         decision = { ...decision, status: "MANUAL_REVIEW", badgeStatus: "REVIEWING" };
         await recordVerificationAudit({
@@ -535,6 +535,10 @@ export async function runProfilePhotoVerification(
         badgeStatus: decision.badgeStatus,
         riskLevel: decision.riskLevel,
         lastValidatedAt: new Date(),
+        // Snapshot for the admin queue (no per-row recomputation) + the
+        // calibration config version this decision was made under.
+        riskBand: risk?.band ?? null,
+        calibrationVersion: process.env.FACE_CALIBRATION_VERSION?.trim() || null,
       },
     });
     // Public badge suspension rides ONE denormalized column so hot read
@@ -612,9 +616,17 @@ export async function onProfilePhotosChanged(userId: string, reason: string): Pr
   if (!isFaceMatchConfigured()) return;
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { photoVerifiedAt: true },
+    select: { photoVerifiedAt: true, profile: { select: { country: true } } },
   });
   if (!user?.photoVerifiedAt) return; // face layer only follows identity
+  // Staged rollout (Phase 32): cohort gates NEW work only; users with an
+  // existing job keep flowing (never strand someone mid-verification).
+  const { isFaceCohortEligible } = await import("@/lib/services/face-rollout");
+  const existing = await db.profilePhotoVerification.findUnique({
+    where: { userId },
+    select: { id: true },
+  });
+  if (!existing && !isFaceCohortEligible(userId, user.profile?.country)) return;
   await enqueueProfilePhotoVerification(userId, reason);
 }
 
@@ -640,16 +652,50 @@ export async function deleteFaceVerificationData(userId: string): Promise<void> 
 }
 
 /** Cron sweep: pick up QUEUED jobs (recovery for lost after() runs). */
-export async function sweepQueuedFaceChecks(limit = 10): Promise<number> {
+export async function sweepQueuedFaceChecks(
+  limit = Number(process.env.FACE_SWEEP_BATCH) || 10,
+  opts: { timeBudgetMs?: number } = {},
+): Promise<number> {
   if (!isFaceMatchConfigured()) return 0;
-  const queued = await db.profilePhotoVerification.findMany({
-    where: { status: "QUEUED" },
+  const provider = getFaceMatchProvider();
+
+  // Provider-aware: an OPEN circuit means every run would fail - skip the
+  // whole sweep instead of hammering the vendor (jobs stay claimable).
+  const { circuitOpen } = await import("@/lib/services/provider-resilience");
+  if (await circuitOpen(`face_match:${provider.name}`)) return 0;
+
+  const timeBudgetMs =
+    opts.timeBudgetMs ?? (Number(process.env.FACE_SWEEP_TIME_BUDGET_MS) || 45_000);
+  const leaseMs = (Number(process.env.FACE_LEASE_MINUTES) || 15) * 60_000;
+  const started = Date.now();
+  const leaseCutoff = new Date(started - leaseMs);
+
+  // Candidates, OLDEST FIRST (fairness): fresh QUEUED work plus CHECKING
+  // rows whose lease expired (crashed worker). Index-backed
+  // (status, updatedAt) - never a full-table scan.
+  const candidates = await db.profilePhotoVerification.findMany({
+    where: {
+      OR: [{ status: "QUEUED" }, { status: "CHECKING", lastRunAt: { lt: leaseCutoff } }],
+    },
     orderBy: { updatedAt: "asc" },
     take: limit,
-    select: { userId: true },
+    select: { id: true, userId: true, status: true, lastRunAt: true },
   });
+
   let processed = 0;
-  for (const row of queued) {
+  for (const row of candidates) {
+    if (Date.now() - started > timeBudgetMs) break; // safe continuation next tick
+    // ATOMIC claim: only one concurrent worker wins this row (updateMany
+    // with the observed state in the WHERE; count 0 = someone else has it).
+    const claim = await db.profilePhotoVerification.updateMany({
+      where: {
+        id: row.id,
+        status: row.status,
+        ...(row.status === "CHECKING" ? { lastRunAt: row.lastRunAt } : {}),
+      },
+      data: { status: "QUEUED", lastRunAt: new Date() },
+    });
+    if (claim.count === 0) continue;
     const result = await runProfilePhotoVerification(row.userId);
     if (result) processed += 1;
   }

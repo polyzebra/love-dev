@@ -348,6 +348,7 @@ async function main() {
         "face-match-providers.ts",
         "moderation-providers.ts",
         "billing.ts",
+        "aws-rekognition.ts",
       ]);
       for (const file of services) {
         if (adapterFiles.has(file)) continue;

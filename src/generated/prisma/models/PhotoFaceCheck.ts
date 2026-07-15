@@ -60,6 +60,7 @@ export type PhotoFaceCheckMinAggregateOutputType = {
   failureReason: string | null
   reviewedById: string | null
   reviewedAt: Date | null
+  calibrationVersion: string | null
   createdAt: Date | null
 }
 
@@ -81,6 +82,7 @@ export type PhotoFaceCheckMaxAggregateOutputType = {
   failureReason: string | null
   reviewedById: string | null
   reviewedAt: Date | null
+  calibrationVersion: string | null
   createdAt: Date | null
 }
 
@@ -102,6 +104,7 @@ export type PhotoFaceCheckCountAggregateOutputType = {
   failureReason: number
   reviewedById: number
   reviewedAt: number
+  calibrationVersion: number
   createdAt: number
   _all: number
 }
@@ -141,6 +144,7 @@ export type PhotoFaceCheckMinAggregateInputType = {
   failureReason?: true
   reviewedById?: true
   reviewedAt?: true
+  calibrationVersion?: true
   createdAt?: true
 }
 
@@ -162,6 +166,7 @@ export type PhotoFaceCheckMaxAggregateInputType = {
   failureReason?: true
   reviewedById?: true
   reviewedAt?: true
+  calibrationVersion?: true
   createdAt?: true
 }
 
@@ -183,6 +188,7 @@ export type PhotoFaceCheckCountAggregateInputType = {
   failureReason?: true
   reviewedById?: true
   reviewedAt?: true
+  calibrationVersion?: true
   createdAt?: true
   _all?: true
 }
@@ -291,6 +297,7 @@ export type PhotoFaceCheckGroupByOutputType = {
   failureReason: string | null
   reviewedById: string | null
   reviewedAt: Date | null
+  calibrationVersion: string | null
   createdAt: Date
   _count: PhotoFaceCheckCountAggregateOutputType | null
   _avg: PhotoFaceCheckAvgAggregateOutputType | null
@@ -335,6 +342,7 @@ export type PhotoFaceCheckWhereInput = {
   failureReason?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"PhotoFaceCheck"> | Date | string | null
+  calibrationVersion?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PhotoFaceCheck"> | Date | string
   verification?: Prisma.XOR<Prisma.ProfilePhotoVerificationScalarRelationFilter, Prisma.ProfilePhotoVerificationWhereInput>
   photo?: Prisma.XOR<Prisma.PhotoScalarRelationFilter, Prisma.PhotoWhereInput>
@@ -358,6 +366,7 @@ export type PhotoFaceCheckOrderByWithRelationInput = {
   failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  calibrationVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   verification?: Prisma.ProfilePhotoVerificationOrderByWithRelationInput
   photo?: Prisma.PhotoOrderByWithRelationInput
@@ -385,6 +394,7 @@ export type PhotoFaceCheckWhereUniqueInput = Prisma.AtLeast<{
   failureReason?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"PhotoFaceCheck"> | Date | string | null
+  calibrationVersion?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PhotoFaceCheck"> | Date | string
   verification?: Prisma.XOR<Prisma.ProfilePhotoVerificationScalarRelationFilter, Prisma.ProfilePhotoVerificationWhereInput>
   photo?: Prisma.XOR<Prisma.PhotoScalarRelationFilter, Prisma.PhotoWhereInput>
@@ -408,6 +418,7 @@ export type PhotoFaceCheckOrderByWithAggregationInput = {
   failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  calibrationVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PhotoFaceCheckCountOrderByAggregateInput
   _avg?: Prisma.PhotoFaceCheckAvgOrderByAggregateInput
@@ -437,6 +448,7 @@ export type PhotoFaceCheckScalarWhereWithAggregatesInput = {
   failureReason?: Prisma.StringNullableWithAggregatesFilter<"PhotoFaceCheck"> | string | null
   reviewedById?: Prisma.StringNullableWithAggregatesFilter<"PhotoFaceCheck"> | string | null
   reviewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PhotoFaceCheck"> | Date | string | null
+  calibrationVersion?: Prisma.StringNullableWithAggregatesFilter<"PhotoFaceCheck"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PhotoFaceCheck"> | Date | string
 }
 
@@ -456,6 +468,7 @@ export type PhotoFaceCheckCreateInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
   verification: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutChecksInput
   photo: Prisma.PhotoCreateNestedOneWithoutFaceChecksInput
@@ -479,6 +492,7 @@ export type PhotoFaceCheckUncheckedCreateInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
 }
 
@@ -498,6 +512,7 @@ export type PhotoFaceCheckUpdateInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   verification?: Prisma.ProfilePhotoVerificationUpdateOneRequiredWithoutChecksNestedInput
   photo?: Prisma.PhotoUpdateOneRequiredWithoutFaceChecksNestedInput
@@ -521,6 +536,7 @@ export type PhotoFaceCheckUncheckedUpdateInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -542,6 +558,7 @@ export type PhotoFaceCheckCreateManyInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
 }
 
@@ -561,6 +578,7 @@ export type PhotoFaceCheckUpdateManyMutationInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -582,6 +600,7 @@ export type PhotoFaceCheckUncheckedUpdateManyInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -619,6 +638,7 @@ export type PhotoFaceCheckCountOrderByAggregateInput = {
   failureReason?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
+  calibrationVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -648,6 +668,7 @@ export type PhotoFaceCheckMaxOrderByAggregateInput = {
   failureReason?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
+  calibrationVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -669,6 +690,7 @@ export type PhotoFaceCheckMinOrderByAggregateInput = {
   failureReason?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
+  calibrationVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -788,6 +810,7 @@ export type PhotoFaceCheckCreateWithoutPhotoInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
   verification: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutChecksInput
 }
@@ -809,6 +832,7 @@ export type PhotoFaceCheckUncheckedCreateWithoutPhotoInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
 }
 
@@ -859,6 +883,7 @@ export type PhotoFaceCheckScalarWhereInput = {
   failureReason?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"PhotoFaceCheck"> | Date | string | null
+  calibrationVersion?: Prisma.StringNullableFilter<"PhotoFaceCheck"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PhotoFaceCheck"> | Date | string
 }
 
@@ -878,6 +903,7 @@ export type PhotoFaceCheckCreateWithoutVerificationInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
   photo: Prisma.PhotoCreateNestedOneWithoutFaceChecksInput
 }
@@ -899,6 +925,7 @@ export type PhotoFaceCheckUncheckedCreateWithoutVerificationInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
 }
 
@@ -945,6 +972,7 @@ export type PhotoFaceCheckCreateManyPhotoInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
 }
 
@@ -964,6 +992,7 @@ export type PhotoFaceCheckUpdateWithoutPhotoInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   verification?: Prisma.ProfilePhotoVerificationUpdateOneRequiredWithoutChecksNestedInput
 }
@@ -985,6 +1014,7 @@ export type PhotoFaceCheckUncheckedUpdateWithoutPhotoInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1005,6 +1035,7 @@ export type PhotoFaceCheckUncheckedUpdateManyWithoutPhotoInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1025,6 +1056,7 @@ export type PhotoFaceCheckCreateManyVerificationInput = {
   failureReason?: string | null
   reviewedById?: string | null
   reviewedAt?: Date | string | null
+  calibrationVersion?: string | null
   createdAt?: Date | string
 }
 
@@ -1044,6 +1076,7 @@ export type PhotoFaceCheckUpdateWithoutVerificationInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photo?: Prisma.PhotoUpdateOneRequiredWithoutFaceChecksNestedInput
 }
@@ -1065,6 +1098,7 @@ export type PhotoFaceCheckUncheckedUpdateWithoutVerificationInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1085,6 +1119,7 @@ export type PhotoFaceCheckUncheckedUpdateManyWithoutVerificationInput = {
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1108,6 +1143,7 @@ export type PhotoFaceCheckSelect<ExtArgs extends runtime.Types.Extensions.Intern
   failureReason?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  calibrationVersion?: boolean
   createdAt?: boolean
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
   photo?: boolean | Prisma.PhotoDefaultArgs<ExtArgs>
@@ -1131,6 +1167,7 @@ export type PhotoFaceCheckSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   failureReason?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  calibrationVersion?: boolean
   createdAt?: boolean
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
   photo?: boolean | Prisma.PhotoDefaultArgs<ExtArgs>
@@ -1154,6 +1191,7 @@ export type PhotoFaceCheckSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   failureReason?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  calibrationVersion?: boolean
   createdAt?: boolean
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
   photo?: boolean | Prisma.PhotoDefaultArgs<ExtArgs>
@@ -1177,10 +1215,11 @@ export type PhotoFaceCheckSelectScalar = {
   failureReason?: boolean
   reviewedById?: boolean
   reviewedAt?: boolean
+  calibrationVersion?: boolean
   createdAt?: boolean
 }
 
-export type PhotoFaceCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "verificationId" | "userId" | "photoId" | "photoVersion" | "isCoverAtCheck" | "classification" | "decision" | "faceCount" | "ownerDetected" | "similarityScore" | "confidenceBand" | "qualityScore" | "manipulationRisk" | "failureReason" | "reviewedById" | "reviewedAt" | "createdAt", ExtArgs["result"]["photoFaceCheck"]>
+export type PhotoFaceCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "verificationId" | "userId" | "photoId" | "photoVersion" | "isCoverAtCheck" | "classification" | "decision" | "faceCount" | "ownerDetected" | "similarityScore" | "confidenceBand" | "qualityScore" | "manipulationRisk" | "failureReason" | "reviewedById" | "reviewedAt" | "calibrationVersion" | "createdAt", ExtArgs["result"]["photoFaceCheck"]>
 export type PhotoFaceCheckInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
   photo?: boolean | Prisma.PhotoDefaultArgs<ExtArgs>
@@ -1218,6 +1257,7 @@ export type $PhotoFaceCheckPayload<ExtArgs extends runtime.Types.Extensions.Inte
     failureReason: string | null
     reviewedById: string | null
     reviewedAt: Date | null
+    calibrationVersion: string | null
     createdAt: Date
   }, ExtArgs["result"]["photoFaceCheck"]>
   composites: {}
@@ -1661,6 +1701,7 @@ export interface PhotoFaceCheckFieldRefs {
   readonly failureReason: Prisma.FieldRef<"PhotoFaceCheck", 'String'>
   readonly reviewedById: Prisma.FieldRef<"PhotoFaceCheck", 'String'>
   readonly reviewedAt: Prisma.FieldRef<"PhotoFaceCheck", 'DateTime'>
+  readonly calibrationVersion: Prisma.FieldRef<"PhotoFaceCheck", 'String'>
   readonly createdAt: Prisma.FieldRef<"PhotoFaceCheck", 'DateTime'>
 }
     

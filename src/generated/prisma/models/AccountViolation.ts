@@ -34,6 +34,7 @@ export type AccountViolationMinAggregateOutputType = {
   internalReason: string | null
   expiresAt: Date | null
   appealAllowed: boolean | null
+  source: string | null
   reversedAt: Date | null
   moderationCaseId: string | null
   photoId: string | null
@@ -50,6 +51,7 @@ export type AccountViolationMaxAggregateOutputType = {
   internalReason: string | null
   expiresAt: Date | null
   appealAllowed: boolean | null
+  source: string | null
   reversedAt: Date | null
   moderationCaseId: string | null
   photoId: string | null
@@ -66,6 +68,7 @@ export type AccountViolationCountAggregateOutputType = {
   internalReason: number
   expiresAt: number
   appealAllowed: number
+  source: number
   reversedAt: number
   moderationCaseId: number
   photoId: number
@@ -84,6 +87,7 @@ export type AccountViolationMinAggregateInputType = {
   internalReason?: true
   expiresAt?: true
   appealAllowed?: true
+  source?: true
   reversedAt?: true
   moderationCaseId?: true
   photoId?: true
@@ -100,6 +104,7 @@ export type AccountViolationMaxAggregateInputType = {
   internalReason?: true
   expiresAt?: true
   appealAllowed?: true
+  source?: true
   reversedAt?: true
   moderationCaseId?: true
   photoId?: true
@@ -116,6 +121,7 @@ export type AccountViolationCountAggregateInputType = {
   internalReason?: true
   expiresAt?: true
   appealAllowed?: true
+  source?: true
   reversedAt?: true
   moderationCaseId?: true
   photoId?: true
@@ -205,6 +211,7 @@ export type AccountViolationGroupByOutputType = {
   internalReason: string | null
   expiresAt: Date | null
   appealAllowed: boolean
+  source: string | null
   reversedAt: Date | null
   moderationCaseId: string | null
   photoId: string | null
@@ -242,6 +249,7 @@ export type AccountViolationWhereInput = {
   internalReason?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   expiresAt?: Prisma.DateTimeNullableFilter<"AccountViolation"> | Date | string | null
   appealAllowed?: Prisma.BoolFilter<"AccountViolation"> | boolean
+  source?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"AccountViolation"> | Date | string | null
   moderationCaseId?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   photoId?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
@@ -261,6 +269,7 @@ export type AccountViolationOrderByWithRelationInput = {
   internalReason?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   appealAllowed?: Prisma.SortOrder
+  source?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   moderationCaseId?: Prisma.SortOrderInput | Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -283,6 +292,7 @@ export type AccountViolationWhereUniqueInput = Prisma.AtLeast<{
   internalReason?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   expiresAt?: Prisma.DateTimeNullableFilter<"AccountViolation"> | Date | string | null
   appealAllowed?: Prisma.BoolFilter<"AccountViolation"> | boolean
+  source?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"AccountViolation"> | Date | string | null
   moderationCaseId?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   photoId?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
@@ -302,6 +312,7 @@ export type AccountViolationOrderByWithAggregationInput = {
   internalReason?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   appealAllowed?: Prisma.SortOrder
+  source?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   moderationCaseId?: Prisma.SortOrderInput | Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -324,6 +335,7 @@ export type AccountViolationScalarWhereWithAggregatesInput = {
   internalReason?: Prisma.StringNullableWithAggregatesFilter<"AccountViolation"> | string | null
   expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AccountViolation"> | Date | string | null
   appealAllowed?: Prisma.BoolWithAggregatesFilter<"AccountViolation"> | boolean
+  source?: Prisma.StringNullableWithAggregatesFilter<"AccountViolation"> | string | null
   reversedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AccountViolation"> | Date | string | null
   moderationCaseId?: Prisma.StringNullableWithAggregatesFilter<"AccountViolation"> | string | null
   photoId?: Prisma.StringNullableWithAggregatesFilter<"AccountViolation"> | string | null
@@ -339,6 +351,7 @@ export type AccountViolationCreateInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   photoId?: string | null
   createdAt?: Date | string
@@ -357,6 +370,7 @@ export type AccountViolationUncheckedCreateInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   moderationCaseId?: string | null
   photoId?: string | null
@@ -373,6 +387,7 @@ export type AccountViolationUpdateInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -391,6 +406,7 @@ export type AccountViolationUncheckedUpdateInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderationCaseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -408,6 +424,7 @@ export type AccountViolationCreateManyInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   moderationCaseId?: string | null
   photoId?: string | null
@@ -423,6 +440,7 @@ export type AccountViolationUpdateManyMutationInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,6 +456,7 @@ export type AccountViolationUncheckedUpdateManyInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderationCaseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -464,6 +483,7 @@ export type AccountViolationCountOrderByAggregateInput = {
   internalReason?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   appealAllowed?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   moderationCaseId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -480,6 +500,7 @@ export type AccountViolationMaxOrderByAggregateInput = {
   internalReason?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   appealAllowed?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   moderationCaseId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -496,6 +517,7 @@ export type AccountViolationMinOrderByAggregateInput = {
   internalReason?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   appealAllowed?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   moderationCaseId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -618,6 +640,7 @@ export type AccountViolationCreateWithoutUserInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   photoId?: string | null
   createdAt?: Date | string
@@ -634,6 +657,7 @@ export type AccountViolationUncheckedCreateWithoutUserInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   moderationCaseId?: string | null
   photoId?: string | null
@@ -680,6 +704,7 @@ export type AccountViolationScalarWhereInput = {
   internalReason?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   expiresAt?: Prisma.DateTimeNullableFilter<"AccountViolation"> | Date | string | null
   appealAllowed?: Prisma.BoolFilter<"AccountViolation"> | boolean
+  source?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"AccountViolation"> | Date | string | null
   moderationCaseId?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
   photoId?: Prisma.StringNullableFilter<"AccountViolation"> | string | null
@@ -695,6 +720,7 @@ export type AccountViolationCreateWithoutModerationCaseInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   photoId?: string | null
   createdAt?: Date | string
@@ -712,6 +738,7 @@ export type AccountViolationUncheckedCreateWithoutModerationCaseInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   photoId?: string | null
   createdAt?: Date | string
@@ -753,6 +780,7 @@ export type AccountViolationCreateWithoutAppealsInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   photoId?: string | null
   createdAt?: Date | string
@@ -770,6 +798,7 @@ export type AccountViolationUncheckedCreateWithoutAppealsInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   moderationCaseId?: string | null
   photoId?: string | null
@@ -801,6 +830,7 @@ export type AccountViolationUpdateWithoutAppealsInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -818,6 +848,7 @@ export type AccountViolationUncheckedUpdateWithoutAppealsInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderationCaseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -833,6 +864,7 @@ export type AccountViolationCreateManyUserInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   moderationCaseId?: string | null
   photoId?: string | null
@@ -848,6 +880,7 @@ export type AccountViolationUpdateWithoutUserInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -864,6 +897,7 @@ export type AccountViolationUncheckedUpdateWithoutUserInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderationCaseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -880,6 +914,7 @@ export type AccountViolationUncheckedUpdateManyWithoutUserInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderationCaseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -896,6 +931,7 @@ export type AccountViolationCreateManyModerationCaseInput = {
   internalReason?: string | null
   expiresAt?: Date | string | null
   appealAllowed?: boolean
+  source?: string | null
   reversedAt?: Date | string | null
   photoId?: string | null
   createdAt?: Date | string
@@ -910,6 +946,7 @@ export type AccountViolationUpdateWithoutModerationCaseInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -927,6 +964,7 @@ export type AccountViolationUncheckedUpdateWithoutModerationCaseInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -943,6 +981,7 @@ export type AccountViolationUncheckedUpdateManyWithoutModerationCaseInput = {
   internalReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appealAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -989,6 +1028,7 @@ export type AccountViolationSelect<ExtArgs extends runtime.Types.Extensions.Inte
   internalReason?: boolean
   expiresAt?: boolean
   appealAllowed?: boolean
+  source?: boolean
   reversedAt?: boolean
   moderationCaseId?: boolean
   photoId?: boolean
@@ -1009,6 +1049,7 @@ export type AccountViolationSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   internalReason?: boolean
   expiresAt?: boolean
   appealAllowed?: boolean
+  source?: boolean
   reversedAt?: boolean
   moderationCaseId?: boolean
   photoId?: boolean
@@ -1027,6 +1068,7 @@ export type AccountViolationSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   internalReason?: boolean
   expiresAt?: boolean
   appealAllowed?: boolean
+  source?: boolean
   reversedAt?: boolean
   moderationCaseId?: boolean
   photoId?: boolean
@@ -1045,13 +1087,14 @@ export type AccountViolationSelectScalar = {
   internalReason?: boolean
   expiresAt?: boolean
   appealAllowed?: boolean
+  source?: boolean
   reversedAt?: boolean
   moderationCaseId?: boolean
   photoId?: boolean
   createdAt?: boolean
 }
 
-export type AccountViolationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "violationType" | "actionTaken" | "description" | "userVisibleReason" | "internalReason" | "expiresAt" | "appealAllowed" | "reversedAt" | "moderationCaseId" | "photoId" | "createdAt", ExtArgs["result"]["accountViolation"]>
+export type AccountViolationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "violationType" | "actionTaken" | "description" | "userVisibleReason" | "internalReason" | "expiresAt" | "appealAllowed" | "source" | "reversedAt" | "moderationCaseId" | "photoId" | "createdAt", ExtArgs["result"]["accountViolation"]>
 export type AccountViolationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   moderationCase?: boolean | Prisma.AccountViolation$moderationCaseArgs<ExtArgs>
@@ -1088,6 +1131,15 @@ export type $AccountViolationPayload<ExtArgs extends runtime.Types.Extensions.In
      */
     expiresAt: Date | null
     appealAllowed: boolean
+    /**
+     * *
+     *    * Signal-ownership marker (risk registry): violations created by the
+     *    * face-verification layer set "face_verification" - trust-engine
+     *    * EXCLUDES them from its violation signal because the risk engine
+     *    * already scores the underlying face outcome (double-count fix, PRR
+     *    * TD-2). Stable code value - never display text.
+     */
+    source: string | null
     /**
      * *
      *    * Set when an approved appeal reversed this violation.
@@ -1537,6 +1589,7 @@ export interface AccountViolationFieldRefs {
   readonly internalReason: Prisma.FieldRef<"AccountViolation", 'String'>
   readonly expiresAt: Prisma.FieldRef<"AccountViolation", 'DateTime'>
   readonly appealAllowed: Prisma.FieldRef<"AccountViolation", 'Boolean'>
+  readonly source: Prisma.FieldRef<"AccountViolation", 'String'>
   readonly reversedAt: Prisma.FieldRef<"AccountViolation", 'DateTime'>
   readonly moderationCaseId: Prisma.FieldRef<"AccountViolation", 'String'>
   readonly photoId: Prisma.FieldRef<"AccountViolation", 'String'>

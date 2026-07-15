@@ -149,14 +149,13 @@ export type DuplicateMatchEvidence = {
   band: "confident" | "uncertain";
   /** The matched account, resolved from the matched referenceId. */
   other: {
-    /** Same natural person restoring/re-registering (e.g. matches a
-     *  tombstoned account with the same verified phone/email). */
-    sameLegalIdentity: boolean;
     /** Other account was verified BEFORE this user (first-comer wins). */
     verifiedFirst: boolean;
     /** Other account currently banned/suspended for impersonation-class
      *  violations. */
     flaggedForImpersonation: boolean;
+    /** Same declared birth date (+-1 day) - the twin-evidence signal. */
+    birthDateMatches: boolean;
   } | null;
 };
 
@@ -169,16 +168,21 @@ export function classifyDuplicateMatch(evidence: DuplicateMatchEvidence): Duplic
   if (!evidence.other) return "UNKNOWN";
   if (evidence.band === "uncertain") {
     // Mid-band similarity: relatives are the common benign explanation.
-    return evidence.other.sameLegalIdentity ? "SELF_RESTORE" : "FAMILY_RESEMBLANCE";
+    return "FAMILY_RESEMBLANCE";
   }
   // Confident likeness:
-  if (evidence.other.sameLegalIdentity) return "SELF_RESTORE";
   if (evidence.other.verifiedFirst || evidence.other.flaggedForImpersonation) {
     return "LIKELY_IMPERSONATION";
   }
-  // Confident same-face, this user was first: a second account of the
-  // same person, or an identical twin - identity evidence conflicts.
-  return "LIKELY_DUPLICATE";
+  // Confident same-face, this user was first. Matching declared birth
+  // dates are the evidence-based twin signal (PRR TD-4: TWIN_RISK is now
+  // emitted, not dead); both routes are HUMAN questions, never automated.
+  // Phase 29 note: SELF_RESTORE was REMOVED from automatic classification
+  // (teardown anonymises the fields it keyed on); genuine restores surface
+  // as LIKELY_DUPLICATE and resolve via manual review/appeal. The enum
+  // value remains (Postgres enum removal is destructive) for historical
+  // rows only.
+  return evidence.other.birthDateMatches ? "TWIN_RISK" : "LIKELY_DUPLICATE";
 }
 
 /** Worst-outcome ordering for aggregating multiple matches. */
@@ -206,6 +210,10 @@ export function worstDuplicateClass(classes: DuplicateIdentityClass[]): Duplicat
  * other non-benign outcome routes to manual review.
  */
 export async function runDuplicateCheck(userId: string): Promise<DuplicateIdentityClass | null> {
+  // Independently gated (Phase 32): likeness search has its own
+  // calibration + legal approval track.
+  const { faceRolloutConfig } = await import("@/lib/services/face-rollout");
+  if (!faceRolloutConfig().duplicateSearchEnabled) return null;
   const provider = getFaceMatchProvider();
   if (!provider.searchLikeness) return null;
   const job = await db.profilePhotoVerification.findUnique({
@@ -219,7 +227,7 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
 
   const me = await db.user.findUnique({
     where: { id: userId },
-    select: { email: true, phone: true, photoVerifiedAt: true },
+    select: { photoVerifiedAt: true, profile: { select: { birthDate: true } } },
   });
 
   const classes: DuplicateIdentityClass[] = [];
@@ -230,10 +238,9 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
         userId: true,
         user: {
           select: {
-            email: true,
-            phone: true,
             photoVerifiedAt: true,
             status: true,
+            profile: { select: { birthDate: true } },
             violations: {
               where: { violationType: "IMPERSONATION", reversedAt: null },
               select: { id: true },
@@ -248,9 +255,6 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
         band: match.band,
         other: otherJob
           ? {
-              sameLegalIdentity:
-                Boolean(me?.phone && otherJob.user.phone === me.phone) ||
-                Boolean(me?.email && otherJob.user.email === me.email),
               verifiedFirst: Boolean(
                 otherJob.user.photoVerifiedAt &&
                 me?.photoVerifiedAt &&
@@ -258,6 +262,14 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
               ),
               flaggedForImpersonation:
                 otherJob.user.status === "BANNED" || otherJob.user.violations.length > 0,
+              birthDateMatches: Boolean(
+                me?.profile?.birthDate &&
+                otherJob.user.profile?.birthDate &&
+                Math.abs(
+                  otherJob.user.profile.birthDate.getTime() - me.profile.birthDate.getTime(),
+                ) <=
+                  24 * 3600 * 1000,
+              ),
             }
           : null,
       }),
@@ -287,7 +299,24 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
   });
 
   if (verdict === "LIKELY_IMPERSONATION") {
-    await suspendForImpersonation(userId, job.id);
+    const { faceRolloutConfig: cfg } = await import("@/lib/services/face-rollout");
+    if (cfg().autoSuspendEnabled) {
+      await suspendForImpersonation(userId, job.id);
+    } else {
+      // Auto-suspension not yet approved: HUMANS decide, badge untouched.
+      await db.profilePhotoVerification.update({
+        where: { id: job.id },
+        data: { status: "MANUAL_REVIEW" },
+      });
+      await recordVerificationAudit({
+        userId,
+        verificationId: job.id,
+        eventType: "duplicate_review_hold",
+        actorType: "system",
+        newStatus: "MANUAL_REVIEW",
+        reasonCode: "auto_suspend_disabled",
+      });
+    }
   }
   return verdict;
 }
@@ -347,6 +376,9 @@ export async function createFaceViolation(
           : "Your verified badge is on hold because your profile photos could not be confirmed as you.",
       internalReason: reasonCode,
       appealAllowed: true,
+      // Signal ownership (risk registry): the risk engine scores the face
+      // outcome directly; trust-engine must not score this violation too.
+      source: "face_verification",
     },
   });
   await recordVerificationAudit({
@@ -380,7 +412,7 @@ export async function onFaceViolationReversed(
   await db.$transaction([
     db.profilePhotoVerification.update({
       where: { id: job.id },
-      data: { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE", duplicateClass: "SELF_RESTORE" },
+      data: { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE", duplicateClass: "UNKNOWN" },
     }),
     db.user.update({ where: { id: userId }, data: { faceBadgeSuspendedAt: null } }),
   ]);

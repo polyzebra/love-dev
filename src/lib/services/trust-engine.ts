@@ -110,7 +110,18 @@ export async function computeTrustProfile(userId: string): Promise<TrustProfile 
         select: { reporterId: true },
         distinct: ["reporterId"],
       }),
-      db.accountViolation.count({ where: { userId, reversedAt: null } }),
+      // Face-verification-created violations are EXCLUDED: the risk
+      // engine owns those signals (face_rejected / duplicate_impersonation)
+      // and scoring them here double-counted one event (risk registry).
+      db.accountViolation.count({
+        where: {
+          userId,
+          reversedAt: null,
+          // Include NULL-source (legacy/non-face) rows: a plain NOT would
+          // drop them (SQL: NULL <> x is NULL, not true).
+          OR: [{ source: null }, { source: { not: "face_verification" } }],
+        },
+      }),
       db.payment.count({ where: { userId, status: "REFUNDED" } }),
       getVerificationState(userId),
       // Fraud plane (fraud-signals.ts): device reuse tiers, signup/login

@@ -13,6 +13,57 @@ import type { VerificationUxState } from "@/lib/services/photo-verification";
  * pre-face-check system.
  */
 
+/**
+ * Liveness capture sub-states (Phase 23). They live INSIDE the
+ * checking_profile_photos phase of the canonical machine - not a second
+ * state machine: the canonical state stays authoritative, these only
+ * describe where the user is inside the capture step.
+ */
+export type LivenessCaptureState =
+  | "consent_required"
+  | "capture_ready"
+  | "camera_permission_required"
+  | "capturing"
+  | "capture_submitted"
+  | "liveness_processing"
+  | "capture_failed"
+  | "provider_unavailable";
+
+export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: string }> = {
+  consent_required: {
+    title: "One quick video selfie",
+    body: "We compare a short video selfie with your profile photos to confirm they're really you. It's checked by our verification partner - Tirvea never stores your face data.",
+  },
+  capture_ready: {
+    title: "Ready when you are",
+    body: "Find good, even lighting and hold your phone at eye level. Your whole face should fit inside the oval.",
+  },
+  camera_permission_required: {
+    title: "Camera access needed",
+    body: "Allow camera access in your browser, then tap Try again. On iPhone: Settings > Safari > Camera. On Android: the padlock icon in the address bar.",
+  },
+  capturing: {
+    title: "Hold still",
+    body: "Look at the camera and follow the on-screen guidance.",
+  },
+  capture_submitted: {
+    title: "Uploading your check",
+    body: "Almost done - keep this page open.",
+  },
+  liveness_processing: {
+    title: "Checking it's really you",
+    body: "This usually takes a few seconds.",
+  },
+  capture_failed: {
+    title: "That didn't work",
+    body: "The check couldn't be completed - lighting or movement is the usual cause. You can try again right away.",
+  },
+  provider_unavailable: {
+    title: "We can't run this right now",
+    body: "Our verification partner is temporarily unavailable. Your verification is safe - please try again later.",
+  },
+};
+
 export type VerificationPresentationState =
   | "not_started" // invite: Start photo verification
   | "requires_input" // open session: Continue verification

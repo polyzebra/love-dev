@@ -161,11 +161,91 @@ export async function withResilience<T>(
 // Ops alerts - notify staff through the EXISTING notification outbox
 // ---------------------------------------------------------------------------
 
+export type AlertSeverity = "critical" | "high" | "warning";
+
+/** Severity + escalation policy per alert kind (Phase 26). */
+export const ALERT_POLICY: Record<string, { severity: AlertSeverity; escalateAfterMin: number }> = {
+  provider_down: { severity: "critical", escalateAfterMin: 15 },
+  credential_failure: { severity: "critical", escalateAfterMin: 15 },
+  quota_exhaustion: { severity: "high", escalateAfterMin: 30 },
+  queue_stalled: { severity: "high", escalateAfterMin: 30 },
+  face_dead_letter: { severity: "high", escalateAfterMin: 60 },
+  rotation_or_run_failures: { severity: "high", escalateAfterMin: 60 },
+  verification_spike: { severity: "warning", escalateAfterMin: 120 },
+  appeal_spike: { severity: "warning", escalateAfterMin: 120 },
+  false_positive_spike: { severity: "high", escalateAfterMin: 60 },
+  reference_deletion_failure: { severity: "high", escalateAfterMin: 60 },
+  liveness_completion_drop: { severity: "warning", escalateAfterMin: 120 },
+  cron_failure: { severity: "high", escalateAfterMin: 30 },
+  provider_degraded: { severity: "warning", escalateAfterMin: 120 },
+};
+
+type ExternalAlertTransport = (payload: {
+  kind: string;
+  severity: AlertSeverity;
+  detail: string;
+  status: "firing" | "resolved";
+}) => Promise<boolean>;
+let externalAlertTransportOverride: ExternalAlertTransport | null = null;
+/** Test seam: inject the external alert transport (null restores). */
+export function setExternalAlertTransport(fn: ExternalAlertTransport | null): void {
+  externalAlertTransportOverride = fn;
+}
+
+/**
+ * External channel (Phase 26): a generic JSON webhook (Slack/Discord/
+ * PagerDuty/Opsgenie all accept one) - INDEPENDENT of the application
+ * notification outbox. Payloads carry kind/severity/status/detail only:
+ * detail strings are composed from counts and thresholds, never personal
+ * or biometric data. Channel failure is tolerated (recorded, never
+ * thrown) and the outbox remains the secondary channel.
+ */
+async function sendExternalAlert(payload: {
+  kind: string;
+  severity: AlertSeverity;
+  detail: string;
+  status: "firing" | "resolved";
+}): Promise<boolean> {
+  if (externalAlertTransportOverride) {
+    // Channel failure is tolerated - the outbox remains the secondary path.
+    return externalAlertTransportOverride(payload).catch(() => false);
+  }
+  const url = process.env.ALERT_WEBHOOK_URL?.trim();
+  if (!url) return false;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        source: "tirvea-verification",
+        ...payload,
+        text: `[${payload.severity.toUpperCase()}][${payload.status}] ${payload.kind}: ${payload.detail}`,
+        at: new Date().toISOString(),
+      }),
+      signal: AbortSignal.timeout(5000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function raiseOpsAlert(
   kind: string,
   detail: string,
   dedupeSuffix: string = new Date().toISOString().slice(0, 10),
 ): Promise<void> {
+  const policy = ALERT_POLICY[kind] ?? { severity: "warning" as const, escalateAfterMin: 120 };
+
+  // External channel first (primary, independent of the outbox).
+  const delivered = await sendExternalAlert({
+    kind,
+    severity: policy.severity,
+    detail,
+    status: "firing",
+  });
+
+  // Secondary channel: the in-app notification outbox to staff.
   const admins = await db.user.findMany({
     where: { role: { in: ["ADMIN", "SUPER_ADMIN"] } },
     select: { id: true },
@@ -176,11 +256,40 @@ export async function raiseOpsAlert(
     await notifyUser({
       userId: adminUser.id,
       type: "SYSTEM",
-      title: `Ops alert: ${kind}`,
+      title: `Ops alert [${policy.severity}]: ${kind}`,
       body: detail,
       dedupeKey: `ops-alert:${kind}:${dedupeSuffix}`,
     }).catch(() => undefined);
   }
+
+  // Audit trail: alert state for dedupe/resolved tracking. userId-less
+  // events are not supported by the model, so anchor on any admin (the
+  // event is operational, not personal). Failure tolerated.
+  const anchor = admins[0]?.id;
+  if (anchor) {
+    const { recordVerificationAudit } = await import("@/lib/services/face-verification");
+    await recordVerificationAudit({
+      userId: anchor,
+      eventType: "ops_alert",
+      actorType: "system",
+      newStatus: delivered ? "delivered_external" : "outbox_only",
+      reasonCode: kind,
+    });
+  }
+}
+
+/**
+ * Resolved notifications: called by the alert evaluator when a
+ * previously-firing condition is clear. Deduped per kind/day like firing.
+ */
+export async function resolveOpsAlert(kind: string): Promise<void> {
+  const policy = ALERT_POLICY[kind] ?? { severity: "warning" as const, escalateAfterMin: 120 };
+  await sendExternalAlert({
+    kind,
+    severity: policy.severity,
+    detail: "condition cleared",
+    status: "resolved",
+  });
 }
 
 /**

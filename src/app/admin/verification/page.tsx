@@ -69,6 +69,7 @@ export default async function AdminVerificationPage() {
       referenceVersion: true,
       providerModelVersion: true,
       duplicateClass: true,
+      riskBand: true,
       user: {
         select: {
           email: true,
@@ -122,16 +123,9 @@ export default async function AdminVerificationPage() {
     </section>
   );
 
-  // Risk bands + threat flags per queued job (normalized names only -
-  // the engine never emits raw vendor values).
-  const { computeVerificationRisk } = await import("@/lib/services/risk-engine");
-  const riskByUser = new Map<string, { band: string; signals: string[] }>();
-  for (const job of faceQueue) {
-    riskByUser.set(
-      job.userId,
-      await computeVerificationRisk(job.userId).catch(() => ({ band: "LOW", signals: [] })),
-    );
-  }
+  // Risk bands come from the SNAPSHOT stamped at run time (riskBand
+  // column) - zero per-row recomputation (PRR TD-3 fix). Detailed signals
+  // load on demand via the support view, not on the queue page.
 
   const faceSection = faceQueue.length > 0 && (
     <section className="mb-6">
@@ -161,9 +155,7 @@ export default async function AdminVerificationPage() {
                 <div className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-xs">
                   <span>
                     Risk:{" "}
-                    <span className="text-foreground font-medium">
-                      {riskByUser.get(job.userId)?.band ?? "LOW"}
-                    </span>
+                    <span className="text-foreground font-medium">{job.riskBand ?? "n/a"}</span>
                   </span>
                   <span>
                     Reference: {job.referenceStatus?.toLowerCase() ?? "none"} · v
@@ -177,11 +169,6 @@ export default async function AdminVerificationPage() {
                     </span>
                   )}
                 </div>
-                {(riskByUser.get(job.userId)?.signals.length ?? 0) > 0 && (
-                  <p className="text-muted-foreground truncate text-[11px]">
-                    Flags: {riskByUser.get(job.userId)!.signals.slice(0, 6).join(" · ")}
-                  </p>
-                )}
                 <div className="flex flex-wrap gap-2">
                   {job.checks.map((check) => (
                     <div key={check.id} className="w-20">

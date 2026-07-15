@@ -978,6 +978,14 @@ model AccountViolation {
   expiresAt         DateTime?
   appealAllowed     Boolean            @default(true)
   /**
+   * Signal-ownership marker (risk registry): violations created by the
+   * face-verification layer set "face_verification" - trust-engine
+   * EXCLUDES them from its violation signal because the risk engine
+   * already scores the underlying face outcome (double-count fix, PRR
+   * TD-2). Stable code value - never display text.
+   */
+  source            String?
+  /**
    * Set when an approved appeal reversed this violation.
    */
   reversedAt        DateTime?
@@ -1622,6 +1630,15 @@ model ProfilePhotoVerification {
   // --- Duplicate identity (Phase 4) ---
   duplicateClass       DuplicateIdentityClass         @default(UNKNOWN)
   duplicateCheckedAt   DateTime?
+  /**
+   * Risk band snapshot (LOW/MEDIUM/HIGH/CRITICAL) stamped at run time -
+   * the admin queue reads THIS instead of recomputing per row (PRR TD-3).
+   */
+  riskBand             String?
+  /**
+   * Calibration config version active when the decision was made.
+   */
+  calibrationVersion   String?
   createdAt            DateTime                       @default(now())
   updatedAt            DateTime                       @updatedAt
 
@@ -1629,33 +1646,35 @@ model ProfilePhotoVerification {
   checks PhotoFaceCheck[]
 
   @@index([status])
+  @@index([status, updatedAt])
   @@index([badgeStatus])
 }
 
 model PhotoFaceCheck {
-  id               String                  @id @default(cuid())
-  verificationId   String
-  userId           String
-  photoId          String
+  id                 String                  @id @default(cuid())
+  verificationId     String
+  userId             String
+  photoId            String
   // Immutable version pin: a check is valid ONLY for this exact stored
   // image version (Photo.mediaVersion). Replaced/recropped bytes bump
   // mediaVersion and invalidate this row.
-  photoVersion     Int
-  isCoverAtCheck   Boolean                 @default(false)
-  classification   FaceCheckClassification
-  decision         FaceCheckDecision       @default(PENDING)
-  faceCount        Int?
-  ownerDetected    Boolean?
+  photoVersion       Int
+  isCoverAtCheck     Boolean                 @default(false)
+  classification     FaceCheckClassification
+  decision           FaceCheckDecision       @default(PENDING)
+  faceCount          Int?
+  ownerDetected      Boolean?
   // Calibration data (internal only - never shown to users): band is the
   // coarse presentation value; the raw score exists for threshold tuning.
-  similarityScore  Float?
-  confidenceBand   String? // "confident" | "uncertain" | "mismatch"
-  qualityScore     Float?
-  manipulationRisk Float?
-  failureReason    String? // reason code, e.g. "cover_other_person"
-  reviewedById     String?
-  reviewedAt       DateTime?
-  createdAt        DateTime                @default(now())
+  similarityScore    Float?
+  confidenceBand     String? // "confident" | "uncertain" | "mismatch"
+  qualityScore       Float?
+  manipulationRisk   Float?
+  failureReason      String? // reason code, e.g. "cover_other_person"
+  reviewedById       String?
+  reviewedAt         DateTime?
+  calibrationVersion String?
+  createdAt          DateTime                @default(now())
 
   verification ProfilePhotoVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
   photo        Photo                    @relation(fields: [photoId], references: [id], onDelete: Cascade)

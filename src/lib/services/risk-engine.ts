@@ -25,6 +25,187 @@ import { computeTrustProfile } from "@/lib/services/trust-engine";
 
 export type RiskBand = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
+/**
+ * RISK SIGNAL REGISTRY (Phase 21) - the canonical ownership table. Every
+ * signal has exactly ONE scoring owner; equivalent events never score
+ * twice. Deduplication keys are STABLE code values (enum/source columns,
+ * never display text). Registry is consumed by docs and pinned by tests.
+ */
+export const RISK_SIGNAL_REGISTRY = [
+  // --- owner: trust-engine (content/behaviour plane) ---
+  {
+    name: "photo_rejected",
+    owner: "trust-engine",
+    category: "content",
+    severity: "medium",
+    persistence: "while photo rejected",
+    dedupe: "per photo via Photo.moderation",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "reported",
+    owner: "trust-engine",
+    category: "social",
+    severity: "medium",
+    persistence: "while report open",
+    dedupe: "distinct reporterId",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "violation",
+    owner: "trust-engine",
+    category: "enforcement",
+    severity: "high",
+    persistence: "until reversed",
+    dedupe: "per violation row, EXCLUDES source=face_verification",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "device_multi_account",
+    owner: "fraud-signals",
+    category: "device",
+    severity: "medium",
+    persistence: "while shared",
+    dedupe: "per device hash tier",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "disposable_email",
+    owner: "fraud-signals",
+    category: "identity",
+    severity: "low",
+    persistence: "account lifetime",
+    dedupe: "boolean",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "login_risk_high",
+    owner: "fraud-signals",
+    category: "session",
+    severity: "medium",
+    persistence: "while elevated",
+    dedupe: "boolean",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "admin_flagged",
+    owner: "trust-engine",
+    category: "staff",
+    severity: "high",
+    persistence: "until cleared",
+    dedupe: "boolean (riskReason prefix)",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "payment_refunded",
+    owner: "trust-engine",
+    category: "payment",
+    severity: "low",
+    persistence: "account lifetime",
+    dedupe: "per refunded payment",
+    scoreable: true,
+    informational: false,
+  },
+  // --- owner: risk-engine face plane (this module) ---
+  {
+    name: "identity_unverified",
+    owner: "risk-engine",
+    category: "verification",
+    severity: "low",
+    persistence: "until verified",
+    dedupe: "boolean",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "face_rejected",
+    owner: "risk-engine",
+    category: "verification",
+    severity: "high",
+    persistence: "while status REJECTED",
+    dedupe: "job status enum (violation row is source-excluded upstream)",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "face_suspended",
+    owner: "risk-engine",
+    category: "verification",
+    severity: "high",
+    persistence: "while status SUSPENDED",
+    dedupe: "job status enum",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "manipulation_flagged",
+    owner: "risk-engine",
+    category: "verification",
+    severity: "high",
+    persistence: "while photo live",
+    dedupe: "classification enum, LIVE photos only",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "other_person_photos",
+    owner: "risk-engine",
+    category: "verification",
+    severity: "medium",
+    persistence: "while photos live",
+    dedupe: "per (photoId, mediaVersion), LIVE photos only, capped",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "duplicate_impersonation",
+    owner: "risk-engine",
+    category: "duplicate",
+    severity: "critical",
+    persistence: "while classified",
+    dedupe: "duplicateClass enum (violation row source-excluded)",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "duplicate_unresolved",
+    owner: "risk-engine",
+    category: "duplicate",
+    severity: "medium",
+    persistence: "while classified",
+    dedupe: "duplicateClass enum",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "reference_invalid",
+    owner: "risk-engine",
+    category: "lifecycle",
+    severity: "low",
+    persistence: "until re-enrolled",
+    dedupe: "referenceStatus enum",
+    scoreable: true,
+    informational: false,
+  },
+  {
+    name: "appeal_denied",
+    owner: "risk-engine",
+    category: "appeals",
+    severity: "medium",
+    persistence: "rolling",
+    dedupe: "per REJECTED appeal row, capped",
+    scoreable: true,
+    informational: false,
+  },
+] as const;
+
 export type VerificationRisk = {
   band: RiskBand;
   /** Normalized, staff-safe signal names (threat flags). No values. */
@@ -51,7 +232,7 @@ export function riskEngineConfig() {
       manipulation_flagged: num(process.env.RISK_W_MANIPULATION, 30),
       other_person_photos: num(process.env.RISK_W_OTHER_PERSON, 10), // per photo, capped
       other_person_cap: num(process.env.RISK_W_OTHER_PERSON_CAP, 30),
-      duplicate_impersonation: num(process.env.RISK_W_DUP_IMPERSONATION, 40),
+      duplicate_impersonation: num(process.env.RISK_W_DUP_IMPERSONATION, 50),
       duplicate_unresolved: num(process.env.RISK_W_DUP_UNRESOLVED, 15),
       reference_invalid: num(process.env.RISK_W_REFERENCE_INVALID, 10),
       appeal_denied: num(process.env.RISK_W_APPEAL_DENIED, 10), // per denial, capped
@@ -148,7 +329,13 @@ export async function computeVerificationRisk(userId: string): Promise<Verificat
         referenceStatus: true,
         checks: {
           select: { classification: true },
-          where: { classification: { in: ["MANIPULATION_RISK", "OTHER_PERSON_ONLY"] } },
+          // LIVE photos only: once a flagged photo is moderation-REJECTED
+          // (unpublished), trust-engine's photo_rejected owns that signal -
+          // counting the check here too would double-score one photo.
+          where: {
+            classification: { in: ["MANIPULATION_RISK", "OTHER_PERSON_ONLY"] },
+            photo: { moderation: { not: "REJECTED" } },
+          },
         },
       },
     }),

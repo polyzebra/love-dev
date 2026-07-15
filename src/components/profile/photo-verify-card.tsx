@@ -15,6 +15,14 @@ import {
 } from "lucide-react";
 import type { VerificationUxState } from "@/lib/services/photo-verification";
 import { FACE_STATE_COPY } from "@/lib/verification-presentation";
+import dynamic from "next/dynamic";
+
+// Biometric capture code is dynamically imported: it never ships to
+// routes that don't render the verification card (Phase 23).
+const LivenessCapture = dynamic(
+  () => import("@/components/profile/liveness-capture").then((m) => m.LivenessCapture),
+  { ssr: false },
+);
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -52,6 +60,7 @@ export function PhotoVerifyCard({
   state,
   workflowStatus = null,
   facePresentation = null,
+  liveness = null,
 }: {
   state: VerificationUxState;
   /** Raw Verification.status - WORDING only (expired vs rejected retry
@@ -61,6 +70,9 @@ export function PhotoVerifyCard({
    *  null renders the identity flow exactly as before. */
   facePresentation?:
     "checking_profile_photos" | "photo_update_review" | "action_required" | "manual_review" | null;
+  /** Liveness capture required before profile photos can be checked (no
+   *  trusted reference yet). Carries the consent version to accept. */
+  liveness?: { consentVersion: string } | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -183,6 +195,11 @@ export function PhotoVerifyCard({
   // -------------------------------------------------- face-layer states
   // (identity already verified - profile-photo verification refines what
   // the user sees; no provider vocabulary, no similarity scores)
+  // Capture step: identity verified, face layer on, no trusted reference
+  // yet -> the video-selfie liveness flow (Phases 23/24).
+  if (liveness && facePresentation === "checking_profile_photos") {
+    return wrap(<LivenessCapture consentVersion={liveness.consentVersion} />);
+  }
   if (
     facePresentation === "checking_profile_photos" ||
     facePresentation === "photo_update_review"

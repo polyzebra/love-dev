@@ -83,6 +83,21 @@ export interface FaceComparisonProvider {
   searchLikeness?(
     referenceId: string,
   ): Promise<Array<{ referenceId: string; band: "confident" | "uncertain" }>>;
+  /** Liveness capture (Phase 23): create a hosted/SDK session. */
+  createLivenessSession?(userId: string): Promise<{ sessionId: string }>;
+  /** Liveness result: normalized outcome + whether a trusted reference
+   *  frame is available. NEVER returns media, scores or vendor payloads. */
+  getLivenessResult?(
+    sessionId: string,
+  ): Promise<{ status: "pending" | "passed" | "failed"; referenceFrameReady: boolean }>;
+  /** Create the reference FROM a passed liveness session (Phase 24: the
+   *  ONLY trusted reference source - never an unverified profile photo). */
+  createReferenceFromLiveness?(input: {
+    userId: string;
+    livenessSessionId: string;
+  }): Promise<{ referenceId: string }>;
+  /** Emergency purge: destroy the whole collection (admin path only). */
+  purgeAllReferences?(): Promise<void>;
 }
 
 export class FaceMatchNotConfiguredError extends Error {
@@ -133,6 +148,16 @@ function marker(image: Buffer): string {
   const text = image.toString("latin1");
   const m = /face:(none|owner|group|other|uncertain|manipulated)/.exec(text);
   return m?.[1] ?? "owner";
+}
+
+/** Mock liveness state (dev/tests only - no media anywhere). */
+const mockLivenessStatus = new Map<string, "pending" | "passed" | "failed">();
+let mockLivenessSeq = 0;
+export function setMockLivenessStatus(
+  sessionId: string,
+  status: "pending" | "passed" | "failed",
+): void {
+  mockLivenessStatus.set(sessionId, status);
 }
 
 /** Test seam: stage likeness matches for the mock provider. */
@@ -227,6 +252,27 @@ export const mockFaceMatchProvider: FaceComparisonProvider = {
   async searchLikeness(referenceId: string) {
     return mockLikeness.get(referenceId) ?? [];
   },
+  async createLivenessSession(userId: string) {
+    const id = `mocklive_${createHash("sha256").update(`${userId}:${mockLivenessSeq++}`).digest("hex").slice(0, 12)}`;
+    mockLivenessStatus.set(id, "passed");
+    return { sessionId: id };
+  },
+  async getLivenessResult(sessionId: string) {
+    const status = mockLivenessStatus.get(sessionId) ?? "pending";
+    return { status, referenceFrameReady: status === "passed" };
+  },
+  async createReferenceFromLiveness({ userId, livenessSessionId }) {
+    if (mockLivenessStatus.get(livenessSessionId) !== "passed") {
+      throw new Error("liveness session not passed");
+    }
+    return {
+      referenceId: `mockref_${createHash("sha256").update(userId).digest("hex").slice(0, 16)}`,
+    };
+  },
+  async purgeAllReferences() {
+    mockLikeness.clear();
+    mockLivenessStatus.clear();
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -238,26 +284,20 @@ export const mockFaceMatchProvider: FaceComparisonProvider = {
 // referenceId; DeleteFaces on deleteReference). Needs SigV4 signing.
 // ---------------------------------------------------------------------------
 
-export const awsRekognitionFaceProvider: FaceComparisonProvider = {
-  name: "aws_rekognition_faces",
-  async detectFaces() {
-    throw new FaceMatchNotConfiguredError(
-      "aws_rekognition_faces is a documented stub (SigV4 signing + Collections wiring pending).",
-    );
-  },
-  async createReference() {
-    throw new FaceMatchNotConfiguredError("aws_rekognition_faces stub");
-  },
-  async compareReferenceToPhoto() {
-    throw new FaceMatchNotConfiguredError("aws_rekognition_faces stub");
-  },
-  async assessManipulationRisk() {
-    throw new FaceMatchNotConfiguredError("aws_rekognition_faces stub");
-  },
-  async deleteReference() {
-    throw new FaceMatchNotConfiguredError("aws_rekognition_faces stub");
-  },
-};
+// Real adapter lives in aws-rekognition.ts (SigV4, no SDK). Imported
+// lazily at resolution time so the crypto/signing code never loads in
+// deployments that don't use it.
+let awsProviderCache: FaceComparisonProvider | null = null;
+function loadAwsProvider(): FaceComparisonProvider {
+  if (!awsProviderCache) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require("@/lib/services/aws-rekognition") as {
+      awsRekognitionProvider: FaceComparisonProvider;
+    };
+    awsProviderCache = mod.awsRekognitionProvider;
+  }
+  return awsProviderCache;
+}
 
 /**
  * Env-driven resolution, mirroring getPhotoVerificationProvider():
@@ -267,7 +307,15 @@ export const awsRekognitionFaceProvider: FaceComparisonProvider = {
 export function getFaceMatchProvider(): FaceComparisonProvider {
   const which = process.env.FACE_MATCH_PROVIDER?.trim().toLowerCase();
   if (which === "mock" && process.env.NODE_ENV !== "production") return mockFaceMatchProvider;
-  if (which === "aws_rekognition_faces") return awsRekognitionFaceProvider;
+  if (which === "aws_rekognition_faces") {
+    // HARD LEGAL GATE (Phase 32): biometric processing in production
+    // requires a recorded legal approval version. Without it the layer
+    // stays honestly dormant - it can never enable itself.
+    if (process.env.NODE_ENV === "production" && !process.env.FACE_LEGAL_APPROVAL_VERSION?.trim()) {
+      return faceMatchNotConfiguredProvider;
+    }
+    return loadAwsProvider();
+  }
   return faceMatchNotConfiguredProvider;
 }
 

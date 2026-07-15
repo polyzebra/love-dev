@@ -37,6 +37,7 @@ const LIVE = new Set([
   "face-verification.test.ts",
   "face-security.test.ts",
   "face-chaos.test.ts",
+  "face-final-blockers.test.ts",
 ]);
 
 const UNIT = new Set([

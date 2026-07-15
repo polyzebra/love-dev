@@ -4189,6 +4189,7 @@ export const AccountViolationScalarFieldEnum = {
   internalReason: 'internalReason',
   expiresAt: 'expiresAt',
   appealAllowed: 'appealAllowed',
+  source: 'source',
   reversedAt: 'reversedAt',
   moderationCaseId: 'moderationCaseId',
   photoId: 'photoId',
@@ -4576,6 +4577,8 @@ export const ProfilePhotoVerificationScalarFieldEnum = {
   rotationReason: 'rotationReason',
   duplicateClass: 'duplicateClass',
   duplicateCheckedAt: 'duplicateCheckedAt',
+  riskBand: 'riskBand',
+  calibrationVersion: 'calibrationVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4601,6 +4604,7 @@ export const PhotoFaceCheckScalarFieldEnum = {
   failureReason: 'failureReason',
   reviewedById: 'reviewedById',
   reviewedAt: 'reviewedAt',
+  calibrationVersion: 'calibrationVersion',
   createdAt: 'createdAt'
 } as const
 
