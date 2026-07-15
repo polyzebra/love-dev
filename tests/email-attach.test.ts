@@ -59,20 +59,26 @@ function fakeReq(ip: string): Request {
 
 async function main() {
   const { db } = await import("../src/lib/db");
-  const { sendEmailAttach, verifyEmailAttach, EMAIL_IN_USE_MESSAGE } = await import(
-    "../src/lib/auth/email-attach-flow"
-  );
+  const { sendEmailAttach, verifyEmailAttach, EMAIL_IN_USE_MESSAGE } =
+    await import("../src/lib/auth/email-attach-flow");
   const { authNextStep, needsEmailAttach } = await import("../src/lib/auth/gate");
-  const { phonePlaceholderEmail, provisionPhoneLoginUser } = await import(
-    "../src/lib/auth/identity"
-  );
+  const { phonePlaceholderEmail, provisionPhoneLoginUser } =
+    await import("../src/lib/auth/identity");
   type AuthClient = import("../src/lib/auth/email-attach-flow").EmailAttachAuthClient;
 
   /**
    * Spy auth client. `verifyAs` controls verifyOtp's returned uid (the
    * live session's auth user); an error code string = failure.
    */
-  function spyClient(opts?: { verifyAs?: string; verifyError?: string; sendError?: string }) {
+  function spyClient(opts?: {
+    verifyAs?: string;
+    verifyError?: string;
+    sendError?: string;
+    /** Override the email verifyOtp reports as committed on auth.users.
+     *  Simulates "Secure email change" ON, where the new-side OTP verifies
+     *  but auth.users.email is NOT yet stamped (stays the old value). */
+    verifyEmail?: string;
+  }) {
     const calls: { method: "updateUser" | "verifyOtp"; email?: string; type?: string }[] = [];
     const client: AuthClient = {
       async updateUser({ email }) {
@@ -90,7 +96,13 @@ async function main() {
           };
         }
         return {
-          data: { user: { id: opts?.verifyAs ?? randomUUID(), email }, session: {} },
+          data: {
+            user: {
+              id: opts?.verifyAs ?? randomUUID(),
+              email: opts?.verifyEmail !== undefined ? opts.verifyEmail : email,
+            },
+            session: {},
+          },
           error: null,
         };
       },
@@ -145,59 +157,68 @@ async function main() {
   try {
     // ------------------------------------------------------------ case 1
     console.log("1. gate ladder placement");
-    await check("new phone-login account -> /auth/email right after phone (flag on/off)", async () => {
-      const authUid = randomUUID();
-      const provisioned = await provisionPhoneLoginUser({
-        authUid,
-        email: null,
-        phoneE164: "+353861235101",
-        phoneCountryIso: "IE",
-        phoneDialCode: "+353",
-      });
-      createdUserIds.push(authUid);
-      assert.ok(provisioned.ok);
-      if (provisioned.ok) {
-        assert.equal(provisioned.user.email, phonePlaceholderEmail(authUid));
-        assert.equal(needsEmailAttach(provisioned.user), true);
-        assert.equal(authNextStep(provisioned.user, true), "/auth/email");
-        assert.equal(authNextStep(provisioned.user, false), "/auth/email");
-      }
-    });
-    await check("existing phone-login owner with real verified email never sees /auth/email", () => {
-      const owner = {
-        status: "ACTIVE",
-        bannedAt: null,
-        email: testEmail("settled-owner"),
-        emailVerified: new Date(),
-        phoneVerifiedAt: new Date(),
-        ageConfirmedAt: new Date(),
-        termsVersion: null, // still owes legal - but NEVER /auth/email
-        privacyVersion: null,
-        communityVersion: null,
-        onboardingDone: false,
-      };
-      assert.equal(needsEmailAttach(owner), false);
-      assert.equal(authNextStep(owner, true), "/auth/legal");
-    });
-    await check("email-first user never sees /auth/email; Google user (no phone) -> /auth/phone", () => {
-      const emailFirst = {
-        status: "ACTIVE",
-        bannedAt: null,
-        email: testEmail("google"),
-        emailVerified: new Date(),
-        phoneVerifiedAt: null,
-        ageConfirmedAt: null,
-        termsVersion: null,
-        privacyVersion: null,
-        communityVersion: null,
-        onboardingDone: false,
-      };
-      // Verified email + no phone + flag ON: phone rung first, never email.
-      assert.equal(authNextStep(emailFirst, true), "/auth/phone");
-      // Flag OFF: straight to age - the email rung stays invisible.
-      assert.equal(authNextStep(emailFirst, false), "/auth/age");
-      assert.equal(needsEmailAttach(emailFirst), false);
-    });
+    await check(
+      "new phone-login account -> /auth/email right after phone (flag on/off)",
+      async () => {
+        const authUid = randomUUID();
+        const provisioned = await provisionPhoneLoginUser({
+          authUid,
+          email: null,
+          phoneE164: "+353861235101",
+          phoneCountryIso: "IE",
+          phoneDialCode: "+353",
+        });
+        createdUserIds.push(authUid);
+        assert.ok(provisioned.ok);
+        if (provisioned.ok) {
+          assert.equal(provisioned.user.email, phonePlaceholderEmail(authUid));
+          assert.equal(needsEmailAttach(provisioned.user), true);
+          assert.equal(authNextStep(provisioned.user, true), "/auth/email");
+          assert.equal(authNextStep(provisioned.user, false), "/auth/email");
+        }
+      },
+    );
+    await check(
+      "existing phone-login owner with real verified email never sees /auth/email",
+      () => {
+        const owner = {
+          status: "ACTIVE",
+          bannedAt: null,
+          email: testEmail("settled-owner"),
+          emailVerified: new Date(),
+          phoneVerifiedAt: new Date(),
+          ageConfirmedAt: new Date(),
+          termsVersion: null, // still owes legal - but NEVER /auth/email
+          privacyVersion: null,
+          communityVersion: null,
+          onboardingDone: false,
+        };
+        assert.equal(needsEmailAttach(owner), false);
+        assert.equal(authNextStep(owner, true), "/auth/legal");
+      },
+    );
+    await check(
+      "email-first user never sees /auth/email; Google user (no phone) -> /auth/phone",
+      () => {
+        const emailFirst = {
+          status: "ACTIVE",
+          bannedAt: null,
+          email: testEmail("google"),
+          emailVerified: new Date(),
+          phoneVerifiedAt: null,
+          ageConfirmedAt: null,
+          termsVersion: null,
+          privacyVersion: null,
+          communityVersion: null,
+          onboardingDone: false,
+        };
+        // Verified email + no phone + flag ON: phone rung first, never email.
+        assert.equal(authNextStep(emailFirst, true), "/auth/phone");
+        // Flag OFF: straight to age - the email rung stays invisible.
+        assert.equal(authNextStep(emailFirst, false), "/auth/age");
+        assert.equal(needsEmailAttach(emailFirst), false);
+      },
+    );
 
     // ------------------------------------------------------------ case 2
     console.log("2. junk + blocked input (pre-client)");
@@ -205,110 +226,152 @@ async function main() {
     await db.blockedIdentity
       .create({ data: { email: blockedEmail, reason: "test-block" } })
       .catch(() => {});
-    await check("invalid shape / placeholder domain -> invalid_email, zero client calls", async () => {
-      const spy = spyClient();
-      const junk = await sendEmailAttach({
-        user: sessionUser(junkUserId),
-        email: "not-an-email",
-        client: spy.client,
-      });
-      assert.equal(junk.kind, "invalid_email");
-      const placeholder = await sendEmailAttach({
-        user: sessionUser(junkUserId),
-        email: phonePlaceholderEmail(randomUUID()),
-        client: spy.client,
-      });
-      assert.equal(placeholder.kind, "invalid_email");
-      const verifyJunk = await verifyEmailAttach({
-        user: sessionUser(junkUserId),
-        email: "not-an-email",
-        code: "123456",
-        client: spy.client,
-      });
-      assert.equal(verifyJunk.kind, "invalid_email");
-      assert.equal(spy.calls.length, 0, "client must never be reached");
-    });
-    await check("disposable + blocklisted -> ONE neutral not_allowed, zero client calls", async () => {
-      const spy = spyClient();
-      const disposable = await sendEmailAttach({
-        user: sessionUser(junkUserId),
-        email: `x-${RUN}@mailinator.com`,
-        client: spy.client,
-      });
-      assert.equal(disposable.kind, "not_allowed");
-      const blocked = await sendEmailAttach({
-        user: sessionUser(junkUserId),
-        email: blockedEmail,
-        client: spy.client,
-        req: fakeReq("203.0.113.60"),
-      });
-      assert.equal(blocked.kind, "not_allowed", "blocklist rejection is indistinguishable");
-      const blockedVerify = await verifyEmailAttach({
-        user: sessionUser(junkUserId),
-        email: blockedEmail,
-        code: "123456",
-        client: spy.client,
-      });
-      assert.equal(blockedVerify.kind, "not_allowed");
-      assert.equal(spy.calls.length, 0, "no OTP for junk/blocked addresses");
-      const audit = await db.authVerificationEvent.findFirst({
-        where: { type: "email_attach_send_blocked", email: blockedEmail },
-      });
-      assert.ok(audit, "blocked send audited with the real reason");
-    });
+    await check(
+      "invalid shape / placeholder domain -> invalid_email, zero client calls",
+      async () => {
+        const spy = spyClient();
+        const junk = await sendEmailAttach({
+          user: sessionUser(junkUserId),
+          email: "not-an-email",
+          client: spy.client,
+        });
+        assert.equal(junk.kind, "invalid_email");
+        const placeholder = await sendEmailAttach({
+          user: sessionUser(junkUserId),
+          email: phonePlaceholderEmail(randomUUID()),
+          client: spy.client,
+        });
+        assert.equal(placeholder.kind, "invalid_email");
+        const verifyJunk = await verifyEmailAttach({
+          user: sessionUser(junkUserId),
+          email: "not-an-email",
+          code: "123456",
+          client: spy.client,
+        });
+        assert.equal(verifyJunk.kind, "invalid_email");
+        assert.equal(spy.calls.length, 0, "client must never be reached");
+      },
+    );
+    await check(
+      "disposable + blocklisted -> ONE neutral not_allowed, zero client calls",
+      async () => {
+        const spy = spyClient();
+        const disposable = await sendEmailAttach({
+          user: sessionUser(junkUserId),
+          email: `x-${RUN}@mailinator.com`,
+          client: spy.client,
+        });
+        assert.equal(disposable.kind, "not_allowed");
+        const blocked = await sendEmailAttach({
+          user: sessionUser(junkUserId),
+          email: blockedEmail,
+          client: spy.client,
+          req: fakeReq("203.0.113.60"),
+        });
+        assert.equal(blocked.kind, "not_allowed", "blocklist rejection is indistinguishable");
+        const blockedVerify = await verifyEmailAttach({
+          user: sessionUser(junkUserId),
+          email: blockedEmail,
+          code: "123456",
+          client: spy.client,
+        });
+        assert.equal(blockedVerify.kind, "not_allowed");
+        assert.equal(spy.calls.length, 0, "no OTP for junk/blocked addresses");
+        const audit = await db.authVerificationEvent.findFirst({
+          where: { type: "email_attach_send_blocked", email: blockedEmail },
+        });
+        assert.ok(audit, "blocked send audited with the real reason");
+      },
+    );
 
     // ------------------------------------------------------------ case 3
     console.log("3. CASE 1 - attach happy path (placeholder replaced)");
     const happyId = await createPhoneFirstUser("5103");
     const happyEmail = testEmail("happy");
-    await check("send: updateUser({email}) called once, audited; resend -> neutral limited", async () => {
-      const spy = spyClient();
-      const sent = await sendEmailAttach({
-        user: sessionUser(happyId),
-        email: happyEmail,
-        client: spy.client,
-        req: fakeReq("203.0.113.61"),
-      });
-      assert.equal(sent.kind, "sent");
-      assert.ok(sent.kind === "sent" && !sent.limited);
-      assert.deepEqual(spy.calls, [{ method: "updateUser", email: happyEmail }]);
-      const audit = await db.authVerificationEvent.findFirst({
-        where: { type: "email_attach_send", email: happyEmail, userId: happyId },
-      });
-      assert.ok(audit, "email_attach_send audited");
+    await check(
+      "send: updateUser({email}) called once, audited; resend -> neutral limited",
+      async () => {
+        const spy = spyClient();
+        const sent = await sendEmailAttach({
+          user: sessionUser(happyId),
+          email: happyEmail,
+          client: spy.client,
+          req: fakeReq("203.0.113.61"),
+        });
+        assert.equal(sent.kind, "sent");
+        assert.ok(sent.kind === "sent" && !sent.limited);
+        assert.deepEqual(spy.calls, [{ method: "updateUser", email: happyEmail }]);
+        const audit = await db.authVerificationEvent.findFirst({
+          where: { type: "email_attach_send", email: happyEmail, userId: happyId },
+        });
+        assert.ok(audit, "email_attach_send audited");
 
-      const again = await sendEmailAttach({
-        user: sessionUser(happyId),
-        email: happyEmail,
-        client: spy.client,
-      });
-      assert.equal(again.kind, "sent", "limited resend keeps the neutral shape");
-      assert.ok(again.kind === "sent" && again.limited && again.retryAfter >= 1);
-      assert.equal(spy.calls.length, 1, "limited resend must not reach the client");
-    });
-    await check("verify: type email_change; placeholder replaced + emailVerified; ladder -> /auth/age", async () => {
-      const spy = spyClient({ verifyAs: happyId });
-      const outcome = await verifyEmailAttach({
-        user: sessionUser(happyId),
-        email: happyEmail,
-        code: "123456",
-        client: spy.client,
-        req: fakeReq("203.0.113.61"),
-      });
-      assert.equal(outcome.kind, "attached");
-      assert.deepEqual(spy.calls, [
-        { method: "verifyOtp", email: happyEmail, type: "email_change" },
-      ]);
-      const row = await db.user.findUniqueOrThrow({ where: { id: happyId } });
-      assert.equal(row.email, happyEmail, "placeholder replaced");
-      assert.ok(row.emailVerified, "emailVerified stamped");
-      assert.equal(needsEmailAttach(row), false, "the rung never shows again");
-      assert.equal(authNextStep(row, true), "/auth/age", "ladder continues past the rung");
-      const audit = await db.authVerificationEvent.findFirst({
-        where: { type: "email_attach_verified", email: happyEmail, userId: happyId },
-      });
-      assert.ok(audit, "email_attach_verified audited");
-    });
+        const again = await sendEmailAttach({
+          user: sessionUser(happyId),
+          email: happyEmail,
+          client: spy.client,
+        });
+        assert.equal(again.kind, "sent", "limited resend keeps the neutral shape");
+        assert.ok(again.kind === "sent" && again.limited && again.retryAfter >= 1);
+        assert.equal(spy.calls.length, 1, "limited resend must not reach the client");
+      },
+    );
+    await check(
+      "verify: type email_change; placeholder replaced + emailVerified; ladder -> /auth/age",
+      async () => {
+        const spy = spyClient({ verifyAs: happyId });
+        const outcome = await verifyEmailAttach({
+          user: sessionUser(happyId),
+          email: happyEmail,
+          code: "123456",
+          client: spy.client,
+          req: fakeReq("203.0.113.61"),
+        });
+        assert.equal(outcome.kind, "attached");
+        assert.deepEqual(spy.calls, [
+          { method: "verifyOtp", email: happyEmail, type: "email_change" },
+        ]);
+        const row = await db.user.findUniqueOrThrow({ where: { id: happyId } });
+        assert.equal(row.email, happyEmail, "placeholder replaced");
+        assert.ok(row.emailVerified, "emailVerified stamped");
+        assert.equal(needsEmailAttach(row), false, "the rung never shows again");
+        assert.equal(authNextStep(row, true), "/auth/age", "ladder continues past the rung");
+        const audit = await db.authVerificationEvent.findFirst({
+          where: { type: "email_attach_verified", email: happyEmail, userId: happyId },
+        });
+        assert.ok(audit, "email_attach_verified audited");
+      },
+    );
+
+    await check(
+      "Secure-email-change ON (OTP ok, Auth email NOT committed) -> not_committed, app row UNCHANGED",
+      async () => {
+        // Fresh phone-first account so we can prove the placeholder is kept.
+        const uid = await createPhoneFirstUser("5199");
+        const placeholder = phonePlaceholderEmail(uid);
+        const target = testEmail("securechange");
+        // verifyOtp succeeds but reports the OLD placeholder as the committed
+        // email (Secure email change requires BOTH sides; new-side alone
+        // does not stamp auth.users.email).
+        const spy = spyClient({ verifyAs: uid, verifyEmail: placeholder });
+        const outcome = await verifyEmailAttach({
+          user: sessionUser(uid),
+          email: target,
+          code: "123456",
+          client: spy.client,
+          req: fakeReq("203.0.113.62"),
+        });
+        assert.equal(outcome.kind, "not_committed", "refuses to commit before Auth confirms");
+        const row = await db.user.findUniqueOrThrow({ where: { id: uid } });
+        assert.equal(row.email, placeholder, "app row NEVER moved ahead of Auth");
+        assert.equal(row.emailVerified, null, "no false verification stamp");
+        const audit = await db.authVerificationEvent.findFirst({
+          where: { type: "email_attach_verify_fail", userId: uid },
+          orderBy: { createdAt: "desc" },
+        });
+        assert.equal((audit?.metadata as { code?: string })?.code, "auth_email_not_committed");
+      },
+    );
 
     // ------------------------------------------------------------ case 4
     console.log("4. CASE 2 - already verified on THIS account");
@@ -393,69 +456,79 @@ async function main() {
     console.log("7. wrong/expired codes + failure lock");
     const lockId = await createPhoneFirstUser("5105");
     const lockEmail = testEmail("lock");
-    await check("expired -> expired_code; 5 fails -> locked (client no longer called)", async () => {
-      const expired = await verifyEmailAttach({
-        user: sessionUser(lockId),
-        email: lockEmail,
-        code: "111111",
-        client: spyClient({ verifyError: "otp_expired" }).client,
-      });
-      assert.equal(expired.kind, "expired_code");
-      for (let i = 0; i < 4; i += 1) {
-        const fail = await verifyEmailAttach({
+    await check(
+      "expired -> expired_code; 5 fails -> locked (client no longer called)",
+      async () => {
+        const expired = await verifyEmailAttach({
           user: sessionUser(lockId),
           email: lockEmail,
-          code: "222222",
-          client: spyClient({ verifyError: "otp_invalid" }).client,
+          code: "111111",
+          client: spyClient({ verifyError: "otp_expired" }).client,
         });
-        assert.equal(fail.kind, "invalid_code");
-      }
-      const spy = spyClient({ verifyAs: lockId });
-      const locked = await verifyEmailAttach({
-        user: sessionUser(lockId),
-        email: lockEmail,
-        code: "123456",
-        client: spy.client,
-      });
-      assert.equal(locked.kind, "locked");
-      assert.equal(spy.calls.length, 0, "locked attempts never reach the client");
-      const row = await db.user.findUniqueOrThrow({ where: { id: lockId } });
-      assert.equal(row.email, phonePlaceholderEmail(lockId), "failures claimed nothing");
-      assert.equal(row.emailVerified, null);
-      const audit = await db.authVerificationEvent.findFirst({
-        where: { type: "email_attach_verify_locked", email: lockEmail, userId: lockId },
-      });
-      assert.ok(audit, "lock audited as its own type (never extends itself)");
-    });
+        assert.equal(expired.kind, "expired_code");
+        for (let i = 0; i < 4; i += 1) {
+          const fail = await verifyEmailAttach({
+            user: sessionUser(lockId),
+            email: lockEmail,
+            code: "222222",
+            client: spyClient({ verifyError: "otp_invalid" }).client,
+          });
+          assert.equal(fail.kind, "invalid_code");
+        }
+        const spy = spyClient({ verifyAs: lockId });
+        const locked = await verifyEmailAttach({
+          user: sessionUser(lockId),
+          email: lockEmail,
+          code: "123456",
+          client: spy.client,
+        });
+        assert.equal(locked.kind, "locked");
+        assert.equal(spy.calls.length, 0, "locked attempts never reach the client");
+        const row = await db.user.findUniqueOrThrow({ where: { id: lockId } });
+        assert.equal(row.email, phonePlaceholderEmail(lockId), "failures claimed nothing");
+        assert.equal(row.emailVerified, null);
+        const audit = await db.authVerificationEvent.findFirst({
+          where: { type: "email_attach_verify_locked", email: lockEmail, userId: lockId },
+        });
+        assert.ok(audit, "lock audited as its own type (never extends itself)");
+      },
+    );
 
     // ------------------------------------------------------------ case 8
     console.log("8. concurrent attach race for one free address");
-    await check("two users, one address -> exactly one winner, loser gets email_in_use", async () => {
-      const raceEmail = testEmail("race");
-      const aId = await createPhoneFirstUser("5106");
-      const bId = await createPhoneFirstUser("5107");
-      const [a, b] = await Promise.all([
-        verifyEmailAttach({
-          user: sessionUser(aId),
-          email: raceEmail,
-          code: "123456",
-          client: spyClient({ verifyAs: aId }).client,
-        }),
-        verifyEmailAttach({
-          user: sessionUser(bId),
-          email: raceEmail,
-          code: "123456",
-          client: spyClient({ verifyAs: bId }).client,
-        }),
-      ]);
-      const kinds = [a.kind, b.kind].sort();
-      assert.deepEqual(kinds, ["attached", "email_in_use"], "exactly one winner");
-      const holders = await db.user.findMany({ where: { email: raceEmail } });
-      assert.equal(holders.length, 1, "the unique index kept one holder");
-      const loserId = a.kind === "attached" ? bId : aId;
-      const loser = await db.user.findUniqueOrThrow({ where: { id: loserId } });
-      assert.equal(loser.email, phonePlaceholderEmail(loserId), "loser keeps placeholder - no merge");
-    });
+    await check(
+      "two users, one address -> exactly one winner, loser gets email_in_use",
+      async () => {
+        const raceEmail = testEmail("race");
+        const aId = await createPhoneFirstUser("5106");
+        const bId = await createPhoneFirstUser("5107");
+        const [a, b] = await Promise.all([
+          verifyEmailAttach({
+            user: sessionUser(aId),
+            email: raceEmail,
+            code: "123456",
+            client: spyClient({ verifyAs: aId }).client,
+          }),
+          verifyEmailAttach({
+            user: sessionUser(bId),
+            email: raceEmail,
+            code: "123456",
+            client: spyClient({ verifyAs: bId }).client,
+          }),
+        ]);
+        const kinds = [a.kind, b.kind].sort();
+        assert.deepEqual(kinds, ["attached", "email_in_use"], "exactly one winner");
+        const holders = await db.user.findMany({ where: { email: raceEmail } });
+        assert.equal(holders.length, 1, "the unique index kept one holder");
+        const loserId = a.kind === "attached" ? bId : aId;
+        const loser = await db.user.findUniqueOrThrow({ where: { id: loserId } });
+        assert.equal(
+          loser.email,
+          phonePlaceholderEmail(loserId),
+          "loser keeps placeholder - no merge",
+        );
+      },
+    );
 
     console.log(`\n${passed} checks passed`);
   } finally {
@@ -464,10 +537,7 @@ async function main() {
     await db.authVerificationEvent
       .deleteMany({
         where: {
-          OR: [
-            { email: { contains: `email-attach-` } },
-            { userId: { in: createdUserIds } },
-          ],
+          OR: [{ email: { contains: `email-attach-` } }, { userId: { in: createdUserIds } }],
         },
       })
       .catch(() => {});

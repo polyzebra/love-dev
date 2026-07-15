@@ -20,6 +20,7 @@ const CODE_EXPIRED = "That code has expired. Request a new one.";
 const LOCKED = "Too many attempts. Please try again in a few minutes.";
 const NOT_ALLOWED = "That email address can't be used. Please use a different one.";
 const ACCOUNT_UNAVAILABLE = "That email can't be used right now.";
+const CHANGE_NOT_COMPLETED = "We couldn't complete the email change. Please try again shortly.";
 
 /**
  * POST /api/auth/email-attach/verify { email, code } - AUTHENTICATED.
@@ -102,6 +103,11 @@ export const POST = withUnavailableGuard("auth:email-attach/verify", async (req:
         { ok: false, code: "incorrect_code", error: CODE_FAILED },
         { status: 400 },
       );
+    case "not_committed":
+      // OTP verified but Auth did not stamp the new address (server-side
+      // "Secure email change" is ON - see docs/AUTH-SETUP.md §5e). Neutral
+      // copy; the misconfiguration is in the audit trail, never leaked.
+      return authError(503, "change_not_completed", CHANGE_NOT_COMPLETED);
     case "already_verified":
     case "attached":
       return authOk({ next: authNextStep(outcome.user) });

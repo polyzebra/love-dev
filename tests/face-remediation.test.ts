@@ -29,6 +29,9 @@ async function main() {
   delete process.env.FACE_VERIFICATION_PERCENT;
   delete process.env.FACE_VERIFICATION_COUNTRY_ALLOWLIST;
   delete process.env.FACE_EMERGENCY_DISABLE;
+  // hermetic: the mock capture-handle path must not pick up a real STS
+  // role from .env (the dedicated STS test sets/clears it explicitly).
+  delete process.env.FACE_LIVENESS_ROLE_ARN;
 
   const { db } = await import("../src/lib/db");
   const { createBoundLivenessSession, consumeLivenessFlow, invalidateOpenLivenessSessions } =
@@ -291,6 +294,9 @@ async function main() {
         assert.equal((await admitToFaceVerification(alice, { isRecovery: true })).admit, false);
       } finally {
         delete process.env.FACE_EMERGENCY_DISABLE;
+  // hermetic: the mock capture-handle path must not pick up a real STS
+  // role from .env (the dedicated STS test sets/clears it explicitly).
+  delete process.env.FACE_LIVENESS_ROLE_ARN;
       }
     });
     await check("photo-change path and webhook path agree on admission", async () => {

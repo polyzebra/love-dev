@@ -255,6 +255,11 @@ export type EmailAttachVerifyOutcome =
   | { kind: "invalid_code" }
   | { kind: "expired_code" }
   | { kind: "email_in_use"; holderId: string }
+  // GoTrue accepted the OTP but did NOT stamp the new address onto
+  // auth.users (happens when "Secure email change" is ON - it needs BOTH
+  // the old AND new addresses confirmed). We refuse to rewrite the app
+  // row before Auth actually holds the address, so the two never drift.
+  | { kind: "not_committed" }
   | { kind: "attached"; user: User };
 
 /** Prisma unique-constraint violation (the race loser's signature). */
@@ -347,6 +352,24 @@ export async function verifyEmailAttach(opts: {
       metadata: { code: "uid_mismatch", authUid: data.user.id },
     });
     return { kind: "invalid_code" };
+  }
+
+  // Auth-commit guard: the OTP verified, but the change is only real once
+  // GoTrue has stamped the NEW address onto auth.users.email. With
+  // "Secure email change" ON, verifying only the new-side token leaves
+  // auth.users.email unchanged (new_email stays pending) - committing the
+  // app row now would drift App.email ahead of Auth. Never update the
+  // application email before Supabase Auth confirms the change.
+  const committedEmail = data.user.email?.trim().toLowerCase() ?? null;
+  if (committedEmail !== email) {
+    await recordAuthEvent({
+      type: "email_attach_verify_fail",
+      email,
+      userId: user.id,
+      req,
+      metadata: { code: "auth_email_not_committed" },
+    });
+    return { kind: "not_committed" };
   }
 
   // FINAL-SUCCESS TRANSACTION - the single place the attach rewrites
