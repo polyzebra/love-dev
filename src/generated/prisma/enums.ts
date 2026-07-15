@@ -476,7 +476,9 @@ export type AppearanceMode = (typeof AppearanceMode)[keyof typeof AppearanceMode
 
 
 export const ProfilePhotoVerificationStatus = {
+  LIVENESS_REQUIRED: 'LIVENESS_REQUIRED',
   QUEUED: 'QUEUED',
+  CLAIMED: 'CLAIMED',
   CHECKING: 'CHECKING',
   AUTO_VERIFIED: 'AUTO_VERIFIED',
   MANUAL_REVIEW: 'MANUAL_REVIEW',
@@ -543,3 +545,29 @@ export const FaceCheckDecision = {
 } as const
 
 export type FaceCheckDecision = (typeof FaceCheckDecision)[keyof typeof FaceCheckDecision]
+
+
+export const LivenessSessionStatus = {
+  CREATED: 'CREATED',
+  PROCESSING: 'PROCESSING',
+  PASSED: 'PASSED',
+  FAILED: 'FAILED',
+  CONSUMED: 'CONSUMED',
+  EXPIRED: 'EXPIRED',
+  INVALIDATED: 'INVALIDATED'
+} as const
+
+export type LivenessSessionStatus = (typeof LivenessSessionStatus)[keyof typeof LivenessSessionStatus]
+
+
+export const FaceReferenceRecordStatus = {
+  PENDING_PROVIDER: 'PENDING_PROVIDER',
+  PROVIDER_CREATED: 'PROVIDER_CREATED',
+  LINKED: 'LINKED',
+  LINK_FAILED: 'LINK_FAILED',
+  DELETE_PENDING: 'DELETE_PENDING',
+  DELETED: 'DELETED',
+  DELETE_FAILED: 'DELETE_FAILED'
+} as const
+
+export type FaceReferenceRecordStatus = (typeof FaceReferenceRecordStatus)[keyof typeof FaceReferenceRecordStatus]

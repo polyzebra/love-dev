@@ -55,3 +55,46 @@ export function isFaceCohortEligible(userId: string, country: string | null | un
   }
   return userInPercentCohort(userId, cfg.percent);
 }
+
+/** Canonical environment name (staging vs production) for region/session
+ *  binding. FACE_ENVIRONMENT overrides; otherwise derived from NODE_ENV. */
+export function faceEnvironment(): string {
+  return (
+    process.env.FACE_ENVIRONMENT?.trim() ||
+    (process.env.NODE_ENV === "production" ? "production" : "staging")
+  );
+}
+
+export type AdmitDecision = { admit: boolean; reason: string };
+
+/**
+ * THE canonical rollout-decision function (C-3). EVERY entry point that
+ * would create NEW face work calls this before enqueuing. Recovery of
+ * already-admitted work passes { isRecovery: true } and is allowed to
+ * proceed on its own row (but still refused if the provider/legal gates
+ * are off - never process biometrics when disabled).
+ */
+export async function admitToFaceVerification(
+  userId: string,
+  opts: { country?: string | null; isRecovery?: boolean } = {},
+): Promise<AdmitDecision> {
+  const cfg = faceRolloutConfig();
+  // Hard gates - apply to recovery too (never process when disabled).
+  const { isFaceMatchConfigured } = await import("@/lib/services/face-match-providers");
+  if (!isFaceMatchConfigured()) return { admit: false, reason: "provider_disabled" };
+  if (process.env.FACE_EMERGENCY_DISABLE === "1")
+    return { admit: false, reason: "emergency_disable" };
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.FACE_MATCH_PROVIDER?.trim().toLowerCase() === "aws_rekognition_faces" &&
+    !process.env.FACE_LEGAL_APPROVAL_VERSION?.trim()
+  ) {
+    return { admit: false, reason: "legal_approval_missing" };
+  }
+  // Recovery of admitted work bypasses cohort admission (it is already in).
+  if (opts.isRecovery) return { admit: true, reason: "recovery" };
+  // Cohort admission for NEW work: percentage + country + staff/invite.
+  if (!isFaceCohortEligible(userId, opts.country))
+    return { admit: false, reason: "cohort_excluded" };
+  return { admit: true, reason: "cohort_admitted" };
+}

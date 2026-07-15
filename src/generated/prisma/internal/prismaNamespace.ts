@@ -428,7 +428,9 @@ export const ModelName = {
   ApiIdempotencyKey: 'ApiIdempotencyKey',
   ProfilePhotoVerification: 'ProfilePhotoVerification',
   PhotoFaceCheck: 'PhotoFaceCheck',
-  VerificationAuditEvent: 'VerificationAuditEvent'
+  VerificationAuditEvent: 'VerificationAuditEvent',
+  LivenessSession: 'LivenessSession',
+  FaceReferenceRecord: 'FaceReferenceRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -444,7 +446,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent" | "livenessSession" | "faceReferenceRecord"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3778,6 +3780,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LivenessSession: {
+      payload: Prisma.$LivenessSessionPayload<ExtArgs>
+      fields: Prisma.LivenessSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LivenessSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LivenessSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.LivenessSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LivenessSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>
+        }
+        findMany: {
+          args: Prisma.LivenessSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>[]
+        }
+        create: {
+          args: Prisma.LivenessSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>
+        }
+        createMany: {
+          args: Prisma.LivenessSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LivenessSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.LivenessSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>
+        }
+        update: {
+          args: Prisma.LivenessSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.LivenessSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LivenessSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LivenessSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.LivenessSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LivenessSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.LivenessSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLivenessSession>
+        }
+        groupBy: {
+          args: Prisma.LivenessSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LivenessSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LivenessSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LivenessSessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    FaceReferenceRecord: {
+      payload: Prisma.$FaceReferenceRecordPayload<ExtArgs>
+      fields: Prisma.FaceReferenceRecordFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FaceReferenceRecordFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FaceReferenceRecordFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>
+        }
+        findFirst: {
+          args: Prisma.FaceReferenceRecordFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FaceReferenceRecordFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>
+        }
+        findMany: {
+          args: Prisma.FaceReferenceRecordFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>[]
+        }
+        create: {
+          args: Prisma.FaceReferenceRecordCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>
+        }
+        createMany: {
+          args: Prisma.FaceReferenceRecordCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FaceReferenceRecordCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>[]
+        }
+        delete: {
+          args: Prisma.FaceReferenceRecordDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>
+        }
+        update: {
+          args: Prisma.FaceReferenceRecordUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>
+        }
+        deleteMany: {
+          args: Prisma.FaceReferenceRecordDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FaceReferenceRecordUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FaceReferenceRecordUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>[]
+        }
+        upsert: {
+          args: Prisma.FaceReferenceRecordUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceReferenceRecordPayload>
+        }
+        aggregate: {
+          args: Prisma.FaceReferenceRecordAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFaceReferenceRecord>
+        }
+        groupBy: {
+          args: Prisma.FaceReferenceRecordGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FaceReferenceRecordGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FaceReferenceRecordCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FaceReferenceRecordCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4579,6 +4729,10 @@ export const ProfilePhotoVerificationScalarFieldEnum = {
   duplicateCheckedAt: 'duplicateCheckedAt',
   riskBand: 'riskBand',
   calibrationVersion: 'calibrationVersion',
+  leaseToken: 'leaseToken',
+  leaseExpiresAt: 'leaseExpiresAt',
+  claimedBy: 'claimedBy',
+  attemptCount: 'attemptCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4626,6 +4780,46 @@ export const VerificationAuditEventScalarFieldEnum = {
 } as const
 
 export type VerificationAuditEventScalarFieldEnum = (typeof VerificationAuditEventScalarFieldEnum)[keyof typeof VerificationAuditEventScalarFieldEnum]
+
+
+export const LivenessSessionScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  userId: 'userId',
+  verificationId: 'verificationId',
+  provider: 'provider',
+  environment: 'environment',
+  status: 'status',
+  attemptNumber: 'attemptNumber',
+  flowId: 'flowId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  invalidatedAt: 'invalidatedAt'
+} as const
+
+export type LivenessSessionScalarFieldEnum = (typeof LivenessSessionScalarFieldEnum)[keyof typeof LivenessSessionScalarFieldEnum]
+
+
+export const FaceReferenceRecordScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  verificationId: 'verificationId',
+  referenceVersion: 'referenceVersion',
+  provider: 'provider',
+  environment: 'environment',
+  idempotencyKey: 'idempotencyKey',
+  externalImageId: 'externalImageId',
+  externalFaceId: 'externalFaceId',
+  status: 'status',
+  livenessSessionId: 'livenessSessionId',
+  deleteAttempts: 'deleteAttempts',
+  createdAt: 'createdAt',
+  linkedAt: 'linkedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FaceReferenceRecordScalarFieldEnum = (typeof FaceReferenceRecordScalarFieldEnum)[keyof typeof FaceReferenceRecordScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5444,6 +5638,34 @@ export type EnumFaceCheckDecisionFieldRefInput<$PrismaModel> = FieldRefInputType
 export type ListEnumFaceCheckDecisionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceCheckDecision[]'>
     
 
+
+/**
+ * Reference to a field of type 'LivenessSessionStatus'
+ */
+export type EnumLivenessSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivenessSessionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'LivenessSessionStatus[]'
+ */
+export type ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivenessSessionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceReferenceRecordStatus'
+ */
+export type EnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceReferenceRecordStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceReferenceRecordStatus[]'
+ */
+export type ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceReferenceRecordStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -5599,6 +5821,8 @@ export type GlobalOmitConfig = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationOmit
   photoFaceCheck?: Prisma.PhotoFaceCheckOmit
   verificationAuditEvent?: Prisma.VerificationAuditEventOmit
+  livenessSession?: Prisma.LivenessSessionOmit
+  faceReferenceRecord?: Prisma.FaceReferenceRecordOmit
 }
 
 /* Types for Logging */

@@ -242,3 +242,13 @@ export type PhotoFaceCheck = Prisma.PhotoFaceCheckModel
  * 
  */
 export type VerificationAuditEvent = Prisma.VerificationAuditEventModel
+/**
+ * Model LivenessSession
+ * 
+ */
+export type LivenessSession = Prisma.LivenessSessionModel
+/**
+ * Model FaceReferenceRecord
+ * 
+ */
+export type FaceReferenceRecord = Prisma.FaceReferenceRecordModel

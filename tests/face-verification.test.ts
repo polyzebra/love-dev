@@ -15,6 +15,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { enrollReference } from "./support/face-enroll";
 
 const RUN = Date.now().toString(36);
 
@@ -29,6 +30,7 @@ const src = (...parts: string[]) => readFileSync(path.join(process.cwd(), "src",
 async function main() {
   process.env.VERIFICATION_PROVIDER = "mock";
   process.env.FACE_MATCH_PROVIDER = "mock";
+  process.env.FACE_LIVENESS_ENABLED = "1";
 
   const {
     classifyComparison,
@@ -312,13 +314,21 @@ async function main() {
       });
       assert.equal(enqueued, true);
       const job = await db.profilePhotoVerification.findUniqueOrThrow({ where: { userId: uid } });
-      assert.equal(job.status, "QUEUED");
+      // C-2: no reference yet -> LIVENESS_REQUIRED (not QUEUED).
+      assert.equal(job.status, "LIVENESS_REQUIRED");
       assert.equal(job.badgeStatus, "REVIEWING");
       assert.ok(job.consentVersion, "biometric consent version stamped");
       const audit = await db.verificationAuditEvent.findFirst({
         where: { userId: uid, eventType: "face_check_enqueued" },
       });
       assert.ok(audit, "enqueue audited");
+      // Enroll a reference via the liveness flow so the first run can proceed.
+      await enrollReference(uid);
+      const enrolled = await db.profilePhotoVerification.findUniqueOrThrow({
+        where: { userId: uid },
+      });
+      assert.equal(enrolled.status, "QUEUED", "queued after liveness enrollment");
+      assert.equal(enrolled.referenceStatus, "ACTIVE");
     });
 
     await check(
@@ -514,9 +524,11 @@ async function main() {
     await check("webhook + poll paths enqueue the face job after identity approval", () => {
       const route = src("app", "api", "webhooks", "verification", "route.ts");
       assert.ok(route.includes("enqueueProfilePhotoVerification"), "webhook enqueues");
+      // C-2: the webhook must NOT force a background run (it would call an
+      // unsupported reference mint). It enqueues -> LIVENESS_REQUIRED only.
       assert.ok(
-        route.includes("after(() => runProfilePhotoVerification"),
-        "webhook runs post-response",
+        !route.includes("after(() => runProfilePhotoVerification"),
+        "webhook does NOT force a run (C-2)",
       );
       const service = src("lib", "services", "photo-verification.ts");
       assert.ok(service.includes("enqueueProfilePhotoVerification"), "poll path enqueues");

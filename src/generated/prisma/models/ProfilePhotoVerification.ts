@@ -29,11 +29,13 @@ export type AggregateProfilePhotoVerification = {
 export type ProfilePhotoVerificationAvgAggregateOutputType = {
   referenceVersion: number | null
   riskLevel: number | null
+  attemptCount: number | null
 }
 
 export type ProfilePhotoVerificationSumAggregateOutputType = {
   referenceVersion: number | null
   riskLevel: number | null
+  attemptCount: number | null
 }
 
 export type ProfilePhotoVerificationMinAggregateOutputType = {
@@ -59,6 +61,10 @@ export type ProfilePhotoVerificationMinAggregateOutputType = {
   duplicateCheckedAt: Date | null
   riskBand: string | null
   calibrationVersion: string | null
+  leaseToken: string | null
+  leaseExpiresAt: Date | null
+  claimedBy: string | null
+  attemptCount: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -86,6 +92,10 @@ export type ProfilePhotoVerificationMaxAggregateOutputType = {
   duplicateCheckedAt: Date | null
   riskBand: string | null
   calibrationVersion: string | null
+  leaseToken: string | null
+  leaseExpiresAt: Date | null
+  claimedBy: string | null
+  attemptCount: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -113,6 +123,10 @@ export type ProfilePhotoVerificationCountAggregateOutputType = {
   duplicateCheckedAt: number
   riskBand: number
   calibrationVersion: number
+  leaseToken: number
+  leaseExpiresAt: number
+  claimedBy: number
+  attemptCount: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -122,11 +136,13 @@ export type ProfilePhotoVerificationCountAggregateOutputType = {
 export type ProfilePhotoVerificationAvgAggregateInputType = {
   referenceVersion?: true
   riskLevel?: true
+  attemptCount?: true
 }
 
 export type ProfilePhotoVerificationSumAggregateInputType = {
   referenceVersion?: true
   riskLevel?: true
+  attemptCount?: true
 }
 
 export type ProfilePhotoVerificationMinAggregateInputType = {
@@ -152,6 +168,10 @@ export type ProfilePhotoVerificationMinAggregateInputType = {
   duplicateCheckedAt?: true
   riskBand?: true
   calibrationVersion?: true
+  leaseToken?: true
+  leaseExpiresAt?: true
+  claimedBy?: true
+  attemptCount?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -179,6 +199,10 @@ export type ProfilePhotoVerificationMaxAggregateInputType = {
   duplicateCheckedAt?: true
   riskBand?: true
   calibrationVersion?: true
+  leaseToken?: true
+  leaseExpiresAt?: true
+  claimedBy?: true
+  attemptCount?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -206,6 +230,10 @@ export type ProfilePhotoVerificationCountAggregateInputType = {
   duplicateCheckedAt?: true
   riskBand?: true
   calibrationVersion?: true
+  leaseToken?: true
+  leaseExpiresAt?: true
+  claimedBy?: true
+  attemptCount?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -320,6 +348,10 @@ export type ProfilePhotoVerificationGroupByOutputType = {
   duplicateCheckedAt: Date | null
   riskBand: string | null
   calibrationVersion: string | null
+  leaseToken: string | null
+  leaseExpiresAt: Date | null
+  claimedBy: string | null
+  attemptCount: number
   createdAt: Date
   updatedAt: Date
   _count: ProfilePhotoVerificationCountAggregateOutputType | null
@@ -370,10 +402,16 @@ export type ProfilePhotoVerificationWhereInput = {
   duplicateCheckedAt?: Prisma.DateTimeNullableFilter<"ProfilePhotoVerification"> | Date | string | null
   riskBand?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
   calibrationVersion?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
+  leaseToken?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
+  leaseExpiresAt?: Prisma.DateTimeNullableFilter<"ProfilePhotoVerification"> | Date | string | null
+  claimedBy?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
+  attemptCount?: Prisma.IntFilter<"ProfilePhotoVerification"> | number
   createdAt?: Prisma.DateTimeFilter<"ProfilePhotoVerification"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProfilePhotoVerification"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   checks?: Prisma.PhotoFaceCheckListRelationFilter
+  livenessSessions?: Prisma.LivenessSessionListRelationFilter
+  faceReferences?: Prisma.FaceReferenceRecordListRelationFilter
 }
 
 export type ProfilePhotoVerificationOrderByWithRelationInput = {
@@ -399,10 +437,16 @@ export type ProfilePhotoVerificationOrderByWithRelationInput = {
   duplicateCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   riskBand?: Prisma.SortOrderInput | Prisma.SortOrder
   calibrationVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  leaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  leaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  claimedBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   checks?: Prisma.PhotoFaceCheckOrderByRelationAggregateInput
+  livenessSessions?: Prisma.LivenessSessionOrderByRelationAggregateInput
+  faceReferences?: Prisma.FaceReferenceRecordOrderByRelationAggregateInput
 }
 
 export type ProfilePhotoVerificationWhereUniqueInput = Prisma.AtLeast<{
@@ -431,10 +475,16 @@ export type ProfilePhotoVerificationWhereUniqueInput = Prisma.AtLeast<{
   duplicateCheckedAt?: Prisma.DateTimeNullableFilter<"ProfilePhotoVerification"> | Date | string | null
   riskBand?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
   calibrationVersion?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
+  leaseToken?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
+  leaseExpiresAt?: Prisma.DateTimeNullableFilter<"ProfilePhotoVerification"> | Date | string | null
+  claimedBy?: Prisma.StringNullableFilter<"ProfilePhotoVerification"> | string | null
+  attemptCount?: Prisma.IntFilter<"ProfilePhotoVerification"> | number
   createdAt?: Prisma.DateTimeFilter<"ProfilePhotoVerification"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProfilePhotoVerification"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   checks?: Prisma.PhotoFaceCheckListRelationFilter
+  livenessSessions?: Prisma.LivenessSessionListRelationFilter
+  faceReferences?: Prisma.FaceReferenceRecordListRelationFilter
 }, "id" | "userId">
 
 export type ProfilePhotoVerificationOrderByWithAggregationInput = {
@@ -460,6 +510,10 @@ export type ProfilePhotoVerificationOrderByWithAggregationInput = {
   duplicateCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   riskBand?: Prisma.SortOrderInput | Prisma.SortOrder
   calibrationVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  leaseToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  leaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  claimedBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProfilePhotoVerificationCountOrderByAggregateInput
@@ -495,6 +549,10 @@ export type ProfilePhotoVerificationScalarWhereWithAggregatesInput = {
   duplicateCheckedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProfilePhotoVerification"> | Date | string | null
   riskBand?: Prisma.StringNullableWithAggregatesFilter<"ProfilePhotoVerification"> | string | null
   calibrationVersion?: Prisma.StringNullableWithAggregatesFilter<"ProfilePhotoVerification"> | string | null
+  leaseToken?: Prisma.StringNullableWithAggregatesFilter<"ProfilePhotoVerification"> | string | null
+  leaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProfilePhotoVerification"> | Date | string | null
+  claimedBy?: Prisma.StringNullableWithAggregatesFilter<"ProfilePhotoVerification"> | string | null
+  attemptCount?: Prisma.IntWithAggregatesFilter<"ProfilePhotoVerification"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProfilePhotoVerification"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProfilePhotoVerification"> | Date | string
 }
@@ -521,10 +579,16 @@ export type ProfilePhotoVerificationCreateInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfilePhotoVerificationInput
   checks?: Prisma.PhotoFaceCheckCreateNestedManyWithoutVerificationInput
+  livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutVerificationInput
 }
 
 export type ProfilePhotoVerificationUncheckedCreateInput = {
@@ -550,9 +614,15 @@ export type ProfilePhotoVerificationUncheckedCreateInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   checks?: Prisma.PhotoFaceCheckUncheckedCreateNestedManyWithoutVerificationInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutVerificationInput
 }
 
 export type ProfilePhotoVerificationUpdateInput = {
@@ -577,10 +647,16 @@ export type ProfilePhotoVerificationUpdateInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfilePhotoVerificationNestedInput
   checks?: Prisma.PhotoFaceCheckUpdateManyWithoutVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutVerificationNestedInput
 }
 
 export type ProfilePhotoVerificationUncheckedUpdateInput = {
@@ -606,9 +682,15 @@ export type ProfilePhotoVerificationUncheckedUpdateInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   checks?: Prisma.PhotoFaceCheckUncheckedUpdateManyWithoutVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutVerificationNestedInput
 }
 
 export type ProfilePhotoVerificationCreateManyInput = {
@@ -634,6 +716,10 @@ export type ProfilePhotoVerificationCreateManyInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -660,6 +746,10 @@ export type ProfilePhotoVerificationUpdateManyMutationInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -687,6 +777,10 @@ export type ProfilePhotoVerificationUncheckedUpdateManyInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -719,6 +813,10 @@ export type ProfilePhotoVerificationCountOrderByAggregateInput = {
   duplicateCheckedAt?: Prisma.SortOrder
   riskBand?: Prisma.SortOrder
   calibrationVersion?: Prisma.SortOrder
+  leaseToken?: Prisma.SortOrder
+  leaseExpiresAt?: Prisma.SortOrder
+  claimedBy?: Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -726,6 +824,7 @@ export type ProfilePhotoVerificationCountOrderByAggregateInput = {
 export type ProfilePhotoVerificationAvgOrderByAggregateInput = {
   referenceVersion?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
 }
 
 export type ProfilePhotoVerificationMaxOrderByAggregateInput = {
@@ -751,6 +850,10 @@ export type ProfilePhotoVerificationMaxOrderByAggregateInput = {
   duplicateCheckedAt?: Prisma.SortOrder
   riskBand?: Prisma.SortOrder
   calibrationVersion?: Prisma.SortOrder
+  leaseToken?: Prisma.SortOrder
+  leaseExpiresAt?: Prisma.SortOrder
+  claimedBy?: Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -778,6 +881,10 @@ export type ProfilePhotoVerificationMinOrderByAggregateInput = {
   duplicateCheckedAt?: Prisma.SortOrder
   riskBand?: Prisma.SortOrder
   calibrationVersion?: Prisma.SortOrder
+  leaseToken?: Prisma.SortOrder
+  leaseExpiresAt?: Prisma.SortOrder
+  claimedBy?: Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -785,6 +892,7 @@ export type ProfilePhotoVerificationMinOrderByAggregateInput = {
 export type ProfilePhotoVerificationSumOrderByAggregateInput = {
   referenceVersion?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  attemptCount?: Prisma.SortOrder
 }
 
 export type ProfilePhotoVerificationScalarRelationFilter = {
@@ -854,6 +962,34 @@ export type ProfilePhotoVerificationUpdateOneRequiredWithoutChecksNestedInput = 
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateToOneWithWhereWithoutChecksInput, Prisma.ProfilePhotoVerificationUpdateWithoutChecksInput>, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutChecksInput>
 }
 
+export type ProfilePhotoVerificationCreateNestedOneWithoutLivenessSessionsInput = {
+  create?: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutLivenessSessionsInput>
+  connectOrCreate?: Prisma.ProfilePhotoVerificationCreateOrConnectWithoutLivenessSessionsInput
+  connect?: Prisma.ProfilePhotoVerificationWhereUniqueInput
+}
+
+export type ProfilePhotoVerificationUpdateOneRequiredWithoutLivenessSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutLivenessSessionsInput>
+  connectOrCreate?: Prisma.ProfilePhotoVerificationCreateOrConnectWithoutLivenessSessionsInput
+  upsert?: Prisma.ProfilePhotoVerificationUpsertWithoutLivenessSessionsInput
+  connect?: Prisma.ProfilePhotoVerificationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateToOneWithWhereWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUpdateWithoutLivenessSessionsInput>, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutLivenessSessionsInput>
+}
+
+export type ProfilePhotoVerificationCreateNestedOneWithoutFaceReferencesInput = {
+  create?: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutFaceReferencesInput>
+  connectOrCreate?: Prisma.ProfilePhotoVerificationCreateOrConnectWithoutFaceReferencesInput
+  connect?: Prisma.ProfilePhotoVerificationWhereUniqueInput
+}
+
+export type ProfilePhotoVerificationUpdateOneRequiredWithoutFaceReferencesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutFaceReferencesInput>
+  connectOrCreate?: Prisma.ProfilePhotoVerificationCreateOrConnectWithoutFaceReferencesInput
+  upsert?: Prisma.ProfilePhotoVerificationUpsertWithoutFaceReferencesInput
+  connect?: Prisma.ProfilePhotoVerificationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateToOneWithWhereWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUpdateWithoutFaceReferencesInput>, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutFaceReferencesInput>
+}
+
 export type ProfilePhotoVerificationCreateWithoutUserInput = {
   id?: string
   provider?: string | null
@@ -876,9 +1012,15 @@ export type ProfilePhotoVerificationCreateWithoutUserInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   checks?: Prisma.PhotoFaceCheckCreateNestedManyWithoutVerificationInput
+  livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutVerificationInput
 }
 
 export type ProfilePhotoVerificationUncheckedCreateWithoutUserInput = {
@@ -903,9 +1045,15 @@ export type ProfilePhotoVerificationUncheckedCreateWithoutUserInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   checks?: Prisma.PhotoFaceCheckUncheckedCreateNestedManyWithoutVerificationInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutVerificationInput
 }
 
 export type ProfilePhotoVerificationCreateOrConnectWithoutUserInput = {
@@ -946,9 +1094,15 @@ export type ProfilePhotoVerificationUpdateWithoutUserInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   checks?: Prisma.PhotoFaceCheckUpdateManyWithoutVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutVerificationNestedInput
 }
 
 export type ProfilePhotoVerificationUncheckedUpdateWithoutUserInput = {
@@ -973,9 +1127,15 @@ export type ProfilePhotoVerificationUncheckedUpdateWithoutUserInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   checks?: Prisma.PhotoFaceCheckUncheckedUpdateManyWithoutVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutVerificationNestedInput
 }
 
 export type ProfilePhotoVerificationCreateWithoutChecksInput = {
@@ -1000,9 +1160,15 @@ export type ProfilePhotoVerificationCreateWithoutChecksInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfilePhotoVerificationInput
+  livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutVerificationInput
 }
 
 export type ProfilePhotoVerificationUncheckedCreateWithoutChecksInput = {
@@ -1028,8 +1194,14 @@ export type ProfilePhotoVerificationUncheckedCreateWithoutChecksInput = {
   duplicateCheckedAt?: Date | string | null
   riskBand?: string | null
   calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutVerificationInput
 }
 
 export type ProfilePhotoVerificationCreateOrConnectWithoutChecksInput = {
@@ -1070,9 +1242,15 @@ export type ProfilePhotoVerificationUpdateWithoutChecksInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfilePhotoVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutVerificationNestedInput
 }
 
 export type ProfilePhotoVerificationUncheckedUpdateWithoutChecksInput = {
@@ -1098,8 +1276,310 @@ export type ProfilePhotoVerificationUncheckedUpdateWithoutChecksInput = {
   duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutVerificationNestedInput
+}
+
+export type ProfilePhotoVerificationCreateWithoutLivenessSessionsInput = {
+  id?: string
+  provider?: string | null
+  referenceId?: string | null
+  referenceVersion?: number
+  status?: $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: $Enums.FaceBadgeStatus
+  riskLevel?: number
+  consentVersion?: string | null
+  consentAt?: Date | string | null
+  identitySessionId?: string | null
+  lastRunAt?: Date | string | null
+  expiresAt?: Date | string | null
+  referenceStatus?: $Enums.FaceReferenceStatus | null
+  providerModelVersion?: string | null
+  providerRegion?: string | null
+  lastValidatedAt?: Date | string | null
+  rotationReason?: string | null
+  duplicateClass?: $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Date | string | null
+  riskBand?: string | null
+  calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProfilePhotoVerificationInput
+  checks?: Prisma.PhotoFaceCheckCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutVerificationInput
+}
+
+export type ProfilePhotoVerificationUncheckedCreateWithoutLivenessSessionsInput = {
+  id?: string
+  userId: string
+  provider?: string | null
+  referenceId?: string | null
+  referenceVersion?: number
+  status?: $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: $Enums.FaceBadgeStatus
+  riskLevel?: number
+  consentVersion?: string | null
+  consentAt?: Date | string | null
+  identitySessionId?: string | null
+  lastRunAt?: Date | string | null
+  expiresAt?: Date | string | null
+  referenceStatus?: $Enums.FaceReferenceStatus | null
+  providerModelVersion?: string | null
+  providerRegion?: string | null
+  lastValidatedAt?: Date | string | null
+  rotationReason?: string | null
+  duplicateClass?: $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Date | string | null
+  riskBand?: string | null
+  calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  checks?: Prisma.PhotoFaceCheckUncheckedCreateNestedManyWithoutVerificationInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutVerificationInput
+}
+
+export type ProfilePhotoVerificationCreateOrConnectWithoutLivenessSessionsInput = {
+  where: Prisma.ProfilePhotoVerificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutLivenessSessionsInput>
+}
+
+export type ProfilePhotoVerificationUpsertWithoutLivenessSessionsInput = {
+  update: Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutLivenessSessionsInput>
+  create: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutLivenessSessionsInput>
+  where?: Prisma.ProfilePhotoVerificationWhereInput
+}
+
+export type ProfilePhotoVerificationUpdateToOneWithWhereWithoutLivenessSessionsInput = {
+  where?: Prisma.ProfilePhotoVerificationWhereInput
+  data: Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateWithoutLivenessSessionsInput, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutLivenessSessionsInput>
+}
+
+export type ProfilePhotoVerificationUpdateWithoutLivenessSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumProfilePhotoVerificationStatusFieldUpdateOperationsInput | $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: Prisma.EnumFaceBadgeStatusFieldUpdateOperationsInput | $Enums.FaceBadgeStatus
+  riskLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  identitySessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referenceStatus?: Prisma.NullableEnumFaceReferenceStatusFieldUpdateOperationsInput | $Enums.FaceReferenceStatus | null
+  providerModelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastValidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rotationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duplicateClass?: Prisma.EnumDuplicateIdentityClassFieldUpdateOperationsInput | $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProfilePhotoVerificationNestedInput
+  checks?: Prisma.PhotoFaceCheckUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutVerificationNestedInput
+}
+
+export type ProfilePhotoVerificationUncheckedUpdateWithoutLivenessSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumProfilePhotoVerificationStatusFieldUpdateOperationsInput | $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: Prisma.EnumFaceBadgeStatusFieldUpdateOperationsInput | $Enums.FaceBadgeStatus
+  riskLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  identitySessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referenceStatus?: Prisma.NullableEnumFaceReferenceStatusFieldUpdateOperationsInput | $Enums.FaceReferenceStatus | null
+  providerModelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastValidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rotationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duplicateClass?: Prisma.EnumDuplicateIdentityClassFieldUpdateOperationsInput | $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  checks?: Prisma.PhotoFaceCheckUncheckedUpdateManyWithoutVerificationNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutVerificationNestedInput
+}
+
+export type ProfilePhotoVerificationCreateWithoutFaceReferencesInput = {
+  id?: string
+  provider?: string | null
+  referenceId?: string | null
+  referenceVersion?: number
+  status?: $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: $Enums.FaceBadgeStatus
+  riskLevel?: number
+  consentVersion?: string | null
+  consentAt?: Date | string | null
+  identitySessionId?: string | null
+  lastRunAt?: Date | string | null
+  expiresAt?: Date | string | null
+  referenceStatus?: $Enums.FaceReferenceStatus | null
+  providerModelVersion?: string | null
+  providerRegion?: string | null
+  lastValidatedAt?: Date | string | null
+  rotationReason?: string | null
+  duplicateClass?: $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Date | string | null
+  riskBand?: string | null
+  calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProfilePhotoVerificationInput
+  checks?: Prisma.PhotoFaceCheckCreateNestedManyWithoutVerificationInput
+  livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutVerificationInput
+}
+
+export type ProfilePhotoVerificationUncheckedCreateWithoutFaceReferencesInput = {
+  id?: string
+  userId: string
+  provider?: string | null
+  referenceId?: string | null
+  referenceVersion?: number
+  status?: $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: $Enums.FaceBadgeStatus
+  riskLevel?: number
+  consentVersion?: string | null
+  consentAt?: Date | string | null
+  identitySessionId?: string | null
+  lastRunAt?: Date | string | null
+  expiresAt?: Date | string | null
+  referenceStatus?: $Enums.FaceReferenceStatus | null
+  providerModelVersion?: string | null
+  providerRegion?: string | null
+  lastValidatedAt?: Date | string | null
+  rotationReason?: string | null
+  duplicateClass?: $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Date | string | null
+  riskBand?: string | null
+  calibrationVersion?: string | null
+  leaseToken?: string | null
+  leaseExpiresAt?: Date | string | null
+  claimedBy?: string | null
+  attemptCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  checks?: Prisma.PhotoFaceCheckUncheckedCreateNestedManyWithoutVerificationInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutVerificationInput
+}
+
+export type ProfilePhotoVerificationCreateOrConnectWithoutFaceReferencesInput = {
+  where: Prisma.ProfilePhotoVerificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutFaceReferencesInput>
+}
+
+export type ProfilePhotoVerificationUpsertWithoutFaceReferencesInput = {
+  update: Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutFaceReferencesInput>
+  create: Prisma.XOR<Prisma.ProfilePhotoVerificationCreateWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUncheckedCreateWithoutFaceReferencesInput>
+  where?: Prisma.ProfilePhotoVerificationWhereInput
+}
+
+export type ProfilePhotoVerificationUpdateToOneWithWhereWithoutFaceReferencesInput = {
+  where?: Prisma.ProfilePhotoVerificationWhereInput
+  data: Prisma.XOR<Prisma.ProfilePhotoVerificationUpdateWithoutFaceReferencesInput, Prisma.ProfilePhotoVerificationUncheckedUpdateWithoutFaceReferencesInput>
+}
+
+export type ProfilePhotoVerificationUpdateWithoutFaceReferencesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumProfilePhotoVerificationStatusFieldUpdateOperationsInput | $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: Prisma.EnumFaceBadgeStatusFieldUpdateOperationsInput | $Enums.FaceBadgeStatus
+  riskLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  identitySessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referenceStatus?: Prisma.NullableEnumFaceReferenceStatusFieldUpdateOperationsInput | $Enums.FaceReferenceStatus | null
+  providerModelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastValidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rotationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duplicateClass?: Prisma.EnumDuplicateIdentityClassFieldUpdateOperationsInput | $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProfilePhotoVerificationNestedInput
+  checks?: Prisma.PhotoFaceCheckUpdateManyWithoutVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutVerificationNestedInput
+}
+
+export type ProfilePhotoVerificationUncheckedUpdateWithoutFaceReferencesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referenceVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumProfilePhotoVerificationStatusFieldUpdateOperationsInput | $Enums.ProfilePhotoVerificationStatus
+  badgeStatus?: Prisma.EnumFaceBadgeStatusFieldUpdateOperationsInput | $Enums.FaceBadgeStatus
+  riskLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  identitySessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referenceStatus?: Prisma.NullableEnumFaceReferenceStatusFieldUpdateOperationsInput | $Enums.FaceReferenceStatus | null
+  providerModelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastValidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rotationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  duplicateClass?: Prisma.EnumDuplicateIdentityClassFieldUpdateOperationsInput | $Enums.DuplicateIdentityClass
+  duplicateCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  riskBand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calibrationVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  checks?: Prisma.PhotoFaceCheckUncheckedUpdateManyWithoutVerificationNestedInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutVerificationNestedInput
 }
 
 
@@ -1109,10 +1589,14 @@ export type ProfilePhotoVerificationUncheckedUpdateWithoutChecksInput = {
 
 export type ProfilePhotoVerificationCountOutputType = {
   checks: number
+  livenessSessions: number
+  faceReferences: number
 }
 
 export type ProfilePhotoVerificationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   checks?: boolean | ProfilePhotoVerificationCountOutputTypeCountChecksArgs
+  livenessSessions?: boolean | ProfilePhotoVerificationCountOutputTypeCountLivenessSessionsArgs
+  faceReferences?: boolean | ProfilePhotoVerificationCountOutputTypeCountFaceReferencesArgs
 }
 
 /**
@@ -1130,6 +1614,20 @@ export type ProfilePhotoVerificationCountOutputTypeDefaultArgs<ExtArgs extends r
  */
 export type ProfilePhotoVerificationCountOutputTypeCountChecksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PhotoFaceCheckWhereInput
+}
+
+/**
+ * ProfilePhotoVerificationCountOutputType without action
+ */
+export type ProfilePhotoVerificationCountOutputTypeCountLivenessSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LivenessSessionWhereInput
+}
+
+/**
+ * ProfilePhotoVerificationCountOutputType without action
+ */
+export type ProfilePhotoVerificationCountOutputTypeCountFaceReferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FaceReferenceRecordWhereInput
 }
 
 
@@ -1156,10 +1654,16 @@ export type ProfilePhotoVerificationSelect<ExtArgs extends runtime.Types.Extensi
   duplicateCheckedAt?: boolean
   riskBand?: boolean
   calibrationVersion?: boolean
+  leaseToken?: boolean
+  leaseExpiresAt?: boolean
+  claimedBy?: boolean
+  attemptCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   checks?: boolean | Prisma.ProfilePhotoVerification$checksArgs<ExtArgs>
+  livenessSessions?: boolean | Prisma.ProfilePhotoVerification$livenessSessionsArgs<ExtArgs>
+  faceReferences?: boolean | Prisma.ProfilePhotoVerification$faceReferencesArgs<ExtArgs>
   _count?: boolean | Prisma.ProfilePhotoVerificationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["profilePhotoVerification"]>
 
@@ -1186,6 +1690,10 @@ export type ProfilePhotoVerificationSelectCreateManyAndReturn<ExtArgs extends ru
   duplicateCheckedAt?: boolean
   riskBand?: boolean
   calibrationVersion?: boolean
+  leaseToken?: boolean
+  leaseExpiresAt?: boolean
+  claimedBy?: boolean
+  attemptCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1214,6 +1722,10 @@ export type ProfilePhotoVerificationSelectUpdateManyAndReturn<ExtArgs extends ru
   duplicateCheckedAt?: boolean
   riskBand?: boolean
   calibrationVersion?: boolean
+  leaseToken?: boolean
+  leaseExpiresAt?: boolean
+  claimedBy?: boolean
+  attemptCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1242,14 +1754,20 @@ export type ProfilePhotoVerificationSelectScalar = {
   duplicateCheckedAt?: boolean
   riskBand?: boolean
   calibrationVersion?: boolean
+  leaseToken?: boolean
+  leaseExpiresAt?: boolean
+  claimedBy?: boolean
+  attemptCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProfilePhotoVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "referenceId" | "referenceVersion" | "status" | "badgeStatus" | "riskLevel" | "consentVersion" | "consentAt" | "identitySessionId" | "lastRunAt" | "expiresAt" | "referenceStatus" | "providerModelVersion" | "providerRegion" | "lastValidatedAt" | "rotationReason" | "duplicateClass" | "duplicateCheckedAt" | "riskBand" | "calibrationVersion" | "createdAt" | "updatedAt", ExtArgs["result"]["profilePhotoVerification"]>
+export type ProfilePhotoVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "referenceId" | "referenceVersion" | "status" | "badgeStatus" | "riskLevel" | "consentVersion" | "consentAt" | "identitySessionId" | "lastRunAt" | "expiresAt" | "referenceStatus" | "providerModelVersion" | "providerRegion" | "lastValidatedAt" | "rotationReason" | "duplicateClass" | "duplicateCheckedAt" | "riskBand" | "calibrationVersion" | "leaseToken" | "leaseExpiresAt" | "claimedBy" | "attemptCount" | "createdAt" | "updatedAt", ExtArgs["result"]["profilePhotoVerification"]>
 export type ProfilePhotoVerificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   checks?: boolean | Prisma.ProfilePhotoVerification$checksArgs<ExtArgs>
+  livenessSessions?: boolean | Prisma.ProfilePhotoVerification$livenessSessionsArgs<ExtArgs>
+  faceReferences?: boolean | Prisma.ProfilePhotoVerification$faceReferencesArgs<ExtArgs>
   _count?: boolean | Prisma.ProfilePhotoVerificationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProfilePhotoVerificationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1264,6 +1782,8 @@ export type $ProfilePhotoVerificationPayload<ExtArgs extends runtime.Types.Exten
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     checks: Prisma.$PhotoFaceCheckPayload<ExtArgs>[]
+    livenessSessions: Prisma.$LivenessSessionPayload<ExtArgs>[]
+    faceReferences: Prisma.$FaceReferenceRecordPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1297,6 +1817,10 @@ export type $ProfilePhotoVerificationPayload<ExtArgs extends runtime.Types.Exten
      *    * Calibration config version active when the decision was made.
      */
     calibrationVersion: string | null
+    leaseToken: string | null
+    leaseExpiresAt: Date | null
+    claimedBy: string | null
+    attemptCount: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["profilePhotoVerification"]>
@@ -1695,6 +2219,8 @@ export interface Prisma__ProfilePhotoVerificationClient<T, Null = never, ExtArgs
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   checks<T extends Prisma.ProfilePhotoVerification$checksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfilePhotoVerification$checksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhotoFaceCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  livenessSessions<T extends Prisma.ProfilePhotoVerification$livenessSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfilePhotoVerification$livenessSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LivenessSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  faceReferences<T extends Prisma.ProfilePhotoVerification$faceReferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfilePhotoVerification$faceReferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceReferenceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1746,6 +2272,10 @@ export interface ProfilePhotoVerificationFieldRefs {
   readonly duplicateCheckedAt: Prisma.FieldRef<"ProfilePhotoVerification", 'DateTime'>
   readonly riskBand: Prisma.FieldRef<"ProfilePhotoVerification", 'String'>
   readonly calibrationVersion: Prisma.FieldRef<"ProfilePhotoVerification", 'String'>
+  readonly leaseToken: Prisma.FieldRef<"ProfilePhotoVerification", 'String'>
+  readonly leaseExpiresAt: Prisma.FieldRef<"ProfilePhotoVerification", 'DateTime'>
+  readonly claimedBy: Prisma.FieldRef<"ProfilePhotoVerification", 'String'>
+  readonly attemptCount: Prisma.FieldRef<"ProfilePhotoVerification", 'Int'>
   readonly createdAt: Prisma.FieldRef<"ProfilePhotoVerification", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProfilePhotoVerification", 'DateTime'>
 }
@@ -2170,6 +2700,54 @@ export type ProfilePhotoVerification$checksArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.PhotoFaceCheckScalarFieldEnum | Prisma.PhotoFaceCheckScalarFieldEnum[]
+}
+
+/**
+ * ProfilePhotoVerification.livenessSessions
+ */
+export type ProfilePhotoVerification$livenessSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LivenessSession
+   */
+  select?: Prisma.LivenessSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LivenessSession
+   */
+  omit?: Prisma.LivenessSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LivenessSessionInclude<ExtArgs> | null
+  where?: Prisma.LivenessSessionWhereInput
+  orderBy?: Prisma.LivenessSessionOrderByWithRelationInput | Prisma.LivenessSessionOrderByWithRelationInput[]
+  cursor?: Prisma.LivenessSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LivenessSessionScalarFieldEnum | Prisma.LivenessSessionScalarFieldEnum[]
+}
+
+/**
+ * ProfilePhotoVerification.faceReferences
+ */
+export type ProfilePhotoVerification$faceReferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FaceReferenceRecord
+   */
+  select?: Prisma.FaceReferenceRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FaceReferenceRecord
+   */
+  omit?: Prisma.FaceReferenceRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FaceReferenceRecordInclude<ExtArgs> | null
+  where?: Prisma.FaceReferenceRecordWhereInput
+  orderBy?: Prisma.FaceReferenceRecordOrderByWithRelationInput | Prisma.FaceReferenceRecordOrderByWithRelationInput[]
+  cursor?: Prisma.FaceReferenceRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FaceReferenceRecordScalarFieldEnum | Prisma.FaceReferenceRecordScalarFieldEnum[]
 }
 
 /**

@@ -95,6 +95,8 @@ export interface FaceComparisonProvider {
   createReferenceFromLiveness?(input: {
     userId: string;
     livenessSessionId: string;
+    /** Deterministic ExternalImageId from the registry saga (H-1). */
+    externalImageId: string;
   }): Promise<{ referenceId: string }>;
   /** Emergency purge: destroy the whole collection (admin path only). */
   purgeAllReferences?(): Promise<void>;
@@ -261,12 +263,14 @@ export const mockFaceMatchProvider: FaceComparisonProvider = {
     const status = mockLivenessStatus.get(sessionId) ?? "pending";
     return { status, referenceFrameReady: status === "passed" };
   },
-  async createReferenceFromLiveness({ userId, livenessSessionId }) {
+  async createReferenceFromLiveness({ livenessSessionId, externalImageId }) {
     if (mockLivenessStatus.get(livenessSessionId) !== "passed") {
       throw new Error("liveness session not passed");
     }
+    // Deterministic FaceId derived from the registry key (unique per
+    // env/user/version) - mirrors AWS returning a distinct FaceId.
     return {
-      referenceId: `mockref_${createHash("sha256").update(userId).digest("hex").slice(0, 16)}`,
+      referenceId: `mockface_${createHash("sha256").update(externalImageId).digest("hex").slice(0, 16)}`,
     };
   },
   async purgeAllReferences() {

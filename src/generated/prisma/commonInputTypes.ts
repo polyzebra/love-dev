@@ -1177,6 +1177,40 @@ export type EnumFaceCheckDecisionWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
 }
 
+export type EnumLivenessSessionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivenessSessionStatus | Prisma.EnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivenessSessionStatusFilter<$PrismaModel> | $Enums.LivenessSessionStatus
+}
+
+export type EnumLivenessSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivenessSessionStatus | Prisma.EnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivenessSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.LivenessSessionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivenessSessionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivenessSessionStatusFilter<$PrismaModel>
+}
+
+export type EnumFaceReferenceRecordStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceRecordStatus | Prisma.EnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel> | $Enums.FaceReferenceRecordStatus
+}
+
+export type EnumFaceReferenceRecordStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceRecordStatus | Prisma.EnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceReferenceRecordStatusWithAggregatesFilter<$PrismaModel> | $Enums.FaceReferenceRecordStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -2286,6 +2320,40 @@ export type NestedEnumFaceCheckDecisionWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFaceCheckDecisionFilter<$PrismaModel>
+}
+
+export type NestedEnumLivenessSessionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivenessSessionStatus | Prisma.EnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivenessSessionStatusFilter<$PrismaModel> | $Enums.LivenessSessionStatus
+}
+
+export type NestedEnumLivenessSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivenessSessionStatus | Prisma.EnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivenessSessionStatus[] | Prisma.ListEnumLivenessSessionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivenessSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.LivenessSessionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivenessSessionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivenessSessionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceRecordStatus | Prisma.EnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel> | $Enums.FaceReferenceRecordStatus
+}
+
+export type NestedEnumFaceReferenceRecordStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceReferenceRecordStatus | Prisma.EnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceReferenceRecordStatus[] | Prisma.ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceReferenceRecordStatusWithAggregatesFilter<$PrismaModel> | $Enums.FaceReferenceRecordStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
 }
 
 

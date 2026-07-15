@@ -19,6 +19,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { enrollReference } from "./support/face-enroll";
 
 const RUN = Date.now().toString(36);
 
@@ -41,6 +42,7 @@ async function main() {
   // rollout gates (Phase 32) - this suite exercises the gated features
   process.env.FACE_DUPLICATE_SEARCH_ENABLED = "1";
   process.env.FACE_AUTO_SUSPEND_ENABLED = "1";
+  process.env.FACE_LIVENESS_ENABLED = "1";
 
   const { bandFromScore, scoreFaceSignals, computeVerificationRisk } =
     await import("../src/lib/services/risk-engine");
@@ -244,7 +246,7 @@ async function main() {
 
   try {
     await check("enrolment stamps the full lifecycle (ACTIVE, model, region)", async () => {
-      await enqueueProfilePhotoVerification(alice, "identity_verified", { consent: true });
+      await enrollReference(alice);
       const decision = await runProfilePhotoVerification(alice);
       assert.equal(decision?.status, "AUTO_VERIFIED");
       const job = await db.profilePhotoVerification.findUniqueOrThrow({ where: { userId: alice } });
@@ -263,8 +265,7 @@ async function main() {
         where: { id: before.id },
         data: { referenceStatus: "EXPIRED" },
       });
-      await enqueueProfilePhotoVerification(alice, "rerun");
-      await runProfilePhotoVerification(alice);
+      await enrollReference(alice);
       const after = await db.profilePhotoVerification.findUniqueOrThrow({
         where: { userId: alice },
       });
@@ -291,13 +292,13 @@ async function main() {
       assert.equal(job.referenceStatus, "ROTATING");
       assert.equal(job.rotationReason, "provider_upgrade");
       assert.equal(job.referenceId, null, "pointer severed");
-      assert.equal(job.status, "QUEUED", "re-enters the existing queue");
+      assert.equal(job.status, "LIVENESS_REQUIRED", "C-2: rotation returns to liveness capture");
       const audit = await db.verificationAuditEvent.findFirst({
         where: { userId: alice, eventType: "face_reference_rotated" },
         orderBy: { createdAt: "desc" },
       });
       assert.equal(audit?.reasonCode, "provider_upgrade");
-      await runProfilePhotoVerification(alice); // re-enrol for later checks
+      await enrollReference(alice); // re-enrol via liveness
     });
 
     await check("lifecycle sweep: expiry rotates, renewal window marks EXPIRING", async () => {
@@ -310,7 +311,7 @@ async function main() {
       assert.ok(result.rotatedExpired >= 1, "expired reference rotated");
       let job = await db.profilePhotoVerification.findUniqueOrThrow({ where: { userId: alice } });
       assert.equal(job.rotationReason, "reference_expiry");
-      await runProfilePhotoVerification(alice); // re-enrol
+      await enrollReference(alice); // re-enrol via liveness
       // now put it inside the renewal window
       await db.profilePhotoVerification.update({
         where: { userId: alice },
@@ -330,7 +331,7 @@ async function main() {
     await check(
       "impersonation: confident match to first-verified account auto-suspends",
       async () => {
-        await enqueueProfilePhotoVerification(mallory, "identity_verified", { consent: true });
+        await enrollReference(mallory);
         await runProfilePhotoVerification(mallory);
         const aliceJob = await db.profilePhotoVerification.findUniqueOrThrow({
           where: { userId: alice },
@@ -360,7 +361,7 @@ async function main() {
     await check(
       "duplicate (this user first) routes to manual review - NO auto-suspend",
       async () => {
-        await enqueueProfilePhotoVerification(bob, "identity_verified", { consent: true });
+        await enrollReference(bob);
         await runProfilePhotoVerification(bob);
         const bobJob = await db.profilePhotoVerification.findUniqueOrThrow({
           where: { userId: bob },

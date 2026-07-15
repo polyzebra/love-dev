@@ -95,7 +95,9 @@ export const ModelName = {
   ApiIdempotencyKey: 'ApiIdempotencyKey',
   ProfilePhotoVerification: 'ProfilePhotoVerification',
   PhotoFaceCheck: 'PhotoFaceCheck',
-  VerificationAuditEvent: 'VerificationAuditEvent'
+  VerificationAuditEvent: 'VerificationAuditEvent',
+  LivenessSession: 'LivenessSession',
+  FaceReferenceRecord: 'FaceReferenceRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -876,6 +878,10 @@ export const ProfilePhotoVerificationScalarFieldEnum = {
   duplicateCheckedAt: 'duplicateCheckedAt',
   riskBand: 'riskBand',
   calibrationVersion: 'calibrationVersion',
+  leaseToken: 'leaseToken',
+  leaseExpiresAt: 'leaseExpiresAt',
+  claimedBy: 'claimedBy',
+  attemptCount: 'attemptCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -923,6 +929,46 @@ export const VerificationAuditEventScalarFieldEnum = {
 } as const
 
 export type VerificationAuditEventScalarFieldEnum = (typeof VerificationAuditEventScalarFieldEnum)[keyof typeof VerificationAuditEventScalarFieldEnum]
+
+
+export const LivenessSessionScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  userId: 'userId',
+  verificationId: 'verificationId',
+  provider: 'provider',
+  environment: 'environment',
+  status: 'status',
+  attemptNumber: 'attemptNumber',
+  flowId: 'flowId',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  invalidatedAt: 'invalidatedAt'
+} as const
+
+export type LivenessSessionScalarFieldEnum = (typeof LivenessSessionScalarFieldEnum)[keyof typeof LivenessSessionScalarFieldEnum]
+
+
+export const FaceReferenceRecordScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  verificationId: 'verificationId',
+  referenceVersion: 'referenceVersion',
+  provider: 'provider',
+  environment: 'environment',
+  idempotencyKey: 'idempotencyKey',
+  externalImageId: 'externalImageId',
+  externalFaceId: 'externalFaceId',
+  status: 'status',
+  livenessSessionId: 'livenessSessionId',
+  deleteAttempts: 'deleteAttempts',
+  createdAt: 'createdAt',
+  linkedAt: 'linkedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FaceReferenceRecordScalarFieldEnum = (typeof FaceReferenceRecordScalarFieldEnum)[keyof typeof FaceReferenceRecordScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -18,6 +18,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { enrollReference } from "./support/face-enroll";
 
 const RUN = Date.now().toString(36);
 
@@ -33,6 +34,7 @@ const stripped = (raw: string) => raw.replace(/\/\*[\s\S]*?\*\//g, "").replace(/
 async function main() {
   process.env.VERIFICATION_PROVIDER = "mock";
   process.env.FACE_MATCH_PROVIDER = "mock";
+  process.env.FACE_LIVENESS_ENABLED = "1";
 
   const {
     withResilience,
@@ -213,14 +215,21 @@ async function main() {
     await check(
       "queue corruption: REVOKED reference with dangling id -> clean re-enrol",
       async () => {
-        await enqueueProfilePhotoVerification(uid, "identity_verified", { consent: true });
+        await enrollReference(uid);
         await runProfilePhotoVerification(uid);
         // corrupt: reference revoked but id still present
         await db.profilePhotoVerification.update({
           where: { userId: uid },
           data: { referenceStatus: "REVOKED", referenceId: "mockref_dangling" },
         });
+        // enqueue with an invalid reference -> LIVENESS_REQUIRED (never reuses
+        // the dangling id); a fresh liveness enrolment cleanly recovers.
         await enqueueProfilePhotoVerification(uid, "rerun");
+        const stuck = await db.profilePhotoVerification.findUniqueOrThrow({
+          where: { userId: uid },
+        });
+        assert.equal(stuck.status, "LIVENESS_REQUIRED", "invalid reference never reused");
+        await enrollReference(uid);
         const decision = await runProfilePhotoVerification(uid);
         assert.equal(decision?.status, "AUTO_VERIFIED", "graceful: re-enrolled, verified");
         const job = await db.profilePhotoVerification.findUniqueOrThrow({ where: { userId: uid } });
@@ -242,7 +251,7 @@ async function main() {
         const { sweepReferenceLifecycle } = await import("../src/lib/services/face-reference");
         const swept = await sweepReferenceLifecycle(10);
         assert.ok(swept.rotatedExpired >= 1, "expired-by-clock reference rotated");
-        await runProfilePhotoVerification(uid); // re-enrol for later checks
+        await enrollReference(uid); // re-enrol via liveness
       },
     );
 

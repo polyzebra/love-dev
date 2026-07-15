@@ -427,6 +427,8 @@ model User {
   violations               AccountViolation[]        @relation("AccountViolations")
   appeals                  Appeal[]                  @relation("Appeals")
   profilePhotoVerification ProfilePhotoVerification?
+  livenessSessions         LivenessSession[]
+  faceReferences           FaceReferenceRecord[]
   verificationAuditEvents  VerificationAuditEvent[]
 
   @@index([status, lastActiveAt])
@@ -1544,7 +1546,9 @@ model ApiIdempotencyKey {
 // ---------------------------------------------------------------------------
 
 enum ProfilePhotoVerificationStatus {
+  LIVENESS_REQUIRED // identity verified, but no valid liveness-derived reference yet - user action required (C-2)
   QUEUED // enqueued, waiting for the worker/cron
+  CLAIMED // a worker holds the lease (H-2 mutual exclusion)
   CHECKING // face comparisons in flight
   AUTO_VERIFIED // cover matched, no high-risk gallery mismatches
   MANUAL_REVIEW // uncertain cover / mixed results - human decides
@@ -1639,11 +1643,18 @@ model ProfilePhotoVerification {
    * Calibration config version active when the decision was made.
    */
   calibrationVersion   String?
+  // --- Queue lease (H-2 mutual exclusion) ---
+  leaseToken           String? // set on QUEUED->CLAIMED; only the holder may proceed
+  leaseExpiresAt       DateTime?
+  claimedBy            String? // worker/invocation id (diagnostic)
+  attemptCount         Int                            @default(0)
   createdAt            DateTime                       @default(now())
   updatedAt            DateTime                       @updatedAt
 
-  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  checks PhotoFaceCheck[]
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checks           PhotoFaceCheck[]
+  livenessSessions LivenessSession[]
+  faceReferences   FaceReferenceRecord[]
 
   @@index([status])
   @@index([status, updatedAt])
@@ -1701,4 +1712,89 @@ model VerificationAuditEvent {
 
   @@index([userId, createdAt])
   @@index([eventType, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Liveness session ownership binding (C-1). Every provider liveness session
+// is persisted BEFORE the id reaches the client and is authorized by
+// (sessionId + userId + environment + status) - never by UUID secrecy or
+// "the user created some session". This is session-tracking, not a second
+// verification workflow.
+// ---------------------------------------------------------------------------
+
+enum LivenessSessionStatus {
+  CREATED
+  PROCESSING
+  PASSED
+  FAILED
+  CONSUMED // successfully linked a reference - replay returns the existing result
+  EXPIRED
+  INVALIDATED
+}
+
+model LivenessSession {
+  id             String                @id @default(cuid())
+  // Provider (AWS) session id - UNIQUE. Never authorization by itself.
+  sessionId      String                @unique
+  userId         String
+  verificationId String // ProfilePhotoVerification.id
+  provider       String
+  environment    String // staging | production - a staging id cannot be used in prod
+  status         LivenessSessionStatus @default(CREATED)
+  attemptNumber  Int                   @default(1)
+  // Opaque flow id handed to the client instead of the provider sessionId.
+  flowId         String                @unique
+  createdAt      DateTime              @default(now())
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  invalidatedAt  DateTime?
+
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verification ProfilePhotoVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// Provider-reference registry (H-1/H-3). Tracks EVERY FaceId ever created
+// until deletion is confirmed - so deletion is complete (not just the
+// active pointer) and enrollment is a recoverable saga, not an assumed
+// atomic DB+AWS transaction.
+// ---------------------------------------------------------------------------
+
+enum FaceReferenceRecordStatus {
+  PENDING_PROVIDER // attempt row written BEFORE the AWS call
+  PROVIDER_CREATED // AWS IndexFaces returned a FaceId (persisted immediately)
+  LINKED // linked onto ProfilePhotoVerification.referenceId
+  LINK_FAILED // AWS created but DB link failed - compensating deletion queued
+  DELETE_PENDING // deletion requested, not yet confirmed
+  DELETED // provider deletion confirmed
+  DELETE_FAILED // repeated deletion failure - dead-lettered
+}
+
+model FaceReferenceRecord {
+  id                String                    @id @default(cuid())
+  userId            String
+  verificationId    String
+  referenceVersion  Int
+  provider          String
+  environment       String
+  // Deterministic per (env, user, version) - the enrollment idempotency key.
+  idempotencyKey    String                    @unique
+  externalImageId   String // ExternalImageId sent to IndexFaces
+  externalFaceId    String? // the exact AWS FaceId (persisted right after IndexFaces)
+  status            FaceReferenceRecordStatus @default(PENDING_PROVIDER)
+  livenessSessionId String?
+  deleteAttempts    Int                       @default(0)
+  createdAt         DateTime                  @default(now())
+  linkedAt          DateTime?
+  deletedAt         DateTime?
+
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verification ProfilePhotoVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status])
+  @@index([externalFaceId])
 }

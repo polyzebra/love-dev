@@ -89,11 +89,15 @@ export async function POST(req: Request) {
       // enqueue the gallery check. Cheap row write here; the expensive
       // image analysis runs AFTER the webhook response (never inside it).
       const approvedUserId = result.userId;
+      // C-2: enqueue only. With no valid liveness-derived reference the job
+      // lands in LIVENESS_REQUIRED (action-required UX) - we do NOT run a
+      // background check that would call an unsupported reference mint.
+      // The user's liveness capture (face-liveness.ts) resumes the job.
+      // C-3: enqueue admits through the canonical rollout gate.
       await enqueueProfilePhotoVerification(approvedUserId, "identity_verified", {
         identitySessionId: event.sessionId,
         consent: true,
       });
-      after(() => runProfilePhotoVerification(approvedUserId));
     } else if (event.status === "rejected") {
       await sendSafetyNotice(
         result.userId,

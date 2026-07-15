@@ -77,7 +77,15 @@ export type VerificationPresentationState =
   | "expired"; // session lapsed - start again
 
 export type FaceLayerSnapshot = {
-  status: "QUEUED" | "CHECKING" | "AUTO_VERIFIED" | "MANUAL_REVIEW" | "REJECTED" | "SUSPENDED";
+  status:
+    | "LIVENESS_REQUIRED"
+    | "QUEUED"
+    | "CLAIMED"
+    | "CHECKING"
+    | "AUTO_VERIFIED"
+    | "MANUAL_REVIEW"
+    | "REJECTED"
+    | "SUSPENDED";
   /** null = first pass has never completed (initial check, not an update). */
   lastRunAt: Date | null;
 } | null;
@@ -108,7 +116,10 @@ export function deriveVerificationPresentation(
   // Identity verified - the face layer refines the presentation.
   if (!face) return "verified";
   switch (face.status) {
+    case "LIVENESS_REQUIRED":
+      return "checking_profile_photos"; // capture step (card renders liveness)
     case "QUEUED":
+    case "CLAIMED":
     case "CHECKING":
       return face.lastRunAt === null ? "checking_profile_photos" : "photo_update_review";
     case "MANUAL_REVIEW":

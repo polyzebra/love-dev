@@ -138,10 +138,20 @@ async function call(
   if (transportOverride) return transportOverride(target, payload, opts);
 
   const cfg = awsConfig();
-  // Regional restriction enforcement (Phase 31).
+  // Regional consistency + restriction enforcement (M-3), fail CLOSED:
+  //  - the resolved Rekognition region must be in the approved list;
+  //  - AWS_REGION (if set) must AGREE with AWS_REKOGNITION_REGION;
+  //  - all downstream calls (endpoint, collection, liveness) use this one
+  //    canonical resolved region.
+  const globalRegion = process.env.AWS_REGION?.trim();
   if (!cfg.allowedRegions.includes(cfg.region)) {
     throw new FaceMatchNotConfiguredError(
       `region ${cfg.region} is not in the approved region list`,
+    );
+  }
+  if (globalRegion && globalRegion !== cfg.region) {
+    throw new FaceMatchNotConfiguredError(
+      `AWS_REGION (${globalRegion}) disagrees with AWS_REKOGNITION_REGION (${cfg.region})`,
     );
   }
   const accessKeyId = opts.admin ? cfg.adminAccessKeyId : cfg.accessKeyId;
@@ -231,35 +241,23 @@ export const awsRekognitionProvider: FaceComparisonProvider = {
     return detectionFrom((res.FaceDetails as AwsFace[]) ?? []);
   },
 
-  /** Reference creation from a PASSED liveness session (Phase 24). */
+  /** Reference creation from a PASSED liveness session (Phase 24 / H-1).
+   *  ExternalImageId is supplied by the registry saga - deterministic per
+   *  (environment, user, referenceVersion). NO global epoch, NO ListFaces
+   *  dedup (the DB registry owns idempotency). Returns the exact FaceId. */
   async createReferenceFromLiveness({
-    userId,
     livenessSessionId,
+    externalImageId,
   }): Promise<{ referenceId: string }> {
     if (!awsRekognitionConfigured()) throw new FaceMatchNotConfiguredError();
+    if (!externalImageId) throw new Error("rekognition: externalImageId required (registry key)");
     const cfg = awsConfig();
-    const result = await call("GetFaceLivenessSessionResults", {
-      SessionId: livenessSessionId,
-    });
+    const result = await call("GetFaceLivenessSessionResults", { SessionId: livenessSessionId });
     if (String(result.Status) !== "SUCCEEDED") {
       throw new Error("rekognition liveness: session not succeeded");
     }
     const referenceImage = result.ReferenceImage as { Bytes?: string } | undefined;
     if (!referenceImage?.Bytes) throw new Error("rekognition liveness: no reference frame");
-
-    // IDEMPOTENCY: one active reference per (user, version). ExternalImageId
-    // is the dedupe key; an existing face for it is returned as-is.
-    const externalImageId = `${userId}:${process.env.FACE_REFERENCE_EPOCH ?? "1"}`;
-    const existing = await call("ListFaces", {
-      CollectionId: cfg.collectionId,
-      MaxResults: 1,
-      UserId: undefined,
-    }).catch(() => ({}) as Record<string, unknown>);
-    const priorFaces = (
-      (existing.Faces as Array<{ FaceId?: string; ExternalImageId?: string }>) ?? []
-    ).filter((f) => f.ExternalImageId === externalImageId);
-    if (priorFaces[0]?.FaceId) return { referenceId: priorFaces[0].FaceId };
-
     const indexed = await call("IndexFaces", {
       CollectionId: cfg.collectionId,
       Image: { Bytes: referenceImage.Bytes },
@@ -406,3 +404,21 @@ export const awsRekognitionProvider: FaceComparisonProvider = {
     await call("DeleteCollection", { CollectionId: cfg.collectionId }, { admin: true });
   },
 };
+
+/**
+ * Startup / provider-init region check (M-3). Fail CLOSED when a value is
+ * absent, the two region vars disagree, or the region is not approved.
+ * Returns the resolved region or throws.
+ */
+export function assertRegionConsistency(): string {
+  const cfg = awsConfig();
+  const globalRegion = process.env.AWS_REGION?.trim();
+  if (!cfg.region) throw new Error("AWS_REKOGNITION_REGION is not set");
+  if (!cfg.allowedRegions.includes(cfg.region)) {
+    throw new Error(`region ${cfg.region} not in AWS_ALLOWED_REGIONS`);
+  }
+  if (globalRegion && globalRegion !== cfg.region) {
+    throw new Error(`AWS_REGION (${globalRegion}) != AWS_REKOGNITION_REGION (${cfg.region})`);
+  }
+  return cfg.region;
+}

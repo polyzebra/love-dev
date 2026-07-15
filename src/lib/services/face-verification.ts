@@ -223,30 +223,53 @@ export async function recordVerificationAudit(event: {
 export async function enqueueProfilePhotoVerification(
   userId: string,
   reason: string,
-  opts: { identitySessionId?: string | null; consent?: boolean } = {},
+  opts: {
+    identitySessionId?: string | null;
+    consent?: boolean;
+    country?: string | null;
+    isRecovery?: boolean;
+  } = {},
 ): Promise<boolean> {
-  if (!isFaceMatchConfigured()) return false;
+  // C-3: EVERY entry point admits through the ONE canonical gate. New work
+  // is refused when the cohort/country/percent/legal/emergency gates say
+  // so; recovery of already-admitted work passes isRecovery.
+  const { admitToFaceVerification, faceEnvironment } = await import("@/lib/services/face-rollout");
+  const decision = await admitToFaceVerification(userId, {
+    country: opts.country,
+    isRecovery: opts.isRecovery,
+  });
+  if (!decision.admit) return false;
   const provider = getFaceMatchProvider();
 
   const existing = await db.profilePhotoVerification.findUnique({ where: { userId } });
+
+  // C-2: a job with no VALID active reference must NOT run - it needs a
+  // fresh Tirvea liveness capture. Set LIVENESS_REQUIRED (actionable UX),
+  // never QUEUED, so the run path never calls an unsupported reference
+  // mint. A valid ACTIVE/EXPIRING reference proceeds to QUEUED normally.
+  const hasValidReference =
+    Boolean(existing?.referenceId) &&
+    (existing?.referenceStatus === "ACTIVE" || existing?.referenceStatus === "EXPIRING");
+  const nextStatus = hasValidReference ? "QUEUED" : "LIVENESS_REQUIRED";
+
   const row = await db.profilePhotoVerification.upsert({
     where: { userId },
     create: {
       userId,
       provider: provider.name,
-      status: "QUEUED",
+      status: nextStatus,
       badgeStatus: "REVIEWING",
       identitySessionId: opts.identitySessionId ?? null,
       consentVersion: opts.consent ? BIOMETRIC_CONSENT_VERSION : null,
       consentAt: opts.consent ? new Date() : null,
     },
     update: {
-      status: "QUEUED",
-      // A verified profile keeps its badge while a photo change is
-      // re-checked (temporarily reviewing); suspension is never lifted
-      // here - only a run/admin can do that.
+      status: nextStatus,
       badgeStatus: existing?.badgeStatus === "SUSPENDED" ? "SUSPENDED" : "REVIEWING",
       identitySessionId: opts.identitySessionId ?? existing?.identitySessionId ?? null,
+      // release any stale lease when re-enqueuing
+      leaseToken: null,
+      leaseExpiresAt: null,
       ...(opts.consent ? { consentVersion: BIOMETRIC_CONSENT_VERSION, consentAt: new Date() } : {}),
     },
   });
@@ -256,9 +279,10 @@ export async function enqueueProfilePhotoVerification(
     eventType: "face_check_enqueued",
     actorType: "system",
     previousStatus: existing?.status ?? null,
-    newStatus: "QUEUED",
+    newStatus: nextStatus,
     reasonCode: reason,
   });
+  void faceEnvironment;
   return true;
 }
 
@@ -336,10 +360,39 @@ export function decideProfile(
  */
 export async function runProfilePhotoVerification(
   userId: string,
-  opts: { provider?: FaceComparisonProvider } = {},
+  opts: { provider?: FaceComparisonProvider; leaseToken?: string } = {},
 ): Promise<ProfileDecision | null> {
   const provider = opts.provider ?? getFaceMatchProvider();
   if (provider === faceMatchNotConfiguredProvider) return null;
+
+  const { randomUUID } = await import("node:crypto");
+  const leaseMs = (Number(process.env.FACE_LEASE_MINUTES) || 15) * 60_000;
+  // At-most-one active worker per job (H-2). A caller with a lease token
+  // (the sweep) must already hold it; a direct caller (after()/liveness)
+  // self-claims here: QUEUED|LIVENESS_REQUIRED-with-reference -> CLAIMED.
+  if (opts.leaseToken) {
+    const held = await db.profilePhotoVerification.count({
+      where: { userId, status: "CLAIMED", leaseToken: opts.leaseToken },
+    });
+    if (held === 0) return null; // lease lost/expired - another worker owns it
+  } else {
+    const token = randomUUID();
+    const claim = await db.profilePhotoVerification.updateMany({
+      where: {
+        userId,
+        status: { in: ["QUEUED", "CLAIMED"] },
+        OR: [{ leaseExpiresAt: null }, { leaseExpiresAt: { lt: new Date() } }],
+      },
+      data: {
+        status: "CLAIMED",
+        leaseToken: token,
+        leaseExpiresAt: new Date(Date.now() + leaseMs),
+        claimedBy: "direct",
+      },
+    });
+    if (claim.count === 0) return null; // not claimable (already running / not queued)
+    opts = { ...opts, leaseToken: token };
+  }
 
   const job = await db.profilePhotoVerification.findUnique({ where: { userId } });
   if (!job) return null;
@@ -358,36 +411,34 @@ export async function runProfilePhotoVerification(
   });
 
   try {
-    // Reference lifecycle guard: EXPIRED / REVOKED / DELETED references
-    // are NEVER reused (threat-model Phase 3). Only ACTIVE/EXPIRING pass;
-    // anything else (or none) forces a fresh enrolment.
+    // Reference lifecycle guard (C-2): EXPIRED/REVOKED/DELETED/none means
+    // the user needs a FRESH Tirvea liveness capture. We NEVER call a
+    // generic provider.createReference here (the AWS adapter correctly
+    // refuses it) and NEVER dead-letter this normal condition - we stop
+    // safely at LIVENESS_REQUIRED and surface action-required UX. The
+    // liveness flow (face-liveness.ts) enrolls the reference and re-queues.
     const referenceUsable =
       job.referenceId && (job.referenceStatus === "ACTIVE" || job.referenceStatus === "EXPIRING");
-    let referenceId = referenceUsable ? job.referenceId : null;
-    if (!referenceId) {
-      const { withResilience } = await import("@/lib/services/provider-resilience");
-      const ref = await withResilience(`face_match:${provider.name}`, () =>
-        provider.createReference({
-          userId,
-          identitySessionId: job.identitySessionId,
-        }),
-      );
-      referenceId = ref.referenceId;
-      const ttlDays = faceMatchPolicy().referenceTtlDays;
+    if (!referenceUsable) {
       await db.profilePhotoVerification.update({
         where: { id: job.id },
         data: {
-          referenceId,
-          provider: provider.name,
-          referenceVersion: { increment: 1 },
-          referenceStatus: "ACTIVE",
-          providerModelVersion: provider.modelVersion ?? null,
-          providerRegion: provider.region ?? null,
-          rotationReason: null,
-          expiresAt: new Date(Date.now() + ttlDays * 24 * 3600 * 1000),
+          status: "LIVENESS_REQUIRED",
+          badgeStatus: job.badgeStatus === "ACTIVE" ? "REVIEWING" : job.badgeStatus,
         },
       });
+      await recordVerificationAudit({
+        userId,
+        verificationId: job.id,
+        eventType: "liveness_required",
+        actorType: "system",
+        previousStatus,
+        newStatus: "LIVENESS_REQUIRED",
+        reasonCode: "no_active_reference",
+      });
+      return null;
     }
+    const referenceId = job.referenceId!;
 
     const photos = await db.photo.findMany({
       where: { userId, status: "ACTIVE" },
@@ -535,10 +586,11 @@ export async function runProfilePhotoVerification(
         badgeStatus: decision.badgeStatus,
         riskLevel: decision.riskLevel,
         lastValidatedAt: new Date(),
-        // Snapshot for the admin queue (no per-row recomputation) + the
-        // calibration config version this decision was made under.
         riskBand: risk?.band ?? null,
         calibrationVersion: process.env.FACE_CALIBRATION_VERSION?.trim() || null,
+        // release the lease (H-2)
+        leaseToken: null,
+        leaseExpiresAt: null,
       },
     });
     // Public badge suspension rides ONE denormalized column so hot read
@@ -619,19 +671,26 @@ export async function onProfilePhotosChanged(userId: string, reason: string): Pr
     select: { photoVerifiedAt: true, profile: { select: { country: true } } },
   });
   if (!user?.photoVerifiedAt) return; // face layer only follows identity
-  // Staged rollout (Phase 32): cohort gates NEW work only; users with an
-  // existing job keep flowing (never strand someone mid-verification).
-  const { isFaceCohortEligible } = await import("@/lib/services/face-rollout");
+  // C-3: admission is enforced INSIDE enqueue via the canonical gate. An
+  // already-existing job is recovery (already admitted); a new one admits
+  // on cohort. Pass country so the one gate sees it.
   const existing = await db.profilePhotoVerification.findUnique({
     where: { userId },
     select: { id: true },
   });
-  if (!existing && !isFaceCohortEligible(userId, user.profile?.country)) return;
-  await enqueueProfilePhotoVerification(userId, reason);
+  await enqueueProfilePhotoVerification(userId, reason, {
+    country: user.profile?.country,
+    isRecovery: Boolean(existing),
+  });
 }
 
 /** GDPR deletion path - destroy provider-side biometric material. */
 export async function deleteFaceVerificationData(userId: string): Promise<void> {
+  // H-1/H-3: delete EVERY provider FaceId in the registry (not just the
+  // active pointer), idempotently and audited, BEFORE dropping local rows.
+  const { deleteAllUserReferences } = await import("@/lib/services/face-reference-registry");
+  await deleteAllUserReferences(userId, "account_teardown").catch(() => undefined);
+
   const job = await db.profilePhotoVerification.findUnique({ where: { userId } });
   if (!job) return;
   if (job.referenceId) {
@@ -675,7 +734,11 @@ export async function sweepQueuedFaceChecks(
   // (status, updatedAt) - never a full-table scan.
   const candidates = await db.profilePhotoVerification.findMany({
     where: {
-      OR: [{ status: "QUEUED" }, { status: "CHECKING", lastRunAt: { lt: leaseCutoff } }],
+      OR: [
+        { status: "QUEUED" },
+        { status: "CLAIMED", leaseExpiresAt: { lt: new Date() } },
+        { status: "CHECKING", lastRunAt: { lt: leaseCutoff } },
+      ],
     },
     orderBy: { updatedAt: "asc" },
     take: limit,
@@ -683,20 +746,32 @@ export async function sweepQueuedFaceChecks(
   });
 
   let processed = 0;
+  const { randomUUID } = await import("node:crypto");
   for (const row of candidates) {
     if (Date.now() - started > timeBudgetMs) break; // safe continuation next tick
-    // ATOMIC claim: only one concurrent worker wins this row (updateMany
-    // with the observed state in the WHERE; count 0 = someone else has it).
+    // EXCLUSIVE claim (H-2): transition to a DISTINCT CLAIMED state with a
+    // lease token. Two concurrent claimers both target the observed state
+    // in the WHERE; the row changes to CLAIMED so exactly ONE update
+    // matches (count 1) - the loser gets count 0. Reclaim of a stale
+    // CLAIMED/CHECKING row pins lastRunAt so only the expired lease loses.
+    const leaseToken = randomUUID();
     const claim = await db.profilePhotoVerification.updateMany({
       where: {
         id: row.id,
         status: row.status,
-        ...(row.status === "CHECKING" ? { lastRunAt: row.lastRunAt } : {}),
+        ...(row.status !== "QUEUED" ? { lastRunAt: row.lastRunAt } : {}),
       },
-      data: { status: "QUEUED", lastRunAt: new Date() },
+      data: {
+        status: "CLAIMED",
+        leaseToken,
+        leaseExpiresAt: new Date(Date.now() + leaseMs),
+        claimedBy: `sweep:${started}`,
+        lastRunAt: new Date(),
+        attemptCount: { increment: 1 },
+      },
     });
-    if (claim.count === 0) continue;
-    const result = await runProfilePhotoVerification(row.userId);
+    if (claim.count === 0) continue; // another worker won this row
+    const result = await runProfilePhotoVerification(row.userId, { leaseToken });
     if (result) processed += 1;
   }
   return processed;
@@ -785,18 +860,20 @@ export async function adminFaceAction(opts: {
       return { status: "QUEUED", badgeStatus: job.badgeStatus };
     }
     case "request_new_selfie": {
-      if (job.referenceId) {
-        try {
-          await getFaceMatchProvider().deleteReference(job.referenceId);
-        } catch {
-          // Vendor unreachable - the pointer removal below still severs us.
-        }
-      }
+      // Delete EVERY provider FaceId for the user (H-1 completeness), then
+      // put the job into an ACTIONABLE LIVENESS_REQUIRED state (C-2/H-3) -
+      // NOT a QUEUED row that would immediately fail a background run.
+      const { deleteAllUserReferences } = await import("@/lib/services/face-reference-registry");
+      await deleteAllUserReferences(job.userId, "admin_request_new_selfie").catch(() => undefined);
+      const { invalidateOpenLivenessSessions } = await import("@/lib/services/face-liveness");
+      await invalidateOpenLivenessSessions(job.userId).catch(() => undefined);
       await db.profilePhotoVerification.update({
         where: { id: job.id },
         data: {
           referenceId: null,
-          status: "QUEUED",
+          referenceStatus: "REVOKED",
+          rotationReason: "manual_review",
+          status: "LIVENESS_REQUIRED",
           badgeStatus: "REVIEWING",
           expiresAt: new Date(),
         },
@@ -809,8 +886,8 @@ export async function adminFaceAction(opts: {
         body: "We need a fresh verification selfie to keep your badge. It only takes a minute.",
         dedupeKey: `face-rechallenge:${job.id}:${Date.now()}`,
       });
-      await audit("face_admin_request_selfie", "QUEUED", "re_challenge");
-      return { status: "QUEUED", badgeStatus: "REVIEWING" };
+      await audit("face_admin_request_selfie", "LIVENESS_REQUIRED", "re_challenge");
+      return { status: "LIVENESS_REQUIRED", badgeStatus: "REVIEWING" };
     }
     case "suspend_badge": {
       await db.$transaction([

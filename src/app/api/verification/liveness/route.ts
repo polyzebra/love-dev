@@ -1,26 +1,20 @@
 import { z } from "zod";
 import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
 import { db } from "@/lib/db";
-import { getFaceMatchProvider, isFaceMatchConfigured } from "@/lib/services/face-match-providers";
-import { faceRolloutConfig, isFaceCohortEligible } from "@/lib/services/face-rollout";
-import {
-  BIOMETRIC_CONSENT_VERSION,
-  recordVerificationAudit,
-} from "@/lib/services/face-verification";
-import { withResilience, providerHealthState } from "@/lib/services/provider-resilience";
+import { isFaceMatchConfigured } from "@/lib/services/face-match-providers";
+import { admitToFaceVerification, faceRolloutConfig } from "@/lib/services/face-rollout";
+import { getFaceMatchProvider } from "@/lib/services/face-match-providers";
+import { BIOMETRIC_CONSENT_VERSION } from "@/lib/services/face-verification";
+import { createBoundLivenessSession } from "@/lib/services/face-liveness";
+import { providerHealthState } from "@/lib/services/provider-resilience";
 
 /**
- * POST /api/verification/liveness - create a video-selfie liveness
- * session (Phase 23). Reuses the canonical job row: the session id is
- * stored on ProfilePhotoVerification.identitySessionId's sibling field
- * (livenessSessionId is NOT a new model - we reuse referenceId=null +
- * status QUEUED with the session recorded in the audit trail and the
- * response, so no second state machine exists).
- *
- * Requires: identity verified, explicit versioned biometric consent,
- * face layer configured + liveness enabled + cohort eligible.
- * DEGRADED/UNAVAILABLE providers do NOT reject - they answer 503 with a
- * safe retry message and leave the user's state untouched.
+ * POST /api/verification/liveness - create a bound liveness session and
+ * return an OPAQUE flowId (never the provider sessionId). The session is
+ * persisted and bound to (userId, verificationId, environment) before the
+ * flowId is returned (C-1). Requires identity verified + explicit
+ * versioned consent + rollout admission (C-3). DEGRADED/UNAVAILABLE
+ * providers answer 503 without rejecting the user's state.
  */
 const bodySchema = z.object({ consentVersion: z.string().max(64) });
 
@@ -45,28 +39,20 @@ export async function POST(req: Request) {
     );
   }
 
-  const cfg = faceRolloutConfig();
   const me = await db.user.findUnique({
     where: { id: user.id },
     select: { photoVerifiedAt: true, profile: { select: { country: true } } },
   });
-  if (!me?.photoVerifiedAt) {
+  if (!me?.photoVerifiedAt)
     return apiError(409, "identity_required", "Verify your identity first.");
-  }
-  if (!isFaceMatchConfigured() || !cfg.livenessEnabled) {
+  if (!isFaceMatchConfigured() || !faceRolloutConfig().livenessEnabled) {
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   }
-  if (!isFaceCohortEligible(user.id, me.profile?.country)) {
+  const admit = await admitToFaceVerification(user.id, { country: me.profile?.country });
+  if (!admit.admit)
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
-  }
-
-  const provider = getFaceMatchProvider();
-  if (!provider.createLivenessSession) {
-    return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
-  }
-  const health = await providerHealthState(`face_match:${provider.name}`);
-  if (health === "UNAVAILABLE") {
-    // Never reject: safe temporary state, user retries later.
+  const providerName = getFaceMatchProvider().name;
+  if ((await providerHealthState(`face_match:${providerName}`)) === "UNAVAILABLE") {
     return apiError(
       503,
       "provider_unavailable",
@@ -74,36 +60,21 @@ export async function POST(req: Request) {
     );
   }
 
-  try {
-    const session = await withResilience(`face_match:${provider.name}`, () =>
-      provider.createLivenessSession!(user.id),
-    );
-    // Consent is stamped on the canonical job row (no new model).
-    await db.profilePhotoVerification.upsert({
+  // Consent is stamped on the canonical job row.
+  await db.profilePhotoVerification
+    .update({
       where: { userId: user.id },
-      create: {
-        userId: user.id,
-        provider: provider.name,
-        status: "QUEUED",
-        badgeStatus: "REVIEWING",
-        consentVersion: BIOMETRIC_CONSENT_VERSION,
-        consentAt: new Date(),
-      },
-      update: { consentVersion: BIOMETRIC_CONSENT_VERSION, consentAt: new Date() },
-    });
-    await recordVerificationAudit({
-      userId: user.id,
-      eventType: "liveness_session_created",
-      actorType: "user",
-      actorId: user.id,
-      reasonCode: "capture_started",
-    });
-    return ok({ sessionId: session.sessionId, region: provider.region ?? null });
-  } catch {
+      data: { consentVersion: BIOMETRIC_CONSENT_VERSION, consentAt: new Date() },
+    })
+    .catch(() => undefined);
+
+  const created = await createBoundLivenessSession(user.id);
+  if ("error" in created) {
     return apiError(
       503,
       "provider_unavailable",
       "We can't run this check right now. Try again later.",
     );
   }
+  return ok({ flowId: created.flowId });
 }

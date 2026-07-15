@@ -67,12 +67,16 @@ export async function rotateReference(
       referenceId: null,
       referenceStatus: "ROTATING",
       rotationReason: reason,
-      status: "QUEUED",
-      // Fraud-driven rotations keep the badge withheld; routine ones
-      // keep the badge while the fresh enrolment happens.
+      // C-2: rotation ALWAYS returns the user to LIVENESS_REQUIRED - a
+      // fresh Tirvea liveness capture mints the new reference. It never
+      // requires a new Stripe Identity session (identity is unchanged).
+      status: "LIVENESS_REQUIRED",
       ...(reason === "fraud_investigation" ? { badgeStatus: "SUSPENDED" as const } : {}),
     },
   });
+  // Any open liveness session for the OLD reference is now void.
+  const { invalidateOpenLivenessSessions } = await import("@/lib/services/face-liveness");
+  await invalidateOpenLivenessSessions(userId).catch(() => undefined);
   await recordVerificationAudit({
     userId,
     verificationId: job.id,
@@ -429,5 +433,5 @@ export async function onFaceViolationReversed(
   // Optional fresh evidence: re-check the CURRENT gallery (cheap - the
   // stored per-version verdicts of unchanged photos are reused; a staff
   // "request new selfie" is the stronger, explicit re-challenge).
-  await enqueueProfilePhotoVerification(userId, "appeal_approved");
+  await enqueueProfilePhotoVerification(userId, "appeal_approved", { isRecovery: true });
 }

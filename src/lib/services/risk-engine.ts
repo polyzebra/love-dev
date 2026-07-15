@@ -255,7 +255,15 @@ export function bandFromScore(
 export type FaceRiskInput = {
   identityVerified: boolean;
   faceStatus:
-    "QUEUED" | "CHECKING" | "AUTO_VERIFIED" | "MANUAL_REVIEW" | "REJECTED" | "SUSPENDED" | null;
+    | "LIVENESS_REQUIRED"
+    | "QUEUED"
+    | "CLAIMED"
+    | "CHECKING"
+    | "AUTO_VERIFIED"
+    | "MANUAL_REVIEW"
+    | "REJECTED"
+    | "SUSPENDED"
+    | null;
   duplicateClass:
     | "UNKNOWN"
     | "SELF_RESTORE"
