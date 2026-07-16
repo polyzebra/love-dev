@@ -44,6 +44,7 @@ const LIVE = new Set([
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",
   "face-badge-trust.test.ts",
+  "face-cache-cover-role.test.ts",
 ]);
 
 const UNIT = new Set([

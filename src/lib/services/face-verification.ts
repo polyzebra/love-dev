@@ -492,7 +492,11 @@ export async function runProfilePhotoVerification(
       // reused; a replaced/recropped image (mediaVersion bump) is not. The
       // verdict is ALSO only reused when it was produced by the current
       // provider + threshold version (activeCalibration) - a recalibration
-      // or provider swap re-analyses even an unchanged photo.
+      // or provider swap re-analyses even an unchanged photo. And it is only
+      // reused in the SAME cover role it was scored under (isCoverAtCheck):
+      // cover and gallery have different decision tables (classifyComparison),
+      // so a gallery verdict must never satisfy the stricter cover slot, nor
+      // vice-versa - a promote/demote forces a fresh comparison (F3).
       const existing = await db.photoFaceCheck.findUnique({
         where: {
           photoId_photoVersion_verificationId: {
@@ -505,7 +509,8 @@ export async function runProfilePhotoVerification(
       if (
         existing &&
         existing.decision !== "PENDING" &&
-        existing.calibrationVersion === activeCalibration
+        existing.calibrationVersion === activeCalibration &&
+        existing.isCoverAtCheck === photo.isCover
       ) {
         results.push({
           decision: existing.decision,
