@@ -56,15 +56,43 @@ export async function mintEmailChangeOtp(
   const { supabaseAdmin } = await import("@/lib/supabase/admin");
   const admin = supabaseAdmin();
   const current = await admin.auth.admin.getUserById(userId);
-  const currentEmail = current.data.user?.email;
-  if (current.error || !currentEmail) {
+  if (current.error) {
     return {
       code: null,
-      error: current.error
-        ? { code: current.error.code, message: current.error.message, status: current.error.status }
-        : { message: "current auth user has no email" },
+      error: {
+        code: current.error.code,
+        message: current.error.message,
+        status: current.error.status,
+      },
     };
   }
+  let currentEmail = current.data.user?.email?.trim() || null;
+
+  // Native phone-first accounts sign up with a phone and NO auth.users email
+  // (auth.users.email is empty; the placeholder lives only in the app row).
+  // email_change_new needs a current address to move FROM, so seed the
+  // account's OWN unroutable placeholder onto auth.users first - idempotent,
+  // matches the app row, sends nothing. Without this the mint fails with a
+  // code-less error and the attach screen wrongly shows a transport error
+  // ("We couldn't send the code") for every genuinely phone-first user.
+  if (!currentEmail) {
+    const { phonePlaceholderEmail } = await import("@/lib/auth/identity");
+    const placeholder = phonePlaceholderEmail(userId);
+    const seed = await admin.auth.admin.updateUserById(userId, {
+      email: placeholder,
+      email_confirm: true,
+    });
+    if (seed.error || !seed.data.user?.email) {
+      return {
+        code: null,
+        error: seed.error
+          ? { code: seed.error.code, message: seed.error.message, status: seed.error.status }
+          : { message: "could not seed placeholder email for phone-first account" },
+      };
+    }
+    currentEmail = placeholder;
+  }
+
   const { data, error } = await admin.auth.admin.generateLink({
     type: "email_change_new",
     email: currentEmail,
