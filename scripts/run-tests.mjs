@@ -74,6 +74,7 @@ const UNIT = new Set([
   "face-internal-allowlist.test.ts",
   "face-outcomes.test.ts",
   "face-badge-helpers.test.ts",
+  "verification-presentation.test.ts",
   "face-binding-platform.test.ts",
 ]);
 

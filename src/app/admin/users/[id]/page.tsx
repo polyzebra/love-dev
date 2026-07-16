@@ -286,7 +286,11 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 );
               })()}
             </Field>
-            <Field label="Photo verification">
+            {/* Dual-badge model (Epic 4): Identity Verified (Stripe) and Photo
+                Verified (positive face grant) are SEPARATE signals - never
+                conflate. Photo Verified is null for everyone until the full
+                trust workflow completes. */}
+            <Field label="Identity verified">
               <VerifiedStamp
                 verifiedAt={verification.photoVerifiedAt}
                 label={verification.photoVerified ? "Verified" : "Not verified"}
@@ -294,6 +298,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <span className="text-muted-foreground text-xs">
                 Provider: {user.photoVerificationProvider ?? "-"}
               </span>
+            </Field>
+            <Field label="Photo verified (badge)">
+              <VerifiedStamp
+                verifiedAt={user.faceVerifiedAt}
+                label={user.faceVerifiedAt ? "Verified" : "Not yet"}
+              />
             </Field>
             <Field label="Country (last IP)">{user.lastIpCountry ?? "-"}</Field>
             <Field label="Created">{stampDate(user.createdAt)}</Field>

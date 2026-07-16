@@ -64,25 +64,19 @@ function main() {
     assert.equal(isPhotoVerified({ faceVerifiedAt: D }), true);
   });
 
-  // ---- dormancy invariant: only the engine + helper CONSUME faceVerifiedAt -
-  check("faceVerifiedAt is confined to the helper + the grant engine (no UI/route)", () => {
-    // Scan CODE only - strip comments so doc-comments that merely mention
-    // "does not set faceVerifiedAt" (grant/binding services, review route) do
-    // not count as consumption.
-    const stripComments = (s: string) =>
-      s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+  // ---- dormancy invariant: exactly ONE writer of the grant column ---------
+  // Post-Epic-4 the presentation layer + admin legitimately READ faceVerifiedAt
+  // (dual-badge display); it stays inert because nothing GRANTS it except the
+  // canonical engine. So the durable invariant is the single WRITER, and that
+  // no route/UI writes it (reads are allowed).
+  check("faceVerifiedAt has exactly one writer (the grant engine); nothing else writes it", () => {
     const files = walk("src");
-    const hits = files.filter((f) => stripComments(readFileSync(f, "utf8")).includes("faceVerifiedAt"));
-    // In CODE, faceVerifiedAt lives ONLY in the canonical helper (reads it) and
-    // the grant engine (the ONE writer). No service, route or UI consumes it.
-    const allowed = ["src/lib/services/verification.ts", "src/lib/services/photo-grant.ts"];
-    for (const h of hits) assert.ok(allowed.includes(h), `unexpected faceVerifiedAt code reference: ${h}`);
-    assert.ok(!hits.some((h) => h.endsWith(".tsx")), "no UI reads faceVerifiedAt");
-    assert.ok(!hits.some((h) => h.startsWith("src/app/")), "no route/public surface reads it");
-    // Exactly ONE writer: only photo-grant.ts writes the column.
-    const writers = files.filter((f) => /faceVerifiedAt:\s*(new Date\(\)|null)/.test(readFileSync(f, "utf8")));
-    assert.deepEqual(writers, ["src/lib/services/photo-grant.ts"], "faceVerifiedAt has exactly one writer");
-    // The helper never puts it inside a Prisma select.
+    const isWrite = (f: string) => /faceVerifiedAt:\s*(new Date\(\)|null)/.test(readFileSync(f, "utf8"));
+    const writers = files.filter(isWrite);
+    assert.deepEqual(writers, ["src/lib/services/photo-grant.ts"], "exactly one writer");
+    const appWriters = files.filter((f) => f.startsWith("src/app/") && isWrite(f));
+    assert.deepEqual(appWriters, [], "no route/UI writes faceVerifiedAt");
+    // The canonical helper never puts it inside a Prisma select.
     const v = readFileSync("src/lib/services/verification.ts", "utf8");
     assert.ok(!/faceVerifiedAt:\s*true/.test(v), "faceVerifiedAt must not be in any select");
   });
