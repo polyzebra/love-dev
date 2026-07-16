@@ -625,8 +625,12 @@ export async function runProfilePhotoVerification(
         });
       }
     }
-    await db.profilePhotoVerification.update({
-      where: { id: job.id },
+    // Race guard (F2): commit this decision ONLY if we still hold the lease.
+    // A newer cover change re-enqueues the job and nulls the lease, so a
+    // superseded worker matches 0 rows and must NOT write trust - newest
+    // mediaVersion wins, no stale job may restore the badge.
+    const committed = await db.profilePhotoVerification.updateMany({
+      where: { id: job.id, leaseToken: opts.leaseToken },
       data: {
         status: decision.status,
         badgeStatus: decision.badgeStatus,
@@ -639,12 +643,16 @@ export async function runProfilePhotoVerification(
         leaseExpiresAt: null,
       },
     });
+    if (committed.count === 0) return null; // superseded by a newer run
     // Public badge suspension rides ONE denormalized column so hot read
-    // paths (discovery/explore) never join the face tables.
+    // paths (discovery/explore) never join the face tables. Trust is granted
+    // ONLY on a confirmed MATCH (badgeStatus ACTIVE / AUTO_VERIFIED); every
+    // other outcome - REVIEWING (MANUAL_REVIEW), SUSPENDED, NONE - keeps the
+    // badge withheld (F2: the badge always reflects the CURRENT trusted state).
     await db.user.update({
       where: { id: userId },
       data: {
-        faceBadgeSuspendedAt: decision.badgeStatus === "SUSPENDED" ? new Date() : null,
+        faceBadgeSuspendedAt: decision.badgeStatus === "ACTIVE" ? null : new Date(),
       },
     });
     await recordVerificationAudit({
@@ -722,6 +730,17 @@ export async function onProfilePhotosChanged(userId: string, reason: string): Pr
     select: { photoVerifiedAt: true, profile: { select: { country: true } } },
   });
   if (!user?.photoVerifiedAt) return; // face layer only follows identity
+  // F2: trust is provisional the instant the COVER changes. Withhold the
+  // public badge NOW - do not wait for the async worker. It is restored only
+  // when the worker re-confirms a MATCH (badgeStatus ACTIVE). Gallery-only
+  // changes (additions / reorders that do not crown a new cover) never send
+  // "cover_changed", so a harmless gallery edit is not suspended here.
+  if (reason === "cover_changed") {
+    await db.user.update({
+      where: { id: userId },
+      data: { faceBadgeSuspendedAt: new Date() },
+    });
+  }
   // C-3: admission is enforced INSIDE enqueue via the canonical gate. An
   // already-existing job is recovery (already admitted); a new one admits
   // on cohort. Pass country so the one gate sees it.

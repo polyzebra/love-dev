@@ -43,6 +43,7 @@ const LIVE = new Set([
   "ops-alerts.test.ts",
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",
+  "face-badge-trust.test.ts",
 ]);
 
 const UNIT = new Set([

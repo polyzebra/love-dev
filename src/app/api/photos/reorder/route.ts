@@ -28,9 +28,10 @@ export async function PATCH(req: Request) {
 
   const photos = await db.photo.findMany({
     where: { userId: user.id },
-    select: { id: true },
+    select: { id: true, isCover: true },
   });
   const owned = new Set(photos.map((p) => p.id));
+  const prevCoverId = photos.find((p) => p.isCover)?.id ?? null;
 
   // Every id must belong to the session user, and the list must cover all of
   // the user's photos - a partial reorder would leave duplicate positions.
@@ -48,10 +49,13 @@ export async function PATCH(req: Request) {
   );
 
   // Reorder can crown a NEW cover (index 0) - re-verify before the badge
-  // rests on it; unchanged photo versions keep their stored verdicts.
+  // rests on it; unchanged photo versions keep their stored verdicts. Only a
+  // genuine cover change signals "cover_changed" (which withholds the badge);
+  // a pure gallery reorder must not suspend a harmless edit (F2 / Phase 5).
+  const coverChanged = data.order[0] !== prevCoverId;
   const { onProfilePhotosChanged, runProfilePhotoVerification } =
     await import("@/lib/services/face-verification");
-  await onProfilePhotosChanged(user.id, "cover_changed");
+  await onProfilePhotosChanged(user.id, coverChanged ? "cover_changed" : "photos_reordered");
   after(() => runProfilePhotoVerification(user.id));
 
   return ok({ reordered: true, order: data.order });
