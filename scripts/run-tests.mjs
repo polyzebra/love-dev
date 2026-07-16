@@ -56,6 +56,7 @@ const UNIT = new Set([
   "auth-transport.test.ts",
   "api-contract.test.ts",
   "otp-email.test.ts",
+  "login-view.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

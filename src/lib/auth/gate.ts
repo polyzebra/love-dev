@@ -99,3 +99,36 @@ export function authNextStep(
   if (!user.onboardingDone) return "/onboarding";
   return "/discover";
 }
+
+/**
+ * What the /login front door should show. This is the ONE place that maps
+ * an (optional) session to a login view, keeping AUTHENTICATION state and
+ * navigation INTENT separate: an explicit /login visit is a deliberate act,
+ * so an authenticated-but-incompletely-onboarded account is offered a
+ * RECOVERY screen (continue setup / use another account / sign out) instead
+ * of being silently forced back into the setup ladder. Only a restricted
+ * (suspended/banned) account is redirected - to its status area. Everyone
+ * else (unauthenticated, or a fresh account still owing its FIRST verified
+ * channel, where the gate answers "/login") gets the method chooser.
+ *
+ * Setup enforcement on PROTECTED app routes is unchanged and still lives in
+ * requireUser()/authNextStep - this function governs ONLY the /login route,
+ * which is never a protected route.
+ */
+export type LoginView =
+  | { kind: "chooser" }
+  | { kind: "recovery"; next: string; setupComplete: boolean }
+  | { kind: "redirect"; to: string };
+
+export function resolveLoginView(session: { user: GateUser } | null): LoginView {
+  if (!session) return { kind: "chooser" };
+  const next = authNextStep(session.user);
+  // Restricted accounts have exactly one place to be.
+  if (next === RESTRICTED_ACCOUNT_ROUTE) return { kind: "redirect", to: next };
+  // A fresh account still owing its first channel belongs on the chooser
+  // (the gate itself answers "/login"); rendering it here never loops.
+  if (next === "/login") return { kind: "chooser" };
+  // Authenticated + more setup owed OR fully complete: a recovery screen,
+  // never a silent bounce. `setupComplete` picks the primary CTA copy.
+  return { kind: "recovery", next, setupComplete: next === "/discover" };
+}

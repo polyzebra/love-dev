@@ -106,6 +106,16 @@ async function main() {
     assert.ok(html.includes("Continue with Email"), "/login owns the email row");
   });
 
+  console.log("email-attach step is never a trap - it always offers exits");
+  await check("/auth/email renders 'Back to sign-in options' and 'Sign out' exits", async () => {
+    const res = await get("/auth/email", "mobile");
+    assert.equal(res.status, 200);
+    const html = await res.text();
+    // A failed OPTIONAL email-attach must never strip every navigation exit.
+    assert.ok(html.includes("Back to sign-in options"), "must offer a way back to the chooser");
+    assert.ok(html.includes("Sign out"), "must offer a full sign-out");
+  });
+
   console.log(`\n${passed} checks passed`);
 }
 

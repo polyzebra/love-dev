@@ -144,20 +144,16 @@ export default async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Reverse gate: SIGNED-IN visitors never enter the auth front door.
-  // The /login page's own redirect() runs after the (auth) segment has
-  // already committed, leaving the shell mounted with an EMPTY slot for
-  // the whole next-route fetch (the logo-and-footer-only frame captured
-  // on real iPhones). Redirecting at the edge keeps the previous screen
-  // visible through the entire hop. /discover's requireUser then routes
-  // users who still owe a gate step; the page-level redirect stays as a
-  // backstop. Refreshed session cookies (token rotation!) must ride the
-  // redirect, or the rotated refresh token would be lost.
-  if (pathname === "/login") {
-    const redirect = NextResponse.redirect(new URL("/discover", request.url));
-    for (const c of response.cookies.getAll()) redirect.cookies.set(c);
-    return redirect;
-  }
+  // NOTE: /login is deliberately NOT reverse-gated here. A signed-in
+  // visitor must be able to reach the front door so it can offer the
+  // recovery view (continue setup / use another account / sign out) - see
+  // resolveLoginView() in lib/auth/gate.ts. Previously this edge redirect
+  // sent every signed-in visitor to /discover, which re-gated an
+  // incompletely-onboarded account straight to /auth/email, making the
+  // login chooser unreachable and trapping partial phone-first accounts.
+  // The page renders (never edge-redirects) for authenticated users, so
+  // the old empty-slot frame does not recur; only a restricted account is
+  // redirected, page-side, to its status area.
 
   return response;
 }

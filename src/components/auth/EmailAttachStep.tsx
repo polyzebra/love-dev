@@ -18,6 +18,7 @@ import { OtpInput, refocusOtpInput } from "@/components/auth/OtpInput";
 import { ResendTimer } from "@/components/auth/ResendTimer";
 import { GoogleIcon, AppleIcon } from "@/components/auth/LoginEntry";
 import { sendEmailAttachCode, verifyEmailAttachCode } from "@/components/auth/api";
+import { signOutEverywhere } from "@/components/auth/sign-out";
 import { appleLoginEnabled } from "@/lib/auth/apple";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { authRedirectUrl } from "@/lib/auth/url";
@@ -71,6 +72,44 @@ export function EmailAttachStep() {
   const [codeError, setCodeError] = useState<string | null>(null);
   const otpRef = useRef<HTMLInputElement>(null);
   const [oauthPending, setOauthPending] = useState<"google" | "apple" | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
+
+  // Email attach is an OPTIONAL account-completion rung, never a trap. Even
+  // when a send fails, the user must keep every exit: back to the sign-in
+  // options (the /login recovery screen) and a full sign-out. Without these
+  // a delivery failure would strand a phone-first account with no way to
+  // reach the login chooser.
+  async function signOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOutEverywhere("/login");
+    } catch {
+      setSigningOut(false);
+      toast.error("Couldn't sign out. Please try again.");
+    }
+  }
+  const stepExits = (
+    <div className="text-muted-foreground mt-6 flex items-center justify-center gap-3 text-xs">
+      <button
+        type="button"
+        onClick={() => router.push("/login")}
+        disabled={signingOut}
+        className="hover:text-foreground focus-visible:ring-foreground/20 rounded-sm underline-offset-2 outline-none hover:underline focus-visible:ring-2 disabled:opacity-50"
+      >
+        Back to sign-in options
+      </button>
+      <span aria-hidden="true">·</span>
+      <button
+        type="button"
+        onClick={signOut}
+        disabled={signingOut}
+        className="hover:text-foreground focus-visible:ring-foreground/20 rounded-sm underline-offset-2 outline-none hover:underline focus-visible:ring-2 disabled:opacity-50"
+      >
+        {signingOut ? "Signing out..." : "Sign out"}
+      </button>
+    </div>
+  );
 
   function enterConflict(message: string) {
     setConflictMessage(message);
@@ -293,6 +332,7 @@ export function EmailAttachStep() {
           }
           cta={<ResendTimer disabled={verifying} initialSeconds={retryAfter} onResend={resend} />}
         />
+        {stepExits}
       </AuthShell>
     );
   }
@@ -339,6 +379,7 @@ export function EmailAttachStep() {
         }
         footnote="We only use your email to sign you in - never to spam you."
       />
+      {stepExits}
     </AuthShell>
   );
 }
