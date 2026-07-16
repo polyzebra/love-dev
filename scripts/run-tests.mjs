@@ -60,6 +60,7 @@ const UNIT = new Set([
   "login-entry-lifecycle.test.ts",
   "verification-badge-consistency.test.ts",
   "face-internal-allowlist.test.ts",
+  "face-outcomes.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

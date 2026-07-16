@@ -4,7 +4,6 @@ import {
   getFaceMatchProvider,
   isFaceMatchConfigured,
   faceMatchNotConfiguredProvider,
-  FaceMatchNotConfiguredError,
   type FaceComparisonProvider,
   type FaceComparison,
 } from "@/lib/services/face-match-providers";
@@ -670,7 +669,12 @@ export async function runProfilePhotoVerification(
   } catch (error) {
     // Provider outage / timeout: park the job for the cron sweep; the
     // badge keeps its previous state (fail SAFE for verified users, fail
-    // CLOSED for badge grants - nothing is granted on error).
+    // CLOSED for badge grants - nothing is granted on error). A provider
+    // error is NEVER a mismatch: the normalized outcome is
+    // PROVIDER_UNAVAILABLE / ERROR, never DIFFERENT_PERSON, and the badge
+    // is never suspended here.
+    const { providerErrorToOutcome } = await import("@/lib/services/face-outcomes");
+    const { outcome, reasonCode } = providerErrorToOutcome(error);
     await db.profilePhotoVerification.update({
       where: { id: job.id },
       data: { status: "QUEUED" },
@@ -682,8 +686,8 @@ export async function runProfilePhotoVerification(
       actorType: "system",
       previousStatus: "CHECKING",
       newStatus: "QUEUED",
-      reasonCode:
-        error instanceof FaceMatchNotConfiguredError ? "not_configured" : "provider_error",
+      reasonCode,
+      metadata: { outcome },
     });
     return null;
   }

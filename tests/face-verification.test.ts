@@ -480,6 +480,10 @@ async function main() {
             throw new Error("vendor timeout");
           },
         };
+        const before = await db.user.findUniqueOrThrow({
+          where: { id: uid },
+          select: { faceBadgeSuspendedAt: true },
+        });
         const decision = await runProfilePhotoVerification(uid, { provider: brokenProvider });
         assert.equal(decision, null);
         const job = await db.profilePhotoVerification.findUniqueOrThrow({ where: { userId: uid } });
@@ -488,7 +492,22 @@ async function main() {
           where: { userId: uid, eventType: "face_check_error" },
           orderBy: { createdAt: "desc" },
         });
-        assert.equal(audit?.reasonCode, "provider_error");
+        // A provider timeout is PROVIDER_UNAVAILABLE - never a mismatch, and
+        // it never touches the badge (fail-safe).
+        assert.equal(audit?.reasonCode, "provider_unavailable");
+        assert.equal(
+          (audit?.metadata as { outcome?: string } | null)?.outcome,
+          "PROVIDER_UNAVAILABLE",
+        );
+        const after = await db.user.findUniqueOrThrow({
+          where: { id: uid },
+          select: { faceBadgeSuspendedAt: true },
+        });
+        assert.deepEqual(
+          after.faceBadgeSuspendedAt,
+          before.faceBadgeSuspendedAt,
+          "badge untouched",
+        );
       },
     );
 

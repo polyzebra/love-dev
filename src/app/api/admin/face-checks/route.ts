@@ -1,5 +1,6 @@
 import { ok, requirePermission } from "@/lib/api";
 import { db } from "@/lib/db";
+import { classificationToOutcome } from "@/lib/services/face-outcomes";
 
 export const dynamic = "force-dynamic";
 
@@ -58,5 +59,12 @@ export async function GET() {
       },
     },
   });
-  return ok({ queue });
+  // Attach the canonical NORMALIZED outcome per check (admin-only view;
+  // still no raw scores). The stored classification stays as-is (no
+  // migration); this is the read-side mapping.
+  const withOutcomes = queue.map((job) => ({
+    ...job,
+    checks: job.checks.map((c) => ({ ...c, outcome: classificationToOutcome(c.classification) })),
+  }));
+  return ok({ queue: withOutcomes });
 }
