@@ -369,6 +369,12 @@ export async function runProfilePhotoVerification(
   const provider = opts.provider ?? getFaceMatchProvider();
   if (provider === faceMatchNotConfiguredProvider) return null;
 
+  // The threshold identity a cached PhotoFaceCheck is valid FOR: the
+  // provider AND the active calibration (threshold) version. A stored
+  // verdict is reused only when photoId + mediaVersion + THIS token match,
+  // so a provider swap or a threshold recalibration re-runs every photo.
+  const activeCalibration = `${provider.name}:${process.env.FACE_CALIBRATION_VERSION?.trim() || "v0"}`;
+
   const { randomUUID } = await import("node:crypto");
   const leaseMs = (Number(process.env.FACE_LEASE_MINUTES) || 15) * 60_000;
   // At-most-one active worker per job (H-2). A caller with a lease token
@@ -458,7 +464,10 @@ export async function runProfilePhotoVerification(
 
     for (const photo of photos) {
       // Version pin: an existing result for THIS exact stored version is
-      // reused; a replaced/recropped image (mediaVersion bump) is not.
+      // reused; a replaced/recropped image (mediaVersion bump) is not. The
+      // verdict is ALSO only reused when it was produced by the current
+      // provider + threshold version (activeCalibration) - a recalibration
+      // or provider swap re-analyses even an unchanged photo.
       const existing = await db.photoFaceCheck.findUnique({
         where: {
           photoId_photoVersion_verificationId: {
@@ -468,7 +477,11 @@ export async function runProfilePhotoVerification(
           },
         },
       });
-      if (existing && existing.decision !== "PENDING") {
+      if (
+        existing &&
+        existing.decision !== "PENDING" &&
+        existing.calibrationVersion === activeCalibration
+      ) {
         results.push({
           decision: existing.decision,
           classification: existing.classification,
@@ -494,11 +507,13 @@ export async function runProfilePhotoVerification(
             photoId: photo.id,
             photoVersion: photo.mediaVersion,
             isCoverAtCheck: photo.isCover,
+            calibrationVersion: activeCalibration,
             classification: "UNCERTAIN",
             decision: "FLAGGED",
             failureReason: "image_unreadable",
           },
           update: {
+            calibrationVersion: activeCalibration,
             classification: "UNCERTAIN",
             decision: "FLAGGED",
             failureReason: "image_unreadable",
@@ -532,6 +547,7 @@ export async function runProfilePhotoVerification(
           photoId: photo.id,
           photoVersion: photo.mediaVersion,
           isCoverAtCheck: photo.isCover,
+          calibrationVersion: activeCalibration,
           classification: verdict.classification,
           decision: verdict.decision,
           faceCount: cmp.faceCount,
@@ -544,6 +560,7 @@ export async function runProfilePhotoVerification(
         },
         update: {
           isCoverAtCheck: photo.isCover,
+          calibrationVersion: activeCalibration,
           classification: verdict.classification,
           decision: verdict.decision,
           faceCount: cmp.faceCount,

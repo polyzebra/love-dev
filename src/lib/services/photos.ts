@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import sharp from "sharp";
 import { encode as encodeBlurhash } from "blurhash";
 import { storageClient } from "@/lib/storage";
+import { db } from "@/lib/db";
 
 /**
  * Profile photo pipeline built around one canonical 4:5 portrait ratio.
@@ -368,6 +369,60 @@ export function mediaEtag(photoId: string, variant: PhotoVariant, mediaVersion: 
   return `"${photoId}-${variant}-v${mediaVersion}"`;
 }
 
+export type MediaVersionBump = { version: number; bumped: boolean };
+
+/**
+ * THE canonical Photo.mediaVersion mutation - the single place version is
+ * ever incremented, so no route re-implements it.
+ *
+ * Increment WHENEVER the stored bytes behind a photoId are rewritten IN
+ * PLACE (replace / crop / rotate / recompress / regeneration / moderation
+ * or admin byte replacement). NEVER for a pure reorder or a cover change -
+ * those don't touch bytes (a new UPLOAD gets a new photoId and starts at
+ * version 0, which is the "create" case; only same-photoId rewrites bump).
+ *
+ * A bump invalidates every version-pinned PhotoFaceCheck for the old
+ * version by construction (checks key on (photoId, photoVersion, ...)), so
+ * a stale verdict for the previous bytes can never apply to the new ones.
+ *
+ * Concurrency: the increment is a single atomic UPDATE (`mediaVersion + 1`
+ * in SQL), so parallel bumps never lose a write - they compose to one
+ * latest authoritative version. When `expectedVersion` is supplied the
+ * bump is CONDITIONAL (optimistic lock): it applies only if the row is
+ * still at that version; a caller that lost the race gets `bumped: false`
+ * and the current authoritative version to reconcile against. Returns null
+ * only if the photo no longer exists.
+ */
+export async function bumpPhotoMediaVersion(
+  photoId: string,
+  expectedVersion?: number,
+): Promise<MediaVersionBump | null> {
+  if (expectedVersion !== undefined) {
+    const res = await db.photo.updateMany({
+      where: { id: photoId, mediaVersion: expectedVersion },
+      data: { mediaVersion: { increment: 1 } },
+    });
+    if (res.count === 0) {
+      const cur = await db.photo.findUnique({
+        where: { id: photoId },
+        select: { mediaVersion: true },
+      });
+      return cur ? { version: cur.mediaVersion, bumped: false } : null;
+    }
+    return { version: expectedVersion + 1, bumped: true };
+  }
+  try {
+    const updated = await db.photo.update({
+      where: { id: photoId },
+      data: { mediaVersion: { increment: 1 } },
+      select: { mediaVersion: true },
+    });
+    return { version: updated.mediaVersion, bumped: true };
+  } catch {
+    return null; // row gone
+  }
+}
+
 /**
  * Uploads the four variants to the PRIVATE "listing-images" bucket under the
  * owner's folder. Uses the request-scoped Supabase client so storage RLS sees
@@ -379,6 +434,16 @@ export function mediaEtag(photoId: string, variant: PhotoVariant, mediaVersion: 
  * on Vercel - and every stored object is downloaded back and byte-compared
  * before the upload is considered successful. On any mismatch all objects
  * are removed and nothing is recorded.
+ *
+ * `existingPhotoId` REWRITES the bytes of an existing photo IN PLACE
+ * (upsert to the same storagePath). A caller doing this - any
+ * replace/crop/rotate/recompress/regeneration/moderation-or-admin byte
+ * replacement - MUST, in the same operation, call
+ * `bumpPhotoMediaVersion(existingPhotoId)` and `onProfilePhotosChanged`
+ * so the immutable-cache ETag rotates AND the stale-version PhotoFaceCheck
+ * is invalidated (the new bytes get a fresh face verdict). A brand-new
+ * upload (no existingPhotoId) gets a new photoId at mediaVersion 0 and
+ * needs no bump.
  */
 export async function uploadProfilePhoto(
   userId: string,
