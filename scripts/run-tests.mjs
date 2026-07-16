@@ -40,6 +40,7 @@ const LIVE = new Set([
   "face-final-blockers.test.ts",
   "face-remediation.test.ts",
   "face-consent-withdrawal.test.ts",
+  "ops-alerts.test.ts",
 ]);
 
 const UNIT = new Set([

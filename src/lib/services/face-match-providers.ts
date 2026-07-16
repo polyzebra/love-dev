@@ -326,3 +326,56 @@ export function getFaceMatchProvider(): FaceComparisonProvider {
 export function isFaceMatchConfigured(): boolean {
   return getFaceMatchProvider() !== faceMatchNotConfiguredProvider;
 }
+
+/**
+ * Provider config/state alert evaluation (Phase 7). Env + adapter state
+ * only - never queries metrics, never touches PII. Lives in the adapter
+ * layer so consumers (verification-metrics) stay provider-agnostic: they
+ * just fire whatever normalized kinds we return and resolve the rest.
+ *
+ * Returns `fire` (rules currently tripped) and `resolve` (rules that are
+ * healthy right now, so any prior alert of that kind can be cleared).
+ */
+export async function evaluateProviderConfigAlerts(): Promise<{
+  fire: Array<{ kind: string; detail: string }>;
+  resolve: string[];
+}> {
+  const fire: Array<{ kind: string; detail: string }> = [];
+  const resolve: string[] = [];
+  const which = process.env.FACE_MATCH_PROVIDER?.trim().toLowerCase();
+
+  if (process.env.FACE_EMERGENCY_DISABLE === "1") {
+    fire.push({
+      kind: "emergency_disable_active",
+      detail: "FACE_EMERGENCY_DISABLE is ON - face admission is blocked.",
+    });
+  }
+
+  if (which === "aws_rekognition_faces") {
+    if (process.env.NODE_ENV === "production" && !process.env.FACE_LEGAL_APPROVAL_VERSION?.trim()) {
+      fire.push({
+        kind: "legal_gate_missing",
+        detail: "Face provider selected in production without a recorded legal approval version.",
+      });
+    }
+    // Region consistency is an adapter concern - keep the vendor call here.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const adapter = require("@/lib/services/aws-rekognition") as {
+      awsRekognitionConfigured: () => boolean;
+      assertRegionConsistency: () => void;
+    };
+    if (adapter.awsRekognitionConfigured()) {
+      try {
+        adapter.assertRegionConsistency();
+        resolve.push("region_mismatch");
+      } catch (e) {
+        fire.push({
+          kind: "region_mismatch",
+          detail: e instanceof Error ? e.message : "region consistency check failed",
+        });
+      }
+    }
+  }
+
+  return { fire, resolve };
+}

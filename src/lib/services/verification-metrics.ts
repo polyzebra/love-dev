@@ -287,11 +287,38 @@ export async function evaluateVerificationAlerts(): Promise<string[]> {
       `Overturn rate ${metrics.quality.falsePositiveRate}% exceeds ${fpMax}% - check thresholds.`,
     );
   }
-  if (metrics.face.deadLettered > 0) {
+  const dlqMax = num(process.env.ALERT_DLQ_MAX, 0);
+  if (metrics.face.deadLettered > dlqMax) {
     await fire(
-      "rotation_or_run_failures",
-      `${metrics.face.deadLettered} job(s) dead-lettered in 24h.`,
+      "face_dead_letter",
+      `${metrics.face.deadLettered} job(s) dead-lettered in 24h (threshold ${dlqMax}).`,
     );
   }
+
+  // Abnormal decision rates (from the same 24h window).
+  const suspMax = num(process.env.ALERT_SUSPENSION_MAX, 25);
+  if (metrics.face.suspended > suspMax) {
+    await fire(
+      "suspension_spike",
+      `${metrics.face.suspended} badges suspended in 24h (threshold ${suspMax}).`,
+    );
+  }
+  const mrMax = num(process.env.ALERT_MANUAL_REVIEW_PCT, 40);
+  if ((metrics.face.manualReviewRate ?? 0) > mrMax) {
+    await fire(
+      "manual_review_spike",
+      `Manual-review rate ${metrics.face.manualReviewRate}% exceeds ${mrMax}%.`,
+    );
+  }
+
+  // Config/state rules (env + adapter state; no metrics query). These
+  // catch a misconfigured or killed provider even when nothing has
+  // processed. Evaluated in the provider layer so this module stays
+  // provider-agnostic - we only fire the normalized kinds it returns.
+  const { evaluateProviderConfigAlerts } = await import("@/lib/services/face-match-providers");
+  const config = await evaluateProviderConfigAlerts();
+  for (const a of config.fire) await fire(a.kind, a.detail);
+  for (const k of config.resolve) await resolveIfWasFiring(k);
+
   return fired;
 }

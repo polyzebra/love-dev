@@ -28,14 +28,28 @@ export async function GET(req: Request) {
       { status: 401 },
     );
   }
-  const processed = await sweepQueuedFaceChecks(10);
-  // Reference lifecycle: EXPIRING marks, expiry + provider-upgrade
-  // rotations (rotations re-enter the queue; next sweep re-enrols).
-  const lifecycle = await sweepReferenceLifecycle(25);
-  // Dead-letter: repeatedly-failing jobs escalate to humans (never
-  // auto-rejected); alert rules fire at most once/day each.
-  const deadLettered = await sweepDeadLetterJobs(20);
-  const reconciled = await reconcileReferences(25);
-  const alerts = await evaluateVerificationAlerts().catch(() => []);
-  return NextResponse.json({ data: { processed, lifecycle, deadLettered, reconciled, alerts } });
+  try {
+    const processed = await sweepQueuedFaceChecks(10);
+    // Reference lifecycle: EXPIRING marks, expiry + provider-upgrade
+    // rotations (rotations re-enter the queue; next sweep re-enrols).
+    const lifecycle = await sweepReferenceLifecycle(25);
+    // Dead-letter: repeatedly-failing jobs escalate to humans (never
+    // auto-rejected); alert rules fire at most once/day each.
+    const deadLettered = await sweepDeadLetterJobs(20);
+    const reconciled = await reconcileReferences(25);
+    const alerts = await evaluateVerificationAlerts().catch(() => []);
+    return NextResponse.json({ data: { processed, lifecycle, deadLettered, reconciled, alerts } });
+  } catch (error) {
+    // A cron failure is itself an alert event - fire it (error NAME only,
+    // never a message/PII), then answer 500 so the scheduler records it.
+    const { raiseOpsAlert } = await import("@/lib/services/provider-resilience");
+    await raiseOpsAlert(
+      "cron_failure",
+      `face-checks cron failed: ${error instanceof Error ? error.name : "error"}`,
+    ).catch(() => {});
+    return NextResponse.json(
+      { error: { code: "cron_failed", message: "The verification sweep failed." } },
+      { status: 500 },
+    );
+  }
 }

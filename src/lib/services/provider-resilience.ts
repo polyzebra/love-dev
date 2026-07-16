@@ -178,6 +178,14 @@ export const ALERT_POLICY: Record<string, { severity: AlertSeverity; escalateAft
   liveness_completion_drop: { severity: "warning", escalateAfterMin: 120 },
   cron_failure: { severity: "high", escalateAfterMin: 30 },
   provider_degraded: { severity: "warning", escalateAfterMin: 120 },
+  // Config/state rules (Phase 7): a selected provider with no legal
+  // approval, a region-consistency violation, the kill switch being
+  // flipped, and abnormal decision rates.
+  legal_gate_missing: { severity: "critical", escalateAfterMin: 15 },
+  region_mismatch: { severity: "critical", escalateAfterMin: 15 },
+  emergency_disable_active: { severity: "high", escalateAfterMin: 30 },
+  suspension_spike: { severity: "high", escalateAfterMin: 60 },
+  manual_review_spike: { severity: "warning", escalateAfterMin: 120 },
 };
 
 type ExternalAlertTransport = (payload: {
@@ -228,6 +236,27 @@ async function sendExternalAlert(payload: {
   } catch {
     return false;
   }
+}
+
+/**
+ * Admin/CLI DRY-RUN: deliver a synthetic alert through the EXTERNAL channel
+ * ONLY (no admin outbox, no audit) to verify the wiring end to end. Returns
+ * whether a channel is configured and whether it accepted the message.
+ * Never throws - a channel failure is reported, not raised.
+ */
+export async function sendTestOpsAlert(
+  note = "manual dry-run",
+): Promise<{ channelConfigured: boolean; delivered: boolean }> {
+  const channelConfigured = Boolean(
+    externalAlertTransportOverride || process.env.ALERT_WEBHOOK_URL?.trim(),
+  );
+  const delivered = await sendExternalAlert({
+    kind: "ops_alert_test",
+    severity: "warning",
+    detail: `Test alert (${note}) - verifying the external ops channel. No action needed.`,
+    status: "firing",
+  });
+  return { channelConfigured, delivered };
 }
 
 export async function raiseOpsAlert(
