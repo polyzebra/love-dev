@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
 import { getFaceMatchProvider } from "@/lib/services/face-match-providers";
-import { faceEnvironment } from "@/lib/services/face-rollout";
+import { faceEnvironment, faceEmergencyDisabled } from "@/lib/services/face-rollout";
 import {
   enqueueProfilePhotoVerification,
   recordVerificationAudit,
@@ -86,6 +86,8 @@ type ConsumeResult =
 export async function consumeLivenessFlow(flowId: string, userId: string): Promise<ConsumeResult> {
   const provider = getFaceMatchProvider();
   if (!provider.getLivenessResult) return { state: "provider_unavailable" };
+  // H2: no biometric enrollment (IndexFaces) while the kill switch is on.
+  if (faceEmergencyDisabled()) return { state: "provider_unavailable" };
   const environment = faceEnvironment();
 
   const session = await db.livenessSession.findUnique({ where: { flowId } });

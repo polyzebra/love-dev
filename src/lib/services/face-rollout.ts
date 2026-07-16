@@ -122,6 +122,16 @@ export function faceEnvironment(): string {
   );
 }
 
+/**
+ * The instant kill switch (H2). ONE source of truth, checked by admission
+ * AND by every processing/enrollment path (run, sweep, liveness consume), so
+ * flipping it to "1" halts new admission, in-flight biometric processing, and
+ * enrollment - not merely new admission.
+ */
+export function faceEmergencyDisabled(): boolean {
+  return process.env.FACE_EMERGENCY_DISABLE === "1";
+}
+
 export type AdmitDecision = { admit: boolean; reason: string };
 
 /**
@@ -151,8 +161,7 @@ export async function admitToFaceVerification(
 
   // 2. Emergency disable OFF. Overrides EVERYTHING, including the internal
   //    allowlist and recovery - the instant kill switch.
-  if (process.env.FACE_EMERGENCY_DISABLE === "1")
-    return { admit: false, reason: "emergency_disable" };
+  if (faceEmergencyDisabled()) return { admit: false, reason: "emergency_disable" };
 
   // 3. Production legal approval valid. The internal allowlist NEVER
   //    bypasses this - no biometric processing in production without a

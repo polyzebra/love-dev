@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { faceThresholds } from "@/lib/services/face-thresholds";
 import { PHOTOS_BUCKET } from "@/lib/services/photos";
+import { faceEmergencyDisabled } from "@/lib/services/face-rollout";
 import {
   getFaceMatchProvider,
   isFaceMatchConfigured,
@@ -378,6 +379,9 @@ export async function runProfilePhotoVerification(
 ): Promise<ProfileDecision | null> {
   const provider = opts.provider ?? getFaceMatchProvider();
   if (provider === faceMatchNotConfiguredProvider) return null;
+  // H2: the kill switch halts in-flight processing too, not just admission.
+  // No comparison, no decision, no badge write while emergency-disabled.
+  if (faceEmergencyDisabled()) return null;
 
   // The threshold identity a cached PhotoFaceCheck is valid FOR: the
   // provider AND the active calibration (threshold) version. A stored
@@ -854,6 +858,7 @@ export async function sweepQueuedFaceChecks(
   opts: { timeBudgetMs?: number } = {},
 ): Promise<number> {
   if (!isFaceMatchConfigured()) return 0;
+  if (faceEmergencyDisabled()) return 0; // H2: kill switch halts the sweep too
   const provider = getFaceMatchProvider();
 
   // Provider-aware: an OPEN circuit means every run would fail - skip the

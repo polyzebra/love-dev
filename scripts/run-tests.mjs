@@ -41,6 +41,7 @@ const LIVE = new Set([
   "face-remediation.test.ts",
   "face-consent-withdrawal.test.ts",
   "face-consent-liveness-guard.test.ts",
+  "face-emergency-disable.test.ts",
   "ops-alerts.test.ts",
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",

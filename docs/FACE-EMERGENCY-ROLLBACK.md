@@ -22,11 +22,15 @@ is a SEPARATE layer and is untouched by every step here.
 FACE_EMERGENCY_DISABLE=1
 ```
 
-Overrides every other gate in `admitToFaceVerification` (including recovery
-and the internal allowlist): no new work is admitted, in-flight runs no-op
-safely. It also raises the `emergency_disable_active` alert (FACE-ALERTING.md)
-so the stop is visible. Use when you need to stop NOW and keep the provider
-configured for a quick resume. Reverse by removing the var.
+Checked by one canonical helper (`faceEmergencyDisabled`) at admission AND at
+every processing/enrollment path: `admitToFaceVerification` (no new work),
+`runProfilePhotoVerification` (no comparison/grant), `sweepQueuedFaceChecks`
+(processes nothing), and `consumeLivenessFlow` (no `IndexFaces` enrollment).
+So flipping it to `1` halts new admission, in-flight processing, and
+enrollment - not merely admission. It also raises the
+`emergency_disable_active` alert (FACE-ALERTING.md) so the stop is visible.
+Use when you need to stop NOW and keep the provider configured for a quick
+resume. Reverse by removing the var.
 
 > Note: existing badges stay as they are (Tier 1 stops *admission*, it does
 > not clear state). To also hide already-granted badges, suspend them
