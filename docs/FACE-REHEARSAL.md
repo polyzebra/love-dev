@@ -5,6 +5,12 @@ document is the **checklist**; the tooling enforces the gates and can dry-run
 the journey. Nothing here enables production. The rehearsal is refused unless
 every hard gate passes.
 
+**Lifecycle state:** this is **state 5 (rehearsed)** on the status board in
+FACE-VERIFICATION-RUNBOOK.md. A passing rehearsal does not roll the layer out
+(state 6) and does not grant legal approval (state 3) - those remain separate,
+explicit decisions. The rehearsal itself REQUIRES states 3 and 4 first (gates
+below). Current status: **pending** (gates unmet in production).
+
 - **Gate check + plan:** `npm run face:rehearsal`
 - **Headless dry-run (non-prod, mock provider):**
   `npm run face:rehearsal -- --simulate --subject <id> --cover-subject <id>`

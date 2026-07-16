@@ -3,6 +3,21 @@
 Two SEPARATE credential pairs. The runtime path can NEVER administer
 collections; the ops/admin path is used only by the CLI/emergency purge.
 
+> **Lifecycle state:** these policies are what "configured" (state 2) needs
+> on the AWS side. Having them attached does **not** make the layer legally
+> approved (state 3) or rolled out (state 6) - see the status board in
+> FACE-VERIFICATION-RUNBOOK.md. The `<ACCOUNT_ID>`, `<COLLECTION_ID>`, and
+> `eu-west-1` below are placeholders: the region MUST equal both
+> `AWS_REGION` and `AWS_REKOGNITION_REGION` (a mismatch trips the
+> `region_mismatch` alert - see FACE-ALERTING.md), and the collection MUST
+> equal `FACE_COLLECTION_ID` (a distinct collection per environment).
+>
+> `ListFaces` is used by two safe paths: the read-only `face:preflight`
+> check (`ListFaces` MaxResults=1) and the idempotency probe before
+> `IndexFaces`. `DetectFaces` is listed for completeness (quality/detection
+> during enrol); if CloudTrail shows it unused for your account you may drop
+> it without affecting the compare/enrol paths.
+
 ## Runtime credential (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`)
 
 ```json

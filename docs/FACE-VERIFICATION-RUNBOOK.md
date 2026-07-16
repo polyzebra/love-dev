@@ -2,7 +2,33 @@
 
 Operations guide for the profile-photo verification layer. Companions:
 FACE-VERIFICATION.md (architecture), FACE-REFERENCE-AUDIT.md (reference
-source decision), THREAT-MODEL-VERIFICATION.md (threats + risk model).
+source decision), THREAT-MODEL-VERIFICATION.md (threats + risk model),
+FACE-REHEARSAL.md (rehearsal), FACE-CALIBRATION.md (calibration),
+FACE-ALERTING.md (alerts), FACE-EMERGENCY-ROLLBACK.md (rollback),
+FACE-CONSENT-WITHDRAWAL.md (withdrawal), AWS-IAM-VERIFICATION.md (IAM).
+
+## Lifecycle status (the six states are SEPARATE)
+
+This is the authoritative status board. Every other doc links here. The
+six states are independent: satisfying one does **not** imply the next.
+"Legally approved" is a counsel decision recorded outside this repo - this
+document does not, and cannot, grant it.
+
+| # | State | Means | Gate (source of truth) | Current |
+|---|-------|-------|------------------------|---------|
+| 1 | **Implemented** | code exists and is tested | compile-time; no flag | ✅ done |
+| 2 | **Configured** | provider selected in an env | `FACE_MATCH_PROVIDER` set | ⛔ prod OFF (dormant) |
+| 3 | **Legally approved** | counsel signed off a version | `FACE_LEGAL_APPROVAL_VERSION` ∈ `FACE_LEGAL_APPROVED_VERSIONS` | ⛔ pending counsel |
+| 4 | **Calibrated** | thresholds approved from a report | `FACE_CALIBRATION_APPROVED=1` + threshold version | ⛔ pending |
+| 5 | **Rehearsed** | internal rehearsal passed | 8 gates in `evaluateRehearsalGates()` | ⛔ pending |
+| 6 | **Rolled out** | live to real users | `FACE_VERIFICATION_PERCENT > 0` | ⛔ 0 (dormant) |
+
+Only state 1 is currently true. Production runs with the provider unset, no
+legal version, and percent 0 - the badge derives from identity alone. Do
+not advance a state until the one before it is genuinely satisfied; states
+3 and 4 in particular are human sign-offs, not switches to flip to unblock
+work. Advancing to state 6 is the go-live in "Production readiness checklist"
+below; reversing any state is FACE-EMERGENCY-ROLLBACK.md.
 
 ## Sequence: happy path
 
@@ -196,11 +222,17 @@ Each: Detection -> Impact -> Immediate response -> Recovery -> Postmortem.
 
 ## Rollback plan
 
-1. `FACE_MATCH_PROVIDER` unset -> instant dormancy (badge = identity-only).
+Full procedure with severity tiers, decision tree, and verification steps:
+**docs/FACE-EMERGENCY-ROLLBACK.md**. Summary:
+
+1. Fastest kill (keeps config): `FACE_EMERGENCY_DISABLE=1` -> admission
+   blocked immediately, raises `emergency_disable_active`. No redeploy of
+   secrets required if the platform hot-reloads env.
+2. `FACE_MATCH_PROVIDER` unset -> instant dormancy (badge = identity-only).
    Optionally clear suspensions (SQL above).
-2. Vendor-side purge: DeleteCollection / batch deleteReference - references
+3. Vendor-side purge: DeleteCollection / batch deleteReference - references
    are re-creatable, nothing is lost permanently.
-3. Code revert: all changes additive; migrations
+4. Code revert: all changes additive; migrations
    `20260715060000` + `20260716060000` leave inert tables/columns.
-4. Appeals created by the layer remain valid history (violations reverse,
+5. Appeals created by the layer remain valid history (violations reverse,
    never delete) - no cleanup required.
