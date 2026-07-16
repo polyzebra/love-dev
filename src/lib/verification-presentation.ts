@@ -110,11 +110,16 @@ export function deriveVerificationPresentation(
     case "retry_available":
       return opts.workflowStatus === "EXPIRED" ? "expired" : "not_started";
     case "verified":
+    case "requires_reverification":
+      // Identity is verified in both; requires_reverification additionally
+      // means the face layer withheld the badge (photos changed).
       break;
   }
 
-  // Identity verified - the face layer refines the presentation.
-  if (!face) return "verified";
+  // Identity verified - the face layer refines the presentation. With the
+  // badge withheld (requires_reverification) but no live face job to read,
+  // steer to the re-verify prompt rather than falsely presenting "verified".
+  if (!face) return identity === "requires_reverification" ? "action_required" : "verified";
   switch (face.status) {
     case "LIVENESS_REQUIRED":
       return "checking_profile_photos"; // capture step (card renders liveness)

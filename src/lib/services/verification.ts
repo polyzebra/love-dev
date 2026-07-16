@@ -62,6 +62,10 @@ export type VerificationSource = {
   emailVerified: Date | null;
   phoneVerifiedAt: Date | null;
   photoVerifiedAt: Date | null;
+  /** Face-layer badge suspension - withholds the photo badge without
+   *  un-verifying identity (see face-verification.ts). Optional so legacy
+   *  callers that never select it read as "not suspended". */
+  faceBadgeSuspendedAt?: Date | null;
   verifications: Array<{
     type: VerificationType;
     status: VerificationStatus;
@@ -76,6 +80,10 @@ export type VerificationState = {
   phoneVerifiedAt: Date | null;
   photoVerified: boolean;
   photoVerifiedAt: Date | null;
+  /** Identity verified but the photo badge is withheld by the face layer -
+   *  the profile photos changed and need re-checking. The user must re-verify
+   *  their photos to restore the badge; identity itself is intact. */
+  requiresReverification: boolean;
   /** Provider/review workflow state for photo ("In review" copy) - not the verdict. */
   photoStatus: VerificationStatus | null;
   idVerified: boolean;
@@ -88,9 +96,14 @@ export type VerificationState = {
 /** Single place the trust-score weighting lives (sums to 100). */
 export const TRUST_WEIGHTS = { email: 25, phone: 25, photo: 35, id: 15 } as const;
 
-/** Prisma where-clause for "photo verified" in list/filter queries. */
+/**
+ * Prisma where-clause for "photo verified" in list/filter queries - the
+ * SAME rule as isPubliclyVerified: identity verified AND the face badge not
+ * suspended. A suspended badge must never surface as verified in any list.
+ */
 export const PHOTO_VERIFIED_WHERE = {
   photoVerifiedAt: { not: null },
+  faceBadgeSuspendedAt: null,
 } as const satisfies Prisma.UserWhereInput;
 
 /** Pure mapper - the only place verification verdicts are derived. */
@@ -100,7 +113,13 @@ export function toVerificationState(user: VerificationSource): VerificationState
 
   const emailVerified = user.emailVerified !== null;
   const phoneVerified = user.phoneVerifiedAt !== null;
-  const photoVerified = user.photoVerifiedAt !== null;
+  // The PUBLIC photo badge = identity verified AND the face layer has not
+  // suspended it. A suspended badge is NOT "photo verified" on any surface -
+  // owner profile, account page, admin panel and list filters all agree.
+  const identityPhotoVerified = user.photoVerifiedAt !== null;
+  const badgeSuspended = user.faceBadgeSuspendedAt != null;
+  const photoVerified = identityPhotoVerified && !badgeSuspended;
+  const requiresReverification = identityPhotoVerified && badgeSuspended;
   const idVerified = idRow?.status === "APPROVED";
 
   const trustScore =
@@ -116,6 +135,7 @@ export function toVerificationState(user: VerificationSource): VerificationState
     phoneVerifiedAt: user.phoneVerifiedAt,
     photoVerified,
     photoVerifiedAt: user.photoVerifiedAt,
+    requiresReverification,
     photoStatus: photoRow?.status ?? null,
     idVerified,
     idVerifiedAt: idVerified ? (idRow?.updatedAt ?? null) : null,

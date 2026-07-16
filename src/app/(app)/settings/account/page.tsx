@@ -52,6 +52,7 @@ export default async function AccountSettingsPage() {
   });
   const photoUx = deriveVerificationUxState({
     photoVerifiedAt: user?.photoVerifiedAt ?? null,
+    faceBadgeSuspendedAt: user?.faceBadgeSuspendedAt ?? null,
     verification: photoWorkflow,
   });
   const photoRow = photoVerificationRow(photoUx, {

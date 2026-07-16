@@ -48,6 +48,15 @@ export function photoVerificationRow(
   switch (ux) {
     case "verified":
       return { label: "Photo verified", state: "verified", value: "Verified", action: null };
+    case "requires_reverification":
+      // Identity intact, but the badge is withheld because the profile
+      // photos changed and no longer confirm as the verified person.
+      return {
+        label: "Photo verification",
+        state: "needs-action",
+        value: "Photos changed - verify again",
+        action: opts.configured ? { label: "Verify again", href: anchor } : null,
+      };
     case "pending":
     case "verification_started":
       // "Session open" is true for BOTH provider sub-states (user still

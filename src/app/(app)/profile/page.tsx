@@ -69,18 +69,23 @@ export default async function ProfilePage() {
   });
   const verificationUx = deriveVerificationUxState({
     photoVerifiedAt: profile.user.photoVerifiedAt,
+    faceBadgeSuspendedAt: profile.user.faceBadgeSuspendedAt,
     verification: photoWorkflow,
   });
   const verificationConfigured = isPhotoVerificationConfigured();
   // Face layer (profile-photo verification): one unique-row read; null
   // while the layer is dormant. Refines the presentation for VERIFIED
   // users (checking photos / photo update / action required).
-  const faceJob = verification.photoVerified
-    ? await db.profilePhotoVerification.findUnique({
-        where: { userId: user.id },
-        select: { status: true, lastRunAt: true },
-      })
-    : null;
+  // Load the face job whenever IDENTITY is verified (badge live OR withheld
+  // pending re-verification) - not only when the badge is currently live -
+  // so the re-verify card renders while the badge is suspended.
+  const faceJob =
+    profile.user.photoVerifiedAt !== null
+      ? await db.profilePhotoVerification.findUnique({
+          where: { userId: user.id },
+          select: { status: true, lastRunAt: true },
+        })
+      : null;
   const facePresentation = deriveVerificationPresentation(verificationUx, faceJob, {
     workflowStatus: photoWorkflow?.status ?? null,
   });
@@ -95,7 +100,7 @@ export default async function ProfilePage() {
   ] as const;
   type FaceCardState = (typeof FACE_CARD_STATES)[number];
   const faceCardState: FaceCardState | null =
-    verification.photoVerified &&
+    (verification.photoVerified || verification.requiresReverification) &&
     verificationConfigured &&
     (FACE_CARD_STATES as readonly string[]).includes(facePresentation)
       ? (facePresentation as FaceCardState)

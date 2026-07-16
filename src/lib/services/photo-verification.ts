@@ -565,6 +565,10 @@ export type VerificationUxState =
   | "verification_started"
   | "pending"
   | "verified"
+  // Identity verified but the face layer withheld the photo badge because
+  // the profile photos changed and no longer confirm as the verified person.
+  // The user must re-verify their photos to restore the badge.
+  | "requires_reverification"
   | "failed"
   | "retry_available"
   | "manual_review";
@@ -766,13 +770,19 @@ export function isFinalRejection(reviewNote: string | null | undefined): boolean
 
 export function deriveVerificationUxState(source: {
   photoVerifiedAt: Date | null;
+  /** Face-layer badge suspension. When set on a photo-verified user, the
+   *  badge is withheld and the state is requires_reverification (the photos
+   *  changed and need re-checking) - never a plain "verified". */
+  faceBadgeSuspendedAt?: Date | null;
   verification: {
     status: "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED" | "EXPIRED";
     providerSessionId: string | null;
     reviewNote: string | null;
   } | null;
 }): VerificationUxState {
-  if (source.photoVerifiedAt) return "verified";
+  if (source.photoVerifiedAt) {
+    return source.faceBadgeSuspendedAt ? "requires_reverification" : "verified";
+  }
   const row = source.verification;
   if (!row) return "not_verified";
   switch (row.status) {

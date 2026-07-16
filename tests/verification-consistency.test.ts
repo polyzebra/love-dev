@@ -181,8 +181,8 @@ check("UNCONFIGURED: one compact Coming soon row, NO card, NO second message", (
     "PhotoVerifyCard renders only when a provider is configured",
   );
   assert.ok(
-    /verification\.photoVerified &&\s*\n?\s*verificationConfigured &&/.test(page),
-    "faceCardState arm is provider-gated too",
+    /verification\.requiresReverification\)\s*&&\s*\n?\s*verificationConfigured &&/.test(page),
+    "faceCardState arm is provider-gated too (badge-live OR requires-reverification)",
   );
   // ...so the card no longer needs (or has) its own unavailable branch:
   // the mapper's "Coming soon" is the ONLY unavailable copy on the page.

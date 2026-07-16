@@ -24,6 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     where: { id: user.id },
     select: {
       photoVerifiedAt: true,
+      faceBadgeSuspendedAt: true,
       verifications: {
         where: { type: "PHOTO" },
         select: { status: true, providerSessionId: true, reviewNote: true },
@@ -35,6 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const verificationUx = verificationRow
     ? deriveVerificationUxState({
         photoVerifiedAt: verificationRow.photoVerifiedAt,
+        faceBadgeSuspendedAt: verificationRow.faceBadgeSuspendedAt,
         verification: photoRow,
       })
     : null;

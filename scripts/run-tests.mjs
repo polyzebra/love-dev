@@ -58,6 +58,7 @@ const UNIT = new Set([
   "otp-email.test.ts",
   "login-view.test.ts",
   "login-entry-lifecycle.test.ts",
+  "verification-badge-consistency.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";
