@@ -25,6 +25,8 @@ import { calculateAge, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PhotoManager } from "@/components/profile/photo-manager";
 import { PhotoVerifyCard } from "@/components/profile/photo-verify-card";
+import { FaceComparisonControl } from "@/components/profile/face-comparison-control";
+import { isFaceMatchConfigured } from "@/lib/services/face-match-providers";
 import {
   photoVerificationRow,
   VerificationStatusRow,
@@ -83,11 +85,16 @@ export default async function ProfilePage() {
     profile.user.photoVerifiedAt !== null
       ? await db.profilePhotoVerification.findUnique({
           where: { userId: user.id },
-          select: { status: true, lastRunAt: true },
+          select: { status: true, lastRunAt: true, consentAt: true },
         })
       : null;
+  // Consent withdrawn = the badge is hidden AND face-comparison consent is
+  // gone (distinguishes it from "photos changed", where consent remains).
+  const consentWithdrawn =
+    profile.user.faceBadgeSuspendedAt !== null && faceJob !== null && faceJob.consentAt === null;
   const facePresentation = deriveVerificationPresentation(verificationUx, faceJob, {
     workflowStatus: photoWorkflow?.status ?? null,
+    consentWithdrawn,
   });
   // With identity verified, the presentation is one of: verified /
   // checking_profile_photos / photo_update_review / manual_review /
@@ -97,6 +104,7 @@ export default async function ProfilePage() {
     "photo_update_review",
     "action_required",
     "manual_review",
+    "consent_withdrawn",
   ] as const;
   type FaceCardState = (typeof FACE_CARD_STATES)[number];
   const faceCardState: FaceCardState | null =
@@ -177,6 +185,11 @@ export default async function ProfilePage() {
               facePresentation={faceCardState}
             />
           </Reveal>
+        )}
+        {/* Owner control: turn OFF face comparison (withdraw consent), or the
+            withdrawn copy. Only meaningful while the face layer is live. */}
+        {isFaceMatchConfigured() && (verification.photoVerified || consentWithdrawn) && (
+          <FaceComparisonControl withdrawn={consentWithdrawn} />
         )}
       </PhotoManager>
 

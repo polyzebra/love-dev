@@ -69,7 +69,12 @@ export function PhotoVerifyCard({
   /** Face-layer presentation for VERIFIED users (profile-photo checks) -
    *  null renders the identity flow exactly as before. */
   facePresentation?:
-    "checking_profile_photos" | "photo_update_review" | "action_required" | "manual_review" | null;
+    | "checking_profile_photos"
+    | "photo_update_review"
+    | "action_required"
+    | "manual_review"
+    | "consent_withdrawn"
+    | null;
   /** Liveness capture required before profile photos can be checked (no
    *  trusted reference yet). Carries the consent version to accept. */
   liveness?: { consentVersion: string } | null;
@@ -229,6 +234,16 @@ export function PhotoVerifyCard({
         icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
         title="Verification under review"
         body="A member of our team is reviewing your verification. Nothing else is needed from you."
+      />,
+    );
+  }
+  if (facePresentation === "consent_withdrawn") {
+    const copy = FACE_STATE_COPY.consent_withdrawn;
+    return wrap(
+      <StateCard
+        icon={<XCircle className="text-muted-foreground size-5" aria-hidden="true" />}
+        title={copy.title}
+        body={copy.body}
       />,
     );
   }

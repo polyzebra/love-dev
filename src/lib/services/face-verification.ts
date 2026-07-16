@@ -416,6 +416,21 @@ export async function runProfilePhotoVerification(
   const job = await db.profilePhotoVerification.findUnique({ where: { userId } });
   if (!job) return null;
 
+  // Consent guard (Phase 6): never process biometrics without CURRENT
+  // consent. If consent was withdrawn while a job was pending/claimed, the
+  // run no-ops safely - it idles the job to LIVENESS_REQUIRED (re-consent
+  // must re-enroll) and releases the lease. The badge is left as withdrawal
+  // set it (suspended); nothing is granted.
+  if (!job.consentAt || job.consentVersion !== BIOMETRIC_CONSENT_VERSION) {
+    await db.profilePhotoVerification
+      .update({
+        where: { id: job.id },
+        data: { status: "LIVENESS_REQUIRED", leaseToken: null, leaseExpiresAt: null },
+      })
+      .catch(() => {});
+    return null;
+  }
+
   // Identity verification is the precondition for the badge pipeline.
   const user = await db.user.findUnique({
     where: { id: userId },
@@ -720,6 +735,63 @@ export async function onProfilePhotosChanged(userId: string, reason: string): Pr
 }
 
 /** GDPR deletion path - destroy provider-side biometric material. */
+/**
+ * Consent withdrawal (Phase 6) - the user turns OFF face comparison. This
+ * is the SAME canonical reference-deletion path as account teardown, minus
+ * dropping the app rows: we keep a minimal (consent-cleared) job row + the
+ * audit trail so the user can later re-consent and re-enroll.
+ *
+ *  - marks consent withdrawn (consentAt/consentVersion cleared -> no new
+ *    jobs admitted, pending jobs no-op via the run's consent guard);
+ *  - requests provider reference deletion, idempotently, with retry: the
+ *    registry stamps FaceReferenceRecord.deletedAt on success and leaves a
+ *    DELETE_PENDING row (deleteAttempts++) for the sweep on a vendor outage;
+ *  - drops the local reference pointer + idles the job to LIVENESS_REQUIRED
+ *    (re-consent must re-enroll from a fresh liveness capture);
+ *  - removes the PUBLIC badge (faceBadgeSuspendedAt) - identity
+ *    photoVerifiedAt is left INTACT;
+ *  - idempotent: withdrawing again is a safe no-op.
+ *
+ * Callers pass the AUTHENTICATED session user's id - never an arbitrary id.
+ */
+export async function withdrawFaceConsent(userId: string): Promise<{ withdrawn: boolean }> {
+  const job = await db.profilePhotoVerification.findUnique({ where: { userId } });
+
+  // Provider reference deletion (idempotent; retried by the registry sweep
+  // on vendor outage). Runs whether or not a job row exists.
+  const { deleteAllUserReferences } = await import("@/lib/services/face-reference-registry");
+  await deleteAllUserReferences(userId, "consent_withdrawal").catch(() => undefined);
+
+  if (job) {
+    await db.profilePhotoVerification.update({
+      where: { id: job.id },
+      data: {
+        consentAt: null,
+        consentVersion: null,
+        referenceId: null,
+        referenceStatus: null,
+        status: "LIVENESS_REQUIRED",
+        badgeStatus: "NONE",
+        leaseToken: null,
+        leaseExpiresAt: null,
+      },
+    });
+  }
+  // Public badge hidden; identity verdict (photoVerifiedAt) untouched.
+  await db.user.update({ where: { id: userId }, data: { faceBadgeSuspendedAt: new Date() } });
+
+  await recordVerificationAudit({
+    userId,
+    verificationId: job?.id ?? null,
+    eventType: "face_consent_withdrawn",
+    actorType: "user",
+    previousStatus: job?.status ?? null,
+    newStatus: job ? "LIVENESS_REQUIRED" : null,
+    reasonCode: "consent_withdrawal",
+  });
+  return { withdrawn: true };
+}
+
 export async function deleteFaceVerificationData(userId: string): Promise<void> {
   // H-1/H-3: delete EVERY provider FaceId in the registry (not just the
   // active pointer), idempotently and audited, BEFORE dropping local rows.

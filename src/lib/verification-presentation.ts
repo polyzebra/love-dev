@@ -73,6 +73,7 @@ export type VerificationPresentationState =
   | "verified" // badge live
   | "photo_update_review" // new/changed photo being re-checked
   | "action_required" // replace the offending photo (cover rejected)
+  | "consent_withdrawn" // owner turned OFF face comparison; badge hidden
   | "failed" // final, no retry
   | "expired"; // session lapsed - start again
 
@@ -93,8 +94,21 @@ export type FaceLayerSnapshot = {
 export function deriveVerificationPresentation(
   identity: VerificationUxState,
   face: FaceLayerSnapshot,
-  opts: { workflowStatus?: string | null; providerStatus?: string | null } = {},
+  opts: {
+    workflowStatus?: string | null;
+    providerStatus?: string | null;
+    /** Owner withdrew face-comparison consent - badge hidden, feature off. */
+    consentWithdrawn?: boolean;
+  } = {},
 ): VerificationPresentationState {
+  // Consent withdrawal overrides the face-layer refinement: identity stays
+  // verified but photo comparison is OFF and the badge is hidden.
+  if (
+    opts.consentWithdrawn &&
+    (identity === "verified" || identity === "requires_reverification")
+  ) {
+    return "consent_withdrawn";
+  }
   // Identity layer first - it gates everything.
   switch (identity) {
     case "not_verified":
@@ -150,5 +164,9 @@ export const FACE_STATE_COPY = {
   action_required: {
     title: "Replace the selected profile photo",
     body: "Your cover photo couldn't be confirmed as you. Choose a clear photo of yourself to keep your verified badge.",
+  },
+  consent_withdrawn: {
+    title: "Photo comparison is turned off",
+    body: "Photo comparison is turned off. Your verified badge is hidden. You can enable it again by giving consent and completing profile verification.",
   },
 } as const;
