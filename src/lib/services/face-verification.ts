@@ -441,7 +441,12 @@ export async function runProfilePhotoVerification(
     where: { id: userId },
     select: { photoVerifiedAt: true },
   });
-  if (!user?.photoVerifiedAt) return null;
+  if (!user?.photoVerifiedAt) {
+    // Epic 6: identity revoked -> Photo Verified is impossible, clear any grant.
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(userId, PhotoClearReason.IDENTITY_REVOKED).catch(() => undefined);
+    return null;
+  }
 
   const previousStatus = job.status;
   await db.profilePhotoVerification.update({
@@ -675,6 +680,26 @@ export async function runProfilePhotoVerification(
       metadata: { riskLevel: decision.riskLevel, photos: results.length },
     });
 
+    // Epic 6: the WORKER owns evaluation/matching but NEVER writes
+    // faceVerifiedAt - it drives the canonical grant engine (which owns the
+    // grant/clear + audit). A MATCH grants (only if identity + a BOUND binding
+    // + consent also hold - the engine re-checks, so a MATCH without a binding
+    // grants nothing); any other outcome clears the positive grant. A superseded
+    // worker already returned above (committed.count===0), so it never grants.
+    // Idempotent + inert while dormant.
+    const { grantPhotoVerification, clearPhotoVerification, PhotoClearReason } =
+      await import("@/lib/services/photo-grant");
+    if (decision.status === "AUTO_VERIFIED") {
+      await grantPhotoVerification(userId).catch(() => undefined);
+    } else {
+      await clearPhotoVerification(
+        userId,
+        decision.status === "MANUAL_REVIEW"
+          ? PhotoClearReason.MANUAL_REVIEW
+          : PhotoClearReason.PHOTO_CHANGED,
+      ).catch(() => undefined);
+    }
+
     if (decision.status === "AUTO_VERIFIED") {
       const { notifyUser } = await import("@/lib/services/notify");
       await notifyUser({
@@ -749,6 +774,11 @@ export async function onProfilePhotosChanged(userId: string, reason: string): Pr
       where: { id: userId },
       data: { faceBadgeSuspendedAt: new Date() },
     });
+    // Epic 6: the positive Photo Verified grant is also provisional on a cover
+    // change - clear it NOW via the canonical clearer (the worker re-grants
+    // only on a fresh MATCH). Idempotent no-op while dormant.
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(userId, PhotoClearReason.PHOTO_CHANGED).catch(() => undefined);
   }
   // C-3: admission is enforced INSIDE enqueue via the canonical gate. An
   // already-existing job is recovery (already admitted); a new one admits
@@ -814,6 +844,14 @@ export async function withdrawFaceConsent(userId: string): Promise<{ withdrawn: 
   }
   // Public badge hidden; identity verdict (photoVerifiedAt) untouched.
   await db.user.update({ where: { id: userId }, data: { faceBadgeSuspendedAt: new Date() } });
+  // Epic 6: consent withdrawal clears the positive Photo Verified grant too.
+  {
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(userId, PhotoClearReason.CONSENT_WITHDRAWN, {
+      actorType: "user",
+      actorId: userId,
+    }).catch(() => undefined);
+  }
 
   await recordVerificationAudit({
     userId,
@@ -832,6 +870,13 @@ export async function deleteFaceVerificationData(userId: string): Promise<void> 
   // active pointer), idempotently and audited, BEFORE dropping local rows.
   const { deleteAllUserReferences } = await import("@/lib/services/face-reference-registry");
   await deleteAllUserReferences(userId, "account_teardown").catch(() => undefined);
+  // Epic 6: account teardown / reference deletion clears the positive grant.
+  {
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(userId, PhotoClearReason.ACCOUNT_DELETED, {
+      actorType: "system",
+    }).catch(() => undefined);
+  }
 
   const job = await db.profilePhotoVerification.findUnique({ where: { userId } });
   if (!job) return;

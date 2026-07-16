@@ -53,6 +53,7 @@ export const PhotoClearReason = {
   PROVIDER_DISABLED: "PROVIDER_DISABLED",
   ACCOUNT_DELETED: "ACCOUNT_DELETED",
   EMERGENCY_DISABLE: "EMERGENCY_DISABLE",
+  IDENTITY_REVOKED: "IDENTITY_REVOKED",
 } as const;
 export type PhotoClearReason = (typeof PhotoClearReason)[keyof typeof PhotoClearReason];
 

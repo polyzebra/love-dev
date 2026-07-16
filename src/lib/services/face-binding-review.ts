@@ -195,6 +195,9 @@ export async function submitBindingReview(input: {
       newStatus: "QUEUED",
       reasonCode: "post_binding",
     });
+    // Epic 6: the worker auto-grants on a MATCH. This call is idempotent
+    // defense-in-depth; `granted` reflects the resulting Photo Verified state
+    // (eligible + granted), whichever caller wrote it.
     const grant = await grantPhotoVerification(userId, { actorId: reviewer.id });
 
     await notify(
@@ -204,7 +207,7 @@ export async function submitBindingReview(input: {
       "Checking your profile photos",
       "Your verification is confirmed. We're checking that your current photos match.",
     );
-    return { ok: true, code: "OK", status: "BOUND", granted: grant.granted && grant.changed };
+    return { ok: true, code: "OK", status: "BOUND", granted: grant.granted };
   }
 
   // ---- BINDING_FAILED: fail closed; clear any grant; account stays usable --
