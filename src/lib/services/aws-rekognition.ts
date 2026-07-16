@@ -1,4 +1,5 @@
 import { createHash, createHmac } from "node:crypto";
+import { faceThresholds } from "@/lib/services/face-thresholds";
 import {
   FaceMatchNotConfiguredError,
   type FaceComparison,
@@ -219,11 +220,13 @@ function bandFor(similarity: number, matchAt: number, mismatchAt: number) {
 }
 function thresholds() {
   const n = (v: string | undefined, d: number) => (Number.isFinite(Number(v)) ? Number(v) : d);
+  // Rekognition similarity is 0-100; our policy layer speaks 0-1, so the
+  // adapter normalizes here (the ONLY place vendor scales exist). The two
+  // similarity cuts come from the ONE versioned threshold source.
+  const t = faceThresholds();
   return {
-    // Rekognition similarity is 0-100; our policy layer speaks 0-1, so the
-    // adapter normalizes here (the ONLY place vendor scales exist).
-    matchAt: n(process.env.FACE_AWS_MATCH_SIMILARITY, 92),
-    mismatchAt: n(process.env.FACE_AWS_MISMATCH_SIMILARITY, 70),
+    matchAt: t.awsMatchSimilarity,
+    mismatchAt: t.awsMismatchSimilarity,
     minFaceConfidence: n(process.env.FACE_AWS_MIN_FACE_CONFIDENCE, 90),
   };
 }

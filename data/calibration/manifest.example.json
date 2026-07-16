@@ -1,0 +1,189 @@
+{
+  "datasetVersion": "example-synthetic-v1",
+  "collectionId": "tirvea-faces-calibration-staging",
+  "environment": "staging",
+  "_comment": "SCHEMA + synthetic dry-run manifest. imagePath 'mock:<bytes>' makes the MOCK provider deterministic (no real AWS, no real faces). A REAL calibration run replaces these with file paths to a dedicated, consented, labeled dataset and points FACE_MATCH_PROVIDER at aws_rekognition_faces with a dedicated non-production collection. Never put secrets or URLs here - only labels, scenario tags, consent references and image paths.",
+  "samples": [
+    {
+      "id": "ref-A",
+      "subjectId": "subjA",
+      "role": "reference",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "ref-B",
+      "subjectId": "subjB",
+      "role": "reference",
+      "consentRef": "consent://calibration/2026-07/subjB",
+      "imagePath": "mock:face:owner"
+    },
+
+    {
+      "id": "A-normal",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "normal",
+      "scenarioTags": ["frontal"],
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-lowlight",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "low_light",
+      "scenarioTags": ["dim"],
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-beard",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "beard",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-glasses",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "glasses",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-hat",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "hat",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-older",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "older_photo",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-crop",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "crop",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:owner"
+    },
+    {
+      "id": "A-sunglasses",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "sunglasses",
+      "scenarioTags": ["occluded"],
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:uncertain"
+    },
+    {
+      "id": "A-sideangle",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "samePerson",
+      "scenario": "side_angle",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:uncertain"
+    },
+
+    {
+      "id": "B-different",
+      "subjectId": "subjB",
+      "role": "probe",
+      "label": "differentPerson",
+      "scenario": "clearly_different",
+      "consentRef": "consent://calibration/2026-07/subjB",
+      "imagePath": "mock:face:other"
+    },
+    {
+      "id": "B-similar",
+      "subjectId": "subjB",
+      "role": "probe",
+      "label": "differentPerson",
+      "scenario": "visually_similar",
+      "consentRef": "consent://calibration/2026-07/subjB",
+      "imagePath": "mock:face:other"
+    },
+    {
+      "id": "B-faceswap",
+      "subjectId": "subjB",
+      "role": "probe",
+      "label": "differentPerson",
+      "scenario": "face_swap",
+      "consentRef": "consent://calibration/2026-07/subjB",
+      "imagePath": "mock:face:other"
+    },
+
+    {
+      "id": "A-ai",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "aiManipulated",
+      "scenario": "synthetic_ai",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:manipulated"
+    },
+    {
+      "id": "A-filtered",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "aiManipulated",
+      "scenario": "filtered",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:manipulated"
+    },
+
+    {
+      "id": "A-group",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "group",
+      "scenario": "group_photo",
+      "consentRef": "consent://calibration/2026-07/subjA",
+      "imagePath": "mock:face:group"
+    },
+
+    {
+      "id": "A-noface",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "nonFace",
+      "scenario": "no_face",
+      "imagePath": "mock:face:none"
+    },
+    {
+      "id": "A-pet",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "nonFace",
+      "scenario": "pet",
+      "imagePath": "mock:face:none"
+    },
+    {
+      "id": "A-landscape",
+      "subjectId": "subjA",
+      "role": "probe",
+      "label": "nonFace",
+      "scenario": "landscape",
+      "imagePath": "mock:face:none"
+    }
+  ]
+}

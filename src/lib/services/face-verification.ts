@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { faceThresholds } from "@/lib/services/face-thresholds";
 import {
   getFaceMatchProvider,
   isFaceMatchConfigured,
@@ -49,15 +50,20 @@ function num(env: string | undefined, fallback: number): number {
 }
 
 export function faceMatchPolicy() {
+  // Similarity/quality/manipulation cuts come from the ONE versioned
+  // threshold source (face-thresholds.ts); defaults are unchanged. The
+  // face-verification-specific knobs (cover dominance, gallery cap,
+  // reference TTL) stay local.
+  const t = faceThresholds();
   return {
     /** similarity >= this -> confident owner match */
-    matchThreshold: num(process.env.FACE_MATCH_THRESHOLD, 0.85),
+    matchThreshold: t.matchThreshold,
     /** similarity <= this (with a face present) -> confident mismatch */
-    mismatchThreshold: num(process.env.FACE_MISMATCH_THRESHOLD, 0.4),
+    mismatchThreshold: t.mismatchThreshold,
     /** best-face quality below this -> UNCERTAIN, never a verdict */
-    minQuality: num(process.env.FACE_MIN_QUALITY, 0.5),
+    minQuality: t.minQuality,
     /** manipulation risk >= this -> MANIPULATION_RISK */
-    manipulationThreshold: num(process.env.FACE_MANIPULATION_THRESHOLD, 0.8),
+    manipulationThreshold: t.manipulationRiskThreshold,
     /** cover dominant-face area ratio below this -> not a valid cover face */
     coverMinDominance: num(process.env.FACE_COVER_MIN_DOMINANCE, 0.2),
     /** gallery OTHER_PERSON_ONLY count that suspends the badge */
@@ -66,6 +72,8 @@ export function faceMatchPolicy() {
     referenceTtlDays: num(process.env.FACE_REFERENCE_TTL_DAYS, 365),
   };
 }
+
+export type FaceMatchPolicy = ReturnType<typeof faceMatchPolicy>;
 
 export type PhotoClassification = {
   classification: FaceCheckClassification;
@@ -81,9 +89,11 @@ export type PhotoClassification = {
 export function classifyComparison(
   cmp: FaceComparison,
   manipulationRisk: number | null,
-  opts: { isCover: boolean },
+  opts: { isCover: boolean; policy?: FaceMatchPolicy },
 ): PhotoClassification {
-  const p = faceMatchPolicy();
+  // Calibration passes a CANDIDATE policy to re-score captured comparisons
+  // under trial thresholds without new AWS calls; production passes none.
+  const p = opts.policy ?? faceMatchPolicy();
 
   if (manipulationRisk !== null && manipulationRisk >= p.manipulationThreshold) {
     return {

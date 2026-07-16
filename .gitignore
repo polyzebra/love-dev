@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Calibration reports (generated; never commit biometric-derived output)
+reports/calibration/

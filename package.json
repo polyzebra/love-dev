@@ -15,6 +15,7 @@
     "db:studio": "prisma studio",
     "format:check": "prettier --check src prisma",
     "face:preflight": "tsx scripts/face-preflight.ts",
+    "face:calibrate": "tsx scripts/face-calibrate.ts",
     "test": "node scripts/run-tests.mjs",
     "perf:bundle": "node scripts/bundle-report.mjs",
     "perf:check": "node scripts/bundle-report.mjs --check",
