@@ -40,6 +40,7 @@ const LIVE = new Set([
   "face-final-blockers.test.ts",
   "face-remediation.test.ts",
   "face-consent-withdrawal.test.ts",
+  "face-consent-liveness-guard.test.ts",
   "ops-alerts.test.ts",
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",

@@ -5,6 +5,7 @@ import { faceEnvironment } from "@/lib/services/face-rollout";
 import {
   enqueueProfilePhotoVerification,
   recordVerificationAudit,
+  BIOMETRIC_CONSENT_VERSION,
 } from "@/lib/services/face-verification";
 import { enrollReferenceSaga } from "@/lib/services/face-reference-registry";
 
@@ -107,6 +108,19 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
       where: { id: session.id },
       data: { status: "EXPIRED" },
     });
+    return { state: "denied" };
+  }
+
+  // Consent guard (H1): NEVER enrol a biometric reference without CURRENT
+  // consent. Consent withdrawal clears the job's consent and invalidates open
+  // sessions; this second check closes the race where an in-flight capture is
+  // consumed after withdrawal (mirrors the run-path guard). No provider call
+  // or IndexFaces happens without it.
+  const consentJob = await db.profilePhotoVerification.findUnique({
+    where: { id: session.verificationId },
+    select: { consentAt: true, consentVersion: true },
+  });
+  if (!consentJob?.consentAt || consentJob.consentVersion !== BIOMETRIC_CONSENT_VERSION) {
     return { state: "denied" };
   }
 

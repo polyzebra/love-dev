@@ -782,6 +782,12 @@ export async function onProfilePhotosChanged(userId: string, reason: string): Pr
 export async function withdrawFaceConsent(userId: string): Promise<{ withdrawn: boolean }> {
   const job = await db.profilePhotoVerification.findUnique({ where: { userId } });
 
+  // H1: invalidate any OPEN liveness session FIRST, so an in-flight capture
+  // cannot be consumed into a new (post-withdrawal) reference that would
+  // escape the deletion below. Mirrors rotateReference / request_new_selfie.
+  const { invalidateOpenLivenessSessions } = await import("@/lib/services/face-liveness");
+  await invalidateOpenLivenessSessions(userId).catch(() => undefined);
+
   // Provider reference deletion (idempotent; retried by the registry sweep
   // on vendor outage). Runs whether or not a job row exists.
   const { deleteAllUserReferences } = await import("@/lib/services/face-reference-registry");
