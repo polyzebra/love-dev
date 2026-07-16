@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
 import { Aurora } from "@/components/fx/aurora";
+import { AuthChromeFooter } from "@/components/auth/AuthChromeFooter";
 
 /**
  * Auth chrome ONLY: aurora, wordmark, legal footer, centring. The glass
@@ -24,17 +24,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main className="relative flex flex-1 items-center justify-center px-4 pb-16">
         {children}
       </main>
-      <footer className="safe-bottom text-muted-foreground relative pb-6 text-center text-xs">
-        By continuing you agree to our{" "}
-        <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
-          Terms
-        </Link>{" "}
-        and{" "}
-        <Link href="/legal/privacy" className="hover:text-foreground underline underline-offset-2">
-          Privacy Policy
-        </Link>
-        .
-      </footer>
+      <AuthChromeFooter />
     </div>
   );
 }

@@ -106,6 +106,30 @@ async function main() {
     assert.ok(html.includes("Continue with Email"), "/login owns the email row");
   });
 
+  console.log("login chooser: exactly one legal notice, providers render immediately");
+  await check(
+    "/login renders exactly ONE legal notice (card owns it; layout footer suppressed)",
+    async () => {
+      const res = await get("/login", "mobile");
+      assert.equal(res.status, 200);
+      const html = await res.text();
+      const notices = html.split("By continuing").length - 1;
+      assert.equal(notices, 1, `expected exactly one legal notice, found ${notices}`);
+      // The canonical card notice keeps all three required links.
+      assert.ok(html.includes("Cookie Policy"), "Cookie Policy link preserved");
+      assert.ok(html.includes("Terms of Use"), "Terms link preserved");
+    },
+  );
+  await check("/login paints Google/Email/phone immediately (no lone spinner slot)", async () => {
+    const res = await get("/login", "mobile");
+    const html = await res.text();
+    // The button label is in the SSR HTML - the provider renders from
+    // server/build config, not behind a client availability fetch.
+    assert.ok(html.includes("Continue with Google"), "Google label rendered server-side");
+    assert.ok(html.includes("Continue with Email"), "Email rendered");
+    assert.ok(html.includes("Continue with phone number"), "phone rendered");
+  });
+
   console.log("email-attach step is never a trap - it always offers exits");
   await check("/auth/email renders 'Back to sign-in options' and 'Sign out' exits", async () => {
     const res = await get("/auth/email", "mobile");

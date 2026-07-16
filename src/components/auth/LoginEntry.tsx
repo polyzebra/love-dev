@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Loader2, Mail, Smartphone } from "lucide-react";
@@ -54,6 +54,13 @@ export function AppleIcon() {
     </svg>
   );
 }
+
+/**
+ * Bounded recovery for a launch that never navigates. OAuth normally
+ * redirects the tab in well under a second; this is only the backstop that
+ * guarantees the button can never spin forever.
+ */
+const OAUTH_LAUNCH_TIMEOUT_MS = 8000;
 
 /** Shared face for every entry row - link or action, same geometry. */
 const ENTRY_BUTTON_CLASS =
@@ -144,16 +151,55 @@ export function LoginEntry({
   /** ?error=... from /auth/callback redirects, resolved by the server page. */
   errorCode?: string;
 }) {
+  // `pending` is ONLY the "this provider's OAuth launch is in flight" state -
+  // it starts null on every mount, spins just the tapped button, and is a
+  // transient launch flag, never a persisted or availability signal. The
+  // buttons themselves render from server/build-known config (props + the
+  // NEXT_PUBLIC apple flag), so a provider never disappears behind a check.
   const [pending, setPending] = useState<"google" | "apple" | null>(null);
   const appleEnabled = appleLoginEnabled();
   // Hard loads must paint the card fully visible - the entrance only
   // animates for post-hydration mounts (client-side navigations).
   const animatable = useEntranceAnimatable();
+  // The bounded launch-recovery timer (see startOAuth); cleared on unmount.
+  const launchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!errorCode) return;
     toast.error(CALLBACK_ERROR_MESSAGES[errorCode] ?? "Sign-in failed. Please try again.");
   }, [errorCode]);
+
+  // Self-healing launch state. signInWithOAuth navigates the WHOLE tab away;
+  // if the user comes back without completing (canceled the Google screen,
+  // browser Back, or iOS Safari restoring this page from the BFCache), the
+  // document can be resurrected with `pending` frozen true - the stuck
+  // spinner that only a manual refresh cleared. Reset it on every "the user
+  // is looking at this page again" signal so the button recovers on its own.
+  useEffect(() => {
+    const clearPending = () => {
+      if (launchTimer.current) {
+        clearTimeout(launchTimer.current);
+        launchTimer.current = null;
+      }
+      setPending(null);
+    };
+    // pageshow.persisted === true is the definitive BFCache-restore signal.
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) clearPending();
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") clearPending();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("focus", clearPending);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("focus", clearPending);
+      document.removeEventListener("visibilitychange", onVisible);
+      if (launchTimer.current) clearTimeout(launchTimer.current);
+    };
+  }, []);
 
   // Supabase browser client OAuth; prompt=select_account forces the
   // account chooser so switching accounts is always explicit.
@@ -169,6 +215,16 @@ export function LoginEntry({
       return;
     }
     setPending(provider);
+    // Safety net: signInWithOAuth should redirect the tab within a moment.
+    // If it hasn't (call hung, redirect swallowed, blocked), un-stick the
+    // button so the launch state can never be permanent even if the
+    // visibility handlers above never fire.
+    if (launchTimer.current) clearTimeout(launchTimer.current);
+    launchTimer.current = setTimeout(() => {
+      launchTimer.current = null;
+      setPending(null);
+    }, OAUTH_LAUNCH_TIMEOUT_MS);
+
     const { error } = await (
       await supabaseBrowser()
     ).auth.signInWithOAuth({
@@ -179,8 +235,14 @@ export function LoginEntry({
       },
     });
     if (error) {
+      if (launchTimer.current) {
+        clearTimeout(launchTimer.current);
+        launchTimer.current = null;
+      }
       setPending(null);
-      toast.error("Couldn't start sign-in. Please try again.");
+      toast.error(
+        `${provider === "google" ? "Google" : "Apple"} sign-in is temporarily unavailable. Try again.`,
+      );
     }
   }
 
