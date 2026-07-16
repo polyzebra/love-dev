@@ -583,6 +583,16 @@ export async function moderatePhoto(photoId: string): Promise<ModeratePhotoOutco
     }
   });
 
+  // M2: an automated moderation decision changed the photo's visibility state -
+  // a trust-affecting profile mutation. Re-drive the canonical Trust Engine so
+  // Photo Verified is (re)granted or cleared from the CURRENT cover, never from
+  // moderation-specific logic. No-op while the face layer is dormant.
+  const { onProfilePhotosChanged } = await import("@/lib/services/face-verification");
+  await onProfilePhotosChanged(
+    photo.userId,
+    photo.isCover ? "cover_changed" : "photo_moderated",
+  ).catch(() => undefined);
+
   // Case + graduated enforcement OUTSIDE the photo transaction: the photo
   // state must land even if case/violation writes hit a transient error.
   let caseId: string | null = null;

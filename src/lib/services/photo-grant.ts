@@ -209,17 +209,46 @@ export async function grantPhotoVerification(
     where: { id: userId, faceVerifiedAt: null },
     data: { faceVerifiedAt: new Date() },
   });
-  const changed = res.count > 0;
-  if (changed) {
+  if (res.count === 0) {
+    // Already granted (idempotent). A live grant is never stale: every
+    // invalidating path clears faceVerifiedAt after its change, so its presence
+    // means nothing has invalidated it since.
+    return { granted: true, changed: false, reason: PhotoGrantReason.ELIGIBLE };
+  }
+
+  // M1: close the evaluate->write TOCTOU. Re-validate EVERY condition at the
+  // moment of the write. If an eligibility change (consent withdrawn, identity
+  // revoked, binding invalidated, rotation, emergency, status change) landed
+  // between the evaluation and this write, undo the grant. Combined with the
+  // invalidating paths - which each clear faceVerifiedAt AFTER their change -
+  // this leaves NO interleaving in which a stale grant persists: either their
+  // clear sees our now-non-null write and clears it, or our re-check sees their
+  // change and clears our write. Only runs on a fresh grant (rare), so no
+  // meaningful perf cost.
+  const recheck = await evaluatePhotoGrant(userId);
+  if (!recheck.eligible) {
+    await db.user.updateMany({
+      where: { id: userId, faceVerifiedAt: { not: null } },
+      data: { faceVerifiedAt: null },
+    });
     await recordVerificationAudit({
       userId,
-      eventType: AUDIT.granted,
+      eventType: AUDIT.refused,
       actorType: "system",
       actorId: opts.actorId ?? null,
-      reasonCode: PhotoGrantReason.ELIGIBLE,
+      reasonCode: recheck.reason,
     });
+    return { granted: false, changed: false, reason: recheck.reason };
   }
-  return { granted: true, changed, reason: PhotoGrantReason.ELIGIBLE };
+
+  await recordVerificationAudit({
+    userId,
+    eventType: AUDIT.granted,
+    actorType: "system",
+    actorId: opts.actorId ?? null,
+    reasonCode: PhotoGrantReason.ELIGIBLE,
+  });
+  return { granted: true, changed: true, reason: PhotoGrantReason.ELIGIBLE };
 }
 
 /**

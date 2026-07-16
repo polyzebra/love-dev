@@ -17,7 +17,7 @@ export async function POST(_req: Request, { params }: Params) {
 
   const photo = await db.photo.findUnique({
     where: { id },
-    select: { id: true, userId: true, moderation: true },
+    select: { id: true, userId: true, moderation: true, isCover: true },
   });
   if (!photo) return notFound("Photo");
 
@@ -52,6 +52,15 @@ export async function POST(_req: Request, { params }: Params) {
   await sendSafetyNotice(photo.userId, "photo_approved", `photo:${photo.id}:staff-approved`, {
     photoId: photo.id,
   });
+
+  // M2: a photo activation is a trust-affecting profile mutation - re-drive the
+  // canonical Trust Engine exactly like any other photo change (no
+  // moderation-specific badge logic). No-op while the face layer is dormant.
+  const { onProfilePhotosChanged } = await import("@/lib/services/face-verification");
+  await onProfilePhotosChanged(
+    photo.userId,
+    photo.isCover ? "cover_changed" : "photo_moderated",
+  ).catch(() => undefined);
 
   return ok({ id: photo.id, moderation: "APPROVED", status: "ACTIVE" });
 }

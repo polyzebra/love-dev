@@ -27,7 +27,7 @@ export async function POST(req: Request, { params }: Params) {
 
   const photo = await db.photo.findUnique({
     where: { id },
-    select: { id: true, userId: true, moderation: true },
+    select: { id: true, userId: true, moderation: true, isCover: true },
   });
   if (!photo) return notFound("Photo");
 
@@ -62,6 +62,15 @@ export async function POST(req: Request, { params }: Params) {
   await sendSafetyNotice(photo.userId, "photo_removed", `photo:${photo.id}:staff-rejected`, {
     photoId: photo.id,
   });
+
+  // M2: a photo deactivation is a trust-affecting profile mutation - re-drive
+  // the canonical Trust Engine (a rejected cover -> the cover is no longer
+  // confirmable -> the worker withholds/clears). No-op while dormant.
+  const { onProfilePhotosChanged } = await import("@/lib/services/face-verification");
+  await onProfilePhotosChanged(
+    photo.userId,
+    photo.isCover ? "cover_changed" : "photo_moderated",
+  ).catch(() => undefined);
 
   return ok({ id: photo.id, moderation: "REJECTED", status: "REJECTED" });
 }

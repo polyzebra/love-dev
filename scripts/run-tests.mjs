@@ -48,6 +48,7 @@ const LIVE = new Set([
   "human-review-binding.test.ts",
   "trust-rehearsal.test.ts",
   "trust-activation.test.ts",
+  "trust-hardening.test.ts",
   "ops-alerts.test.ts",
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",

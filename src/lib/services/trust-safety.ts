@@ -849,7 +849,8 @@ export async function reverseViolation(
   opts: { now?: Date } = {},
 ): Promise<{ restoredStatus: AccountStatus; restoredPhotoIds: string[] }> {
   const now = opts.now ?? new Date();
-  return db.$transaction(async (tx) => {
+  let restoredCoverUserId: string | null = null;
+  const result = await db.$transaction(async (tx) => {
     const violation = await tx.accountViolation.findUniqueOrThrow({
       where: { id: violationId },
       include: { moderationCase: { select: { id: true, photoId: true } } },
@@ -869,13 +870,14 @@ export async function reverseViolation(
     if (photoId) {
       const photo = await tx.photo.findUnique({
         where: { id: photoId },
-        select: { id: true, status: true, moderation: true },
+        select: { id: true, status: true, moderation: true, isCover: true },
       });
       if (photo && (photo.status === "REJECTED" || photo.moderation === "REJECTED")) {
         await tx.photo.update({
           where: { id: photoId },
           data: { status: "ACTIVE", moderation: "APPROVED", moderatedAt: now },
         });
+        if (photo.isCover) restoredCoverUserId = violation.userId;
         await tx.photoModerationEvent.create({
           data: {
             photoId,
@@ -926,6 +928,16 @@ export async function reverseViolation(
 
     return { restoredStatus, restoredPhotoIds };
   });
+
+  // M2: restoring a rejected COVER is a trust-affecting profile mutation.
+  // Re-drive the canonical Trust Engine (the worker re-grants only on a fresh
+  // MATCH) instead of any moderation-specific badge logic. No-op while dormant.
+  if (restoredCoverUserId) {
+    const { onProfilePhotosChanged } = await import("@/lib/services/face-verification");
+    await onProfilePhotosChanged(restoredCoverUserId, "cover_changed").catch(() => undefined);
+  }
+
+  return result;
 }
 
 /**

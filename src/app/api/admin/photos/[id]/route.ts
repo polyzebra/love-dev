@@ -67,5 +67,14 @@ export async function DELETE(_req: Request, { params }: Params) {
     },
   });
 
+  // M2: staff removal is a trust-affecting profile mutation. Deleting the cover
+  // (or promoting a replacement) must re-drive the canonical Trust Engine, same
+  // as an owner-initiated cover change. No-op while the face layer is dormant.
+  const { onProfilePhotosChanged } = await import("@/lib/services/face-verification");
+  await onProfilePhotosChanged(
+    photo.userId,
+    photo.isCover ? "cover_changed" : "photo_moderated",
+  ).catch(() => undefined);
+
   return ok({ deleted: true });
 }
