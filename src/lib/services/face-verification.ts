@@ -237,6 +237,10 @@ export async function enqueueProfilePhotoVerification(
   const decision = await admitToFaceVerification(userId, {
     country: opts.country,
     isRecovery: opts.isRecovery,
+    // Granting consent in THIS enqueue (first liveness) -> pass it so admit
+    // doesn't chicken-and-egg on a row that hasn't been written yet.
+    // Otherwise admit reads the stored consent on the job row.
+    hasActiveConsent: opts.consent ? true : undefined,
   });
   if (!decision.admit) return false;
   const provider = getFaceMatchProvider();

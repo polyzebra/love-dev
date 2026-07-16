@@ -279,9 +279,9 @@ async function main() {
       process.env.FACE_VERIFICATION_COUNTRY_ALLOWLIST = "GB";
       try {
         const frank = await mkUser("frank", "06", "IE");
-        const d = await admitToFaceVerification(frank, { country: "IE" });
+        const d = await admitToFaceVerification(frank, { country: "IE", hasActiveConsent: true });
         assert.equal(d.admit, false, "IE not in GB allowlist");
-        const d2 = await admitToFaceVerification(frank, { country: "GB" });
+        const d2 = await admitToFaceVerification(frank, { country: "GB", hasActiveConsent: true });
         assert.equal(d2.admit, true);
       } finally {
         delete process.env.FACE_VERIFICATION_COUNTRY_ALLOWLIST;
@@ -294,9 +294,9 @@ async function main() {
         assert.equal((await admitToFaceVerification(alice, { isRecovery: true })).admit, false);
       } finally {
         delete process.env.FACE_EMERGENCY_DISABLE;
-  // hermetic: the mock capture-handle path must not pick up a real STS
-  // role from .env (the dedicated STS test sets/clears it explicitly).
-  delete process.env.FACE_LIVENESS_ROLE_ARN;
+        // hermetic: the mock capture-handle path must not pick up a real STS
+        // role from .env (the dedicated STS test sets/clears it explicitly).
+        delete process.env.FACE_LIVENESS_ROLE_ARN;
       }
     });
     await check("photo-change path and webhook path agree on admission", async () => {

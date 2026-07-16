@@ -12,7 +12,9 @@ import { enqueueProfilePhotoVerification } from "../../src/lib/services/face-ver
  * capture does.
  */
 export async function enrollReference(userId: string): Promise<void> {
-  await enqueueProfilePhotoVerification(userId, "test_enroll");
+  // A real liveness capture GRANTS biometric consent; stamp it so the
+  // enqueue clears the consent admission gate (admitToFaceVerification #4).
+  await enqueueProfilePhotoVerification(userId, "test_enroll", { consent: true });
   const created = await createBoundLivenessSession(userId);
   if ("error" in created) throw new Error(`liveness create failed`);
   const r = await consumeLivenessFlow(created.flowId, userId);

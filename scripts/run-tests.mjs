@@ -59,6 +59,7 @@ const UNIT = new Set([
   "login-view.test.ts",
   "login-entry-lifecycle.test.ts",
   "verification-badge-consistency.test.ts",
+  "face-internal-allowlist.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

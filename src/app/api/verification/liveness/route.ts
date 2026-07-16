@@ -48,7 +48,13 @@ export async function POST(req: Request) {
   if (!isFaceMatchConfigured() || !faceRolloutConfig().livenessEnabled) {
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   }
-  const admit = await admitToFaceVerification(user.id, { country: me.profile?.country });
+  // Consent is being GRANTED in this request (the body's consentVersion was
+  // validated === BIOMETRIC_CONSENT_VERSION above), and is stamped on the job
+  // row right below - so tell admit consent is active for this call.
+  const admit = await admitToFaceVerification(user.id, {
+    country: me.profile?.country,
+    hasActiveConsent: true,
+  });
   if (!admit.admit)
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   const providerName = getFaceMatchProvider().name;
