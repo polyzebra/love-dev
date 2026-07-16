@@ -239,6 +239,15 @@ async function sendExternalAlert(payload: {
 }
 
 /**
+ * Whether an external alert channel is wired (webhook env or an injected
+ * transport) - a read-only gate check with NO delivery/side effect. Use
+ * this for status views; use sendTestOpsAlert to actually exercise it.
+ */
+export function isExternalAlertChannelConfigured(): boolean {
+  return Boolean(externalAlertTransportOverride || process.env.ALERT_WEBHOOK_URL?.trim());
+}
+
+/**
  * Admin/CLI DRY-RUN: deliver a synthetic alert through the EXTERNAL channel
  * ONLY (no admin outbox, no audit) to verify the wiring end to end. Returns
  * whether a channel is configured and whether it accepted the message.
@@ -247,9 +256,7 @@ async function sendExternalAlert(payload: {
 export async function sendTestOpsAlert(
   note = "manual dry-run",
 ): Promise<{ channelConfigured: boolean; delivered: boolean }> {
-  const channelConfigured = Boolean(
-    externalAlertTransportOverride || process.env.ALERT_WEBHOOK_URL?.trim(),
-  );
+  const channelConfigured = isExternalAlertChannelConfigured();
   const delivered = await sendExternalAlert({
     kind: "ops_alert_test",
     severity: "warning",
