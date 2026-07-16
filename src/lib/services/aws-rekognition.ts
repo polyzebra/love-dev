@@ -65,6 +65,33 @@ export function awsRekognitionConfigured(): boolean {
   return Boolean(cfg.accessKeyId && cfg.secretAccessKey && cfg.collectionId);
 }
 
+/**
+ * READ-ONLY preflight: one ListFaces(MaxResults=1) against the configured
+ * collection with the RUNTIME credentials. Verifies in a single call that
+ * credentials resolve, the region is approved + consistent (enforced inside
+ * call()), the collection EXISTS, and IAM permits the runtime read path -
+ * WITHOUT indexing, comparing, deleting or otherwise mutating anything and
+ * WITHOUT any user image. Errors are normalized (AWS error TYPE only - e.g.
+ * AccessDeniedException / ResourceNotFoundException); never raw payloads,
+ * never secrets. Used by the face:preflight command.
+ */
+export async function rekognitionReadPreflight(): Promise<
+  | { ok: true; faceModelVersion: string | null; sampledFaces: number }
+  | { ok: false; errorType: string }
+> {
+  const cfg = awsConfig();
+  try {
+    const res = await call("ListFaces", { CollectionId: cfg.collectionId, MaxResults: 1 });
+    return {
+      ok: true,
+      faceModelVersion: typeof res.FaceModelVersion === "string" ? res.FaceModelVersion : null,
+      sampledFaces: Array.isArray(res.Faces) ? res.Faces.length : 0,
+    };
+  } catch (error) {
+    return { ok: false, errorType: error instanceof Error ? error.message : "unknown_error" };
+  }
+}
+
 /** Injectable transport: (target, payload) -> parsed JSON response. */
 export type RekognitionTransport = (
   target: string,

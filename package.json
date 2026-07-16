@@ -14,6 +14,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "format:check": "prettier --check src prisma",
+    "face:preflight": "tsx scripts/face-preflight.ts",
     "test": "node scripts/run-tests.mjs",
     "perf:bundle": "node scripts/bundle-report.mjs",
     "perf:check": "node scripts/bundle-report.mjs --check",
