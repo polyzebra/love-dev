@@ -104,6 +104,20 @@ export function resetBindingProviders(): void {
   providerOverrides.clear();
 }
 
+// Production registration: a real provider module self-registers a FACTORY
+// that returns its singleton ONLY when the method is configured + approved,
+// and null otherwise. Registering a factory is NOT enabling a provider - it
+// stays dormant until the factory's own config gate passes.
+type BindingProviderFactory = () => FaceBindingProvider | null;
+const productionFactories = new Map<FaceBindingMethod, BindingProviderFactory>();
+
+export function registerBindingProviderFactory(
+  method: FaceBindingMethod,
+  factory: BindingProviderFactory,
+): void {
+  productionFactories.set(method, factory);
+}
+
 /**
  * Resolve the configured method from env (FACE_BINDING_METHOD). Dormant by
  * default: unset / unrecognized -> UNKNOWN. Accepts a friendly alias
@@ -125,12 +139,17 @@ export function bindingMethodFromEnv(): BindingMethodSelection {
 }
 
 /**
- * Select the provider for a method. NO real provider is registered in this
- * Epic, so this returns null in production (only a test override resolves).
+ * Select the provider for a method. Resolution order: a test override, then a
+ * registered production factory (which itself returns null unless configured +
+ * approved). Dormant by default: no override, no factory (or an unconfigured
+ * factory) -> null -> the engine returns NOT_IMPLEMENTED.
  */
 export function getBindingProvider(method: BindingMethodSelection): FaceBindingProvider | null {
   if (method === "UNKNOWN") return null;
-  return providerOverrides.get(method) ?? null;
+  const override = providerOverrides.get(method);
+  if (override) return override;
+  const factory = productionFactories.get(method);
+  return factory ? factory() : null;
 }
 
 // -------------------------------------------------------- transitions
@@ -368,13 +387,19 @@ export const FaceBindingEngine = {
   ): Promise<EngineResult> {
     const binding = await db.faceIdentityBinding.findUnique({ where: { id: bindingId } });
     if (!binding) return { code: "NOT_FOUND", status: null, bindingId };
+    // Idempotent: an already-decided binding re-asserts without a second write
+    // or audit (safe double-submit / admin replay).
+    if (binding.status === decision) return { code: "OK", status: decision, bindingId };
     // Validate BEFORE writing any review metadata - an illegal decision leaves
     // the binding (and reviewer fields) untouched.
     if (!canTransition(binding.status, decision)) {
       return { code: "ILLEGAL_TRANSITION", status: binding.status, bindingId };
     }
-    await db.faceIdentityBinding.update({
-      where: { id: bindingId },
+    // Atomic optimistic guard (Phase 13): only write if the binding is STILL in
+    // the state we validated. Two simultaneous reviewers -> exactly one wins;
+    // the loser sees the changed state and gets ILLEGAL_TRANSITION.
+    const res = await db.faceIdentityBinding.updateMany({
+      where: { id: bindingId, status: binding.status },
       data: {
         status: decision,
         reviewedById: reviewer.id,
@@ -384,6 +409,9 @@ export const FaceBindingEngine = {
         boundAt: decision === "BOUND" ? new Date() : undefined,
       },
     });
+    if (res.count === 0) {
+      return { code: "ILLEGAL_TRANSITION", status: binding.status, bindingId };
+    }
     await auditBinding(
       binding.userId,
       BindingEvent.BindingReviewCompleted,

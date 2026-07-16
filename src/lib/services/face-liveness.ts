@@ -193,6 +193,28 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
   });
   // Resume the SAME canonical job (recovery admission - already admitted).
   await enqueueProfilePhotoVerification(userId, "liveness_passed", { isRecovery: true });
+  // Epic 3: if human binding review is the configured + legally-approved
+  // method, open an identity<->face review for this fresh reference so it
+  // appears in the admin queue. DORMANT no-op otherwise. Best-effort - it must
+  // never break enrollment.
+  try {
+    const { humanReviewConfigured, requestHumanReviewBinding } =
+      await import("@/lib/services/human-review-binding");
+    if (humanReviewConfigured()) {
+      const ref = await db.faceReferenceRecord.findFirst({
+        where: { userId, status: "LINKED" },
+        orderBy: { referenceVersion: "desc" },
+        select: { id: true },
+      });
+      await requestHumanReviewBinding({
+        userId,
+        faceReferenceId: ref?.id ?? null,
+        livenessFlowId: flowId,
+      });
+    }
+  } catch {
+    // binding request is advisory; enrollment already succeeded.
+  }
   return { state: "checking_profile_photos" };
 }
 

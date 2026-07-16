@@ -64,19 +64,19 @@ function main() {
     assert.equal(isPhotoVerified({ faceVerifiedAt: D }), true);
   });
 
-  // ---- dormancy invariant: only the engine + helper touch faceVerifiedAt --
+  // ---- dormancy invariant: only the engine + helper CONSUME faceVerifiedAt -
   check("faceVerifiedAt is confined to the helper + the grant engine (no UI/route)", () => {
+    // Scan CODE only - strip comments so doc-comments that merely mention
+    // "does not set faceVerifiedAt" (grant/binding services, review route) do
+    // not count as consumption.
+    const stripComments = (s: string) =>
+      s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
     const files = walk("src");
-    const hits = files.filter((f) => readFileSync(f, "utf8").includes("faceVerifiedAt"));
-    // Post-F2 the allowed set is: the canonical helper (read), the grant
-    // engine (the ONE writer), and the rotation clear-wiring (comment + call).
-    const allowed = [
-      "src/lib/services/verification.ts",
-      "src/lib/services/photo-grant.ts",
-      "src/lib/services/face-reference.ts",
-    ];
-    for (const h of hits) assert.ok(allowed.includes(h), `unexpected faceVerifiedAt reference: ${h}`);
-    // No UI component and no route/public surface may reference it (dormant).
+    const hits = files.filter((f) => stripComments(readFileSync(f, "utf8")).includes("faceVerifiedAt"));
+    // In CODE, faceVerifiedAt lives ONLY in the canonical helper (reads it) and
+    // the grant engine (the ONE writer). No service, route or UI consumes it.
+    const allowed = ["src/lib/services/verification.ts", "src/lib/services/photo-grant.ts"];
+    for (const h of hits) assert.ok(allowed.includes(h), `unexpected faceVerifiedAt code reference: ${h}`);
     assert.ok(!hits.some((h) => h.endsWith(".tsx")), "no UI reads faceVerifiedAt");
     assert.ok(!hits.some((h) => h.startsWith("src/app/")), "no route/public surface reads it");
     // Exactly ONE writer: only photo-grant.ts writes the column.
