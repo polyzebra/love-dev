@@ -1211,6 +1211,40 @@ export type EnumFaceReferenceRecordStatusWithAggregatesFilter<$PrismaModel = nev
   _max?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
 }
 
+export type EnumFaceBindingMethodFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingMethod | Prisma.EnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingMethodFilter<$PrismaModel> | $Enums.FaceBindingMethod
+}
+
+export type EnumFaceBindingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingStatus | Prisma.EnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingStatusFilter<$PrismaModel> | $Enums.FaceBindingStatus
+}
+
+export type EnumFaceBindingMethodWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingMethod | Prisma.EnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingMethodWithAggregatesFilter<$PrismaModel> | $Enums.FaceBindingMethod
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceBindingMethodFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceBindingMethodFilter<$PrismaModel>
+}
+
+export type EnumFaceBindingStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingStatus | Prisma.EnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingStatusWithAggregatesFilter<$PrismaModel> | $Enums.FaceBindingStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceBindingStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceBindingStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -2354,6 +2388,40 @@ export type NestedEnumFaceReferenceRecordStatusWithAggregatesFilter<$PrismaModel
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFaceReferenceRecordStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceBindingMethodFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingMethod | Prisma.EnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingMethodFilter<$PrismaModel> | $Enums.FaceBindingMethod
+}
+
+export type NestedEnumFaceBindingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingStatus | Prisma.EnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingStatusFilter<$PrismaModel> | $Enums.FaceBindingStatus
+}
+
+export type NestedEnumFaceBindingMethodWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingMethod | Prisma.EnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingMethod[] | Prisma.ListEnumFaceBindingMethodFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingMethodWithAggregatesFilter<$PrismaModel> | $Enums.FaceBindingMethod
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceBindingMethodFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceBindingMethodFilter<$PrismaModel>
+}
+
+export type NestedEnumFaceBindingStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FaceBindingStatus | Prisma.EnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FaceBindingStatus[] | Prisma.ListEnumFaceBindingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFaceBindingStatusWithAggregatesFilter<$PrismaModel> | $Enums.FaceBindingStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFaceBindingStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFaceBindingStatusFilter<$PrismaModel>
 }
 
 

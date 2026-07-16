@@ -45,6 +45,27 @@ export function isPubliclyVerified(user: {
   return user.photoVerifiedAt !== null && !user.faceBadgeSuspendedAt;
 }
 
+/**
+ * Identity-only public fact (Epic 1 / F1): the account holder passed identity
+ * verification. Same semantics as today's photoVerifiedAt check - the future
+ * "Identity Verified" badge reads this. Does NOT assert photo-to-face match.
+ */
+export function isIdentityVerified(user: { photoVerifiedAt: Date | null }): boolean {
+  return user.photoVerifiedAt !== null;
+}
+
+/**
+ * Positive "Photo Verified" grant (Epic 1 / F1). The future public badge that
+ * means "these photos are the identity-verified person". INERT in this phase:
+ * nothing writes User.faceVerifiedAt yet, so this is false for everyone, and
+ * NO UI / list filter / worker / query consumes it. It exists only so later
+ * epics have the ONE canonical positive signal to build on. `faceVerifiedAt`
+ * is optional so legacy callers that never select it safely read false.
+ */
+export function isPhotoVerified(user: { faceVerifiedAt?: Date | null }): boolean {
+  return user.faceVerifiedAt != null;
+}
+
 /** Select fragment - extend an existing user query instead of re-querying. */
 export const VERIFICATION_USER_SELECT = {
   emailVerified: true,

@@ -302,6 +302,7 @@ export type FaceReferenceRecordWhereInput = {
   deletedAt?: Prisma.DateTimeNullableFilter<"FaceReferenceRecord"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   verification?: Prisma.XOR<Prisma.ProfilePhotoVerificationScalarRelationFilter, Prisma.ProfilePhotoVerificationWhereInput>
+  bindings?: Prisma.FaceIdentityBindingListRelationFilter
 }
 
 export type FaceReferenceRecordOrderByWithRelationInput = {
@@ -322,6 +323,7 @@ export type FaceReferenceRecordOrderByWithRelationInput = {
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   verification?: Prisma.ProfilePhotoVerificationOrderByWithRelationInput
+  bindings?: Prisma.FaceIdentityBindingOrderByRelationAggregateInput
 }
 
 export type FaceReferenceRecordWhereUniqueInput = Prisma.AtLeast<{
@@ -345,6 +347,7 @@ export type FaceReferenceRecordWhereUniqueInput = Prisma.AtLeast<{
   deletedAt?: Prisma.DateTimeNullableFilter<"FaceReferenceRecord"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   verification?: Prisma.XOR<Prisma.ProfilePhotoVerificationScalarRelationFilter, Prisma.ProfilePhotoVerificationWhereInput>
+  bindings?: Prisma.FaceIdentityBindingListRelationFilter
 }, "id" | "idempotencyKey">
 
 export type FaceReferenceRecordOrderByWithAggregationInput = {
@@ -407,6 +410,7 @@ export type FaceReferenceRecordCreateInput = {
   deletedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutFaceReferencesInput
   verification: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutFaceReferencesInput
+  bindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutFaceReferenceInput
 }
 
 export type FaceReferenceRecordUncheckedCreateInput = {
@@ -425,6 +429,7 @@ export type FaceReferenceRecordUncheckedCreateInput = {
   createdAt?: Date | string
   linkedAt?: Date | string | null
   deletedAt?: Date | string | null
+  bindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutFaceReferenceInput
 }
 
 export type FaceReferenceRecordUpdateInput = {
@@ -443,6 +448,7 @@ export type FaceReferenceRecordUpdateInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutFaceReferencesNestedInput
   verification?: Prisma.ProfilePhotoVerificationUpdateOneRequiredWithoutFaceReferencesNestedInput
+  bindings?: Prisma.FaceIdentityBindingUpdateManyWithoutFaceReferenceNestedInput
 }
 
 export type FaceReferenceRecordUncheckedUpdateInput = {
@@ -461,6 +467,7 @@ export type FaceReferenceRecordUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutFaceReferenceNestedInput
 }
 
 export type FaceReferenceRecordCreateManyInput = {
@@ -589,6 +596,11 @@ export type FaceReferenceRecordSumOrderByAggregateInput = {
   deleteAttempts?: Prisma.SortOrder
 }
 
+export type FaceReferenceRecordNullableScalarRelationFilter = {
+  is?: Prisma.FaceReferenceRecordWhereInput | null
+  isNot?: Prisma.FaceReferenceRecordWhereInput | null
+}
+
 export type FaceReferenceRecordCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.FaceReferenceRecordCreateWithoutUserInput, Prisma.FaceReferenceRecordUncheckedCreateWithoutUserInput> | Prisma.FaceReferenceRecordCreateWithoutUserInput[] | Prisma.FaceReferenceRecordUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.FaceReferenceRecordCreateOrConnectWithoutUserInput | Prisma.FaceReferenceRecordCreateOrConnectWithoutUserInput[]
@@ -677,6 +689,22 @@ export type EnumFaceReferenceRecordStatusFieldUpdateOperationsInput = {
   set?: $Enums.FaceReferenceRecordStatus
 }
 
+export type FaceReferenceRecordCreateNestedOneWithoutBindingsInput = {
+  create?: Prisma.XOR<Prisma.FaceReferenceRecordCreateWithoutBindingsInput, Prisma.FaceReferenceRecordUncheckedCreateWithoutBindingsInput>
+  connectOrCreate?: Prisma.FaceReferenceRecordCreateOrConnectWithoutBindingsInput
+  connect?: Prisma.FaceReferenceRecordWhereUniqueInput
+}
+
+export type FaceReferenceRecordUpdateOneWithoutBindingsNestedInput = {
+  create?: Prisma.XOR<Prisma.FaceReferenceRecordCreateWithoutBindingsInput, Prisma.FaceReferenceRecordUncheckedCreateWithoutBindingsInput>
+  connectOrCreate?: Prisma.FaceReferenceRecordCreateOrConnectWithoutBindingsInput
+  upsert?: Prisma.FaceReferenceRecordUpsertWithoutBindingsInput
+  disconnect?: Prisma.FaceReferenceRecordWhereInput | boolean
+  delete?: Prisma.FaceReferenceRecordWhereInput | boolean
+  connect?: Prisma.FaceReferenceRecordWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FaceReferenceRecordUpdateToOneWithWhereWithoutBindingsInput, Prisma.FaceReferenceRecordUpdateWithoutBindingsInput>, Prisma.FaceReferenceRecordUncheckedUpdateWithoutBindingsInput>
+}
+
 export type FaceReferenceRecordCreateWithoutUserInput = {
   id?: string
   referenceVersion: number
@@ -692,6 +720,7 @@ export type FaceReferenceRecordCreateWithoutUserInput = {
   linkedAt?: Date | string | null
   deletedAt?: Date | string | null
   verification: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutFaceReferencesInput
+  bindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutFaceReferenceInput
 }
 
 export type FaceReferenceRecordUncheckedCreateWithoutUserInput = {
@@ -709,6 +738,7 @@ export type FaceReferenceRecordUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   linkedAt?: Date | string | null
   deletedAt?: Date | string | null
+  bindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutFaceReferenceInput
 }
 
 export type FaceReferenceRecordCreateOrConnectWithoutUserInput = {
@@ -773,6 +803,7 @@ export type FaceReferenceRecordCreateWithoutVerificationInput = {
   linkedAt?: Date | string | null
   deletedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutFaceReferencesInput
+  bindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutFaceReferenceInput
 }
 
 export type FaceReferenceRecordUncheckedCreateWithoutVerificationInput = {
@@ -790,6 +821,7 @@ export type FaceReferenceRecordUncheckedCreateWithoutVerificationInput = {
   createdAt?: Date | string
   linkedAt?: Date | string | null
   deletedAt?: Date | string | null
+  bindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutFaceReferenceInput
 }
 
 export type FaceReferenceRecordCreateOrConnectWithoutVerificationInput = {
@@ -816,6 +848,94 @@ export type FaceReferenceRecordUpdateWithWhereUniqueWithoutVerificationInput = {
 export type FaceReferenceRecordUpdateManyWithWhereWithoutVerificationInput = {
   where: Prisma.FaceReferenceRecordScalarWhereInput
   data: Prisma.XOR<Prisma.FaceReferenceRecordUpdateManyMutationInput, Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutVerificationInput>
+}
+
+export type FaceReferenceRecordCreateWithoutBindingsInput = {
+  id?: string
+  referenceVersion: number
+  provider: string
+  environment: string
+  idempotencyKey: string
+  externalImageId: string
+  externalFaceId?: string | null
+  status?: $Enums.FaceReferenceRecordStatus
+  livenessSessionId?: string | null
+  deleteAttempts?: number
+  createdAt?: Date | string
+  linkedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  user: Prisma.UserCreateNestedOneWithoutFaceReferencesInput
+  verification: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutFaceReferencesInput
+}
+
+export type FaceReferenceRecordUncheckedCreateWithoutBindingsInput = {
+  id?: string
+  userId: string
+  verificationId: string
+  referenceVersion: number
+  provider: string
+  environment: string
+  idempotencyKey: string
+  externalImageId: string
+  externalFaceId?: string | null
+  status?: $Enums.FaceReferenceRecordStatus
+  livenessSessionId?: string | null
+  deleteAttempts?: number
+  createdAt?: Date | string
+  linkedAt?: Date | string | null
+  deletedAt?: Date | string | null
+}
+
+export type FaceReferenceRecordCreateOrConnectWithoutBindingsInput = {
+  where: Prisma.FaceReferenceRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.FaceReferenceRecordCreateWithoutBindingsInput, Prisma.FaceReferenceRecordUncheckedCreateWithoutBindingsInput>
+}
+
+export type FaceReferenceRecordUpsertWithoutBindingsInput = {
+  update: Prisma.XOR<Prisma.FaceReferenceRecordUpdateWithoutBindingsInput, Prisma.FaceReferenceRecordUncheckedUpdateWithoutBindingsInput>
+  create: Prisma.XOR<Prisma.FaceReferenceRecordCreateWithoutBindingsInput, Prisma.FaceReferenceRecordUncheckedCreateWithoutBindingsInput>
+  where?: Prisma.FaceReferenceRecordWhereInput
+}
+
+export type FaceReferenceRecordUpdateToOneWithWhereWithoutBindingsInput = {
+  where?: Prisma.FaceReferenceRecordWhereInput
+  data: Prisma.XOR<Prisma.FaceReferenceRecordUpdateWithoutBindingsInput, Prisma.FaceReferenceRecordUncheckedUpdateWithoutBindingsInput>
+}
+
+export type FaceReferenceRecordUpdateWithoutBindingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referenceVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  environment?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  externalImageId?: Prisma.StringFieldUpdateOperationsInput | string
+  externalFaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumFaceReferenceRecordStatusFieldUpdateOperationsInput | $Enums.FaceReferenceRecordStatus
+  livenessSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutFaceReferencesNestedInput
+  verification?: Prisma.ProfilePhotoVerificationUpdateOneRequiredWithoutFaceReferencesNestedInput
+}
+
+export type FaceReferenceRecordUncheckedUpdateWithoutBindingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  verificationId?: Prisma.StringFieldUpdateOperationsInput | string
+  referenceVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  environment?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  externalImageId?: Prisma.StringFieldUpdateOperationsInput | string
+  externalFaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumFaceReferenceRecordStatusFieldUpdateOperationsInput | $Enums.FaceReferenceRecordStatus
+  livenessSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FaceReferenceRecordCreateManyUserInput = {
@@ -850,6 +970,7 @@ export type FaceReferenceRecordUpdateWithoutUserInput = {
   linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verification?: Prisma.ProfilePhotoVerificationUpdateOneRequiredWithoutFaceReferencesNestedInput
+  bindings?: Prisma.FaceIdentityBindingUpdateManyWithoutFaceReferenceNestedInput
 }
 
 export type FaceReferenceRecordUncheckedUpdateWithoutUserInput = {
@@ -867,6 +988,7 @@ export type FaceReferenceRecordUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutFaceReferenceNestedInput
 }
 
 export type FaceReferenceRecordUncheckedUpdateManyWithoutUserInput = {
@@ -918,6 +1040,7 @@ export type FaceReferenceRecordUpdateWithoutVerificationInput = {
   linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutFaceReferencesNestedInput
+  bindings?: Prisma.FaceIdentityBindingUpdateManyWithoutFaceReferenceNestedInput
 }
 
 export type FaceReferenceRecordUncheckedUpdateWithoutVerificationInput = {
@@ -935,6 +1058,7 @@ export type FaceReferenceRecordUncheckedUpdateWithoutVerificationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   linkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutFaceReferenceNestedInput
 }
 
 export type FaceReferenceRecordUncheckedUpdateManyWithoutVerificationInput = {
@@ -955,6 +1079,35 @@ export type FaceReferenceRecordUncheckedUpdateManyWithoutVerificationInput = {
 }
 
 
+/**
+ * Count Type FaceReferenceRecordCountOutputType
+ */
+
+export type FaceReferenceRecordCountOutputType = {
+  bindings: number
+}
+
+export type FaceReferenceRecordCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bindings?: boolean | FaceReferenceRecordCountOutputTypeCountBindingsArgs
+}
+
+/**
+ * FaceReferenceRecordCountOutputType without action
+ */
+export type FaceReferenceRecordCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FaceReferenceRecordCountOutputType
+   */
+  select?: Prisma.FaceReferenceRecordCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * FaceReferenceRecordCountOutputType without action
+ */
+export type FaceReferenceRecordCountOutputTypeCountBindingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FaceIdentityBindingWhereInput
+}
+
 
 export type FaceReferenceRecordSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -974,6 +1127,8 @@ export type FaceReferenceRecordSelect<ExtArgs extends runtime.Types.Extensions.I
   deletedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
+  bindings?: boolean | Prisma.FaceReferenceRecord$bindingsArgs<ExtArgs>
+  _count?: boolean | Prisma.FaceReferenceRecordCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["faceReferenceRecord"]>
 
 export type FaceReferenceRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1038,6 +1193,8 @@ export type FaceReferenceRecordOmit<ExtArgs extends runtime.Types.Extensions.Int
 export type FaceReferenceRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
+  bindings?: boolean | Prisma.FaceReferenceRecord$bindingsArgs<ExtArgs>
+  _count?: boolean | Prisma.FaceReferenceRecordCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FaceReferenceRecordIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1053,6 +1210,7 @@ export type $FaceReferenceRecordPayload<ExtArgs extends runtime.Types.Extensions
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     verification: Prisma.$ProfilePhotoVerificationPayload<ExtArgs>
+    bindings: Prisma.$FaceIdentityBindingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1466,6 +1624,7 @@ export interface Prisma__FaceReferenceRecordClient<T, Null = never, ExtArgs exte
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   verification<T extends Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>>): Prisma.Prisma__ProfilePhotoVerificationClient<runtime.Types.Result.GetResult<Prisma.$ProfilePhotoVerificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  bindings<T extends Prisma.FaceReferenceRecord$bindingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FaceReferenceRecord$bindingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceIdentityBindingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1908,6 +2067,30 @@ export type FaceReferenceRecordDeleteManyArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many FaceReferenceRecords to delete.
    */
   limit?: number
+}
+
+/**
+ * FaceReferenceRecord.bindings
+ */
+export type FaceReferenceRecord$bindingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FaceIdentityBinding
+   */
+  select?: Prisma.FaceIdentityBindingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FaceIdentityBinding
+   */
+  omit?: Prisma.FaceIdentityBindingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FaceIdentityBindingInclude<ExtArgs> | null
+  where?: Prisma.FaceIdentityBindingWhereInput
+  orderBy?: Prisma.FaceIdentityBindingOrderByWithRelationInput | Prisma.FaceIdentityBindingOrderByWithRelationInput[]
+  cursor?: Prisma.FaceIdentityBindingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FaceIdentityBindingScalarFieldEnum | Prisma.FaceIdentityBindingScalarFieldEnum[]
 }
 
 /**

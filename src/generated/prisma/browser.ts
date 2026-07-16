@@ -252,3 +252,8 @@ export type LivenessSession = Prisma.LivenessSessionModel
  * 
  */
 export type FaceReferenceRecord = Prisma.FaceReferenceRecordModel
+/**
+ * Model FaceIdentityBinding
+ * 
+ */
+export type FaceIdentityBinding = Prisma.FaceIdentityBindingModel

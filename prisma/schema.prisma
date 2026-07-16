@@ -380,6 +380,12 @@ model User {
   // never touches photoVerifiedAt - identity stays verified; only the
   // badge visibility is withheld while profile photos are in question.
   faceBadgeSuspendedAt      DateTime?
+  // Epic 1 / F1: POSITIVE "Photo Verified" grant projection. INERT in this
+  // phase - written by nothing, read by nothing (isPhotoVerified only). It
+  // will be set by the worker (future epic) ONLY on a complete positive
+  // proof: identity + bound reference + current cover MATCH + consent. NULL
+  // for every existing user; the legacy badge (isPubliclyVerified) is unchanged.
+  faceVerifiedAt            DateTime?
 
   lastActiveAt      DateTime  @default(now())
   // onboardingDone doubles as the spec's "onboarding completed" boolean
@@ -429,6 +435,8 @@ model User {
   profilePhotoVerification ProfilePhotoVerification?
   livenessSessions         LivenessSession[]
   faceReferences           FaceReferenceRecord[]
+  faceIdentityBindings     FaceIdentityBinding[]     @relation("FaceBindingSubject")
+  faceBindingsReviewed     FaceIdentityBinding[]     @relation("FaceBindingReviewer")
   verificationAuditEvents  VerificationAuditEvent[]
 
   @@index([status, lastActiveAt])
@@ -1793,8 +1801,72 @@ model FaceReferenceRecord {
 
   user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   verification ProfilePhotoVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  bindings     FaceIdentityBinding[]
 
   @@index([userId, status])
   @@index([status])
   @@index([externalFaceId])
+}
+
+// Identity<->liveness binding evidence (Epic 1 / F1, C2). SEPARATE from
+// FaceReferenceRecord on purpose: reference lifecycle and identity-binding
+// lifecycle are independent facts; a reference may have MULTIPLE binding
+// attempts; reference rotation requires a FRESH binding; and human + future
+// automated (pluggable) methods each need independent evidence without a
+// schema redesign. Stores ONLY normalized evidence - never raw images,
+// biometric templates, or raw AWS/Stripe payloads. Not publicly exposed.
+// INERT in F1: created/read by nothing yet.
+//
+// Lifecycle policy: at most ONE binding row per liveness capture
+// (livenessFlowId unique); a rotation is a new capture -> new flow -> new
+// binding. Multiple NULL flowIds (e.g. pre-capture human review) are allowed.
+model FaceIdentityBinding {
+  id                     String            @id @default(cuid())
+  userId                 String
+  faceReferenceId        String?
+  // The Stripe Identity subject this binding is checked against (Verification
+  // row id and/or the provider session id) - identifiers only, never images.
+  identityVerificationId String?
+  identitySessionId      String?
+  livenessFlowId         String?           @unique
+  method                 FaceBindingMethod
+  provider               String
+  status                 FaceBindingStatus @default(BINDING_REQUIRED)
+  // Normalized band only (e.g. "confident"/"uncertain"/"mismatch") - NEVER a
+  // raw similarity score.
+  similarityBand         String?
+  modelVersion           String?
+  thresholdVersion       String?
+  failureReasonCode      String?
+  boundAt                DateTime?
+  reviewedById           String?
+  reviewedAt             DateTime?
+  reviewReasonCode       String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  user          User                 @relation("FaceBindingSubject", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy    User?                @relation("FaceBindingReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  faceReference FaceReferenceRecord? @relation(fields: [faceReferenceId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([faceReferenceId])
+  @@index([status])
+}
+
+enum FaceBindingMethod {
+  STRIPE_SELFIE_COMPARE // automated: Stripe identity selfie vs liveness frame
+  HUMAN_REVIEW // staff compares identity evidence against the liveness frame
+  PROVIDER_NATIVE // a combined identity+face provider binds the subject natively
+}
+
+enum FaceBindingStatus {
+  NOT_BOUND
+  BINDING_REQUIRED
+  BINDING_IN_PROGRESS
+  BOUND
+  BINDING_FAILED
+  MANUAL_REVIEW
+  PROVIDER_UNAVAILABLE
+  CONSENT_WITHDRAWN
 }

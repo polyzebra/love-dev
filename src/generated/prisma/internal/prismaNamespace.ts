@@ -430,7 +430,8 @@ export const ModelName = {
   PhotoFaceCheck: 'PhotoFaceCheck',
   VerificationAuditEvent: 'VerificationAuditEvent',
   LivenessSession: 'LivenessSession',
-  FaceReferenceRecord: 'FaceReferenceRecord'
+  FaceReferenceRecord: 'FaceReferenceRecord',
+  FaceIdentityBinding: 'FaceIdentityBinding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -446,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent" | "livenessSession" | "faceReferenceRecord"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent" | "livenessSession" | "faceReferenceRecord" | "faceIdentityBinding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3928,6 +3929,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FaceIdentityBinding: {
+      payload: Prisma.$FaceIdentityBindingPayload<ExtArgs>
+      fields: Prisma.FaceIdentityBindingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FaceIdentityBindingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FaceIdentityBindingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>
+        }
+        findFirst: {
+          args: Prisma.FaceIdentityBindingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FaceIdentityBindingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>
+        }
+        findMany: {
+          args: Prisma.FaceIdentityBindingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>[]
+        }
+        create: {
+          args: Prisma.FaceIdentityBindingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>
+        }
+        createMany: {
+          args: Prisma.FaceIdentityBindingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FaceIdentityBindingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>[]
+        }
+        delete: {
+          args: Prisma.FaceIdentityBindingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>
+        }
+        update: {
+          args: Prisma.FaceIdentityBindingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>
+        }
+        deleteMany: {
+          args: Prisma.FaceIdentityBindingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FaceIdentityBindingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FaceIdentityBindingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>[]
+        }
+        upsert: {
+          args: Prisma.FaceIdentityBindingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FaceIdentityBindingPayload>
+        }
+        aggregate: {
+          args: Prisma.FaceIdentityBindingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFaceIdentityBinding>
+        }
+        groupBy: {
+          args: Prisma.FaceIdentityBindingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FaceIdentityBindingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FaceIdentityBindingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FaceIdentityBindingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4015,6 +4090,7 @@ export const UserScalarFieldEnum = {
   photoVerificationProvider: 'photoVerificationProvider',
   photoVerificationSession: 'photoVerificationSession',
   faceBadgeSuspendedAt: 'faceBadgeSuspendedAt',
+  faceVerifiedAt: 'faceVerifiedAt',
   lastActiveAt: 'lastActiveAt',
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
@@ -4820,6 +4896,31 @@ export const FaceReferenceRecordScalarFieldEnum = {
 } as const
 
 export type FaceReferenceRecordScalarFieldEnum = (typeof FaceReferenceRecordScalarFieldEnum)[keyof typeof FaceReferenceRecordScalarFieldEnum]
+
+
+export const FaceIdentityBindingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  faceReferenceId: 'faceReferenceId',
+  identityVerificationId: 'identityVerificationId',
+  identitySessionId: 'identitySessionId',
+  livenessFlowId: 'livenessFlowId',
+  method: 'method',
+  provider: 'provider',
+  status: 'status',
+  similarityBand: 'similarityBand',
+  modelVersion: 'modelVersion',
+  thresholdVersion: 'thresholdVersion',
+  failureReasonCode: 'failureReasonCode',
+  boundAt: 'boundAt',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  reviewReasonCode: 'reviewReasonCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FaceIdentityBindingScalarFieldEnum = (typeof FaceIdentityBindingScalarFieldEnum)[keyof typeof FaceIdentityBindingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5666,6 +5767,34 @@ export type EnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel> = FieldRefI
 export type ListEnumFaceReferenceRecordStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceReferenceRecordStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'FaceBindingMethod'
+ */
+export type EnumFaceBindingMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBindingMethod'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceBindingMethod[]'
+ */
+export type ListEnumFaceBindingMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBindingMethod[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceBindingStatus'
+ */
+export type EnumFaceBindingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBindingStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FaceBindingStatus[]'
+ */
+export type ListEnumFaceBindingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBindingStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -5823,6 +5952,7 @@ export type GlobalOmitConfig = {
   verificationAuditEvent?: Prisma.VerificationAuditEventOmit
   livenessSession?: Prisma.LivenessSessionOmit
   faceReferenceRecord?: Prisma.FaceReferenceRecordOmit
+  faceIdentityBinding?: Prisma.FaceIdentityBindingOmit
 }
 
 /* Types for Logging */

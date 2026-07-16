@@ -88,6 +88,7 @@ export type UserMinAggregateOutputType = {
   photoVerificationProvider: string | null
   photoVerificationSession: string | null
   faceBadgeSuspendedAt: Date | null
+  faceVerifiedAt: Date | null
   lastActiveAt: Date | null
   onboardingDone: boolean | null
   marketingOptIn: boolean | null
@@ -144,6 +145,7 @@ export type UserMaxAggregateOutputType = {
   photoVerificationProvider: string | null
   photoVerificationSession: string | null
   faceBadgeSuspendedAt: Date | null
+  faceVerifiedAt: Date | null
   lastActiveAt: Date | null
   onboardingDone: boolean | null
   marketingOptIn: boolean | null
@@ -200,6 +202,7 @@ export type UserCountAggregateOutputType = {
   photoVerificationProvider: number
   photoVerificationSession: number
   faceBadgeSuspendedAt: number
+  faceVerifiedAt: number
   lastActiveAt: number
   onboardingDone: number
   marketingOptIn: number
@@ -272,6 +275,7 @@ export type UserMinAggregateInputType = {
   photoVerificationProvider?: true
   photoVerificationSession?: true
   faceBadgeSuspendedAt?: true
+  faceVerifiedAt?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -328,6 +332,7 @@ export type UserMaxAggregateInputType = {
   photoVerificationProvider?: true
   photoVerificationSession?: true
   faceBadgeSuspendedAt?: true
+  faceVerifiedAt?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -384,6 +389,7 @@ export type UserCountAggregateInputType = {
   photoVerificationProvider?: true
   photoVerificationSession?: true
   faceBadgeSuspendedAt?: true
+  faceVerifiedAt?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -527,6 +533,7 @@ export type UserGroupByOutputType = {
   photoVerificationProvider: string | null
   photoVerificationSession: string | null
   faceBadgeSuspendedAt: Date | null
+  faceVerifiedAt: Date | null
   lastActiveAt: Date
   onboardingDone: boolean
   marketingOptIn: boolean
@@ -606,6 +613,7 @@ export type UserWhereInput = {
   photoVerificationProvider?: Prisma.StringNullableFilter<"User"> | string | null
   photoVerificationSession?: Prisma.StringNullableFilter<"User"> | string | null
   faceBadgeSuspendedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  faceVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastActiveAt?: Prisma.DateTimeFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolFilter<"User"> | boolean
@@ -644,6 +652,8 @@ export type UserWhereInput = {
   profilePhotoVerification?: Prisma.XOR<Prisma.ProfilePhotoVerificationNullableScalarRelationFilter, Prisma.ProfilePhotoVerificationWhereInput> | null
   livenessSessions?: Prisma.LivenessSessionListRelationFilter
   faceReferences?: Prisma.FaceReferenceRecordListRelationFilter
+  faceIdentityBindings?: Prisma.FaceIdentityBindingListRelationFilter
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingListRelationFilter
   verificationAuditEvents?: Prisma.VerificationAuditEventListRelationFilter
 }
 
@@ -695,6 +705,7 @@ export type UserOrderByWithRelationInput = {
   photoVerificationProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   photoVerificationSession?: Prisma.SortOrderInput | Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  faceVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -733,6 +744,8 @@ export type UserOrderByWithRelationInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationOrderByWithRelationInput
   livenessSessions?: Prisma.LivenessSessionOrderByRelationAggregateInput
   faceReferences?: Prisma.FaceReferenceRecordOrderByRelationAggregateInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingOrderByRelationAggregateInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingOrderByRelationAggregateInput
   verificationAuditEvents?: Prisma.VerificationAuditEventOrderByRelationAggregateInput
 }
 
@@ -787,6 +800,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   photoVerificationProvider?: Prisma.StringNullableFilter<"User"> | string | null
   photoVerificationSession?: Prisma.StringNullableFilter<"User"> | string | null
   faceBadgeSuspendedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  faceVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastActiveAt?: Prisma.DateTimeFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolFilter<"User"> | boolean
@@ -825,6 +839,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   profilePhotoVerification?: Prisma.XOR<Prisma.ProfilePhotoVerificationNullableScalarRelationFilter, Prisma.ProfilePhotoVerificationWhereInput> | null
   livenessSessions?: Prisma.LivenessSessionListRelationFilter
   faceReferences?: Prisma.FaceReferenceRecordListRelationFilter
+  faceIdentityBindings?: Prisma.FaceIdentityBindingListRelationFilter
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingListRelationFilter
   verificationAuditEvents?: Prisma.VerificationAuditEventListRelationFilter
 }, "id" | "email" | "phone" | "phoneE164">
 
@@ -876,6 +892,7 @@ export type UserOrderByWithAggregationInput = {
   photoVerificationProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   photoVerificationSession?: Prisma.SortOrderInput | Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  faceVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -940,6 +957,7 @@ export type UserScalarWhereWithAggregatesInput = {
   photoVerificationProvider?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   photoVerificationSession?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   faceBadgeSuspendedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  faceVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   lastActiveAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
@@ -996,6 +1014,7 @@ export type UserCreateInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1034,6 +1053,8 @@ export type UserCreateInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -1085,6 +1106,7 @@ export type UserUncheckedCreateInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1123,6 +1145,8 @@ export type UserUncheckedCreateInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1174,6 +1198,7 @@ export type UserUpdateInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1212,6 +1237,8 @@ export type UserUpdateInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -1263,6 +1290,7 @@ export type UserUncheckedUpdateInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1301,6 +1329,8 @@ export type UserUncheckedUpdateInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1352,6 +1382,7 @@ export type UserCreateManyInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1408,6 +1439,7 @@ export type UserUpdateManyMutationInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1464,6 +1496,7 @@ export type UserUncheckedUpdateManyInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1520,6 +1553,7 @@ export type UserCountOrderByAggregateInput = {
   photoVerificationProvider?: Prisma.SortOrder
   photoVerificationSession?: Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrder
+  faceVerifiedAt?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -1583,6 +1617,7 @@ export type UserMaxOrderByAggregateInput = {
   photoVerificationProvider?: Prisma.SortOrder
   photoVerificationSession?: Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrder
+  faceVerifiedAt?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -1639,6 +1674,7 @@ export type UserMinOrderByAggregateInput = {
   photoVerificationProvider?: Prisma.SortOrder
   photoVerificationSession?: Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrder
+  faceVerifiedAt?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -2172,6 +2208,36 @@ export type UserUpdateOneRequiredWithoutFaceReferencesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFaceReferencesInput, Prisma.UserUpdateWithoutFaceReferencesInput>, Prisma.UserUncheckedUpdateWithoutFaceReferencesInput>
 }
 
+export type UserCreateNestedOneWithoutFaceIdentityBindingsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFaceIdentityBindingsInput, Prisma.UserUncheckedCreateWithoutFaceIdentityBindingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFaceIdentityBindingsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutFaceBindingsReviewedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFaceBindingsReviewedInput, Prisma.UserUncheckedCreateWithoutFaceBindingsReviewedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFaceBindingsReviewedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutFaceIdentityBindingsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFaceIdentityBindingsInput, Prisma.UserUncheckedCreateWithoutFaceIdentityBindingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFaceIdentityBindingsInput
+  upsert?: Prisma.UserUpsertWithoutFaceIdentityBindingsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFaceIdentityBindingsInput, Prisma.UserUpdateWithoutFaceIdentityBindingsInput>, Prisma.UserUncheckedUpdateWithoutFaceIdentityBindingsInput>
+}
+
+export type UserUpdateOneWithoutFaceBindingsReviewedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFaceBindingsReviewedInput, Prisma.UserUncheckedCreateWithoutFaceBindingsReviewedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFaceBindingsReviewedInput
+  upsert?: Prisma.UserUpsertWithoutFaceBindingsReviewedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFaceBindingsReviewedInput, Prisma.UserUpdateWithoutFaceBindingsReviewedInput>, Prisma.UserUncheckedUpdateWithoutFaceBindingsReviewedInput>
+}
+
 export type UserCreateWithoutDevicesInput = {
   id?: string
   email: string
@@ -2220,6 +2286,7 @@ export type UserCreateWithoutDevicesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2257,6 +2324,8 @@ export type UserCreateWithoutDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -2308,6 +2377,7 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2345,6 +2415,8 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -2412,6 +2484,7 @@ export type UserUpdateWithoutDevicesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2449,6 +2522,8 @@ export type UserUpdateWithoutDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -2500,6 +2575,7 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2537,6 +2613,8 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2588,6 +2666,7 @@ export type UserCreateWithoutProfileInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2625,6 +2704,8 @@ export type UserCreateWithoutProfileInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -2676,6 +2757,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2713,6 +2795,8 @@ export type UserUncheckedCreateWithoutProfileInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -2780,6 +2864,7 @@ export type UserUpdateWithoutProfileInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2817,6 +2902,8 @@ export type UserUpdateWithoutProfileInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -2868,6 +2955,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2905,6 +2993,8 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2956,6 +3046,7 @@ export type UserCreateWithoutPhotosInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2993,6 +3084,8 @@ export type UserCreateWithoutPhotosInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -3044,6 +3137,7 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3081,6 +3175,8 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -3148,6 +3244,7 @@ export type UserUpdateWithoutPhotosInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3185,6 +3282,8 @@ export type UserUpdateWithoutPhotosInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -3236,6 +3335,7 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3273,6 +3373,8 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -3324,6 +3426,7 @@ export type UserCreateWithoutVerificationsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3361,6 +3464,8 @@ export type UserCreateWithoutVerificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -3412,6 +3517,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3449,6 +3555,8 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -3516,6 +3624,7 @@ export type UserUpdateWithoutVerificationsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3553,6 +3662,8 @@ export type UserUpdateWithoutVerificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -3604,6 +3715,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3641,6 +3753,8 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -3692,6 +3806,7 @@ export type UserCreateWithoutLikesSentInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3729,6 +3844,8 @@ export type UserCreateWithoutLikesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -3780,6 +3897,7 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3817,6 +3935,8 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -3873,6 +3993,7 @@ export type UserCreateWithoutLikesReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3910,6 +4031,8 @@ export type UserCreateWithoutLikesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -3961,6 +4084,7 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3998,6 +4122,8 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -4065,6 +4191,7 @@ export type UserUpdateWithoutLikesSentInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4102,6 +4229,8 @@ export type UserUpdateWithoutLikesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -4153,6 +4282,7 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4190,6 +4320,8 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -4252,6 +4384,7 @@ export type UserUpdateWithoutLikesReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4289,6 +4422,8 @@ export type UserUpdateWithoutLikesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -4340,6 +4475,7 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4377,6 +4513,8 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -4428,6 +4566,7 @@ export type UserCreateWithoutMatchesAsAInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4465,6 +4604,8 @@ export type UserCreateWithoutMatchesAsAInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -4516,6 +4657,7 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4553,6 +4695,8 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -4609,6 +4753,7 @@ export type UserCreateWithoutMatchesAsBInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4646,6 +4791,8 @@ export type UserCreateWithoutMatchesAsBInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -4697,6 +4844,7 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4734,6 +4882,8 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -4801,6 +4951,7 @@ export type UserUpdateWithoutMatchesAsAInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4838,6 +4989,8 @@ export type UserUpdateWithoutMatchesAsAInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -4889,6 +5042,7 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4926,6 +5080,8 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -4988,6 +5144,7 @@ export type UserUpdateWithoutMatchesAsBInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5025,6 +5182,8 @@ export type UserUpdateWithoutMatchesAsBInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -5076,6 +5235,7 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5113,6 +5273,8 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -5164,6 +5326,7 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5201,6 +5364,8 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -5252,6 +5417,7 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5289,6 +5455,8 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -5345,6 +5513,7 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5382,6 +5551,8 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -5433,6 +5604,7 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5470,6 +5642,8 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -5537,6 +5711,7 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5574,6 +5749,8 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -5625,6 +5802,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5662,6 +5840,8 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -5724,6 +5904,7 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5761,6 +5942,8 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -5812,6 +5995,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5849,6 +6033,8 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -5900,6 +6086,7 @@ export type UserCreateWithoutParticipantsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5937,6 +6124,8 @@ export type UserCreateWithoutParticipantsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -5988,6 +6177,7 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6025,6 +6215,8 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -6092,6 +6284,7 @@ export type UserUpdateWithoutParticipantsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6129,6 +6322,8 @@ export type UserUpdateWithoutParticipantsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -6180,6 +6375,7 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6217,6 +6413,8 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -6268,6 +6466,7 @@ export type UserCreateWithoutMessagesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6305,6 +6504,8 @@ export type UserCreateWithoutMessagesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -6356,6 +6557,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6393,6 +6595,8 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -6460,6 +6664,7 @@ export type UserUpdateWithoutMessagesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6497,6 +6702,8 @@ export type UserUpdateWithoutMessagesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -6548,6 +6755,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6585,6 +6793,8 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -6636,6 +6846,7 @@ export type UserCreateWithoutReportsMadeInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6673,6 +6884,8 @@ export type UserCreateWithoutReportsMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -6724,6 +6937,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6761,6 +6975,8 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -6817,6 +7033,7 @@ export type UserCreateWithoutReportsReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6854,6 +7071,8 @@ export type UserCreateWithoutReportsReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -6905,6 +7124,7 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6942,6 +7162,8 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -7009,6 +7231,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7046,6 +7269,8 @@ export type UserUpdateWithoutReportsMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -7097,6 +7322,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7134,6 +7360,8 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -7196,6 +7424,7 @@ export type UserUpdateWithoutReportsReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7233,6 +7462,8 @@ export type UserUpdateWithoutReportsReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -7284,6 +7515,7 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7321,6 +7553,8 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -7372,6 +7606,7 @@ export type UserCreateWithoutModerationCasesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7409,6 +7644,8 @@ export type UserCreateWithoutModerationCasesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -7460,6 +7697,7 @@ export type UserUncheckedCreateWithoutModerationCasesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7497,6 +7735,8 @@ export type UserUncheckedCreateWithoutModerationCasesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -7564,6 +7804,7 @@ export type UserUpdateWithoutModerationCasesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7601,6 +7842,8 @@ export type UserUpdateWithoutModerationCasesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -7652,6 +7895,7 @@ export type UserUncheckedUpdateWithoutModerationCasesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7689,6 +7933,8 @@ export type UserUncheckedUpdateWithoutModerationCasesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -7740,6 +7986,7 @@ export type UserCreateWithoutViolationsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7777,6 +8024,8 @@ export type UserCreateWithoutViolationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -7828,6 +8077,7 @@ export type UserUncheckedCreateWithoutViolationsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7865,6 +8115,8 @@ export type UserUncheckedCreateWithoutViolationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -7932,6 +8184,7 @@ export type UserUpdateWithoutViolationsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7969,6 +8222,8 @@ export type UserUpdateWithoutViolationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -8020,6 +8275,7 @@ export type UserUncheckedUpdateWithoutViolationsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8057,6 +8313,8 @@ export type UserUncheckedUpdateWithoutViolationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -8108,6 +8366,7 @@ export type UserCreateWithoutAppealsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8145,6 +8404,8 @@ export type UserCreateWithoutAppealsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -8196,6 +8457,7 @@ export type UserUncheckedCreateWithoutAppealsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8233,6 +8495,8 @@ export type UserUncheckedCreateWithoutAppealsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -8300,6 +8564,7 @@ export type UserUpdateWithoutAppealsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8337,6 +8602,8 @@ export type UserUpdateWithoutAppealsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -8388,6 +8655,7 @@ export type UserUncheckedUpdateWithoutAppealsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8425,6 +8693,8 @@ export type UserUncheckedUpdateWithoutAppealsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -8476,6 +8746,7 @@ export type UserCreateWithoutBlocksMadeInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8513,6 +8784,8 @@ export type UserCreateWithoutBlocksMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -8564,6 +8837,7 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8601,6 +8875,8 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -8657,6 +8933,7 @@ export type UserCreateWithoutBlocksReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8694,6 +8971,8 @@ export type UserCreateWithoutBlocksReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -8745,6 +9024,7 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8782,6 +9062,8 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -8849,6 +9131,7 @@ export type UserUpdateWithoutBlocksMadeInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8886,6 +9169,8 @@ export type UserUpdateWithoutBlocksMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -8937,6 +9222,7 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8974,6 +9260,8 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -9036,6 +9324,7 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9073,6 +9362,8 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -9124,6 +9415,7 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9161,6 +9453,8 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -9212,6 +9506,7 @@ export type UserCreateWithoutSubscriptionInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9249,6 +9544,8 @@ export type UserCreateWithoutSubscriptionInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -9300,6 +9597,7 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9337,6 +9635,8 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -9404,6 +9704,7 @@ export type UserUpdateWithoutSubscriptionInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9441,6 +9742,8 @@ export type UserUpdateWithoutSubscriptionInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -9492,6 +9795,7 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9529,6 +9833,8 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -9580,6 +9886,7 @@ export type UserCreateWithoutPaymentsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9617,6 +9924,8 @@ export type UserCreateWithoutPaymentsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -9668,6 +9977,7 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9705,6 +10015,8 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -9772,6 +10084,7 @@ export type UserUpdateWithoutPaymentsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9809,6 +10122,8 @@ export type UserUpdateWithoutPaymentsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -9860,6 +10175,7 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9897,6 +10213,8 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -9948,6 +10266,7 @@ export type UserCreateWithoutNotificationsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9985,6 +10304,8 @@ export type UserCreateWithoutNotificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -10036,6 +10357,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10073,6 +10395,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -10140,6 +10464,7 @@ export type UserUpdateWithoutNotificationsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10177,6 +10502,8 @@ export type UserUpdateWithoutNotificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -10228,6 +10555,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10265,6 +10593,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -10316,6 +10646,7 @@ export type UserCreateWithoutNotificationDevicesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10353,6 +10684,8 @@ export type UserCreateWithoutNotificationDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -10404,6 +10737,7 @@ export type UserUncheckedCreateWithoutNotificationDevicesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10441,6 +10775,8 @@ export type UserUncheckedCreateWithoutNotificationDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -10508,6 +10844,7 @@ export type UserUpdateWithoutNotificationDevicesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10545,6 +10882,8 @@ export type UserUpdateWithoutNotificationDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -10596,6 +10935,7 @@ export type UserUncheckedUpdateWithoutNotificationDevicesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10633,6 +10973,8 @@ export type UserUncheckedUpdateWithoutNotificationDevicesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -10684,6 +11026,7 @@ export type UserCreateWithoutConversationPresenceInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10721,6 +11064,8 @@ export type UserCreateWithoutConversationPresenceInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -10772,6 +11117,7 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10809,6 +11155,8 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -10876,6 +11224,7 @@ export type UserUpdateWithoutConversationPresenceInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10913,6 +11262,8 @@ export type UserUpdateWithoutConversationPresenceInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -10964,6 +11315,7 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11001,6 +11353,8 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -11052,6 +11406,7 @@ export type UserCreateWithoutAdminLogsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11089,6 +11444,8 @@ export type UserCreateWithoutAdminLogsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -11140,6 +11497,7 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11177,6 +11535,8 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -11244,6 +11604,7 @@ export type UserUpdateWithoutAdminLogsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11281,6 +11642,8 @@ export type UserUpdateWithoutAdminLogsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -11332,6 +11695,7 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11369,6 +11733,8 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -11420,6 +11786,7 @@ export type UserCreateWithoutExplorePreferencesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11457,6 +11824,8 @@ export type UserCreateWithoutExplorePreferencesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -11508,6 +11877,7 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11545,6 +11915,8 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -11612,6 +11984,7 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11649,6 +12022,8 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -11700,6 +12075,7 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11737,6 +12113,8 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -11788,6 +12166,7 @@ export type UserCreateWithoutAuthEventsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11825,6 +12204,8 @@ export type UserCreateWithoutAuthEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -11876,6 +12257,7 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11913,6 +12295,8 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -11980,6 +12364,7 @@ export type UserUpdateWithoutAuthEventsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12017,6 +12402,8 @@ export type UserUpdateWithoutAuthEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -12068,6 +12455,7 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12105,6 +12493,8 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -12156,6 +12546,7 @@ export type UserCreateWithoutSettingsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12193,6 +12584,8 @@ export type UserCreateWithoutSettingsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -12244,6 +12637,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12281,6 +12675,8 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -12348,6 +12744,7 @@ export type UserUpdateWithoutSettingsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12385,6 +12782,8 @@ export type UserUpdateWithoutSettingsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -12436,6 +12835,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12473,6 +12873,8 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -12524,6 +12926,7 @@ export type UserCreateWithoutApiIdempotencyKeysInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12561,6 +12964,8 @@ export type UserCreateWithoutApiIdempotencyKeysInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -12612,6 +13017,7 @@ export type UserUncheckedCreateWithoutApiIdempotencyKeysInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12649,6 +13055,8 @@ export type UserUncheckedCreateWithoutApiIdempotencyKeysInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -12716,6 +13124,7 @@ export type UserUpdateWithoutApiIdempotencyKeysInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12753,6 +13162,8 @@ export type UserUpdateWithoutApiIdempotencyKeysInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -12804,6 +13215,7 @@ export type UserUncheckedUpdateWithoutApiIdempotencyKeysInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12841,6 +13253,8 @@ export type UserUncheckedUpdateWithoutApiIdempotencyKeysInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -12892,6 +13306,7 @@ export type UserCreateWithoutProfilePhotoVerificationInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12929,6 +13344,8 @@ export type UserCreateWithoutProfilePhotoVerificationInput = {
   appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -12980,6 +13397,7 @@ export type UserUncheckedCreateWithoutProfilePhotoVerificationInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13017,6 +13435,8 @@ export type UserUncheckedCreateWithoutProfilePhotoVerificationInput = {
   appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -13084,6 +13504,7 @@ export type UserUpdateWithoutProfilePhotoVerificationInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13121,6 +13542,8 @@ export type UserUpdateWithoutProfilePhotoVerificationInput = {
   appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -13172,6 +13595,7 @@ export type UserUncheckedUpdateWithoutProfilePhotoVerificationInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13209,6 +13633,8 @@ export type UserUncheckedUpdateWithoutProfilePhotoVerificationInput = {
   appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -13260,6 +13686,7 @@ export type UserCreateWithoutVerificationAuditEventsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13298,6 +13725,8 @@ export type UserCreateWithoutVerificationAuditEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
 }
 
 export type UserUncheckedCreateWithoutVerificationAuditEventsInput = {
@@ -13348,6 +13777,7 @@ export type UserUncheckedCreateWithoutVerificationAuditEventsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13386,6 +13816,8 @@ export type UserUncheckedCreateWithoutVerificationAuditEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
 }
 
 export type UserCreateOrConnectWithoutVerificationAuditEventsInput = {
@@ -13452,6 +13884,7 @@ export type UserUpdateWithoutVerificationAuditEventsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13490,6 +13923,8 @@ export type UserUpdateWithoutVerificationAuditEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerificationAuditEventsInput = {
@@ -13540,6 +13975,7 @@ export type UserUncheckedUpdateWithoutVerificationAuditEventsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13578,6 +14014,8 @@ export type UserUncheckedUpdateWithoutVerificationAuditEventsInput = {
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
 }
 
 export type UserCreateWithoutLivenessSessionsInput = {
@@ -13628,6 +14066,7 @@ export type UserCreateWithoutLivenessSessionsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13665,6 +14104,8 @@ export type UserCreateWithoutLivenessSessionsInput = {
   appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -13716,6 +14157,7 @@ export type UserUncheckedCreateWithoutLivenessSessionsInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13753,6 +14195,8 @@ export type UserUncheckedCreateWithoutLivenessSessionsInput = {
   appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -13820,6 +14264,7 @@ export type UserUpdateWithoutLivenessSessionsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13857,6 +14302,8 @@ export type UserUpdateWithoutLivenessSessionsInput = {
   appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -13908,6 +14355,7 @@ export type UserUncheckedUpdateWithoutLivenessSessionsInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13945,6 +14393,8 @@ export type UserUncheckedUpdateWithoutLivenessSessionsInput = {
   appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -13996,6 +14446,7 @@ export type UserCreateWithoutFaceReferencesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14033,6 +14484,8 @@ export type UserCreateWithoutFaceReferencesInput = {
   appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
 }
 
@@ -14084,6 +14537,7 @@ export type UserUncheckedCreateWithoutFaceReferencesInput = {
   photoVerificationProvider?: string | null
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14121,6 +14575,8 @@ export type UserUncheckedCreateWithoutFaceReferencesInput = {
   appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
   livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -14188,6 +14644,7 @@ export type UserUpdateWithoutFaceReferencesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14225,6 +14682,8 @@ export type UserUpdateWithoutFaceReferencesInput = {
   appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
 }
 
@@ -14276,6 +14735,7 @@ export type UserUncheckedUpdateWithoutFaceReferencesInput = {
   photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14313,6 +14773,768 @@ export type UserUncheckedUpdateWithoutFaceReferencesInput = {
   appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
   profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
   livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutFaceIdentityBindingsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
+  livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
+  faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingCreateNestedManyWithoutReviewedByInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutFaceIdentityBindingsInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutReviewedByInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutFaceIdentityBindingsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFaceIdentityBindingsInput, Prisma.UserUncheckedCreateWithoutFaceIdentityBindingsInput>
+}
+
+export type UserCreateWithoutFaceBindingsReviewedInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceCreateNestedManyWithoutUserInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealCreateNestedManyWithoutUserInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationCreateNestedOneWithoutUserInput
+  livenessSessions?: Prisma.LivenessSessionCreateNestedManyWithoutUserInput
+  faceReferences?: Prisma.FaceReferenceRecordCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingCreateNestedManyWithoutUserInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutFaceBindingsReviewedInput = {
+  id?: string
+  email: string
+  emailVerified?: Date | string | null
+  phone?: string | null
+  phoneVerified?: Date | string | null
+  name?: string | null
+  image?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  phoneE164?: string | null
+  phoneCountryIso?: string | null
+  phoneDialCode?: string | null
+  phoneVerifiedAt?: Date | string | null
+  phoneSyncStatus?: $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: string | null
+  phoneSyncUpdatedAt?: Date | string | null
+  authCompleted?: boolean
+  riskScore?: number
+  bannedAt?: Date | string | null
+  banReason?: string | null
+  lastLoginAt?: Date | string | null
+  lastLoginIpHash?: string | null
+  lastUserAgentHash?: string | null
+  previousIpHash?: string | null
+  lastIpCountry?: string | null
+  lastIpAsn?: string | null
+  lastDeviceHash?: string | null
+  deviceCount?: number
+  scamScore?: number
+  riskReason?: string | null
+  riskUpdatedAt?: Date | string | null
+  safetyRiskScore?: number
+  safetyRiskReasons?: string | null
+  safetyRecommendedAction?: $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Date | string | null
+  ageConfirmedAt?: Date | string | null
+  ageConfirmedIpHash?: string | null
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  communityVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  consentIpHash?: string | null
+  consentUserAgentHash?: string | null
+  photoVerifiedAt?: Date | string | null
+  photoVerificationProvider?: string | null
+  photoVerificationSession?: string | null
+  faceBadgeSuspendedAt?: Date | string | null
+  faceVerifiedAt?: Date | string | null
+  lastActiveAt?: Date | string
+  onboardingDone?: boolean
+  marketingOptIn?: boolean
+  deletionRequested?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutUserInput
+  likesSent?: Prisma.LikeUncheckedCreateNestedManyWithoutFromInput
+  likesReceived?: Prisma.LikeUncheckedCreateNestedManyWithoutToInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutSenderInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedCreateNestedManyWithoutReceiverInput
+  matchesAsA?: Prisma.MatchUncheckedCreateNestedManyWithoutUserAInput
+  matchesAsB?: Prisma.MatchUncheckedCreateNestedManyWithoutUserBInput
+  participants?: Prisma.ParticipantUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsReceived?: Prisma.ReportUncheckedCreateNestedManyWithoutReportedInput
+  blocksMade?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockerInput
+  blocksReceived?: Prisma.BlockUncheckedCreateNestedManyWithoutBlockedInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedCreateNestedManyWithoutUserInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedCreateNestedManyWithoutUserInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedCreateNestedManyWithoutUserInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedCreateNestedManyWithoutUserInput
+  adminLogs?: Prisma.AdminLogUncheckedCreateNestedManyWithoutActorInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedCreateNestedManyWithoutUserInput
+  moderationCases?: Prisma.ModerationCaseUncheckedCreateNestedManyWithoutUserInput
+  violations?: Prisma.AccountViolationUncheckedCreateNestedManyWithoutUserInput
+  appeals?: Prisma.AppealUncheckedCreateNestedManyWithoutUserInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedCreateNestedOneWithoutUserInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedCreateNestedManyWithoutUserInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedCreateNestedManyWithoutUserInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedCreateNestedManyWithoutUserInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutFaceBindingsReviewedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFaceBindingsReviewedInput, Prisma.UserUncheckedCreateWithoutFaceBindingsReviewedInput>
+}
+
+export type UserUpsertWithoutFaceIdentityBindingsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFaceIdentityBindingsInput, Prisma.UserUncheckedUpdateWithoutFaceIdentityBindingsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFaceIdentityBindingsInput, Prisma.UserUncheckedCreateWithoutFaceIdentityBindingsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFaceIdentityBindingsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFaceIdentityBindingsInput, Prisma.UserUncheckedUpdateWithoutFaceIdentityBindingsInput>
+}
+
+export type UserUpdateWithoutFaceIdentityBindingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
+  livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUpdateManyWithoutReviewedByNestedInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFaceIdentityBindingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceBindingsReviewed?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutReviewedByNestedInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutFaceBindingsReviewedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFaceBindingsReviewedInput, Prisma.UserUncheckedUpdateWithoutFaceBindingsReviewedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFaceBindingsReviewedInput, Prisma.UserUncheckedCreateWithoutFaceBindingsReviewedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFaceBindingsReviewedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFaceBindingsReviewedInput, Prisma.UserUncheckedUpdateWithoutFaceBindingsReviewedInput>
+}
+
+export type UserUpdateWithoutFaceBindingsReviewedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUpdateManyWithoutUserNestedInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUpdateManyWithoutUserNestedInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationUpdateOneWithoutUserNestedInput
+  livenessSessions?: Prisma.LivenessSessionUpdateManyWithoutUserNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUpdateManyWithoutUserNestedInput
+  verificationAuditEvents?: Prisma.VerificationAuditEventUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFaceBindingsReviewedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCountryIso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneDialCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneSyncStatus?: Prisma.NullableEnumPhoneSyncStatusFieldUpdateOperationsInput | $Enums.PhoneSyncStatus | null
+  phoneSyncErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneSyncUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  authCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  riskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastIpAsn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastDeviceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceCount?: Prisma.IntFieldUpdateOperationsInput | number
+  scamScore?: Prisma.IntFieldUpdateOperationsInput | number
+  riskReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  safetyRiskScore?: Prisma.IntFieldUpdateOperationsInput | number
+  safetyRiskReasons?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safetyRecommendedAction?: Prisma.NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput | $Enums.SafetyRecommendedAction | null
+  safetyRiskUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ageConfirmedIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  communityVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  consentIpHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentUserAgentHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  photos?: Prisma.PhotoUncheckedUpdateManyWithoutUserNestedInput
+  likesSent?: Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput
+  likesReceived?: Prisma.LikeUncheckedUpdateManyWithoutToNestedInput
+  firstMessagesSent?: Prisma.FirstMessageUncheckedUpdateManyWithoutSenderNestedInput
+  firstMessagesReceived?: Prisma.FirstMessageUncheckedUpdateManyWithoutReceiverNestedInput
+  matchesAsA?: Prisma.MatchUncheckedUpdateManyWithoutUserANestedInput
+  matchesAsB?: Prisma.MatchUncheckedUpdateManyWithoutUserBNestedInput
+  participants?: Prisma.ParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsReceived?: Prisma.ReportUncheckedUpdateManyWithoutReportedNestedInput
+  blocksMade?: Prisma.BlockUncheckedUpdateManyWithoutBlockerNestedInput
+  blocksReceived?: Prisma.BlockUncheckedUpdateManyWithoutBlockedNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationDevices?: Prisma.NotificationDeviceUncheckedUpdateManyWithoutUserNestedInput
+  apiIdempotencyKeys?: Prisma.ApiIdempotencyKeyUncheckedUpdateManyWithoutUserNestedInput
+  conversationPresence?: Prisma.ConversationPresenceUncheckedUpdateManyWithoutUserNestedInput
+  explorePreferences?: Prisma.UserExplorePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  adminLogs?: Prisma.AdminLogUncheckedUpdateManyWithoutActorNestedInput
+  authEvents?: Prisma.AuthVerificationEventUncheckedUpdateManyWithoutUserNestedInput
+  moderationCases?: Prisma.ModerationCaseUncheckedUpdateManyWithoutUserNestedInput
+  violations?: Prisma.AccountViolationUncheckedUpdateManyWithoutUserNestedInput
+  appeals?: Prisma.AppealUncheckedUpdateManyWithoutUserNestedInput
+  profilePhotoVerification?: Prisma.ProfilePhotoVerificationUncheckedUpdateOneWithoutUserNestedInput
+  livenessSessions?: Prisma.LivenessSessionUncheckedUpdateManyWithoutUserNestedInput
+  faceReferences?: Prisma.FaceReferenceRecordUncheckedUpdateManyWithoutUserNestedInput
+  faceIdentityBindings?: Prisma.FaceIdentityBindingUncheckedUpdateManyWithoutUserNestedInput
   verificationAuditEvents?: Prisma.VerificationAuditEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -14350,6 +15572,8 @@ export type UserCountOutputType = {
   appeals: number
   livenessSessions: number
   faceReferences: number
+  faceIdentityBindings: number
+  faceBindingsReviewed: number
   verificationAuditEvents: number
 }
 
@@ -14382,6 +15606,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   appeals?: boolean | UserCountOutputTypeCountAppealsArgs
   livenessSessions?: boolean | UserCountOutputTypeCountLivenessSessionsArgs
   faceReferences?: boolean | UserCountOutputTypeCountFaceReferencesArgs
+  faceIdentityBindings?: boolean | UserCountOutputTypeCountFaceIdentityBindingsArgs
+  faceBindingsReviewed?: boolean | UserCountOutputTypeCountFaceBindingsReviewedArgs
   verificationAuditEvents?: boolean | UserCountOutputTypeCountVerificationAuditEventsArgs
 }
 
@@ -14594,6 +15820,20 @@ export type UserCountOutputTypeCountFaceReferencesArgs<ExtArgs extends runtime.T
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountFaceIdentityBindingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FaceIdentityBindingWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFaceBindingsReviewedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FaceIdentityBindingWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountVerificationAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.VerificationAuditEventWhereInput
 }
@@ -14647,6 +15887,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   photoVerificationProvider?: boolean
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
+  faceVerifiedAt?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14685,6 +15926,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   profilePhotoVerification?: boolean | Prisma.User$profilePhotoVerificationArgs<ExtArgs>
   livenessSessions?: boolean | Prisma.User$livenessSessionsArgs<ExtArgs>
   faceReferences?: boolean | Prisma.User$faceReferencesArgs<ExtArgs>
+  faceIdentityBindings?: boolean | Prisma.User$faceIdentityBindingsArgs<ExtArgs>
+  faceBindingsReviewed?: boolean | Prisma.User$faceBindingsReviewedArgs<ExtArgs>
   verificationAuditEvents?: boolean | Prisma.User$verificationAuditEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -14737,6 +15980,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   photoVerificationProvider?: boolean
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
+  faceVerifiedAt?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14793,6 +16037,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   photoVerificationProvider?: boolean
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
+  faceVerifiedAt?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14849,6 +16094,7 @@ export type UserSelectScalar = {
   photoVerificationProvider?: boolean
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
+  faceVerifiedAt?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14857,7 +16103,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "faceBadgeSuspendedAt" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "faceBadgeSuspendedAt" | "faceVerifiedAt" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
@@ -14891,6 +16137,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   profilePhotoVerification?: boolean | Prisma.User$profilePhotoVerificationArgs<ExtArgs>
   livenessSessions?: boolean | Prisma.User$livenessSessionsArgs<ExtArgs>
   faceReferences?: boolean | Prisma.User$faceReferencesArgs<ExtArgs>
+  faceIdentityBindings?: boolean | Prisma.User$faceIdentityBindingsArgs<ExtArgs>
+  faceBindingsReviewed?: boolean | Prisma.User$faceBindingsReviewedArgs<ExtArgs>
   verificationAuditEvents?: boolean | Prisma.User$verificationAuditEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -14932,6 +16180,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     profilePhotoVerification: Prisma.$ProfilePhotoVerificationPayload<ExtArgs> | null
     livenessSessions: Prisma.$LivenessSessionPayload<ExtArgs>[]
     faceReferences: Prisma.$FaceReferenceRecordPayload<ExtArgs>[]
+    faceIdentityBindings: Prisma.$FaceIdentityBindingPayload<ExtArgs>[]
+    faceBindingsReviewed: Prisma.$FaceIdentityBindingPayload<ExtArgs>[]
     verificationAuditEvents: Prisma.$VerificationAuditEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -14982,6 +16232,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     photoVerificationProvider: string | null
     photoVerificationSession: string | null
     faceBadgeSuspendedAt: Date | null
+    faceVerifiedAt: Date | null
     lastActiveAt: Date
     onboardingDone: boolean
     marketingOptIn: boolean
@@ -15414,6 +16665,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   profilePhotoVerification<T extends Prisma.User$profilePhotoVerificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$profilePhotoVerificationArgs<ExtArgs>>): Prisma.Prisma__ProfilePhotoVerificationClient<runtime.Types.Result.GetResult<Prisma.$ProfilePhotoVerificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   livenessSessions<T extends Prisma.User$livenessSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$livenessSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LivenessSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faceReferences<T extends Prisma.User$faceReferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$faceReferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceReferenceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  faceIdentityBindings<T extends Prisma.User$faceIdentityBindingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$faceIdentityBindingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceIdentityBindingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  faceBindingsReviewed<T extends Prisma.User$faceBindingsReviewedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$faceBindingsReviewedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceIdentityBindingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verificationAuditEvents<T extends Prisma.User$verificationAuditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationAuditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -15491,6 +16744,7 @@ export interface UserFieldRefs {
   readonly photoVerificationProvider: Prisma.FieldRef<"User", 'String'>
   readonly photoVerificationSession: Prisma.FieldRef<"User", 'String'>
   readonly faceBadgeSuspendedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly faceVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastActiveAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly onboardingDone: Prisma.FieldRef<"User", 'Boolean'>
   readonly marketingOptIn: Prisma.FieldRef<"User", 'Boolean'>
@@ -16635,6 +17889,54 @@ export type User$faceReferencesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.FaceReferenceRecordScalarFieldEnum | Prisma.FaceReferenceRecordScalarFieldEnum[]
+}
+
+/**
+ * User.faceIdentityBindings
+ */
+export type User$faceIdentityBindingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FaceIdentityBinding
+   */
+  select?: Prisma.FaceIdentityBindingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FaceIdentityBinding
+   */
+  omit?: Prisma.FaceIdentityBindingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FaceIdentityBindingInclude<ExtArgs> | null
+  where?: Prisma.FaceIdentityBindingWhereInput
+  orderBy?: Prisma.FaceIdentityBindingOrderByWithRelationInput | Prisma.FaceIdentityBindingOrderByWithRelationInput[]
+  cursor?: Prisma.FaceIdentityBindingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FaceIdentityBindingScalarFieldEnum | Prisma.FaceIdentityBindingScalarFieldEnum[]
+}
+
+/**
+ * User.faceBindingsReviewed
+ */
+export type User$faceBindingsReviewedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FaceIdentityBinding
+   */
+  select?: Prisma.FaceIdentityBindingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FaceIdentityBinding
+   */
+  omit?: Prisma.FaceIdentityBindingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FaceIdentityBindingInclude<ExtArgs> | null
+  where?: Prisma.FaceIdentityBindingWhereInput
+  orderBy?: Prisma.FaceIdentityBindingOrderByWithRelationInput | Prisma.FaceIdentityBindingOrderByWithRelationInput[]
+  cursor?: Prisma.FaceIdentityBindingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FaceIdentityBindingScalarFieldEnum | Prisma.FaceIdentityBindingScalarFieldEnum[]
 }
 
 /**

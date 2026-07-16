@@ -26,6 +26,7 @@
     "test:integration": "node scripts/run-tests.mjs integration",
     "test:integration:live": "node scripts/run-tests.mjs live",
     "db:validate": "prisma validate && prisma generate && git diff --exit-code --stat src/generated",
+    "db:apply-migration": "tsx scripts/db-apply-migration.ts",
     "check:public-env": "node scripts/check-public-env.mjs",
     "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check"
   },

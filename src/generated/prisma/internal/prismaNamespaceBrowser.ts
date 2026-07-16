@@ -97,7 +97,8 @@ export const ModelName = {
   PhotoFaceCheck: 'PhotoFaceCheck',
   VerificationAuditEvent: 'VerificationAuditEvent',
   LivenessSession: 'LivenessSession',
-  FaceReferenceRecord: 'FaceReferenceRecord'
+  FaceReferenceRecord: 'FaceReferenceRecord',
+  FaceIdentityBinding: 'FaceIdentityBinding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -164,6 +165,7 @@ export const UserScalarFieldEnum = {
   photoVerificationProvider: 'photoVerificationProvider',
   photoVerificationSession: 'photoVerificationSession',
   faceBadgeSuspendedAt: 'faceBadgeSuspendedAt',
+  faceVerifiedAt: 'faceVerifiedAt',
   lastActiveAt: 'lastActiveAt',
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
@@ -969,6 +971,31 @@ export const FaceReferenceRecordScalarFieldEnum = {
 } as const
 
 export type FaceReferenceRecordScalarFieldEnum = (typeof FaceReferenceRecordScalarFieldEnum)[keyof typeof FaceReferenceRecordScalarFieldEnum]
+
+
+export const FaceIdentityBindingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  faceReferenceId: 'faceReferenceId',
+  identityVerificationId: 'identityVerificationId',
+  identitySessionId: 'identitySessionId',
+  livenessFlowId: 'livenessFlowId',
+  method: 'method',
+  provider: 'provider',
+  status: 'status',
+  similarityBand: 'similarityBand',
+  modelVersion: 'modelVersion',
+  thresholdVersion: 'thresholdVersion',
+  failureReasonCode: 'failureReasonCode',
+  boundAt: 'boundAt',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  reviewReasonCode: 'reviewReasonCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FaceIdentityBindingScalarFieldEnum = (typeof FaceIdentityBindingScalarFieldEnum)[keyof typeof FaceIdentityBindingScalarFieldEnum]
 
 
 export const SortOrder = {

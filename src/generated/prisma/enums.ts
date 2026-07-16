@@ -571,3 +571,26 @@ export const FaceReferenceRecordStatus = {
 } as const
 
 export type FaceReferenceRecordStatus = (typeof FaceReferenceRecordStatus)[keyof typeof FaceReferenceRecordStatus]
+
+
+export const FaceBindingMethod = {
+  STRIPE_SELFIE_COMPARE: 'STRIPE_SELFIE_COMPARE',
+  HUMAN_REVIEW: 'HUMAN_REVIEW',
+  PROVIDER_NATIVE: 'PROVIDER_NATIVE'
+} as const
+
+export type FaceBindingMethod = (typeof FaceBindingMethod)[keyof typeof FaceBindingMethod]
+
+
+export const FaceBindingStatus = {
+  NOT_BOUND: 'NOT_BOUND',
+  BINDING_REQUIRED: 'BINDING_REQUIRED',
+  BINDING_IN_PROGRESS: 'BINDING_IN_PROGRESS',
+  BOUND: 'BOUND',
+  BINDING_FAILED: 'BINDING_FAILED',
+  MANUAL_REVIEW: 'MANUAL_REVIEW',
+  PROVIDER_UNAVAILABLE: 'PROVIDER_UNAVAILABLE',
+  CONSENT_WITHDRAWN: 'CONSENT_WITHDRAWN'
+} as const
+
+export type FaceBindingStatus = (typeof FaceBindingStatus)[keyof typeof FaceBindingStatus]
