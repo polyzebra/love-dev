@@ -18,6 +18,7 @@
     "face:calibrate": "tsx scripts/face-calibrate.ts",
     "ops:alert-test": "tsx scripts/ops-alert-test.ts",
     "face:rehearsal": "tsx scripts/face-rehearsal.ts",
+    "trust:rehearsal": "tsx scripts/trust-rehearsal.ts",
     "test": "node scripts/run-tests.mjs",
     "perf:bundle": "node scripts/bundle-report.mjs",
     "perf:check": "node scripts/bundle-report.mjs --check",
