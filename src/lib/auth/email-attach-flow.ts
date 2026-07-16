@@ -379,26 +379,34 @@ export async function verifyEmailAttach(opts: {
     return { kind: "locked" };
   }
 
-  // The email_change confirmation - GoTrue stamps auth.users.email +
-  // email_confirmed_at for the CURRENT auth user on success.
+  // Proof-of-possession of the emailed code. A wrong/expired code ALWAYS
+  // comes back as an ERROR (verified: GoTrue answers otp_expired). A VALID
+  // new-side code returns NO error - but when "Secure email change" is ON
+  // it returns NO user and does NOT commit (the change stays pending until
+  // BOTH the old and new addresses confirm). So the code is proven the
+  // moment there is no error; a returned user is NOT guaranteed. The admin
+  // force-commit below is the source of truth and lands the change
+  // regardless of that dashboard setting. Gating on `!data.user` here was
+  // the bug: every phone-first attach failed with "That code didn't work"
+  // even though the entered code was correct.
   const { data, error } = await opts.client.verifyOtp({
     email,
     token: opts.code,
     type: "email_change",
   });
-  if (error || !data.user) {
+  if (error) {
     await recordAuthEvent({
       type: "email_attach_verify_fail",
       email,
       userId: user.id,
       req,
-      metadata: { code: error?.code ?? "no_user" },
+      metadata: { code: error.code ?? "verify_error" },
     });
-    return { kind: error?.code === "otp_expired" ? "expired_code" : "invalid_code" };
+    return { kind: error.code === "otp_expired" ? "expired_code" : "invalid_code" };
   }
-  if (data.user.id !== user.id) {
-    // Should be impossible for an email_change verify on this session -
-    // never adopt a foreign uid's result.
+  if (data.user && data.user.id !== user.id) {
+    // When GoTrue DOES return a user (Secure email change OFF), defensively
+    // confirm it is this session's account - never adopt a foreign result.
     await recordAuthEvent({
       type: "email_attach_verify_fail",
       email,

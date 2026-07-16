@@ -86,6 +86,9 @@ async function main() {
     commitEmail?: string;
     /** Admin commit hard error -> not_committed. */
     commitError?: string;
+    /** "Secure email change" ON: a valid code verifies with NO error and
+     *  NO user (the change stays pending); the admin commit is the truth. */
+    verifyNoUser?: boolean;
   }) {
     const calls: {
       method: "generateEmailChangeOtp" | "sendOtpEmail" | "verifyOtp" | "commitEmailChange";
@@ -115,6 +118,10 @@ async function main() {
             data: { user: null, session: null },
             error: { code: opts.verifyError, message: opts.verifyError },
           };
+        }
+        if (opts?.verifyNoUser) {
+          // Secure email change ON: valid code, no error, no user, no commit.
+          return { data: { user: null, session: null }, error: null };
         }
         return {
           data: { user: { id: opts?.verifyAs ?? randomUUID(), email }, session: {} },
@@ -401,6 +408,33 @@ async function main() {
           where: { type: "email_attach_verified", email: happyEmail, userId: happyId },
         });
         assert.ok(audit, "email_attach_verified audited");
+      },
+    );
+    await check(
+      "Secure email change ON: valid code verifies with NO user -> still attaches (admin commit)",
+      async () => {
+        // The production project has "Secure email change" ON: a correct
+        // new-side code returns no error AND no user (change pending). The
+        // flow must treat no-error as proof and let the admin commit land
+        // the change - NOT reject it as "That code didn't work".
+        const uid = await createPhoneFirstUser("5177");
+        const target = testEmail("secure-on");
+        const spy = spyClient({ verifyNoUser: true, commitEmail: target });
+        const outcome = await verifyEmailAttach({
+          user: sessionUser(uid),
+          email: target,
+          code: "123456",
+          client: spy.client,
+          req: fakeReq("203.0.113.64"),
+        });
+        assert.equal(outcome.kind, "attached", "no-user verify still succeeds via the commit");
+        assert.deepEqual(spy.calls, [
+          { method: "verifyOtp", email: target, type: "email_change" },
+          { method: "commitEmailChange", email: target },
+        ]);
+        const row = await db.user.findUniqueOrThrow({ where: { id: uid } });
+        assert.equal(row.email, target, "placeholder replaced with the real address");
+        assert.ok(row.emailVerified, "emailVerified stamped");
       },
     );
 
