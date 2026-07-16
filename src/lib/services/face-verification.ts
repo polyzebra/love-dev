@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { faceThresholds } from "@/lib/services/face-thresholds";
+import { PHOTOS_BUCKET } from "@/lib/services/photos";
 import {
   getFaceMatchProvider,
   isFaceMatchConfigured,
@@ -318,7 +319,7 @@ async function loadPhotoBytes(storagePath: string | null): Promise<Buffer | null
   const admin = createClient(url, key, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
-  const { data } = await admin.storage.from("photos").download(`${storagePath}/card.webp`);
+  const { data } = await admin.storage.from(PHOTOS_BUCKET).download(`${storagePath}/card.webp`);
   if (!data) return null;
   return Buffer.from(await data.arrayBuffer());
 }
