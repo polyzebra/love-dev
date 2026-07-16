@@ -64,17 +64,26 @@ function main() {
     assert.equal(isPhotoVerified({ faceVerifiedAt: D }), true);
   });
 
-  // ---- dormancy invariant: nothing consumes faceVerifiedAt yet -----------
-  check("no app surface references faceVerifiedAt except the helper definition", () => {
+  // ---- dormancy invariant: only the engine + helper touch faceVerifiedAt --
+  check("faceVerifiedAt is confined to the helper + the grant engine (no UI/route)", () => {
     const files = walk("src");
     const hits = files.filter((f) => readFileSync(f, "utf8").includes("faceVerifiedAt"));
-    assert.deepEqual(
-      hits,
-      ["src/lib/services/verification.ts"],
-      `unexpected consumers: ${hits.join(", ")}`,
-    );
+    // Post-F2 the allowed set is: the canonical helper (read), the grant
+    // engine (the ONE writer), and the rotation clear-wiring (comment + call).
+    const allowed = [
+      "src/lib/services/verification.ts",
+      "src/lib/services/photo-grant.ts",
+      "src/lib/services/face-reference.ts",
+    ];
+    for (const h of hits) assert.ok(allowed.includes(h), `unexpected faceVerifiedAt reference: ${h}`);
+    // No UI component and no route/public surface may reference it (dormant).
+    assert.ok(!hits.some((h) => h.endsWith(".tsx")), "no UI reads faceVerifiedAt");
+    assert.ok(!hits.some((h) => h.startsWith("src/app/")), "no route/public surface reads it");
+    // Exactly ONE writer: only photo-grant.ts writes the column.
+    const writers = files.filter((f) => /faceVerifiedAt:\s*(new Date\(\)|null)/.test(readFileSync(f, "utf8")));
+    assert.deepEqual(writers, ["src/lib/services/photo-grant.ts"], "faceVerifiedAt has exactly one writer");
+    // The helper never puts it inside a Prisma select.
     const v = readFileSync("src/lib/services/verification.ts", "utf8");
-    // It must NOT appear inside a Prisma select/where/query object.
     assert.ok(!/faceVerifiedAt:\s*true/.test(v), "faceVerifiedAt must not be in any select");
   });
 

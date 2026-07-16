@@ -87,6 +87,15 @@ export async function rotateReference(
     newStatus: "ROTATING",
     reasonCode: reason,
   });
+  // F2 (Phase 6): a rotated reference must NEVER carry an old positive grant.
+  // The new reference has no binding, so it must be re-bound + re-matched
+  // before Photo Verified can be regranted. Inert while dormant (faceVerifiedAt
+  // is always NULL today -> a 0-row no-op). The canonical clearer owns the write.
+  const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+  await clearPhotoVerification(userId, PhotoClearReason.REFERENCE_ROTATED, {
+    actorType: actor.type,
+    actorId: actor.id ?? null,
+  }).catch(() => undefined);
   return true;
 }
 
