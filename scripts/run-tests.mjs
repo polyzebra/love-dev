@@ -44,6 +44,7 @@ const LIVE = new Set([
   "face-emergency-disable.test.ts",
   "face-identity-binding.test.ts",
   "photo-grant.test.ts",
+  "face-binding-engine.test.ts",
   "ops-alerts.test.ts",
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",
@@ -72,6 +73,7 @@ const UNIT = new Set([
   "face-internal-allowlist.test.ts",
   "face-outcomes.test.ts",
   "face-badge-helpers.test.ts",
+  "face-binding-platform.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";
