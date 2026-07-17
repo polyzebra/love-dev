@@ -8,11 +8,7 @@ import {
 } from "@/lib/services/photo-verification";
 import { notifyUser } from "@/lib/services/notify";
 import { sendSafetyNotice } from "@/lib/services/safety-notices";
-import { after } from "next/server";
-import {
-  enqueueProfilePhotoVerification,
-  runProfilePhotoVerification,
-} from "@/lib/services/face-verification";
+import { enqueueProfilePhotoVerification } from "@/lib/services/face-verification";
 
 /**
  * POST /api/webhooks/verification - provider callback for photo

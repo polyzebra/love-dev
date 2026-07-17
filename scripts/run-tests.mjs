@@ -60,6 +60,7 @@ const LIVE = new Set([
 const UNIT = new Set([
   // Pure source-contract suites - no DB import, no env needed.
   "activation-legal-gate.test.ts",
+  "calibration-tooling.test.ts",
   "auth-form-stack.test.ts",
   "rate-limit.test.ts",
   "architecture.test.ts",
