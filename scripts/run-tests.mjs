@@ -49,6 +49,7 @@ const LIVE = new Set([
   "trust-rehearsal.test.ts",
   "trust-activation.test.ts",
   "trust-hardening.test.ts",
+  "activation-blockers.test.ts",
   "ops-alerts.test.ts",
   "face-rehearsal.test.ts",
   "face-storage-bucket.test.ts",
@@ -58,6 +59,7 @@ const LIVE = new Set([
 
 const UNIT = new Set([
   // Pure source-contract suites - no DB import, no env needed.
+  "activation-legal-gate.test.ts",
   "auth-form-stack.test.ts",
   "rate-limit.test.ts",
   "architecture.test.ts",

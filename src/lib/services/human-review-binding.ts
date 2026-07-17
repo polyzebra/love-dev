@@ -10,6 +10,7 @@ import {
   registerBindingProviderFactory,
   bindingMethodFromEnv,
 } from "@/lib/services/face-binding";
+import { faceBindingLegalGate } from "@/lib/services/face-rollout";
 
 /**
  * Epic 3 - the FIRST real FaceBindingProvider: HUMAN_REVIEW.
@@ -31,10 +32,14 @@ import {
 
 /** Configured + legally approved to run human binding review. Dormant default. */
 export function humanReviewConfigured(): boolean {
-  return (
-    bindingMethodFromEnv() === "HUMAN_REVIEW" &&
-    Boolean(process.env.FACE_BINDING_LEGAL_APPROVAL_VERSION?.trim())
-  );
+  if (bindingMethodFromEnv() !== "HUMAN_REVIEW") return false;
+  // H4: production requires the FULL recorded binding compliance set (the
+  // match-layer legal/DPA/calibration gates PLUS a counsel-approved,
+  // allow-listed binding version, emergency OFF). Non-production keeps the
+  // lightweight dev/rehearsal gate (a supplied version string) so mock lanes
+  // and the internal rehearsal continue to run.
+  if (process.env.NODE_ENV === "production") return faceBindingLegalGate().ok;
+  return Boolean(process.env.FACE_BINDING_LEGAL_APPROVAL_VERSION?.trim());
 }
 
 /** Canonical, structured review reason codes (Phase 5). No free-text verdicts. */

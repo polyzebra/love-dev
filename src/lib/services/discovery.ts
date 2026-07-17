@@ -6,7 +6,7 @@ import { getReplySignals } from "@/lib/services/signals";
 import { promptLabel } from "@/config/prompts";
 import { GOAL_LINES } from "@/lib/discovery/taxonomy";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
-import { isPubliclyVerified } from "@/lib/services/verification";
+import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
 
 /**
  * Discovery feed. Excludes: self, already-swiped, blocked (either way),
@@ -146,8 +146,10 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
         select: {
           lastActiveAt: true,
           createdAt: true,
-          // Canonical photo-verified verdict (see lib/services/verification.ts)
-          photoVerifiedAt: true,
+          // H1: canonical public-badge projection (photoVerifiedAt +
+          // faceVerifiedAt + faceBadgeSuspendedAt). Never hand-pick the fields -
+          // a missing suspension field would silently read as "not suspended".
+          ...PUBLIC_BADGE_SELECT,
           photos: {
             where: { moderation: { not: "REJECTED" } },
             orderBy: [{ isCover: "desc" }, { position: "asc" }],

@@ -290,17 +290,25 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
   }
   const verdict = worstDuplicateClass(classes);
 
+  const downgradedToReview =
+    ["LIKELY_DUPLICATE", "TWIN_RISK"].includes(verdict) && job.status === "AUTO_VERIFIED";
   await db.profilePhotoVerification.update({
     where: { id: job.id },
     data: {
       duplicateClass: verdict,
       duplicateCheckedAt: new Date(),
       // Human routing for non-benign, non-impersonation outcomes.
-      ...(["LIKELY_DUPLICATE", "TWIN_RISK"].includes(verdict) && job.status === "AUTO_VERIFIED"
-        ? { status: "MANUAL_REVIEW" as const }
-        : {}),
+      ...(downgradedToReview ? { status: "MANUAL_REVIEW" as const } : {}),
     },
   });
+  if (downgradedToReview) {
+    // H2: routing a verified user to manual review invalidates trust - revoke
+    // the positive grant via the canonical engine (AFTER the status change).
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(userId, PhotoClearReason.MANUAL_REVIEW, {
+      actorType: "system",
+    }).catch(() => undefined);
+  }
   await recordVerificationAudit({
     userId,
     verificationId: job.id,
@@ -316,11 +324,19 @@ export async function runDuplicateCheck(userId: string): Promise<DuplicateIdenti
     if (cfg().autoSuspendEnabled) {
       await suspendForImpersonation(userId, job.id);
     } else {
-      // Auto-suspension not yet approved: HUMANS decide, badge untouched.
+      // Auto-suspension not yet approved: HUMANS decide, public badge
+      // (faceBadgeSuspendedAt) untouched - but the POSITIVE grant is still
+      // trust and an impersonation signal invalidates it.
       await db.profilePhotoVerification.update({
         where: { id: job.id },
         data: { status: "MANUAL_REVIEW" },
       });
+      // H2: revoke the positive Photo Verified grant via the canonical engine.
+      const { clearPhotoVerification, PhotoClearReason } =
+        await import("@/lib/services/photo-grant");
+      await clearPhotoVerification(userId, PhotoClearReason.MANUAL_REVIEW, {
+        actorType: "system",
+      }).catch(() => undefined);
       await recordVerificationAudit({
         userId,
         verificationId: job.id,
@@ -343,6 +359,13 @@ async function suspendForImpersonation(userId: string, verificationId: string): 
     }),
     db.user.update({ where: { id: userId }, data: { faceBadgeSuspendedAt: new Date() } }),
   ]);
+  // H2: an impersonation auto-suspend is a trust invalidation - revoke the
+  // positive Photo Verified grant through the canonical engine (never a direct
+  // faceVerifiedAt write). Runs AFTER the suspend so no stale grant survives.
+  const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+  await clearPhotoVerification(userId, PhotoClearReason.MANUAL_REVIEW, {
+    actorType: "system",
+  }).catch(() => undefined);
   await createFaceViolation(userId, "IMPERSONATION", "duplicate_impersonation");
   await recordVerificationAudit({
     userId,
