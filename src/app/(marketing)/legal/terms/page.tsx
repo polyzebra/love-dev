@@ -10,8 +10,10 @@ export default function TermsPage() {
 
       <h2>1. Who we are</h2>
       <p>
-        Tirvea is operated by Tirvea Ltd. These terms govern your use of the Tirvea platform across
-        web and mobile.
+        Tirvea is a platform operated by WiseWave Limited, a company registered in Ireland (company
+        number 762171), with its registered office at 39 Cooley Park, Dundalk, Co. Louth, A91 AP2V,
+        Ireland. These terms govern your use of the Tirvea platform across web and mobile. You can
+        contact us at info@tirvea.com.
       </p>
 
       <h2>2. Eligibility</h2>

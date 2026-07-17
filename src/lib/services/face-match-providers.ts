@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { faceMatchLegalGate } from "@/lib/services/face-rollout";
 
 /**
  * FaceComparisonProvider - the vendor seam for PROFILE-PHOTO verification
@@ -312,10 +313,13 @@ export function getFaceMatchProvider(): FaceComparisonProvider {
   const which = process.env.FACE_MATCH_PROVIDER?.trim().toLowerCase();
   if (which === "mock" && process.env.NODE_ENV !== "production") return mockFaceMatchProvider;
   if (which === "aws_rekognition_faces") {
-    // HARD LEGAL GATE (Phase 32): biometric processing in production
-    // requires a recorded legal approval version. Without it the layer
-    // stays honestly dormant - it can never enable itself.
-    if (process.env.NODE_ENV === "production" && !process.env.FACE_LEGAL_APPROVAL_VERSION?.trim()) {
+    // HARD LEGAL GATE (Phase 32 / H4): production biometric processing requires
+    // the FULL recorded compliance set - counsel-approved version (present AND
+    // allow-listed), executed DPA, approved calibration + version, and the
+    // emergency switch OFF - not merely a non-empty version string. The runtime
+    // fails closed here, independently of the rehearsal preflight, so the layer
+    // can never enable itself without every approval on record.
+    if (process.env.NODE_ENV === "production" && !faceMatchLegalGate().ok) {
       return faceMatchNotConfiguredProvider;
     }
     return loadAwsProvider();

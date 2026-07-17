@@ -15,7 +15,7 @@ import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline as presenceOnline } from "@/lib/presence";
 import { promptLabel } from "@/config/prompts";
 import { categoriesForProfile } from "@/lib/discovery/taxonomy";
-import { isPubliclyVerified } from "@/lib/services/verification";
+import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
 
 export const metadata: Metadata = { title: "Conversation" };
 
@@ -59,8 +59,10 @@ export default async function ConversationPage({
                 },
               },
             },
-            // Canonical photo-verified verdict (see lib/services/verification.ts)
-            photoVerifiedAt: true,
+            // H1: canonical public-badge projection (photoVerifiedAt +
+            // faceVerifiedAt + faceBadgeSuspendedAt) - never hand-pick, so a
+            // suspended badge can never read as verified in chat.
+            ...PUBLIC_BADGE_SELECT,
             photos: {
               orderBy: [{ isCover: "desc" }, { position: "asc" }],
               take: 1,

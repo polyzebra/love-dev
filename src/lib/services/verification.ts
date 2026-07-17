@@ -40,7 +40,10 @@ import type { VerificationStatus, VerificationType } from "@/generated/prisma/en
  */
 export function isPubliclyVerified(user: {
   photoVerifiedAt: Date | null;
-  faceBadgeSuspendedAt?: Date | null;
+  // H1: REQUIRED (not optional). A caller that forgets to select this security
+  // field is now a COMPILE error, not a silent "not suspended". Spread
+  // PUBLIC_BADGE_SELECT into the query to satisfy it.
+  faceBadgeSuspendedAt: Date | null;
 }): boolean {
   return user.photoVerifiedAt !== null && !user.faceBadgeSuspendedAt;
 }
@@ -66,6 +69,22 @@ export function isPhotoVerified(user: { faceVerifiedAt?: Date | null }): boolean
   return user.faceVerifiedAt != null;
 }
 
+/**
+ * H1 - THE canonical public-badge projection. EVERY surface that renders the
+ * public verified badge (swipe, chat, explore, search, public profile, profile
+ * peek) MUST spread this into its user select so the badge is always computed
+ * from a complete row. It carries EXACTLY the fields the public verdict
+ * (isPubliclyVerified) consumes - the identity signal AND the suspension gate.
+ * Because isPubliclyVerified() now REQUIRES faceBadgeSuspendedAt, omitting this
+ * fragment is a compile error, never a silent "not suspended". (The dormant
+ * positive grant faceVerifiedAt is deliberately NOT selected here - it has no
+ * public-verdict consumer; see isPhotoVerified.)
+ */
+export const PUBLIC_BADGE_SELECT = {
+  photoVerifiedAt: true,
+  faceBadgeSuspendedAt: true,
+} as const satisfies Prisma.UserSelect;
+
 /** Select fragment - extend an existing user query instead of re-querying. */
 export const VERIFICATION_USER_SELECT = {
   emailVerified: true,
@@ -84,9 +103,10 @@ export type VerificationSource = {
   phoneVerifiedAt: Date | null;
   photoVerifiedAt: Date | null;
   /** Face-layer badge suspension - withholds the photo badge without
-   *  un-verifying identity (see face-verification.ts). Optional so legacy
-   *  callers that never select it read as "not suspended". */
-  faceBadgeSuspendedAt?: Date | null;
+   *  un-verifying identity (see face-verification.ts). H1: REQUIRED (no
+   *  optional security fields) - VERIFICATION_USER_SELECT always loads it, so
+   *  a caller that omits it is a compile error, never a silent "not suspended". */
+  faceBadgeSuspendedAt: Date | null;
   verifications: Array<{
     type: VerificationType;
     status: VerificationStatus;
@@ -205,6 +225,18 @@ export async function reviewVerification(opts: {
     }
     return row;
   });
+  // H3: revoking identity (PHOTO reject -> photoVerifiedAt cleared above) must
+  // revoke the dependent Photo Verified grant through the canonical engine - no
+  // stale positive grant may outlive its identity precondition. Runs AFTER the
+  // committed revocation; a no-op when nothing was granted. Dynamic import
+  // avoids the photo-grant <-> service import cycle.
+  if (verification.type === "PHOTO" && !opts.approve) {
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(verification.userId, PhotoClearReason.IDENTITY_REVOKED, {
+      actorType: "admin",
+      actorId: opts.actorId,
+    }).catch(() => undefined);
+  }
   await sendSafetyNotice(
     verification.userId,
     opts.approve ? "verification_approved" : "verification_rejected",

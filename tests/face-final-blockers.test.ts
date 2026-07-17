@@ -302,12 +302,21 @@ async function main() {
     });
 
     await check(
-      "legal-approval gate: prod + real provider without version -> dormant",
+      "legal-approval gate: prod + real provider requires FULL compliance (H4)",
       async () => {
         const { getFaceMatchProvider, faceMatchNotConfiguredProvider } =
           await import("../src/lib/services/face-match-providers");
-        const savedEnv = process.env.NODE_ENV;
-        const savedProvider = process.env.FACE_MATCH_PROVIDER;
+        const KEYS = [
+          "NODE_ENV",
+          "FACE_MATCH_PROVIDER",
+          "FACE_LEGAL_APPROVAL_VERSION",
+          "FACE_LEGAL_APPROVED_VERSIONS",
+          "FACE_AWS_DPA_CONFIRMED",
+          "FACE_CALIBRATION_APPROVED",
+          "FACE_CALIBRATION_VERSION",
+          "FACE_EMERGENCY_DISABLE",
+        ];
+        const SAVED = Object.fromEntries(KEYS.map((k) => [k, process.env[k]]));
         (process.env as Record<string, string>).NODE_ENV = "production";
         process.env.FACE_MATCH_PROVIDER = "aws_rekognition_faces";
         delete process.env.FACE_LEGAL_APPROVAL_VERSION;
@@ -317,16 +326,30 @@ async function main() {
             faceMatchNotConfiguredProvider,
             "no legal version -> dormant in prod",
           );
+          // H4: a lone version string is NO LONGER enough - the runtime now
+          // requires the full recorded compliance set and fails closed.
           process.env.FACE_LEGAL_APPROVAL_VERSION = "dpia-2026-07";
+          assert.equal(
+            getFaceMatchProvider(),
+            faceMatchNotConfiguredProvider,
+            "version alone -> still dormant (needs approved-version allowlist, DPA, calibration)",
+          );
+          // Full recorded compliance -> live.
+          process.env.FACE_LEGAL_APPROVED_VERSIONS = "dpia-2026-07";
+          process.env.FACE_AWS_DPA_CONFIRMED = "1";
+          process.env.FACE_CALIBRATION_APPROVED = "1";
+          process.env.FACE_CALIBRATION_VERSION = "cal-2026-07";
+          delete process.env.FACE_EMERGENCY_DISABLE;
           assert.notEqual(
             getFaceMatchProvider(),
             faceMatchNotConfiguredProvider,
-            "with approval -> live",
+            "full recorded approval -> live",
           );
         } finally {
-          (process.env as Record<string, string>).NODE_ENV = savedEnv ?? "test";
-          process.env.FACE_MATCH_PROVIDER = savedProvider;
-          delete process.env.FACE_LEGAL_APPROVAL_VERSION;
+          for (const [k, v] of Object.entries(SAVED)) {
+            if (v === undefined) delete process.env[k];
+            else process.env[k] = v;
+          }
         }
       },
     );

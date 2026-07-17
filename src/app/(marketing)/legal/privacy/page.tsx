@@ -8,6 +8,16 @@ export default function PrivacyPage() {
       <h1>Privacy Policy</h1>
       <p>Last updated: 1 July 2026</p>
 
+      <h2>Data controller</h2>
+      <p>
+        Tirvea is a platform operated by <strong>WiseWave Limited</strong>, which is the data
+        controller responsible for your personal data under the EU General Data Protection
+        Regulation (GDPR) and the Irish Data Protection Act 2018. WiseWave Limited is a company
+        registered in Ireland (company number 762171), with its registered office at 39 Cooley Park,
+        Dundalk, Co. Louth, A91 AP2V, Ireland. For any privacy question or to exercise your rights,
+        contact us at info@tirvea.com (or privacy@tirvea.app for data-rights requests).
+      </p>
+
       <h2>1. Data we collect</h2>
       <ul>
         <li>Account data: email, name, date of birth, hashed password.</li>

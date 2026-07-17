@@ -511,7 +511,7 @@ export async function applyVerificationOutcome(
 ): Promise<ApplyOutcomeResult> {
   if (outcome === "pending") return { applied: false, reason: "no_op", userId: null };
 
-  return db.$transaction(async (tx) => {
+  const result = await db.$transaction(async (tx): Promise<ApplyOutcomeResult> => {
     const row = await tx.verification.findFirst({
       where: { type: "PHOTO", provider: providerName, providerSessionId: sessionId },
       select: { id: true, userId: true, status: true },
@@ -554,6 +554,18 @@ export async function applyVerificationOutcome(
     }
     return { applied: true as const, userId: row.userId, outcome };
   });
+
+  // H3: a provider/webhook identity revocation (rejected -> photoVerifiedAt
+  // cleared above) must revoke the dependent Photo Verified grant through the
+  // canonical engine. Runs AFTER the committed revocation; a no-op when nothing
+  // was granted. Dynamic import avoids the photo-grant import cycle.
+  if (result.applied && outcome === "rejected") {
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(result.userId, PhotoClearReason.IDENTITY_REVOKED, {
+      actorType: "system",
+    }).catch(() => undefined);
+  }
+  return result;
 }
 
 // ---------------------------------------------------------------------------

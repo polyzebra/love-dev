@@ -452,3 +452,139 @@ export function assertRegionConsistency(): string {
   }
   return cfg.region;
 }
+
+// ===========================================================================
+// CALIBRATION-ONLY surface (G3.2). TRIPLE-GATED and can NEVER run in
+// production. Production security is UNCHANGED: the provider's createReference
+// stays liveness-only; these functions are the ONLY sanctioned path for static
+// (IndexFaces) enrollment, and they operate EXCLUSIVELY against a dedicated
+// calibration collection (FACE_CALIBRATION_COLLECTION_ID), never the runtime
+// FACE_COLLECTION_ID. They are called only by the calibration CLI/module.
+// ===========================================================================
+
+/** Thrown when calibration mode is not fully + safely enabled. */
+export class CalibrationModeError extends Error {
+  constructor(reason: string) {
+    super(`calibration refused: ${reason}`);
+    this.name = "CalibrationModeError";
+  }
+}
+
+/**
+ * THE calibration safety gate. Fails closed unless ALL hold:
+ *  - environment is NOT production (FACE_ENVIRONMENT != "production" AND
+ *    NODE_ENV != "production");
+ *  - FACE_CALIBRATION_MODE === "1";
+ *  - FACE_CALIBRATION_COLLECTION_ID is set, explicitly named "*calibration*",
+ *    and DIFFERENT from the production FACE_COLLECTION_ID.
+ * Returns the resolved calibration collection id + region.
+ */
+export function assertCalibrationMode(): { collectionId: string; region: string } {
+  const envName =
+    process.env.FACE_ENVIRONMENT?.trim() ||
+    (process.env.NODE_ENV === "production" ? "production" : "staging");
+  if (envName === "production") throw new CalibrationModeError("FACE_ENVIRONMENT=production");
+  if (process.env.NODE_ENV === "production") throw new CalibrationModeError("NODE_ENV=production");
+  if (process.env.FACE_CALIBRATION_MODE !== "1")
+    throw new CalibrationModeError("FACE_CALIBRATION_MODE!=1");
+  const calCol = process.env.FACE_CALIBRATION_COLLECTION_ID?.trim();
+  if (!calCol) throw new CalibrationModeError("FACE_CALIBRATION_COLLECTION_ID is not set");
+  if (!/calibration/i.test(calCol))
+    throw new CalibrationModeError(
+      "calibration collection must be explicitly named '*calibration*'",
+    );
+  const prodCol = process.env.FACE_COLLECTION_ID?.trim();
+  if (prodCol && calCol === prodCol)
+    throw new CalibrationModeError("calibration collection must differ from FACE_COLLECTION_ID");
+  return { collectionId: calCol, region: awsConfig().region };
+}
+
+/** Calibration-only static enrollment: IndexFaces into the CALIBRATION
+ *  collection. Gated. externalImageId carries the labelled calibration key. */
+export async function calibrationIndexFace(opts: {
+  image: Buffer;
+  externalImageId: string;
+}): Promise<{ faceId: string }> {
+  const { collectionId } = assertCalibrationMode();
+  if (!opts.externalImageId)
+    throw new Error("calibration: externalImageId (labelled key) required");
+  const indexed = await call("IndexFaces", {
+    CollectionId: collectionId,
+    Image: { Bytes: opts.image.toString("base64") },
+    ExternalImageId: opts.externalImageId,
+    MaxFaces: 1,
+    QualityFilter: "AUTO",
+    DetectionAttributes: [],
+  });
+  const records = (indexed.FaceRecords as Array<{ Face?: { FaceId?: string } }>) ?? [];
+  const faceId = records[0]?.Face?.FaceId;
+  if (!faceId) throw new Error("calibration IndexFaces: no face indexed");
+  return { faceId };
+}
+
+/** Calibration-only comparison against the CALIBRATION collection. Mirrors the
+ *  production compare's normalization but never touches FACE_COLLECTION_ID. */
+export async function calibrationCompare(
+  referenceId: string,
+  input: FaceDetectInput,
+): Promise<FaceComparison> {
+  const { collectionId } = assertCalibrationMode();
+  const t = thresholds();
+  const detected = await call("DetectFaces", {
+    Image: { Bytes: input.image.toString("base64") },
+    Attributes: ["DEFAULT"],
+  });
+  const faces = ((detected.FaceDetails as AwsFace[]) ?? []).filter(
+    (f) => (f.Confidence ?? 0) >= t.minFaceConfidence,
+  );
+  const detection = detectionFrom(faces);
+  if (detection.faceCount === 0) {
+    return {
+      similarity: null,
+      ownerDetected: false,
+      faceCount: 0,
+      dominantFaceRatio: null,
+      qualityScore: detection.qualityScore,
+    };
+  }
+  const search = await call("SearchFacesByImage", {
+    CollectionId: collectionId,
+    Image: { Bytes: input.image.toString("base64") },
+    MaxFaces: 5,
+    FaceMatchThreshold: t.mismatchAt,
+    QualityFilter: "AUTO",
+  }).catch(() => ({}) as Record<string, unknown>);
+  const matches =
+    (search.FaceMatches as Array<{ Similarity?: number; Face?: { FaceId?: string } }>) ?? [];
+  const own = matches.find((m) => m.Face?.FaceId === referenceId);
+  const similarity = own?.Similarity ?? 0;
+  return {
+    similarity: similarity / 100,
+    ownerDetected: bandFor(similarity, t.matchAt, t.mismatchAt) === "confident",
+    faceCount: detection.faceCount,
+    dominantFaceRatio: detection.dominantFaceRatio,
+    qualityScore: detection.qualityScore,
+  };
+}
+
+/** Calibration-only deletion (cleanup). Idempotent at AWS. Gated. */
+export async function calibrationDeleteFaces(faceIds: string[]): Promise<{ deleted: number }> {
+  const { collectionId } = assertCalibrationMode();
+  if (faceIds.length === 0) return { deleted: 0 };
+  await call("DeleteFaces", { CollectionId: collectionId, FaceIds: faceIds });
+  return { deleted: faceIds.length };
+}
+
+/** Calibration-only listing (for cleanup + verification). Gated. */
+export async function calibrationListFaces(): Promise<{
+  faceIds: string[];
+  faceModelVersion: string | null;
+}> {
+  const { collectionId } = assertCalibrationMode();
+  const res = await call("ListFaces", { CollectionId: collectionId, MaxResults: 4096 });
+  const faces = (res.Faces as Array<{ FaceId?: string }>) ?? [];
+  return {
+    faceIds: faces.map((f) => f.FaceId).filter((x): x is string => Boolean(x)),
+    faceModelVersion: typeof res.FaceModelVersion === "string" ? res.FaceModelVersion : null,
+  };
+}

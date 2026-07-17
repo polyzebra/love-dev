@@ -30,6 +30,18 @@ const nextConfig: NextConfig = {
       // The app nav labels /matches "Likes" and the route allowlist
       // reserves /likes - alias the guessable URL instead of 404ing it.
       { source: "/likes", destination: "/matches", permanent: false },
+      // Legal Centre canonical-slug aliases (L2.1). The published pages
+      // use descriptive slugs; the L2.1 URL map lists shorter synonyms.
+      // Alias the synonyms onto the canonical routes so every documented
+      // legal URL resolves without duplicating pages or breaking links.
+      { source: "/legal/refunds", destination: "/legal/refund-policy", permanent: true },
+      { source: "/legal/subscriptions", destination: "/legal/subscription-terms", permanent: true },
+      {
+        source: "/legal/biometric-information",
+        destination: "/legal/biometric-data",
+        permanent: true,
+      },
+      { source: "/legal/safety-centre", destination: "/safety", permanent: true },
     ];
   },
   async rewrites() {

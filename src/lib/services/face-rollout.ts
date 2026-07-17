@@ -132,6 +132,62 @@ export function faceEmergencyDisabled(): boolean {
   return process.env.FACE_EMERGENCY_DISABLE === "1";
 }
 
+/** Parse a comma-separated approved-versions env into a trimmed, non-empty list. */
+function splitApprovedVersions(raw: string | undefined): string[] {
+  return (raw ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export type FaceLegalGateResult = { ok: boolean; missing: string[] };
+
+/**
+ * H4 - THE canonical RUNTIME legal/compliance gate for the MATCH layer. Pure
+ * env read, side-effect free, fail-closed. Enforced at provider resolution in
+ * production (getFaceMatchProvider), so the whole face layer stays dormant
+ * unless EVERY recorded approval exists:
+ *   - FACE_LEGAL_APPROVED_VERSIONS  (counsel-approved allowlist, non-empty)
+ *   - FACE_LEGAL_APPROVAL_VERSION   (supplied AND a member of the allowlist)
+ *   - FACE_AWS_DPA_CONFIRMED=1       (executed data-processing agreement)
+ *   - FACE_CALIBRATION_APPROVED=1 + FACE_CALIBRATION_VERSION (approved calibration)
+ *   - FACE_EMERGENCY_DISABLE not set (kill switch OFF)
+ * Previously these lived ONLY in the rehearsal preflight; they now bind
+ * production runtime independently. `missing` lists non-secret env keys only.
+ */
+export function faceMatchLegalGate(): FaceLegalGateResult {
+  const missing: string[] = [];
+  const approved = splitApprovedVersions(process.env.FACE_LEGAL_APPROVED_VERSIONS);
+  const supplied = process.env.FACE_LEGAL_APPROVAL_VERSION?.trim() || "";
+  if (approved.length === 0) missing.push("FACE_LEGAL_APPROVED_VERSIONS");
+  if (!supplied) missing.push("FACE_LEGAL_APPROVAL_VERSION");
+  else if (!approved.includes(supplied)) missing.push("FACE_LEGAL_APPROVAL_VERSION:not_approved");
+  if (process.env.FACE_AWS_DPA_CONFIRMED !== "1") missing.push("FACE_AWS_DPA_CONFIRMED");
+  if (process.env.FACE_CALIBRATION_APPROVED !== "1") missing.push("FACE_CALIBRATION_APPROVED");
+  if (!process.env.FACE_CALIBRATION_VERSION?.trim()) missing.push("FACE_CALIBRATION_VERSION");
+  if (faceEmergencyDisabled()) missing.push("FACE_EMERGENCY_DISABLE");
+  return { ok: missing.length === 0, missing };
+}
+
+/**
+ * H4 - THE canonical RUNTIME legal gate for the BINDING layer. Binding is
+ * downstream of matching, so it requires the FULL match-layer compliance PLUS
+ * its own counsel-approved binding-version allowlist:
+ *   - FACE_BINDING_LEGAL_APPROVED_VERSIONS  (allowlist, non-empty)
+ *   - FACE_BINDING_LEGAL_APPROVAL_VERSION    (supplied AND a member)
+ * Enforced in production by humanReviewConfigured(). Fail-closed.
+ */
+export function faceBindingLegalGate(): FaceLegalGateResult {
+  const missing = faceMatchLegalGate().missing.slice();
+  const approved = splitApprovedVersions(process.env.FACE_BINDING_LEGAL_APPROVED_VERSIONS);
+  const supplied = process.env.FACE_BINDING_LEGAL_APPROVAL_VERSION?.trim() || "";
+  if (approved.length === 0) missing.push("FACE_BINDING_LEGAL_APPROVED_VERSIONS");
+  if (!supplied) missing.push("FACE_BINDING_LEGAL_APPROVAL_VERSION");
+  else if (!approved.includes(supplied))
+    missing.push("FACE_BINDING_LEGAL_APPROVAL_VERSION:not_approved");
+  return { ok: missing.length === 0, missing };
+}
+
 export type AdmitDecision = { admit: boolean; reason: string };
 
 /**

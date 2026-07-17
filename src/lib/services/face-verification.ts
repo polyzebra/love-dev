@@ -1002,6 +1002,19 @@ export async function adminFaceAction(opts: {
       reasonCode: reasonCode ?? opts.reasonCode ?? null,
     });
 
+  // H2: any admin action that invalidates trust must revoke the positive Photo
+  // Verified grant through the canonical engine (never a direct faceVerifiedAt
+  // write). Called AFTER the state change; a no-op when nothing was granted.
+  // Dynamic import mirrors the rest of this file (photo-grant <-> this module
+  // form a cycle broken by lazy import).
+  const clearGrant = async (reason: "PHOTO_CHANGED" | "REFERENCE_DELETED" | "MANUAL_REVIEW") => {
+    const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
+    await clearPhotoVerification(job.userId, PhotoClearReason[reason], {
+      actorType: "admin",
+      actorId: opts.actorId,
+    }).catch(() => undefined);
+  };
+
   switch (opts.action) {
     case "approve": {
       await db.$transaction([
@@ -1043,6 +1056,9 @@ export async function adminFaceAction(opts: {
         }),
       ]);
       await audit("face_admin_reject_photo", job.status, "photo_rejected");
+      // H2: unpublishing a verified photo invalidates the current match -
+      // revoke provisionally; the re-run re-grants only on a fresh MATCH.
+      await clearGrant("PHOTO_CHANGED");
       // Photo set changed: re-run so cover fallback / aggregate risk update.
       await enqueueProfilePhotoVerification(job.userId, "admin_photo_rejected");
       return { status: "QUEUED", badgeStatus: job.badgeStatus };
@@ -1074,6 +1090,9 @@ export async function adminFaceAction(opts: {
         body: "We need a fresh verification selfie to keep your badge. It only takes a minute.",
         dedupeKey: `face-rechallenge:${job.id}:${Date.now()}`,
       });
+      // H2: references deleted + job idled to LIVENESS_REQUIRED - trust is
+      // invalidated; revoke the positive grant through the canonical engine.
+      await clearGrant("REFERENCE_DELETED");
       await audit("face_admin_request_selfie", "LIVENESS_REQUIRED", "re_challenge");
       return { status: "LIVENESS_REQUIRED", badgeStatus: "REVIEWING" };
     }
@@ -1085,6 +1104,8 @@ export async function adminFaceAction(opts: {
         }),
         db.user.update({ where: { id: job.userId }, data: { faceBadgeSuspendedAt: new Date() } }),
       ]);
+      // H2: manual suspension invalidates trust - revoke the positive grant.
+      await clearGrant("MANUAL_REVIEW");
       await audit("face_admin_suspend", "SUSPENDED");
       return { status: "SUSPENDED", badgeStatus: "SUSPENDED" };
     }
