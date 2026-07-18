@@ -25,6 +25,10 @@ export const LEGAL_DOC_FILES: Record<LegalDocSlug, string> = {
   "account-suspension": "L3.3-ACCOUNT-SUSPENSION-POLICY-DRAFT.md",
   "child-safety": "L3.4-CHILD-SAFETY-POLICY-DRAFT.md",
   "ai-moderation": "L3.5-AI-MODERATION-POLICY-DRAFT.md",
+  "data-retention": "L4.1-DATA-RETENTION-POLICY-DRAFT.md",
+  gdpr: "L4.2-GDPR-RIGHTS-POLICY-DRAFT.md",
+  "account-deletion": "L4.3-ACCOUNT-DELETION-POLICY-DRAFT.md",
+  "cookie-preferences": "L4.4-COOKIE-PREFERENCES-POLICY-DRAFT.md",
 };
 
 export type LegalDocMeta = {

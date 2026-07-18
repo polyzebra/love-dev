@@ -15,6 +15,10 @@ export const LEGAL_DOC_SLUGS = [
   "account-suspension",
   "child-safety",
   "ai-moderation",
+  "data-retention",
+  "gdpr",
+  "account-deletion",
+  "cookie-preferences",
 ] as const;
 
 export type LegalDocSlug = (typeof LEGAL_DOC_SLUGS)[number];
