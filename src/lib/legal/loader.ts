@@ -29,6 +29,9 @@ export const LEGAL_DOC_FILES: Record<LegalDocSlug, string> = {
   gdpr: "L4.2-GDPR-RIGHTS-POLICY-DRAFT.md",
   "account-deletion": "L4.3-ACCOUNT-DELETION-POLICY-DRAFT.md",
   "cookie-preferences": "L4.4-COOKIE-PREFERENCES-POLICY-DRAFT.md",
+  "biometric-data": "L5.1-BIOMETRIC-INFORMATION-POLICY-DRAFT.md",
+  "photo-verification": "L5.2-PHOTO-VERIFICATION-POLICY-DRAFT.md",
+  "identity-verification": "L5.3-IDENTITY-VERIFICATION-POLICY-DRAFT.md",
 };
 
 export type LegalDocMeta = {
