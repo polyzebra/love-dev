@@ -1,18 +1,23 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
+import { legalFooterGroups, type LegalFooterLink } from "@/lib/legal/registry";
 
 /**
  * Premium SaaS footer / Legal Centre.
- *  - Desktop (>=1024px): a static, permanently-expanded 5-column grid. No JS,
- *    no accordion, every link in the HTML.
+ *  - Desktop (>=1024px): a static, permanently-expanded grid. No JS, no
+ *    accordion, every link in the HTML.
  *  - Mobile (<1024px): CSS-only collapsible sections (a focusable checkbox +
  *    :has() + a grid-rows 0fr->1fr height animation, ~200ms, no layout shift,
  *    chevron rotates). Links stay in the DOM (SEO + a11y), never lazy-rendered.
  * Zero client JavaScript.
+ *
+ * L2.9: every legal link is derived from the canonical registry
+ * (`legalFooterGroups`), so the footer can never drift from the Legal Centre.
+ * Only the non-legal Product and Company columns are curated here.
  */
-type FooterLink = { href: string; label: string; external?: boolean };
+type FooterLink = LegalFooterLink;
 
-const GROUPS: { title: string; id: string; links: FooterLink[] }[] = [
+const MARKETING_GROUPS: { title: string; id: string; links: FooterLink[] }[] = [
   {
     title: "Product",
     id: "footer-product",
@@ -21,37 +26,6 @@ const GROUPS: { title: string; id: string; links: FooterLink[] }[] = [
       { href: "/login", label: "Create Account" },
       { href: "/login", label: "Sign In" },
       { href: "/settings/support", label: "Help" },
-    ],
-  },
-  {
-    title: "Legal",
-    id: "footer-legal",
-    links: [
-      { href: "/legal/terms", label: "Terms of Service" },
-      { href: "/legal/privacy", label: "Privacy Policy" },
-      { href: "/legal/cookies", label: "Cookie Policy" },
-      { href: "/legal/refund-policy", label: "Refund Policy" },
-      { href: "/legal/subscription-terms", label: "Subscription Terms" },
-    ],
-  },
-  {
-    title: "Safety & Compliance",
-    id: "footer-safety",
-    links: [
-      { href: "/legal/community-guidelines", label: "Community Guidelines" },
-      { href: "/safety", label: "Trust & Safety" },
-      { href: "/legal/identity-verification", label: "Identity Verification Policy" },
-      { href: "/legal/photo-verification", label: "Photo Verification Policy" },
-      { href: "/legal/biometric-data", label: "Biometric Information Policy" },
-      { href: "/legal/ai-moderation", label: "AI Moderation Policy" },
-      { href: "/legal/security", label: "Security Policy" },
-      { href: "/legal/child-safety", label: "Child Safety Policy" },
-      { href: "/legal/data-retention", label: "Data Retention Policy" },
-      { href: "/legal/transparency", label: "Transparency Report" },
-      { href: "/legal/compliance", label: "Compliance Statement" },
-      { href: "/legal/law-enforcement", label: "Law Enforcement Guidelines" },
-      { href: "/legal/copyright", label: "Copyright Policy" },
-      { href: "/legal/vulnerability-disclosure", label: "Vulnerability Disclosure Policy" },
     ],
   },
   {
@@ -68,7 +42,7 @@ const GROUPS: { title: string; id: string; links: FooterLink[] }[] = [
 ];
 
 const LINK_CLASS =
-  "text-foreground/75 hover:text-foreground text-[15px] leading-6 underline-offset-4 transition-colors hover:underline";
+  "text-foreground/75 hover:text-foreground text-[15px] leading-6 underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-sm";
 
 function FooterLinks({ links }: { links: FooterLink[] }) {
   return (
@@ -92,7 +66,7 @@ function FooterLinks({ links }: { links: FooterLink[] }) {
   );
 }
 
-function FooterSection({ title, id, links }: (typeof GROUPS)[number]) {
+function FooterSection({ title, id, links }: { title: string; id: string; links: FooterLink[] }) {
   return (
     <nav aria-label={title} className="group/sec border-border border-b lg:border-none">
       {/* Focusable checkbox drives the mobile-only CSS accordion. Hidden on
@@ -119,38 +93,68 @@ function FooterSection({ title, id, links }: (typeof GROUPS)[number]) {
   );
 }
 
+function categoryId(category: string): string {
+  return "footer-legal-" + category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 export function MarketingFooter() {
+  const legalGroups = legalFooterGroups();
   return (
     <footer className="border-border border-t">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-10 gap-y-1 px-6 py-14 md:px-10 md:py-20 lg:grid-cols-[1.6fr_1fr_1fr_1.5fr_1fr] lg:items-start lg:gap-8">
-        {/* Branding block */}
-        <div className="mb-6 max-w-xs lg:mb-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-web.svg"
-            alt="Tirvea"
-            width={134}
-            height={32}
-            className="h-8 w-auto select-none"
-            draggable={false}
-          />
-          <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-            Dating, designed with intention.
-            <br />
-            Wherever you are.
-          </p>
-          <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-            Verified identities.
-            <br />
-            Private conversations.
-            <br />
-            Built for meaningful connections.
-          </p>
+      <div className="mx-auto max-w-6xl px-6 py-14 md:px-10 md:py-20">
+        {/* Top: branding + marketing columns */}
+        <div className="grid grid-cols-1 gap-x-10 gap-y-1 lg:grid-cols-[1.8fr_1fr_1fr] lg:items-start lg:gap-8">
+          <div className="mb-6 max-w-xs lg:mb-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-web.svg"
+              alt="Tirvea"
+              width={134}
+              height={32}
+              className="h-8 w-auto select-none"
+              draggable={false}
+            />
+            <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
+              Dating, designed with intention.
+              <br />
+              Wherever you are.
+            </p>
+            <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
+              Verified identities.
+              <br />
+              Private conversations.
+              <br />
+              Built for meaningful connections.
+            </p>
+          </div>
+
+          {MARKETING_GROUPS.map((group) => (
+            <FooterSection key={group.id} {...group} />
+          ))}
         </div>
 
-        {GROUPS.map((group) => (
-          <FooterSection key={group.id} {...group} />
-        ))}
+        {/* Legal Centre: every link derived from the registry */}
+        <div className="border-border mt-10 border-t pt-10">
+          <div className="mb-2 flex items-baseline justify-between lg:mb-6">
+            <h2 className="text-foreground text-sm font-semibold">Legal Centre</h2>
+            <Link
+              href="/legal"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/60 rounded-sm text-xs underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-x-8 gap-y-0 sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-8">
+            {legalGroups.map((group) => (
+              <FooterSection
+                key={group.category}
+                title={group.category}
+                id={categoryId(group.category)}
+                links={group.links}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Bottom */}

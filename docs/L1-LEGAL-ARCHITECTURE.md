@@ -1,7 +1,7 @@
-# L1 — Tirvea Legal Architecture (Master Blueprint)
+# L1 - Tirvea Legal Architecture (Master Blueprint)
 
 Single source of truth for every legal document, footer link, consent flow,
-policy version, audit log, and compliance requirement. **Architecture only — no
+policy version, audit log, and compliance requirement. **Architecture only - no
 legal text is drafted here.** All legal copy is drafted in later phases and must
 be reviewed by qualified counsel before production.
 
@@ -13,13 +13,13 @@ be reviewed by qualified counsel before production.
 | Company number (CRO, Ireland) | 762171 |
 | Registered office | 39 Cooley Park, Dundalk, Co. Louth, A91 AP2V, Ireland |
 | Contact | info@tirvea.com |
-| Brand / platform name | **Tirvea** (brand only — never a legal entity) |
+| Brand / platform name | **Tirvea** (brand only - never a legal entity) |
 | Forbidden strings | ~~Tirvea Ltd~~, ~~Tirvea Limited~~ |
 | Initial jurisdictions | Ireland + United Kingdom |
 
 ---
 
-## 1. Current architecture (Task 1 — audit)
+## 1. Current architecture (Task 1 - audit)
 
 **Existing `/legal/*` (19):** terms, privacy, cookies, community-guidelines,
 acceptable-use, refund-policy, subscription-terms, identity-verification,
@@ -46,7 +46,7 @@ metadata), `gate.ts`; biometric `BIOMETRIC_CONSENT_VERSION="2026-07-bio-v1"` +
 - ⚠️ Duplication risk: biometric content spans `biometric-data` +
   `photo-verification`; deletion content spans `data-retention` + settings;
   copyright vs DMCA overlap. Needs canonical-owner rules (§6).
-- ⚠️ Version model covers terms/privacy/community + biometric only — **no
+- ⚠️ Version model covers terms/privacy/community + biometric only - **no
   per-document version/effective-date/revision-history registry**.
 
 ---
@@ -54,10 +54,10 @@ metadata), `gate.ts`; biometric `BIOMETRIC_CONSENT_VERSION="2026-07-bio-v1"` +
 ## 2. Target architecture
 
 Three tiers, one source of truth:
-1. **Legal Centre** (`/legal/*`, public) — canonical documents.
-2. **In-app mirrors** (`/settings/*`) — link to the canonical `/legal/*`; never
+1. **Legal Centre** (`/legal/*`, public) - canonical documents.
+2. **In-app mirrors** (`/settings/*`) - link to the canonical `/legal/*`; never
    fork the text.
-3. **Operational surfaces** — consent capture (signup, checkout, verification),
+3. **Operational surfaces** - consent capture (signup, checkout, verification),
    audit log (`ConsentEvent`/`VerificationAuditEvent`), external status page.
 
 Principles: one canonical URL per concept; in-app never duplicates copy (links
@@ -66,7 +66,7 @@ every document carries version + effective date + revision history.
 
 ---
 
-## 3. Legal Centre (Task 2 — every page)
+## 3. Legal Centre (Task 2 - every page)
 
 | # | Document | URL | Status |
 |---|---|---|---|
@@ -110,7 +110,7 @@ account-suspension, account-deletion, contact, status (external)**.
 ## 4. Footer architecture (Task 4)
 
 Same 4 groups across breakpoints; content identical (no hidden links). Desktop
-= static 5-column grid; tablet = 2–3 columns; mobile = collapsible sections.
+= static 5-column grid; tablet = 2-3 columns; mobile = collapsible sections.
 
 | Group | Links |
 |---|---|
@@ -120,8 +120,8 @@ Same 4 groups across breakpoints; content identical (no hidden links). Desktop
 | **Company** | About · Contact · Careers · Blog · Press · Status |
 
 Bottom bar: `© <year> WiseWave Limited. All rights reserved.` (full registered
-details live on Terms/Privacy/Compliance, not the footer — per product decision).
-Responsive: `grid-cols-1` (mobile accordion) → `md:` 2–3 cols → `lg:` 5-col
+details live on Terms/Privacy/Compliance, not the footer - per product decision).
+Responsive: `grid-cols-1` (mobile accordion) → `md:` 2-3 cols → `lg:` 5-col
 static. All links server-rendered (SEO); zero client JS.
 
 ---
@@ -130,7 +130,7 @@ static. All links server-rendered (SEO); zero client JS.
 
 Convention: `/legal/<kebab-case-noun>`; hub at `/legal`; product hubs at top
 level (`/safety`, `/about`, `/contact`); in-app mirrors under `/settings/*`
-linking to `/legal/*`; status external. Never rename a published URL — add a
+linking to `/legal/*`; status external. Never rename a published URL - add a
 redirect if a concept moves. Anchors for sub-topics (e.g.
 `/legal/copyright#complaints`, `/legal/gdpr#dsar`).
 
@@ -143,17 +143,17 @@ redirect if a concept moves. Anchors for sub-topics (e.g.
 | Terms of Service | Signup | Required | `CURRENT_VERSIONS.terms` | on version bump (gate) | `ConsentEvent(terms)` | account deletion |
 | Privacy notice | Signup | Required (transparency, not "consent") | `CURRENT_VERSIONS.privacy` | on bump | `ConsentEvent(privacy)` | n/a (info duty) |
 | Community Guidelines | Signup | Required | `CURRENT_VERSIONS.community` | on bump | `ConsentEvent(community)` | account deletion |
-| Age (18+) | Signup | Required | `ageConfirmedAt` | — | consent metadata | — |
-| Login | Login | none (auth only) | — | — | auth audit | — |
+| Age (18+) | Signup | Required | `ageConfirmedAt` | - | consent metadata | - |
+| Login | Login | none (auth only) | - | - | auth audit | - |
 | Subscription / billing | Checkout | Required (contract) | plan + price acceptance | on price change (notice) | Stripe + billing audit | cancel |
 | Digital-content immediate access | Checkout | Optional (waives 14-day withdrawal) | checkout flag | per purchase | billing audit | refund window |
 | Identity verification | Verify flow | Optional | provider session | per session | `VerificationAuditEvent` | n/a (outcome only) |
 | Biometric processing (photo/liveness) | Photo-verify | **Explicit opt-in (GDPR Art. 9)** | `BIOMETRIC_CONSENT_VERSION` | on bump | `VerificationAuditEvent` + `consentAt` | `/api/verification/consent/withdraw` → deletes reference |
 | AI processing (moderation) | Upload (notice) | Legitimate interest + notice | AI Moderation policy version | on material change | moderation audit | n/a |
 | Cookies (non-essential) | First visit | Consent (opt-in) | cookie-consent version | on category change | cookie-consent log | Cookie Preferences |
-| Marketing | Settings/opt-in | Optional (consent) | marketing flag | — | notification prefs | unsubscribe |
-| Appeals | Appeal submit | Implicit (process) | — | — | appeal audit | — |
-| Account deletion | Settings | Explicit action | deletion request | — | account audit | — |
+| Marketing | Settings/opt-in | Optional (consent) | marketing flag | - | notification prefs | unsubscribe |
+| Appeals | Appeal submit | Implicit (process) | - | - | appeal audit | - |
+| Account deletion | Settings | Explicit action | deletion request | - | account audit | - |
 
 Rules: separate, unbundled consent for each Art. 9 (biometric) and cookie
 category; explicit opt-in for biometrics + non-essential cookies; withdrawal as
@@ -199,7 +199,7 @@ revisionHistory[], consentVersionKey (nullable), requiresReconsent (bool)`.
   `ConsentEvent` with the new version (audit). Non-material edits bump
   lastUpdated only (no re-consent).
 - **Acceptance audit:** every acceptance/withdrawal is an immutable event
-  (user, timestamp, version, IP-hash) — already implemented for signup consent;
+  (user, timestamp, version, IP-hash) - already implemented for signup consent;
   extend to cookie/biometric/marketing.
 
 ---
@@ -231,11 +231,11 @@ Cross-cutting: DPIA reference (`DPIA-FACE-VERIFICATION.md`); processor register
 | Terms, Subscription, Refund | Legal Counsel | users | 12 mo / on change | consumer law | billing/Stripe |
 | Privacy, GDPR Rights, Cookie, Data Retention | Privacy Counsel / DPO | users, DPC | 12 mo | GDPR/DPA | data map, cookies |
 | Biometric, Identity/Photo Verification | Privacy Counsel + T&S | users, DPC | 6 mo (higher-risk) | Art. 9, DPIA | verification stack |
-| Community, Acceptable Use, Trust & Safety, Appeals, Suspension, Child Safety, AI Moderation, Transparency | Trust & Safety Lead | users, regulators | 6–12 mo | DSA | moderation/appeals |
-| Security, Vulnerability Disclosure | Security Lead | researchers | 12 mo | — | infra |
-| Law Enforcement | Legal Counsel | LE | 12 mo | MLAT/local law | — |
-| Compliance, Copyright, About, Contact | Legal / Company | public | 12 mo | mixed | — |
-| Status | Ops | users | live | — | monitoring |
+| Community, Acceptable Use, Trust & Safety, Appeals, Suspension, Child Safety, AI Moderation, Transparency | Trust & Safety Lead | users, regulators | 6-12 mo | DSA | moderation/appeals |
+| Security, Vulnerability Disclosure | Security Lead | researchers | 12 mo | - | infra |
+| Law Enforcement | Legal Counsel | LE | 12 mo | MLAT/local law | - |
+| Compliance, Copyright, About, Contact | Legal / Company | public | 12 mo | mixed | - |
+| Status | Ops | users | live | - | monitoring |
 
 ---
 
@@ -267,13 +267,13 @@ Cross-cutting: DPIA reference (`DPIA-FACE-VERIFICATION.md`); processor register
 
 | Phase | Scope | Delivers |
 |---|---|---|
-| **L2 — Core Legal Documents** | Terms, Privacy, Cookie, Community Guidelines, Acceptable Use, `/legal` hub | contract + transparency baseline |
-| **L3 — Trust & Safety** | Trust & Safety, Appeals, Account Suspension, Child Safety, AI Moderation, Transparency, Law Enforcement | DSA + safety framework |
-| **L4 — Privacy & GDPR** | GDPR Rights, Data Retention, Account Deletion, Cookie Preferences, DSAR flow, processor register + DPAs | data-subject rights + records |
-| **L5 — Subscriptions** | Subscription Terms, Refund, cooling-off/immediate-access consent, Stripe alignment | consumer-law compliance |
-| **L6 — Verification & Biometrics** | Biometric Information (canonical), Identity Verification, Photo Verification, liveness disclosures, biometric consent/withdrawal audit, DPIA link | Art. 9 + AWS compliance |
-| **L7 — Security & Compliance** | Security, Vulnerability Disclosure, Compliance Statement, Copyright/DMCA | security + IP + umbrella |
-| **L8 — Final Legal Audit** | links, entity, versions, consent audit trail, footer, sitemap/SEO, language, code↔doc consistency, **counsel sign-off** | production readiness |
+| **L2 - Core Legal Documents** | Terms, Privacy, Cookie, Community Guidelines, Acceptable Use, `/legal` hub | contract + transparency baseline |
+| **L3 - Trust & Safety** | Trust & Safety, Appeals, Account Suspension, Child Safety, AI Moderation, Transparency, Law Enforcement | DSA + safety framework |
+| **L4 - Privacy & GDPR** | GDPR Rights, Data Retention, Account Deletion, Cookie Preferences, DSAR flow, processor register + DPAs | data-subject rights + records |
+| **L5 - Subscriptions** | Subscription Terms, Refund, cooling-off/immediate-access consent, Stripe alignment | consumer-law compliance |
+| **L6 - Verification & Biometrics** | Biometric Information (canonical), Identity Verification, Photo Verification, liveness disclosures, biometric consent/withdrawal audit, DPIA link | Art. 9 + AWS compliance |
+| **L7 - Security & Compliance** | Security, Vulnerability Disclosure, Compliance Statement, Copyright/DMCA | security + IP + umbrella |
+| **L8 - Final Legal Audit** | links, entity, versions, consent audit trail, footer, sitemap/SEO, language, code↔doc consistency, **counsel sign-off** | production readiness |
 
 **Cross-phase invariants:** every document carries the entity block (WiseWave
 Limited); every material change bumps a consent version + writes an audit event;

@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
+import { LegalDocument } from "@/components/legal/legal-document";
+import { buildLegalMetadata } from "@/lib/legal/seo";
 
-export const metadata: Metadata = { title: "Appeals Policy" };
+// L2.9 - thin wrapper. All legal text lives in docs/L3.2-APPEALS-POLICY-DRAFT.md.
+export function generateMetadata(): Promise<Metadata> {
+  return buildLegalMetadata("appeals");
+}
 
 export default function AppealsPage() {
-  return (
-    <>
-      <h1>Appeals Policy</h1>
-      <p>
-        If we remove your content or restrict your account, you can ask us to review the decision.
-        This policy will set out who can appeal, how to appeal, timelines, and the outcome you can
-        expect. The full text is being finalised.
-      </p>
-      <p>
-        You can already appeal enforcement decisions from within the app. For related information see
-        our Community Guidelines, Account Suspension Policy, and Transparency Report.
-      </p>
-    </>
-  );
+  return <LegalDocument slug="appeals" />;
 }

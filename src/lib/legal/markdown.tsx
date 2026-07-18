@@ -1,7 +1,7 @@
 import React from "react";
 
 /**
- * L2.7 — a small, dependency-free Markdown + frontmatter parser for the legal
+ * L2.7 - a small, dependency-free Markdown + frontmatter parser for the legal
  * publishing system. It renders to React nodes (never raw HTML strings), so all
  * text is auto-escaped by React and there is no injection surface. It supports
  * exactly the constructs used in the legal master documents: ATX headings,

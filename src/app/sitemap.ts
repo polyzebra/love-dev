@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${base}${doc.path}`,
       lastModified: doc.lastUpdated,
       changeFrequency: "yearly",
-      priority: doc.category === "Core" ? 0.6 : 0.4,
+      priority: doc.category === "Core Legal" ? 0.6 : 0.4,
     });
   }
 

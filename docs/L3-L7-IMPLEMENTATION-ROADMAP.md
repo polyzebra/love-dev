@@ -1,6 +1,6 @@
-# Tirvea — Master Legal Implementation Roadmap (L3–L7)
+# Tirvea - Master Legal Implementation Roadmap (L3-L7)
 
-**PLANNING ARTIFACT — execution plan for the remaining legal library. No legal text is drafted here.**
+**PLANNING ARTIFACT - execution plan for the remaining legal library. No legal text is drafted here.**
 
 > Operator / contracting entity throughout: **WiseWave Limited** (Company Number 762171, 39 Cooley Park, Dundalk, Co. Louth, A91 AP2V, Ireland, info@tirvea.com). "Tirvea" is the brand only. "Tirvea Ltd" / "Tirvea Limited" must never appear.
 
@@ -12,34 +12,34 @@ The Legal Publishing System (L2.7) renders any `/legal/<slug>` from a `docs/` ma
 
 - **Completed & migrated:** Terms (L2.2), Privacy (L2.3), Cookies (L2.4), Community Guidelines (L2.5), Acceptable Use (L2.6), **Trust & Safety (L3.1)**.
 
-**Correction to the brief's list:** *Trust & Safety Policy already has its master (`docs/L3.1-TRUST-AND-SAFETY-POLICY-DRAFT.md`) and is migrated.* It is not a drafting item — it only needs counsel sign-off + a `status: published` flip. That leaves **20 documents to draft** (not 21).
+**Correction to the brief's list:** *Trust & Safety Policy already has its master (`docs/L3.1-TRUST-AND-SAFETY-POLICY-DRAFT.md`) and is migrated.* It is not a drafting item - it only needs counsel sign-off + a `status: published` flip. That leaves **20 documents to draft** (not 21).
 
 **Current state of the 20 remaining (audited, not from memory):**
 
 | # | Document | Slug | Current impl | Lines | Counsel notes |
 |---|---|---|---|---|---|
-| 1 | Child Safety Policy | child-safety | Hardcoded JSX | 50 | – |
-| 2 | Appeals Policy | appeals | Placeholder | 20 | – |
-| 3 | Account Suspension Policy | account-suspension | Placeholder | 19 | – |
-| 4 | AI Moderation Policy | ai-moderation | Hardcoded JSX | 51 | – |
-| 5 | Data Retention Policy | data-retention | Hardcoded JSX | 57 | – |
-| 6 | GDPR Rights | gdpr | Placeholder | 20 | – |
-| 7 | Account Deletion Policy | account-deletion | Hardcoded JSX | 20 | – |
-| 8 | Cookie Preferences | cookie-preferences | Placeholder | 19 | – |
+| 1 | Child Safety Policy | child-safety | Hardcoded JSX | 50 | - |
+| 2 | Appeals Policy | appeals | Placeholder | 20 | - |
+| 3 | Account Suspension Policy | account-suspension | Placeholder | 19 | - |
+| 4 | AI Moderation Policy | ai-moderation | Hardcoded JSX | 51 | - |
+| 5 | Data Retention Policy | data-retention | Hardcoded JSX | 57 | - |
+| 6 | GDPR Rights | gdpr | Placeholder | 20 | - |
+| 7 | Account Deletion Policy | account-deletion | Hardcoded JSX | 20 | - |
+| 8 | Cookie Preferences | cookie-preferences | Placeholder | 19 | - |
 | 9 | Biometric Information Policy | biometric-data | Placeholder | 78 | **6 (DPIA/counsel)** |
-| 10 | Photo Verification Policy | photo-verification | Hardcoded JSX | 48 | – |
-| 11 | Identity Verification Policy | identity-verification | Hardcoded JSX | 52 | – |
-| 12 | Subscription Terms | subscription-terms | Hardcoded JSX | 66 | – |
-| 13 | Refund Policy | refund-policy | Hardcoded JSX | 52 | – |
-| 14 | Security Policy | security | Hardcoded JSX | 41 | – |
-| 15 | Vulnerability Disclosure Policy | vulnerability-disclosure | Hardcoded JSX | 45 | – |
-| 16 | Law Enforcement Guidelines | law-enforcement | Hardcoded JSX | 62 | – |
-| 17 | Transparency Report | transparency | Hardcoded JSX | 54 | – |
-| 18 | Copyright Policy | copyright | Hardcoded JSX | 52 | – |
-| 19 | Compliance Statement | compliance | Hardcoded JSX | 54 | – |
-| 20 | Legal Contact | contact | Hardcoded JSX | 26 | – |
+| 10 | Photo Verification Policy | photo-verification | Hardcoded JSX | 48 | - |
+| 11 | Identity Verification Policy | identity-verification | Hardcoded JSX | 52 | - |
+| 12 | Subscription Terms | subscription-terms | Hardcoded JSX | 66 | - |
+| 13 | Refund Policy | refund-policy | Hardcoded JSX | 52 | - |
+| 14 | Security Policy | security | Hardcoded JSX | 41 | - |
+| 15 | Vulnerability Disclosure Policy | vulnerability-disclosure | Hardcoded JSX | 45 | - |
+| 16 | Law Enforcement Guidelines | law-enforcement | Hardcoded JSX | 62 | - |
+| 17 | Transparency Report | transparency | Hardcoded JSX | 54 | - |
+| 18 | Copyright Policy | copyright | Hardcoded JSX | 52 | - |
+| 19 | Compliance Statement | compliance | Hardcoded JSX | 54 | - |
+| 20 | Legal Contact | contact | Hardcoded JSX | 26 | - |
 
-None of the 20 has a `docs/` master; all legal text lives only in JSX (to be replaced, never copied). The **Biometric Information** placeholder already carries counsel/DPIA flags — its master must reconcile with `docs/DPIA-FACE-VERIFICATION.md`.
+None of the 20 has a `docs/` master; all legal text lives only in JSX (to be replaced, never copied). The **Biometric Information** placeholder already carries counsel/DPIA flags - its master must reconcile with `docs/DPIA-FACE-VERIFICATION.md`.
 
 ---
 
@@ -67,14 +67,14 @@ Per-document: purpose · owner · engineering owner · required cross-references
 | Law Enforcement Guidelines | Legal Counsel | T&S eng | privacy, data-retention, child-safety, transparency |
 | Transparency Report | Trust & Safety Lead | T&S eng (metrics) | community-guidelines, ai-moderation, appeals |
 | Copyright Policy | Legal Counsel | Web eng | acceptable-use, terms |
-| Compliance Statement | Legal Counsel | – | privacy, transparency, child-safety, subscription-terms, refund-policy, law-enforcement |
+| Compliance Statement | Legal Counsel | - | privacy, transparency, child-safety, subscription-terms, refund-policy, law-enforcement |
 | Legal Contact | Legal Counsel | Web eng | about, compliance, law-enforcement, copyright, vulnerability-disclosure |
 
 ---
 
 ## 2. Dependency graph (Task 2)
 
-Edges are **content dependencies** — the canonical-owner document that another must reference rather than restate. (Routing is not a dependency: all `/legal/*` routes already resolve to placeholders, so a doc may reference an un-drafted target without breaking; the ordering is about drafting canonical definitions first.)
+Edges are **content dependencies** - the canonical-owner document that another must reference rather than restate. (Routing is not a dependency: all `/legal/*` routes already resolve to placeholders, so a doc may reference an un-drafted target without breaking; the ordering is about drafting canonical definitions first.)
 
 **Canonical owners (draft first within their domain):**
 - **Data Retention** → underpins Account Deletion, Biometric Information, GDPR Rights, Law Enforcement.
@@ -126,49 +126,49 @@ Purpose / scope condensed; section-count and complexity estimated from the compa
 
 ---
 
-## 4. Publication order — phases L3–L7 (Task 4)
+## 4. Publication order - phases L3-L7 (Task 4)
 
 Ordered by dependency (canonical-first) and grouped by domain for reviewer batching; highest legal/reputational risk first.
 
-- **Phase L3 — Child Safety & Enforcement** (highest risk; underpins the already-published Trust & Safety/Community set)
+- **Phase L3 - Child Safety & Enforcement** (highest risk; underpins the already-published Trust & Safety/Community set)
   1. Child Safety Policy → 2. Appeals Policy → 3. Account Suspension Policy → 4. AI Moderation Policy
-- **Phase L4 — Privacy Operations** (Data Retention is a canonical dependency for L5 + Account Deletion)
+- **Phase L4 - Privacy Operations** (Data Retention is a canonical dependency for L5 + Account Deletion)
   5. Data Retention Policy → 6. GDPR Rights → 7. Account Deletion Policy → 8. Cookie Preferences
-- **Phase L5 — Verification & Biometrics** (needs Data Retention from L4)
+- **Phase L5 - Verification & Biometrics** (needs Data Retention from L4)
   9. Biometric Information Policy → 10. Photo Verification Policy → 11. Identity Verification Policy
-- **Phase L6 — Commercial** (independent; parallelisable with L3–L5)
+- **Phase L6 - Commercial** (independent; parallelisable with L3-L5)
   12. Subscription Terms → 13. Refund Policy
-- **Phase L7 — Regulation, Security & Company** (Compliance aggregator last)
+- **Phase L7 - Regulation, Security & Company** (Compliance aggregator last)
   14. Security Policy → 15. Vulnerability Disclosure Policy → 16. Law Enforcement Guidelines → 17. Transparency Report → 18. Copyright Policy → 19. Compliance Statement → 20. Legal Contact
 
 ---
 
 ## 5. Review requirements matrix (Task 5)
 
-✓ = required · ~ = likely / partial · – = not applicable.
+✓ = required · ~ = likely / partial · - = not applicable.
 
 | Document | DSA | GDPR | Security | Commercial | Child Safety | External counsel |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|
-| Child Safety Policy | ✓ | ✓ | – | – | ✓ | ✓ |
-| Appeals Policy | ✓ | ~ | – | – | – | ~ |
-| Account Suspension Policy | ✓ | ~ | – | – | – | – |
-| AI Moderation Policy | ✓ | ✓ | – | – | ~ | ~ |
-| Data Retention Policy | – | ✓ | ~ | ~ | – | ~ |
-| GDPR Rights | – | ✓ | – | – | – | ✓ |
-| Account Deletion Policy | – | ✓ | ~ | – | – | – |
-| Cookie Preferences | – | ✓ | – | – | – | ~ |
-| Biometric Information Policy | – | ✓ | ✓ | – | – | ✓ |
-| Photo Verification Policy | – | ✓ | ✓ | – | – | ~ |
-| Identity Verification Policy | – | ✓ | ✓ | – | ~ | ~ |
-| Subscription Terms | – | – | – | ✓ | – | ✓ |
-| Refund Policy | – | – | – | ✓ | – | ✓ |
-| Security Policy | – | ~ | ✓ | – | – | – |
-| Vulnerability Disclosure Policy | – | – | ✓ | – | – | ~ |
-| Law Enforcement Guidelines | ✓ | ✓ | ~ | – | ✓ | ✓ |
-| Transparency Report | ✓ | ~ | – | – | – | ~ |
-| Copyright Policy | ✓ | – | – | ~ | – | ~ |
+| Child Safety Policy | ✓ | ✓ | - | - | ✓ | ✓ |
+| Appeals Policy | ✓ | ~ | - | - | - | ~ |
+| Account Suspension Policy | ✓ | ~ | - | - | - | - |
+| AI Moderation Policy | ✓ | ✓ | - | - | ~ | ~ |
+| Data Retention Policy | - | ✓ | ~ | ~ | - | ~ |
+| GDPR Rights | - | ✓ | - | - | - | ✓ |
+| Account Deletion Policy | - | ✓ | ~ | - | - | - |
+| Cookie Preferences | - | ✓ | - | - | - | ~ |
+| Biometric Information Policy | - | ✓ | ✓ | - | - | ✓ |
+| Photo Verification Policy | - | ✓ | ✓ | - | - | ~ |
+| Identity Verification Policy | - | ✓ | ✓ | - | ~ | ~ |
+| Subscription Terms | - | - | - | ✓ | - | ✓ |
+| Refund Policy | - | - | - | ✓ | - | ✓ |
+| Security Policy | - | ~ | ✓ | - | - | - |
+| Vulnerability Disclosure Policy | - | - | ✓ | - | - | ~ |
+| Law Enforcement Guidelines | ✓ | ✓ | ~ | - | ✓ | ✓ |
+| Transparency Report | ✓ | ~ | - | - | - | ~ |
+| Copyright Policy | ✓ | - | - | ~ | - | ~ |
 | Compliance Statement | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Legal Contact | ~ | ~ | – | – | – | – |
+| Legal Contact | ~ | ~ | - | - | - | - |
 
 ---
 
@@ -176,16 +176,16 @@ Ordered by dependency (canonical-first) and grouped by domain for reviewer batch
 
 Every document follows the identical L2.7 mechanic (proven on the first six):
 
-1. **Author** `docs/<code>-<NAME>-DRAFT.md` with the legal body under a `## 3. Output — Complete <Doc>` heading (the loader extracts only that region; scaffolding stays internal).
+1. **Author** `docs/<code>-<NAME>-DRAFT.md` with the legal body under a `## 3. Output - Complete <Doc>` heading (the loader extracts only that region; scaffolding stays internal).
 2. **Frontmatter** at top: `title, slug, category, version, effectiveDate (""), lastUpdated, status: draft, owner, requiresCounselReview: true, requiresReConsent, relatedPolicies, description` (+ `consentVersion` if consent-bearing).
 3. **Register** the slug: add to `src/lib/legal/doc-slugs.ts` (`LEGAL_DOC_SLUGS`) and `src/lib/legal/loader.ts` (`LEGAL_DOC_FILES`).
 4. **Thin-wrapper** the page: replace JSX with `generateMetadata` + `<LegalDocument slug="…" />` (≈12 lines).
-5. **Remove** all hardcoded legal text — single source in `docs/`.
+5. **Remove** all hardcoded legal text - single source in `docs/`.
 6. **Reconcile registry** entry (status/version/owner) so the hub is honest.
 7. **Verify** (automated): `tsc` + `build`; rendered section count == master; **0 scaffolding leaks**; **0** "Tirvea Ltd/Limited"; cross-refs resolve; SEO/robots/JSON-LD; sitemap consistency.
 8. **On counsel sign-off:** set `effectiveDate`, flip `status: published`, `requiresCounselReview: false`; consent-bearing docs bump `CURRENT_VERSIONS` to trigger re-consent.
 
-**Consent-versioned docs** (need `CURRENT_VERSIONS` wiring on publish): none of the 20 are new consent gates except **Cookie Preferences** (cookie consent version — currently declared in registry but not wired in `src/lib/auth/consent.ts`). Flag: wire the `cookies` consent key before Cookie Preferences goes live.
+**Consent-versioned docs** (need `CURRENT_VERSIONS` wiring on publish): none of the 20 are new consent gates except **Cookie Preferences** (cookie consent version - currently declared in registry but not wired in `src/lib/auth/consent.ts`). Flag: wire the `cookies` consent key before Cookie Preferences goes live.
 
 ---
 
@@ -195,25 +195,25 @@ Effort: S ≤0.5d · M ~1d · L ~2d · XL ~3d+ (drafting + verification; exclude
 
 | Document | Priority | Dependencies | Review owner | Engineering work | Publishing work | Est. effort | Publication blocker |
 |---|:--:|---|---|---|---|:--:|---|
-| Child Safety Policy | P1 | – (canonical) | T&S + Child-Safety + ext. counsel | Verify age-assurance claims | Migrate + register | XL | Mandatory-reporting bodies / hotline (NCMEC) confirmed |
-| Appeals Policy | P1 | Trust & Safety | T&S + DSA counsel | Verify appeals service | Migrate + register | M | DSA Art. 20–21 ADR bodies |
-| Account Suspension Policy | P1 | Community, Appeals | T&S + DSA counsel | Verify AccountStatus ladder | Migrate + register | M | – (aligns to code) |
+| Child Safety Policy | P1 | - (canonical) | T&S + Child-Safety + ext. counsel | Verify age-assurance claims | Migrate + register | XL | Mandatory-reporting bodies / hotline (NCMEC) confirmed |
+| Appeals Policy | P1 | Trust & Safety | T&S + DSA counsel | Verify appeals service | Migrate + register | M | DSA Art. 20-21 ADR bodies |
+| Account Suspension Policy | P1 | Community, Appeals | T&S + DSA counsel | Verify AccountStatus ladder | Migrate + register | M | - (aligns to code) |
 | AI Moderation Policy | P1 | Appeals, Transparency | T&S + DSA/GDPR counsel | Verify moderation/risk engine | Migrate + register | L | Art. 22 / EU AI Act analysis |
-| Data Retention Policy | P2 | – (canonical) | Privacy/DPO | Confirm retention jobs/periods | Migrate + register | L | Retention periods (DPIA) confirmed |
+| Data Retention Policy | P2 | - (canonical) | Privacy/DPO | Confirm retention jobs/periods | Migrate + register | L | Retention periods (DPIA) confirmed |
 | GDPR Rights | P2 | Data Retention | Privacy/DPO + ext. counsel | Verify DSAR flow | Migrate + register | L | DPC details / SA one-stop-shop |
 | Account Deletion Policy | P2 | Data Retention, GDPR | Privacy/DPO | Verify deletion job + grace | Migrate + register | M | Post-deletion hold periods |
 | Cookie Preferences | P2 | Cookies | Privacy/DPO | Build consent tool + wire version | Migrate + register | M | Consent tool + `cookies` version wiring |
 | Biometric Information Policy | P3 | Data Retention | Privacy + Security + ext. counsel | Reconcile with DPIA doc | Migrate + register | XL | DPIA sign-off + BIPA (US) counsel |
 | Photo Verification Policy | P3 | Biometric | Privacy + Security | Verify liveness/Rekognition flow | Migrate + register | L | Aligns with Biometric sign-off |
-| Identity Verification Policy | P3 | Photo | Privacy + Security | Verify Stripe Identity flow | Migrate + register | L | – |
-| Subscription Terms | P4 | – (canonical) | Commercial + ext. counsel | Verify billing/renewal | Migrate + register | L | Consumer-law + VAT/OSS counsel |
+| Identity Verification Policy | P3 | Photo | Privacy + Security | Verify Stripe Identity flow | Migrate + register | L | - |
+| Subscription Terms | P4 | - (canonical) | Commercial + ext. counsel | Verify billing/renewal | Migrate + register | L | Consumer-law + VAT/OSS counsel |
 | Refund Policy | P4 | Subscription | Commercial + ext. counsel | Verify refund flow | Migrate + register | M | Withdrawal-right / digital-content exception |
-| Security Policy | P5 | – (canonical) | Security | Confirm controls claims | Migrate + register | L | – |
+| Security Policy | P5 | - (canonical) | Security | Confirm controls claims | Migrate + register | L | - |
 | Vulnerability Disclosure Policy | P5 | Security | Security | Confirm intake | Migrate + register | M | Safe-harbour vs computer-misuse law |
 | Law Enforcement Guidelines | P5 | Privacy, Data Retention, Child Safety | Legal + ext. counsel | Verify request handling | Migrate + register | L | Disclosure thresholds per jurisdiction |
 | Transparency Report | P5 | AI Moderation, Appeals | T&S + DSA counsel | Wire metrics source | Migrate + register | L | DSA reporting scope + real metrics |
 | Copyright Policy | P5 | AUP | Legal + DSA counsel | Verify notice intake | Migrate + register | M | DMCA + DSA notice-and-action |
-| Compliance Statement | P5 | (aggregator: many) | Legal (all specialists) | – | Migrate + register | L | All referenced docs signed off |
+| Compliance Statement | P5 | (aggregator: many) | Legal (all specialists) | - | Migrate + register | L | All referenced docs signed off |
 | Legal Contact | P5 | Compliance | Legal | Confirm routes | Migrate + register | S | DSA single-point-of-contact designation |
 
 ---
@@ -228,19 +228,19 @@ Draft master (docs/) ─▶ Automated internal QA ─▶ Specialist review ─�
                            section count, no         safety / commercial)                      figures)         consent-bearing)
                            scaffolding leak)
 ```
-- **Automated QA** is the same gate used on L2.2–L3.1 and is a hard pre-condition for human review.
+- **Automated QA** is the same gate used on L2.2-L3.1 and is a hard pre-condition for human review.
 - A document cannot flip to `status: published` until its **Publication blocker** (§7) is cleared.
 
 ### Publication workflow (per document)
-Identical to §6 steps 1–8. Publishing is decoupled from approval: a document can be **migrated (draft, noindex)** immediately — rendering through the system with a Draft/Review badge — and later **published** by a one-line frontmatter flip once counsel signs off. This is the L2.7 design and requires no further engineering per document.
+Identical to §6 steps 1-8. Publishing is decoupled from approval: a document can be **migrated (draft, noindex)** immediately - rendering through the system with a Draft/Review badge - and later **published** by a one-line frontmatter flip once counsel signs off. This is the L2.7 design and requires no further engineering per document.
 
 ### Cross-cutting blockers to resolve once (benefit multiple docs)
-1. **Trusted-flagger process (DSA Art. 22)** — established operationally in Trust & Safety §32; formalise criteria (affects Appeals, AI Moderation, Transparency, Copyright).
-2. **Mandatory-reporting bodies / hotlines** — (Child Safety, Law Enforcement).
-3. **DSA single point(s) of contact** — (Trust & Safety, Transparency, Legal Contact, Compliance).
-4. **DPIA sign-off + retention periods** — (Biometric, Photo, Data Retention, Account Deletion).
-5. **Cookie consent tool + version wiring** — (Cookie Preferences).
-6. **Consumer-law + VAT counsel** — (Subscription, Refund).
+1. **Trusted-flagger process (DSA Art. 22)** - established operationally in Trust & Safety §32; formalise criteria (affects Appeals, AI Moderation, Transparency, Copyright).
+2. **Mandatory-reporting bodies / hotlines** - (Child Safety, Law Enforcement).
+3. **DSA single point(s) of contact** - (Trust & Safety, Transparency, Legal Contact, Compliance).
+4. **DPIA sign-off + retention periods** - (Biometric, Photo, Data Retention, Account Deletion).
+5. **Cookie consent tool + version wiring** - (Cookie Preferences).
+6. **Consumer-law + VAT counsel** - (Subscription, Refund).
 
 ---
 

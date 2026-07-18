@@ -17,7 +17,7 @@ export type HubDoc = {
 };
 
 /**
- * L2.8 — the Legal Centre document explorer: client-side search + category
+ * L2.8 - the Legal Centre document explorer: client-side search + category
  * filtering over the registry, with enterprise document cards (status, version,
  * last updated, reading time). Data is supplied by the server hub page.
  */

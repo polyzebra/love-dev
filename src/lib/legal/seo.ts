@@ -4,7 +4,7 @@ import { siteUrl } from "@/lib/auth/url";
 import { loadLegalDocument, type LegalDocMeta } from "./loader";
 
 /**
- * L2.7 — automatic SEO for legal pages, derived entirely from the document
+ * L2.7 - automatic SEO for legal pages, derived entirely from the document
  * frontmatter. A document that is still a draft or requires counsel review is
  * marked `noindex` so unapproved legal text is never indexed; it becomes
  * indexable automatically once frontmatter flips to published + no review.

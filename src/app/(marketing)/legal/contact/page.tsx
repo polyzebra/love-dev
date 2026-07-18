@@ -18,8 +18,8 @@ export default function LegalContactPage() {
         </li>
       </ul>
       <p>
-        For specific matters, see the relevant policy — Law Enforcement Requests, Copyright, or
-        Vulnerability Disclosure — which each set out a dedicated route.
+        For specific matters, see the relevant policy - Law Enforcement Requests, Copyright, or
+        Vulnerability Disclosure - which each set out a dedicated route.
       </p>
     </>
   );

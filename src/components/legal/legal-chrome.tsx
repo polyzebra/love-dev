@@ -34,7 +34,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
   const isHub = pathname === "/legal";
 
   // Scan the rendered article for headings (assigning ids where missing, e.g.
-  // legacy JSX pages) and compute reading time — so the ToC + metadata bar work
+  // legacy JSX pages) and compute reading time - so the ToC + metadata bar work
   // uniformly for markdown and legacy pages alike.
   useEffect(() => {
     if (isHub) return;
@@ -211,7 +211,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               disabled
-              title="PDF export — coming soon"
+              title="PDF export - coming soon"
               className={actionBtn}
             >
               <FileDown aria-hidden className="size-3.5" /> Download PDF

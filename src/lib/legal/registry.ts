@@ -16,11 +16,11 @@ export const LEGAL_COMPANY = {
 } as const;
 
 export type LegalCategory =
-  | "Core"
+  | "Core Legal"
   | "Trust & Safety"
   | "Privacy & Data"
   | "Payments"
-  | "Verification"
+  | "Verification & Biometrics"
   | "Security & Compliance"
   | "Company & Support";
 
@@ -39,7 +39,7 @@ export type LegalDoc = {
   revisionHistory: { version: string; date: string; note: string }[];
   language: "en";
   owner: string;
-  /** Cross-references (Task 8) — related canonical paths. */
+  /** Cross-references (Task 8) - related canonical paths. */
   related: string[];
   /** Versioning framework (Task 7): which consent key gates re-acceptance. */
   consentVersionKey?: "terms" | "privacy" | "community" | "biometric" | "cookies";
@@ -60,7 +60,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     path: "/legal/terms",
     title: "Terms of Service",
     summary: "The contract between you and WiseWave Limited for using Tirvea.",
-    category: "Core",
+    category: "Core Legal",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -76,7 +76,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     path: "/legal/privacy",
     title: "Privacy Policy",
     summary: "How WiseWave Limited, as data controller, processes your personal data.",
-    category: "Core",
+    category: "Core Legal",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -91,7 +91,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     path: "/legal/cookies",
     title: "Cookie Policy",
     summary: "The cookies and similar technologies Tirvea uses, and your choices.",
-    category: "Core",
+    category: "Core Legal",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -106,7 +106,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     path: "/legal/community-guidelines",
     title: "Community Guidelines",
     summary: "The behaviour we expect from everyone on Tirvea.",
-    category: "Core",
+    category: "Trust & Safety",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -122,14 +122,14 @@ export const LEGAL_DOCS: LegalDoc[] = [
     path: "/legal/acceptable-use",
     title: "Acceptable Use Policy",
     summary: "What you must not do on Tirvea.",
-    category: "Core",
+    category: "Trust & Safety",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
     revisionHistory: hist1,
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/community-guidelines", "/legal/terms"],
+    related: ["/legal/community-guidelines", "/legal/terms", "/legal/copyright"],
     status: "draft",
   },
   // ---- Trust & Safety -----------------------------------------------------
@@ -144,7 +144,13 @@ export const LEGAL_DOCS: LegalDoc[] = [
     revisionHistory: [{ version: "1.0", date: U, note: "Initial master draft." }],
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/appeals", "/legal/account-suspension", "/legal/transparency", "/safety"],
+    related: [
+      "/legal/appeals",
+      "/legal/account-suspension",
+      "/legal/transparency",
+      "/legal/ai-moderation",
+      "/safety",
+    ],
     status: "draft",
   },
   {
@@ -152,13 +158,19 @@ export const LEGAL_DOCS: LegalDoc[] = [
     title: "Appeals Policy",
     summary: "How to challenge a moderation or enforcement decision.",
     category: "Trust & Safety",
-    version: "0.1",
+    version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
-    revisionHistory: [{ version: "0.1", date: U, note: "Structural placeholder." }],
+    revisionHistory: [{ version: "1.0", date: U, note: "Initial master draft." }],
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/account-suspension", "/legal/trust-safety", "/legal/transparency"],
+    related: [
+      "/legal/trust-safety",
+      "/legal/account-suspension",
+      "/legal/community-guidelines",
+      "/legal/acceptable-use",
+      "/legal/privacy",
+    ],
     status: "draft",
   },
   {
@@ -166,13 +178,19 @@ export const LEGAL_DOCS: LegalDoc[] = [
     title: "Account Suspension Policy",
     summary: "When and how accounts are limited, suspended, or terminated.",
     category: "Trust & Safety",
-    version: "0.1",
+    version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
-    revisionHistory: [{ version: "0.1", date: U, note: "Structural placeholder." }],
+    revisionHistory: [{ version: "1.0", date: U, note: "Initial master draft." }],
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/community-guidelines", "/legal/appeals", "/legal/account-deletion"],
+    related: [
+      "/legal/community-guidelines",
+      "/legal/appeals",
+      "/legal/account-deletion",
+      "/legal/trust-safety",
+      "/legal/acceptable-use",
+    ],
     status: "draft",
   },
   {
@@ -183,11 +201,17 @@ export const LEGAL_DOCS: LegalDoc[] = [
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
-    revisionHistory: hist1,
+    revisionHistory: [{ version: "1.0", date: U, note: "Initial master draft." }],
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/community-guidelines", "/legal/law-enforcement"],
-    status: "published",
+    related: [
+      "/legal/community-guidelines",
+      "/legal/trust-safety",
+      "/legal/account-suspension",
+      "/legal/law-enforcement",
+      "/legal/appeals",
+    ],
+    status: "draft",
   },
   {
     path: "/legal/ai-moderation",
@@ -197,11 +221,17 @@ export const LEGAL_DOCS: LegalDoc[] = [
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
-    revisionHistory: hist1,
+    revisionHistory: [{ version: "1.0", date: U, note: "Initial master draft." }],
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/community-guidelines", "/legal/transparency", "/legal/appeals"],
-    status: "published",
+    related: [
+      "/legal/trust-safety",
+      "/legal/community-guidelines",
+      "/legal/appeals",
+      "/legal/privacy",
+      "/legal/transparency",
+    ],
+    status: "draft",
   },
   {
     path: "/legal/transparency",
@@ -214,8 +244,8 @@ export const LEGAL_DOCS: LegalDoc[] = [
     revisionHistory: hist1,
     language: "en",
     owner: "Trust & Safety Lead",
-    related: ["/legal/community-guidelines", "/legal/appeals"],
-    status: "published",
+    related: ["/legal/community-guidelines", "/legal/appeals", "/legal/ai-moderation"],
+    status: "draft",
   },
   {
     path: "/legal/law-enforcement",
@@ -229,7 +259,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Legal Counsel",
     related: ["/legal/privacy", "/legal/data-retention", "/legal/child-safety"],
-    status: "published",
+    status: "draft",
   },
   // ---- Privacy & Data -----------------------------------------------------
   {
@@ -258,7 +288,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Privacy Counsel / DPO",
     related: ["/legal/privacy", "/legal/account-deletion", "/legal/biometric-data"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/account-deletion",
@@ -302,7 +332,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Legal Counsel",
     related: ["/legal/refund-policy", "/legal/terms"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/refund-policy",
@@ -316,14 +346,14 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Legal Counsel",
     related: ["/legal/subscription-terms"],
-    status: "published",
+    status: "draft",
   },
   // ---- Verification -------------------------------------------------------
   {
     path: "/legal/identity-verification",
     title: "Identity Verification Policy",
     summary: "How identity checks work and what we store.",
-    category: "Verification",
+    category: "Verification & Biometrics",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -331,13 +361,13 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Privacy Counsel + Trust & Safety",
     related: ["/legal/photo-verification", "/legal/privacy"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/photo-verification",
     title: "Photo Verification Policy",
     summary: "Confirming your profile photos belong to you.",
-    category: "Verification",
+    category: "Verification & Biometrics",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -345,13 +375,13 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Privacy Counsel + Trust & Safety",
     related: ["/legal/biometric-data", "/legal/identity-verification"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/biometric-data",
     title: "Biometric Information Policy",
     summary: "How biometric data for photo verification is handled and deleted.",
-    category: "Verification",
+    category: "Verification & Biometrics",
     version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
@@ -361,7 +391,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     related: ["/legal/photo-verification", "/legal/privacy", "/legal/data-retention"],
     consentVersionKey: "biometric",
     requiresReconsent: true,
-    status: "published",
+    status: "draft",
   },
   // ---- Security & Compliance ---------------------------------------------
   {
@@ -376,7 +406,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Security Lead",
     related: ["/legal/vulnerability-disclosure", "/legal/compliance"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/vulnerability-disclosure",
@@ -390,7 +420,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Security Lead",
     related: ["/legal/security"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/copyright",
@@ -404,7 +434,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Legal Counsel",
     related: ["/legal/acceptable-use", "/legal/terms"],
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/compliance",
@@ -418,7 +448,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Legal Counsel",
     related: ["/legal/privacy", "/legal/transparency", "/legal/child-safety"],
-    status: "published",
+    status: "draft",
   },
   // ---- Company & Support --------------------------------------------------
   {
@@ -453,11 +483,11 @@ export const LEGAL_DOCS: LegalDoc[] = [
 ];
 
 export const LEGAL_CATEGORY_ORDER: LegalCategory[] = [
-  "Core",
+  "Core Legal",
   "Trust & Safety",
   "Privacy & Data",
   "Payments",
-  "Verification",
+  "Verification & Biometrics",
   "Security & Compliance",
   "Company & Support",
 ];
@@ -478,4 +508,22 @@ export function legalDocNeighbours(path: string): { prev?: LegalDoc; next?: Lega
   const i = LEGAL_DOCS.findIndex((d) => d.path === path);
   if (i === -1) return {};
   return { prev: LEGAL_DOCS[i - 1], next: LEGAL_DOCS[i + 1] };
+}
+
+export type LegalFooterLink = { href: string; label: string; external?: boolean };
+
+/**
+ * L2.9 - registry-backed footer groups. The single source for every legal link
+ * in the site footer, so the footer can never drift from the registry. External
+ * entries (e.g. the status page) link out; everything else links to its route.
+ */
+export function legalFooterGroups(): { category: LegalCategory; links: LegalFooterLink[] }[] {
+  return LEGAL_CATEGORY_ORDER.map((category) => ({
+    category,
+    links: LEGAL_DOCS.filter((d) => d.category === category).map((d) => ({
+      href: d.external ?? d.path,
+      label: d.title,
+      external: Boolean(d.external),
+    })),
+  })).filter((group) => group.links.length > 0);
 }

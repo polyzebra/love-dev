@@ -5,10 +5,10 @@ import { parseFrontmatter } from "./markdown";
 import { LEGAL_DOC_SLUGS, type LegalDocSlug, isLegalDocSlug } from "./doc-slugs";
 
 /**
- * L2.7 — the legal document loader. The single point at which a `/legal/<slug>`
+ * L2.7 - the legal document loader. The single point at which a `/legal/<slug>`
  * route is bound to its canonical `docs/` master. It reads the markdown, parses
  * and validates frontmatter (throwing on any missing required field), and
- * extracts the publishable legal body — the "## 3. Output — Complete/Full ..."
+ * extracts the publishable legal body - the "## 3. Output - Complete/Full ..."
  * section, i.e. only the legal text, never the internal drafting scaffolding
  * (Document control, consistency reviews, checklists, review notes).
  */
@@ -21,6 +21,10 @@ export const LEGAL_DOC_FILES: Record<LegalDocSlug, string> = {
   "community-guidelines": "L2.5-COMMUNITY-GUIDELINES-DRAFT.md",
   "acceptable-use": "L2.6-ACCEPTABLE-USE-POLICY-DRAFT.md",
   "trust-safety": "L3.1-TRUST-AND-SAFETY-POLICY-DRAFT.md",
+  appeals: "L3.2-APPEALS-POLICY-DRAFT.md",
+  "account-suspension": "L3.3-ACCOUNT-SUSPENSION-POLICY-DRAFT.md",
+  "child-safety": "L3.4-CHILD-SAFETY-POLICY-DRAFT.md",
+  "ai-moderation": "L3.5-AI-MODERATION-POLICY-DRAFT.md",
 };
 
 export type LegalDocMeta = {
@@ -93,21 +97,24 @@ export async function loadLegalDocument(
 }
 
 /**
- * The publishable legal text is the "## 3. Output — Complete/Full ..." section,
- * bounded by the next "## 4. Output — ..." heading. Everything else in the
+ * The publishable legal text is the "## 3. Output - Complete/Full ..." section,
+ * bounded by the next "## 4. Output - ..." heading. Everything else in the
  * master (Document control, TOC, architecture, consistency/DSA reviews, legal
  * review notes, readiness checklist) is internal drafting scaffolding and MUST
  * NOT be published.
  */
 function extractBody(raw: string, file: string): string {
   const lines = raw.replace(/\r\n/g, "\n").split("\n");
-  const start = lines.findIndex((l) => /^## 3\. Output/.test(l));
-  const end = lines.findIndex((l) => /^## 4\. Output/.test(l));
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error(
-      `[legal] cannot locate the legal body (## 3. Output … ## 4. Output markers) in ${file}`,
-    );
+  // The publishable body is the "## N. Output - Complete/Full <Doc>" section,
+  // bounded by the next "## N. Output ..." heading. It is located by that
+  // heading rather than a fixed number, so documents that carry extra outputs
+  // (e.g. a repository audit before the body) still extract correctly.
+  const start = lines.findIndex((l) => /^## \d+\. Output\b.*\b(Complete|Full)\b/i.test(l));
+  if (start === -1) {
+    throw new Error(`[legal] cannot locate the "## N. Output - Complete/Full ..." body in ${file}`);
   }
+  const relEnd = lines.slice(start + 1).findIndex((l) => /^## \d+\. Output\b/.test(l));
+  const end = relEnd === -1 ? lines.length : start + 1 + relEnd;
   return lines
     .slice(start + 1, end)
     .join("\n")

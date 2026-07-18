@@ -8,7 +8,7 @@ import { LegalCentreDocs, type HubDoc } from "@/components/legal/legal-centre-do
 export const metadata: Metadata = {
   title: "Legal Centre",
   description:
-    "Tirvea's Legal Centre — terms, privacy, safety, verification, and compliance policies operated by WiseWave Limited.",
+    "Tirvea's Legal Centre - terms, privacy, safety, verification, and compliance policies operated by WiseWave Limited.",
   alternates: { canonical: "/legal" },
 };
 
@@ -26,7 +26,7 @@ export default async function LegalCentrePage() {
           const { body } = await loadLegalDocument(slug);
           readingMin = readingMinutes(body);
         } catch {
-          /* fall through — card renders without reading time */
+          /* fall through - card renders without reading time */
         }
       }
       return {

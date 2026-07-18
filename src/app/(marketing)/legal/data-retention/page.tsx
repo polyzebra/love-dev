@@ -28,7 +28,7 @@ export default function DataRetentionPage() {
           deletion subject to safety/legal holds.
         </li>
         <li>
-          <strong>Verification data:</strong> only outcomes and opaque provider references — no
+          <strong>Verification data:</strong> only outcomes and opaque provider references - no
           documents or biometric images. Biometric references are deleted on consent withdrawal or
           account deletion (see the{" "}
           <a href="/legal/biometric-data">Biometric Information Policy</a>).

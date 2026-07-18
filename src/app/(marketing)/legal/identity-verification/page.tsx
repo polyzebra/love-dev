@@ -19,7 +19,7 @@ export default function IdentityVerificationPage() {
       <p>
         Identity verification is performed by a specialist provider (Stripe Identity). You complete
         the check in a hosted flow. Tirvea receives only the outcome (verified / not verified) and an
-        opaque provider reference — never your identity documents or selfie images.
+        opaque provider reference - never your identity documents or selfie images.
       </p>
 
       <h2>3. What we store</h2>
@@ -39,7 +39,7 @@ export default function IdentityVerificationPage() {
       <p>
         A successful check can unlock a verified badge and related features. A failed or cancelled
         check does not by itself remove your account; you can retry. Verification does not guarantee
-        any person’s intentions — always follow our <a href="/safety">safety guidance</a>.
+        any person’s intentions - always follow our <a href="/safety">safety guidance</a>.
       </p>
 
       <h2>6. Your rights and contact</h2>

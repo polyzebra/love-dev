@@ -38,7 +38,7 @@ export default function RefundPolicyPage() {
 
       <h2>4. Exceptional refunds</h2>
       <p>
-        We may issue a refund at our discretion — for example, a duplicate charge or a proven billing
+        We may issue a refund at our discretion - for example, a duplicate charge or a proven billing
         error. Refunds are returned to the original payment method via our payment provider.
       </p>
 
