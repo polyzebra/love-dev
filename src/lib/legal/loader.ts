@@ -32,6 +32,8 @@ export const LEGAL_DOC_FILES: Record<LegalDocSlug, string> = {
   "biometric-data": "L5.1-BIOMETRIC-INFORMATION-POLICY-DRAFT.md",
   "photo-verification": "L5.2-PHOTO-VERIFICATION-POLICY-DRAFT.md",
   "identity-verification": "L5.3-IDENTITY-VERIFICATION-POLICY-DRAFT.md",
+  "subscription-terms": "L6.1-SUBSCRIPTION-TERMS-DRAFT.md",
+  "refund-policy": "L6.2-REFUND-POLICY-DRAFT.md",
 };
 
 export type LegalDocMeta = {

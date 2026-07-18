@@ -22,6 +22,8 @@ export const LEGAL_DOC_SLUGS = [
   "biometric-data",
   "photo-verification",
   "identity-verification",
+  "subscription-terms",
+  "refund-policy",
 ] as const;
 
 export type LegalDocSlug = (typeof LEGAL_DOC_SLUGS)[number];
