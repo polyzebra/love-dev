@@ -34,6 +34,11 @@ export const LEGAL_DOC_FILES: Record<LegalDocSlug, string> = {
   "identity-verification": "L5.3-IDENTITY-VERIFICATION-POLICY-DRAFT.md",
   "subscription-terms": "L6.1-SUBSCRIPTION-TERMS-DRAFT.md",
   "refund-policy": "L6.2-REFUND-POLICY-DRAFT.md",
+  security: "L7.1-SECURITY-POLICY-DRAFT.md",
+  "vulnerability-disclosure": "L7.2-VULNERABILITY-DISCLOSURE-POLICY-DRAFT.md",
+  "law-enforcement": "L7.3-LAW-ENFORCEMENT-GUIDELINES-DRAFT.md",
+  transparency: "L7.4-TRANSPARENCY-REPORT-POLICY-DRAFT.md",
+  compliance: "L7.5-COMPLIANCE-STATEMENT-DRAFT.md",
 };
 
 export type LegalDocMeta = {
