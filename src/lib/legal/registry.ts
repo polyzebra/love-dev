@@ -70,7 +70,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     related: ["/legal/privacy", "/legal/community-guidelines", "/legal/acceptable-use"],
     consentVersionKey: "terms",
     requiresReconsent: true,
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/privacy",
@@ -85,7 +85,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     owner: "Privacy Counsel / DPO",
     related: ["/legal/cookies", "/legal/data-retention", "/legal/gdpr", "/legal/biometric-data"],
     consentVersionKey: "privacy",
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/cookies",
@@ -100,7 +100,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     owner: "Privacy Counsel / DPO",
     related: ["/legal/privacy", "/legal/cookie-preferences"],
     consentVersionKey: "cookies",
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/community-guidelines",
@@ -116,7 +116,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     related: ["/legal/acceptable-use", "/legal/trust-safety", "/legal/account-suspension"],
     consentVersionKey: "community",
     requiresReconsent: true,
-    status: "published",
+    status: "draft",
   },
   {
     path: "/legal/acceptable-use",
@@ -130,7 +130,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
     language: "en",
     owner: "Trust & Safety Lead",
     related: ["/legal/community-guidelines", "/legal/terms"],
-    status: "published",
+    status: "draft",
   },
   // ---- Trust & Safety -----------------------------------------------------
   {
@@ -138,10 +138,10 @@ export const LEGAL_DOCS: LegalDoc[] = [
     title: "Trust & Safety Policy",
     summary: "Our framework for keeping the community safe, and how enforcement works.",
     category: "Trust & Safety",
-    version: "0.1",
+    version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
-    revisionHistory: [{ version: "0.1", date: U, note: "Structural placeholder." }],
+    revisionHistory: [{ version: "1.0", date: U, note: "Initial master draft." }],
     language: "en",
     owner: "Trust & Safety Lead",
     related: ["/legal/appeals", "/legal/account-suspension", "/legal/transparency", "/safety"],
