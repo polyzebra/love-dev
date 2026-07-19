@@ -1,4 +1,4 @@
-import { apiError, created, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, created, guardRate, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { sendFirstMessageSchema } from "@/lib/validators/first-message";
 import {
@@ -11,7 +11,7 @@ import { schedulePushDispatch } from "@/lib/services/notify";
 
 /** POST /api/first-messages - send a message before matching (with a Like). */
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`first-message:${user.id}`, RATE_LIMITS.message);
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
 /** GET /api/first-messages - pending inbox for the Likes page. */
 export async function GET() {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   return ok(await listFirstMessagesFor(user.id));

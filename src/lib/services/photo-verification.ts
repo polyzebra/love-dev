@@ -737,7 +737,13 @@ export async function syncPhotoVerificationState(userId: string): Promise<{
               dedupeKey: `verification:${row.providerSessionId}:approved`,
             });
             await db.user.updateMany({
-              where: { id: result.userId, status: "PHOTO_REVIEW_REQUIRED" },
+              // Only lift to ACTIVE for a completed registration (DB CHECK
+              // constraint forbids ACTIVE without registrationCompletedAt; L7.3.9).
+              where: {
+                id: result.userId,
+                status: "PHOTO_REVIEW_REQUIRED",
+                registrationCompletedAt: { not: null },
+              },
               data: { status: "ACTIVE" },
             });
             // Face layer: identity proven via the poll path too - same

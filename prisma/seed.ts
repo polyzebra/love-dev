@@ -155,6 +155,11 @@ async function main() {
       role: "ADMIN",
       emailVerified: new Date(),
       onboardingDone: true,
+      // Seeded accounts are fully-registered (L7.3.9 activation-integrity
+      // constraint: ACTIVE requires registrationCompletedAt).
+      onboardingCompletedAt: new Date(),
+      status: "ACTIVE",
+      registrationCompletedAt: new Date(),
       subscription: { create: { tier: "GOLD" } },
     },
     update: { role: "ADMIN" },
@@ -176,6 +181,9 @@ async function main() {
         emailVerified: new Date(),
         photoVerifiedAt: new Date(),
         onboardingDone: true,
+        onboardingCompletedAt: new Date(),
+        status: "ACTIVE",
+        registrationCompletedAt: new Date(),
         subscription: { create: { tier: "FREE" } },
         verifications: {
           create: [{ type: "PHOTO", status: "APPROVED", provider: "internal" }],
@@ -346,7 +354,12 @@ async function seedExtras() {
   // Freshen activity so TODAY rows have live members
   await db.user.updateMany({
     where: { email: { endsWith: "@demo.tirvea.app" } },
-    data: { lastActiveAt: new Date(), status: "ACTIVE" },
+    data: {
+      lastActiveAt: new Date(),
+      status: "ACTIVE",
+      registrationCompletedAt: new Date(),
+      onboardingCompletedAt: new Date(),
+    },
   });
   console.log(`✓ structured tags on ${demoProfiles.length} demo profiles`);
   // Expand the demo cast to 12 so every taxonomy circle has people (dev only)
@@ -416,9 +429,17 @@ async function seedExtras() {
         name: e.name,
         emailVerified: new Date(),
         onboardingDone: true,
+        onboardingCompletedAt: new Date(),
+        status: "ACTIVE",
+        registrationCompletedAt: new Date(),
         lastActiveAt: new Date(Date.now() - i * 3 * 3600_000),
       },
-      update: { lastActiveAt: new Date(Date.now() - i * 3 * 3600_000), status: "ACTIVE" },
+      update: {
+        lastActiveAt: new Date(Date.now() - i * 3 * 3600_000),
+        status: "ACTIVE",
+        registrationCompletedAt: new Date(),
+        onboardingCompletedAt: new Date(),
+      },
     });
     const interestRows = await db.interest.findMany({ where: { slug: { in: [...e.interests] } } });
     await db.profile.upsert({

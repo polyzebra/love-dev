@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, requireSession } from "@/lib/api";
+import { apiError, guardRate, ok, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { isPushConfigured } from "@/lib/services/push";
 import { dispatchPushDelivery, notifyUser } from "@/lib/services/notify";
@@ -15,7 +15,7 @@ import { db } from "@/lib/db";
  * Strictly limited to 3/hour.
  */
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   if (!isPushConfigured()) {

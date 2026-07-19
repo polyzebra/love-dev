@@ -35,6 +35,7 @@ export default async function AdminDashboardPage() {
   const [
     totalUsers,
     activeUsers,
+    pendingRegistrations,
     verifiedUsers,
     suspendedUsers,
     bannedUsers,
@@ -51,6 +52,9 @@ export default async function AdminDashboardPage() {
   ] = await Promise.all([
     db.user.count({ where: { status: { not: "DELETED" } } }),
     db.user.count({ where: { status: "ACTIVE" } }),
+    // Registration funnel: accounts still mid-registration (L7.3.8) - born
+    // PENDING, invisible/unusable until the ladder completes.
+    db.user.count({ where: { status: "PENDING" } }),
     // "Verified" = carries the photo-verified badge (canonical column,
     // see lib/services/verification.ts) or an APPROVED identity review.
     db.user.count({
@@ -90,6 +94,13 @@ export default async function AdminDashboardPage() {
       value: activeUsers,
       sub: "status ACTIVE",
       icon: UserCheck,
+      href: "/admin/users",
+    },
+    {
+      label: "Pending registration",
+      value: pendingRegistrations,
+      sub: "mid-registration (PENDING)",
+      icon: Users,
       href: "/admin/users",
     },
     {

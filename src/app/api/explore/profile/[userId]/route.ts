@@ -1,11 +1,11 @@
-import { apiError, guardRate, ok, requireSession } from "@/lib/api";
+import { apiError, guardRate, ok, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { getExploreProfile } from "@/lib/services/explore";
 
 /** Next-profile loader for the immersive viewer queue. */
 export async function GET(_req: Request, { params }: { params: Promise<{ userId: string }> }) {
   const { userId: targetId } = await params;
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
   const limited = await guardRate(`api:${user.id}`, RATE_LIMITS.api);
   if (limited) return limited;

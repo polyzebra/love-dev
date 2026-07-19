@@ -65,9 +65,16 @@ export function canEngage(status: string): boolean {
   return status === "ACTIVE" || status === "PHOTO_REVIEW_REQUIRED";
 }
 
-/** Prisma where-fragment for "candidate is visible" user filters. */
+/**
+ * Prisma where-fragment for "candidate is visible" user filters. A visible
+ * candidate must have a discoverable status AND a completed registration
+ * (onboardingDone) - PENDING/mid-registration accounts are never in the set
+ * (L7.3.8; also closes the historical discovery-feed gap where the main swipe
+ * feed relied on profile.isVisible alone).
+ */
 export const DISCOVERABLE_USER_WHERE = {
   status: { in: [...DISCOVERABLE_STATUSES] },
+  onboardingDone: true,
 } as const satisfies Prisma.UserWhereInput;
 
 // ---------------------------------------------------------------------------
@@ -963,8 +970,15 @@ export async function sweepExpiredRestrictions(
     select: { id: true },
   });
   if (!live) {
-    await db.user.update({ where: { id: userId }, data: { status: "ACTIVE" } });
-    return "ACTIVE";
+    // Restore the base status: never promote a not-yet-completed registration
+    // to ACTIVE (DB CHECK constraint; L7.3.9).
+    const reg = await db.user.findUnique({
+      where: { id: userId },
+      select: { registrationCompletedAt: true },
+    });
+    const restored = reg?.registrationCompletedAt ? "ACTIVE" : "PENDING";
+    await db.user.update({ where: { id: userId }, data: { status: restored } });
+    return restored;
   }
   return "LIMITED";
 }

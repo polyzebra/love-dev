@@ -4,7 +4,7 @@ import {
   guardRate,
   created,
   ok,
-  requireSession,
+  requireActiveAccount,
   withIdempotency,
 } from "@/lib/api";
 import { canEngage, sweepExpiredRestrictions } from "@/lib/services/trust-safety";
@@ -19,7 +19,7 @@ type Params = { params: Promise<{ conversationId: string }> };
 
 export async function GET(req: Request, { params }: Params) {
   const { conversationId } = await params;
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const participant = await assertParticipant(conversationId, user.id);
@@ -37,7 +37,7 @@ export async function GET(req: Request, { params }: Params) {
 
 export async function POST(req: Request, { params }: Params) {
   const { conversationId } = await params;
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   // v1 idempotency (opt-in via Idempotency-Key): a duplicate send - the
@@ -49,7 +49,7 @@ export async function POST(req: Request, { params }: Params) {
     if (limited) return limited;
 
     // Trust-safety ladder: LIMITED accounts cannot send chat messages
-    // (suspended/banned are already refused by requireSession). The sweep
+    // (suspended/banned are already refused by requireActiveAccount). The sweep
     // lifts an expired restriction on the spot.
     const status = (await sweepExpiredRestrictions(user.id)) ?? user.status;
     if (!canEngage(status)) {

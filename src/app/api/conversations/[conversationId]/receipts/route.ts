@@ -1,4 +1,4 @@
-import { forbidden, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { forbidden, guardRate, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { receiptSchema } from "@/lib/validators/chat";
 import { assertParticipant, markDelivered, markRead } from "@/lib/services/chat";
@@ -17,7 +17,7 @@ type Params = { params: Promise<{ conversationId: string }> };
  */
 export async function POST(req: Request, { params }: Params) {
   const { conversationId } = await params;
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`receipt:${user.id}`, RATE_LIMITS.message);

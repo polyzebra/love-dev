@@ -1,4 +1,4 @@
-import { ok, requireSession } from "@/lib/api";
+import { ok, requireActiveAccount } from "@/lib/api";
 import { getVapidConfig, listPushDevices } from "@/lib/services/push";
 
 /**
@@ -7,7 +7,7 @@ import { getVapidConfig, listPushDevices } from "@/lib/services/push";
  * a full endpoint is a capability URL and never leaves the server.
  */
 export async function GET() {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const config = getVapidConfig();

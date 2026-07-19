@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { activateAccountIfComplete } from "@/lib/auth/identity";
 import { PROFILE_PROMPTS } from "@/config/prompts";
 import { GROUP_LABELS, TAXONOMY } from "@/lib/discovery/taxonomy";
 import type { OnboardingInput } from "@/lib/validators/profile";
@@ -102,8 +103,13 @@ export async function completeOnboarding(userId: string, input: OnboardingInput)
 
     await tx.user.update({
       where: { id: userId },
-      data: { onboardingDone: true, name: fields.displayName },
+      data: { onboardingDone: true, onboardingCompletedAt: new Date(), name: fields.displayName },
     });
+
+    // Onboarding is the terminal registration rung. Attempt activation IN the
+    // same transaction: the single canonical activator promotes PENDING->ACTIVE
+    // and stamps registrationCompletedAt iff the whole ladder is now complete.
+    await activateAccountIfComplete(userId, { client: tx });
 
     return profile;
   });

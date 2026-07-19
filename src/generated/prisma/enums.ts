@@ -20,6 +20,7 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 
 export const AccountStatus = {
+  PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
   LIMITED: 'LIMITED',
   PHOTO_REVIEW_REQUIRED: 'PHOTO_REVIEW_REQUIRED',

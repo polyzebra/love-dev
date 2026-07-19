@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError, type ZodSchema } from "zod";
 import { auth } from "@/lib/auth";
+import { registrationComplete } from "@/lib/auth/gate";
 import { hasPermission, type Permission } from "@/lib/rbac";
 import { rateLimit, type RateLimitPreset, type RateLimitResult } from "@/lib/rate-limit";
 
@@ -106,6 +107,32 @@ export async function requireSession(opts?: { allowRestricted?: boolean }) {
   const restricted = user.status === "SUSPENDED" || user.status === "BANNED" || !!user.bannedAt;
   if (restricted && !opts?.allowRestricted) {
     return { user: null, response: accountRestricted() } as const;
+  }
+  return { user, response: null } as const;
+}
+
+/** 403 for a valid session whose registration is not yet complete. */
+export const registrationIncomplete = () =>
+  apiError(
+    403,
+    "registration_incomplete",
+    "Finish creating your account to use this feature.",
+  );
+
+/**
+ * Session guard for POST-ACTIVATION product features (L7.3.8). Layers the
+ * canonical registration resolver on top of requireSession: an authenticated
+ * but incomplete account (PENDING / mid-ladder) is refused with 403
+ * registration_incomplete. This is the ONE completeness gate - every
+ * post-activation feature route uses it, never a bespoke status check.
+ * Registration/setup routes keep plain requireSession (they must run while
+ * the account is still incomplete).
+ */
+export async function requireActiveAccount(opts?: { allowRestricted?: boolean }) {
+  const { user, response } = await requireSession(opts);
+  if (response) return { user: null, response } as const;
+  if (!registrationComplete(user)) {
+    return { user: null, response: registrationIncomplete() } as const;
   }
   return { user, response: null } as const;
 }

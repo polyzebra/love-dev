@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, guardRate, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pushSubscribeSchema, validatePushEndpoint } from "@/lib/validators/push";
 import { isPushConfigured, registerPushSubscription } from "@/lib/services/push";
@@ -11,7 +11,7 @@ import { isPushConfigured, registerPushSubscription } from "@/lib/services/push"
  * changes account (see registerPushSubscription).
  */
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   if (!isPushConfigured()) {

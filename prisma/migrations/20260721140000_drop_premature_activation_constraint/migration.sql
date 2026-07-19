@@ -1,0 +1,12 @@
+-- L7.3.9 recovery: the ACTIVE⇒registrationCompletedAt CHECK constraint added in
+-- 20260721120000 is DEPLOY-COUPLED - it can only be live once the application
+-- build that creates accounts as PENDING (and activates them via the canonical
+-- activator) is deployed. The currently-deployed build still inserts
+-- status='ACTIVE' at sign-up, so the constraint rejects every new registration.
+-- Drop it here to restore sign-up; it is re-added by
+-- 20260721150000_reinstate_activation_constraint, which is intended to apply
+-- TOGETHER WITH the L7.3.8/L7.3.9 code deploy (migrate deploy runs before the
+-- new build is activated - see docs/RELEASE.md). The companion constraint
+-- User_completed_requires_onboarding stays (it is backward-compatible: the old
+-- build never writes registrationCompletedAt).
+ALTER TABLE "User" DROP CONSTRAINT IF EXISTS "User_active_requires_completed_registration";

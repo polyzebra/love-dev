@@ -39,6 +39,13 @@ export type GateUser = {
   privacyVersion: string | null;
   communityVersion: string | null;
   onboardingDone: boolean;
+  /**
+   * The persisted "registration activated" signal (L7.3.8). Once stamped it is
+   * authoritative for ACCESS: a completed account keeps access even if a NEW
+   * rung is later added to the ladder (existing users are never retro-locked).
+   * Optional so legacy callers that don't select it still type-check.
+   */
+  registrationCompletedAt?: Date | null;
 };
 
 /**
@@ -131,4 +138,117 @@ export function resolveLoginView(session: { user: GateUser } | null): LoginView 
   // Authenticated + more setup owed OR fully complete: a recovery screen,
   // never a silent bounce. `setupComplete` picks the primary CTA copy.
   return { kind: "recovery", next, setupComplete: next === "/discover" };
+}
+
+// ---------------------------------------------------------------------------
+// Registration state machine (L7.3.8). ONE canonical resolver: the persisted
+// account is ACTIVE only once the WHOLE registration ladder completes. State
+// and progress are DERIVED from authNextStep above, so routing and state can
+// never disagree - there is exactly one ladder. `registrationCompletedAt` is
+// the explicit, persisted completion signal (stamped by the single activator
+// in identity.ts); completion is never inferred loosely.
+// ---------------------------------------------------------------------------
+
+export type RegistrationState =
+  | "EMAIL_PENDING" // owes a first verified channel OR a real verified email
+  | "PHONE_PENDING" // email done, phone verification owed
+  | "LEGAL_PENDING" // age confirmation and/or legal consent owed
+  | "ONBOARDING_PENDING" // profile onboarding owed
+  | "ACTIVE" // registration fully complete
+  | "CANCELLED" // deactivated / deleted registration
+  | "BLOCKED"; // suspended / banned
+
+/**
+ * Is registration fully complete? The single predicate every access gate
+ * asks (requireActiveAccount). Equivalent to "the ladder has nothing left":
+ * authNextStep answers /discover.
+ */
+export function registrationComplete(
+  user: GateUser,
+  phoneEnabled: boolean = isPhoneVerificationEnabled(),
+): boolean {
+  // Persisted stamp is authoritative (never retro-lock a completed account);
+  // otherwise the live ladder decides (belt-and-braces / self-heal).
+  return !!user.registrationCompletedAt || registrationLadderComplete(user, phoneEnabled);
+}
+
+/**
+ * The FIELD-derived completion predicate: the ladder has nothing left to do.
+ * This is what the activator uses to DECIDE whether to stamp
+ * registrationCompletedAt (it must not depend on the stamp it is about to set).
+ */
+export function registrationLadderComplete(
+  user: GateUser,
+  phoneEnabled: boolean = isPhoneVerificationEnabled(),
+): boolean {
+  return authNextStep(user, phoneEnabled) === "/discover";
+}
+
+/** Canonical registration state, derived from the one ladder (authNextStep). */
+export function resolveRegistrationState(
+  user: GateUser,
+  phoneEnabled: boolean = isPhoneVerificationEnabled(),
+): RegistrationState {
+  if (user.status === "DELETED" || user.status === "DEACTIVATED") return "CANCELLED";
+  if (user.bannedAt || user.status === "SUSPENDED" || user.status === "BANNED") return "BLOCKED";
+  // A stamped account is ACTIVE for state purposes even if a newer rung exists.
+  if (user.registrationCompletedAt) return "ACTIVE";
+  switch (authNextStep(user, phoneEnabled)) {
+    case RESTRICTED_ACCOUNT_ROUTE:
+      return "BLOCKED";
+    case "/login":
+    case "/auth/email":
+      return "EMAIL_PENDING";
+    case "/auth/phone":
+      return "PHONE_PENDING";
+    case "/auth/age":
+    case "/auth/legal":
+      return "LEGAL_PENDING";
+    case "/onboarding":
+      return "ONBOARDING_PENDING";
+    case "/discover":
+      return "ACTIVE";
+    default:
+      return "EMAIL_PENDING";
+  }
+}
+
+export type RegistrationProgress = {
+  state: RegistrationState;
+  /** Route of the next required step (or "/discover" when complete). */
+  next: string;
+  completed: boolean;
+  /** 0-100 across the applicable rungs (phone counts only when enabled). */
+  percentComplete: number;
+  /** Machine-readable keys of the rungs still owed (empty when complete/blocked). */
+  remaining: string[];
+};
+
+/**
+ * The API-contract view of a registration: current state, next step,
+ * completion %, and remaining required actions. Rungs mirror authNextStep's
+ * order exactly; phone is applicable only when the SMS provider is wired.
+ */
+export function registrationProgress(
+  user: GateUser,
+  phoneEnabled: boolean = isPhoneVerificationEnabled(),
+): RegistrationProgress {
+  const rungs = [
+    { key: "email_verified", applies: true, done: !needsEmailAttach(user) },
+    { key: "phone_verified", applies: phoneEnabled, done: !!user.phoneVerifiedAt },
+    { key: "age_confirmed", applies: true, done: !needsAgeConfirmation(user) },
+    { key: "legal_accepted", applies: true, done: !needsConsent(user) },
+    { key: "onboarding_completed", applies: true, done: user.onboardingDone },
+  ].filter((r) => r.applies);
+
+  const state = resolveRegistrationState(user, phoneEnabled);
+  const inactive = state === "BLOCKED" || state === "CANCELLED";
+  const doneCount = rungs.filter((r) => r.done).length;
+  return {
+    state,
+    next: authNextStep(user, phoneEnabled),
+    completed: state === "ACTIVE",
+    percentComplete: inactive ? 0 : Math.round((doneCount / rungs.length) * 100),
+    remaining: inactive ? [] : rungs.filter((r) => !r.done).map((r) => r.key),
+  };
 }

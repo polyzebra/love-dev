@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, requireSession, validationError } from "@/lib/api";
+import { apiError, guardRate, ok, requireActiveAccount, validationError } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { checkoutStatusQuerySchema } from "@/lib/validators/billing";
 import { BillingError, BILLING_ERROR_STATUS, getCheckoutStatus } from "@/lib/services/billing";
@@ -21,7 +21,7 @@ import { BillingError, BILLING_ERROR_STATUS, getCheckoutStatus } from "@/lib/ser
  *  503 billing_unavailable
  */
 export async function GET(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`billing:${user.id}`, RATE_LIMITS.billing);

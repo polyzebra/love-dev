@@ -96,6 +96,9 @@ const UNIT = new Set([
   "migration-portability.test.ts",
   "release-gate.test.ts",
   "release-governance.test.ts",
+  "registration-state-machine.test.ts",
+  "registration-governance.test.ts",
+  "activation-contract.test.ts",
   "seo-integrity.test.ts",
 ]);
 

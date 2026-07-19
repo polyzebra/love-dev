@@ -36,6 +36,9 @@ export const PERMISSIONS = {
   // anchor itself, so no delegation below the owner tier.
   "roles:assign": ["SUPER_ADMIN"],
   "diagnostics:view": ["SUPER_ADMIN"],
+  // Force-activate a registration (bypasses ladder rungs). Touches the
+  // activation invariant itself -> owner tier only, reason + audit required.
+  "users:activate": ["SUPER_ADMIN"],
   // Releasing a number out of a DELETED/orphaned account moves an auth
   // factor between identities - supers only (live-account releases stay
   // under users:manage via the regular release-phone action).

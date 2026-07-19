@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, guardRate, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { swipeSchema } from "@/lib/validators/swipe";
 import {
@@ -17,7 +17,7 @@ import {
 } from "@/lib/services/trust-safety";
 
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`swipe:${user.id}`, RATE_LIMITS.swipe);
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     return apiError(400, "invalid_target", "You cannot swipe on yourself.");
 
   // LIMITED accounts keep read access but cannot send likes (trust-safety
-  // ladder). Suspended/banned never reach here - requireSession refused.
+  // ladder). Suspended/banned never reach here - requireActiveAccount refused.
   // The sweep returns fresh status so an expired restriction lifts itself.
   const status = (await sweepExpiredRestrictions(user.id)) ?? user.status;
   if (data.action !== "PASS" && !canEngage(status)) {
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 
 /** DELETE = undo last swipe (Plus/Gold). */
 export async function DELETE() {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const tier = await planTierOf(user.id);

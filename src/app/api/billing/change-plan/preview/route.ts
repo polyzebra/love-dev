@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, guardRate, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { changePlanSchema } from "@/lib/validators/billing";
 import { BillingError, BILLING_ERROR_STATUS, previewChangePlan } from "@/lib/services/billing";
@@ -22,7 +22,7 @@ import { BillingError, BILLING_ERROR_STATUS, previewChangePlan } from "@/lib/ser
  *  503 billing_unavailable
  */
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`billing:${user.id}`, RATE_LIMITS.billing);

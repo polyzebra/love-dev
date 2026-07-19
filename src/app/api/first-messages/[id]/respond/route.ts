@@ -1,4 +1,4 @@
-import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, guardRate, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { respondFirstMessageSchema } from "@/lib/validators/first-message";
 import {
@@ -13,7 +13,7 @@ type Params = { params: Promise<{ id: string }> };
 /** POST /api/first-messages/[id]/respond - accept or decline (receiver only). */
 export async function POST(req: Request, { params }: Params) {
   const { id } = await params;
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`first-message-respond:${user.id}`, RATE_LIMITS.api);

@@ -4253,6 +4253,9 @@ export const UserScalarFieldEnum = {
   onboardingDone: 'onboardingDone',
   marketingOptIn: 'marketingOptIn',
   deletionRequested: 'deletionRequested',
+  registrationStartedAt: 'registrationStartedAt',
+  onboardingCompletedAt: 'onboardingCompletedAt',
+  registrationCompletedAt: 'registrationCompletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

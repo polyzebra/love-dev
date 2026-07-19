@@ -1,9 +1,9 @@
-import { ok, requireSession } from "@/lib/api";
+import { ok, requireActiveAccount } from "@/lib/api";
 import { db } from "@/lib/db";
 import { calculateAge } from "@/lib/utils";
 
 export async function GET() {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const matches = await db.match.findMany({

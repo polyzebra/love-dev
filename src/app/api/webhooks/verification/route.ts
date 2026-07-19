@@ -76,9 +76,15 @@ export async function POST(req: Request) {
         body: "Your photo verification was approved. Your badge is now live.",
         dedupeKey: `verification:${event.sessionId}:approved`,
       });
-      // If verification was the pending gate, lift PHOTO_REVIEW_REQUIRED.
+      // If verification was the pending gate, lift PHOTO_REVIEW_REQUIRED - but
+      // only for a COMPLETED registration (never promote to ACTIVE without
+      // registrationCompletedAt; DB CHECK constraint, L7.3.9).
       await db.user.updateMany({
-        where: { id: result.userId, status: "PHOTO_REVIEW_REQUIRED" },
+        where: {
+          id: result.userId,
+          status: "PHOTO_REVIEW_REQUIRED",
+          registrationCompletedAt: { not: null },
+        },
         data: { status: "ACTIVE" },
       });
       // Profile-photo verification (face layer): identity is now proven -

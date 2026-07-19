@@ -44,6 +44,8 @@ export type AppSession = {
     privacyVersion: string | null;
     communityVersion: string | null;
     authCompleted: boolean;
+    /** Persisted registration-complete signal (L7.3.8); null while PENDING. */
+    registrationCompletedAt: Date | null;
   };
 };
 
@@ -160,6 +162,7 @@ export const auth = cache(async (): Promise<AppSession | null> => {
       privacyVersion: appUser.privacyVersion,
       communityVersion: appUser.communityVersion,
       authCompleted: appUser.authCompleted,
+      registrationCompletedAt: appUser.registrationCompletedAt,
     },
   };
 });

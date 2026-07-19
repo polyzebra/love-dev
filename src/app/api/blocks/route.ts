@@ -1,10 +1,10 @@
-import { apiError, created, ok, parseBody, requireSession } from "@/lib/api";
+import { apiError, created, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { blockSchema } from "@/lib/validators/safety";
 import { db } from "@/lib/db";
 import { orderPair } from "@/lib/services/matching";
 
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const { data, response: invalid } = await parseBody(req, blockSchema);
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const blocks = await db.block.findMany({

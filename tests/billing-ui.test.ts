@@ -432,8 +432,11 @@ check("clientSecret is owner-only and never logged", () => {
 });
 
 check("preview and status routes are authenticated and never accept price ids or amounts", () => {
-  assert.match(previewRoute, /requireSession\(\)/);
-  assert.match(statusRoute, /requireSession\(\)/);
+  // L7.3.8: billing is a post-activation feature -> requireActiveAccount
+  // (requireSession + registration-complete gate). An incomplete account
+  // cannot reach billing at all.
+  assert.match(previewRoute, /requireActiveAccount\(\)/);
+  assert.match(statusRoute, /requireActiveAccount\(\)/);
   assert.match(previewRoute, /changePlanSchema/);
   const validators = read("src", "lib", "validators", "billing.ts");
   assert.match(validators, /strictObject/);

@@ -1,4 +1,4 @@
-import { ok, requireSession } from "@/lib/api";
+import { ok, requireActiveAccount } from "@/lib/api";
 import { getPurchaseRecords } from "@/lib/services/billing";
 
 /**
@@ -7,7 +7,7 @@ import { getPurchaseRecords } from "@/lib/services/billing";
  * payment/subscription records verbatim; never mutates anything.
  */
 export async function GET() {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
   return ok(await getPurchaseRecords(user.id));
 }

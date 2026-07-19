@@ -1,4 +1,4 @@
-import { forbidden, ok, parseBody, requireSession } from "@/lib/api";
+import { forbidden, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { conversationActionSchema } from "@/lib/validators/chat";
 import { assertParticipant, markRead } from "@/lib/services/chat";
 import { db } from "@/lib/db";
@@ -7,7 +7,7 @@ type Params = { params: Promise<{ conversationId: string }> };
 
 export async function PATCH(req: Request, { params }: Params) {
   const { conversationId } = await params;
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const participant = await assertParticipant(conversationId, user.id);

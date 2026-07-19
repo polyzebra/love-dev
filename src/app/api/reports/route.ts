@@ -1,4 +1,4 @@
-import { apiError, clientIp, created, guardRate, parseBody, requireSession } from "@/lib/api";
+import { apiError, clientIp, created, guardRate, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { reportSchema } from "@/lib/validators/safety";
 import { db } from "@/lib/db";
@@ -18,7 +18,7 @@ const REPORT_CASE_TYPE: Partial<Record<ReportReason, ModerationCaseType>> = {
 };
 
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`report:${user.id}`, RATE_LIMITS.report);

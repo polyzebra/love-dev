@@ -1,4 +1,4 @@
-import { guardRate, notFound, ok, parseBody, requireSession } from "@/lib/api";
+import { guardRate, notFound, ok, parseBody, requireActiveAccount } from "@/lib/api";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pushUnsubscribeSchema } from "@/lib/validators/push";
 import { revokeDeviceToken, revokePushSubscription } from "@/lib/services/push";
@@ -9,7 +9,7 @@ import { revokeDeviceToken, revokePushSubscription } from "@/lib/services/push";
  * device history stays auditable.
  */
 export async function POST(req: Request) {
-  const { user, response } = await requireSession();
+  const { user, response } = await requireActiveAccount();
   if (response) return response;
 
   const limited = await guardRate(`push-subscribe:${user.id}`, RATE_LIMITS.pushSubscribe);

@@ -1,8 +1,14 @@
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
 import { ipHashFrom, recordAuthEvent, userAgentHashFrom } from "@/lib/auth/audit";
-import { PLACEHOLDER_EMAIL_SUFFIX } from "@/lib/auth/gate";
-import { Prisma, type User as AppUser } from "@/generated/prisma/client";
+import {
+  PLACEHOLDER_EMAIL_SUFFIX,
+  registrationLadderComplete,
+  resolveRegistrationState,
+  type GateUser,
+  type RegistrationState,
+} from "@/lib/auth/gate";
+import { Prisma, PrismaClient, type User as AppUser } from "@/generated/prisma/client";
 
 /**
  * Identity rules - Supabase Auth (auth.users.id) is the ONLY identity.
@@ -252,6 +258,11 @@ export async function ensureAppUser(
       data: {
         id: u.id,
         email,
+        // L7.3.8: born PENDING. The account is NOT active - it owes phone,
+        // legal, and onboarding. The single activator flips it to ACTIVE
+        // only when the whole ladder completes.
+        status: "PENDING",
+        registrationStartedAt: new Date(),
         emailVerified: u.email_confirmed_at ? new Date(u.email_confirmed_at) : null,
         name: (u.user_metadata?.full_name as string | undefined) ?? null,
         image: (u.user_metadata?.avatar_url as string | undefined) ?? null,
@@ -273,6 +284,126 @@ export async function ensureAppUser(
   }
   console.info(`[identity] new account auth.uid=${u.id} provider=${provider}`);
   return { ok: true, user: createdUser, created: true, previousLoginIpHash: null };
+}
+
+// ---------------------------------------------------------------------------
+// Deferred activation (L7.3.8) - THE single place an account becomes ACTIVE.
+// ---------------------------------------------------------------------------
+
+/** Map an app User row onto the gate's decision shape. */
+function toGateUser(u: AppUser): GateUser {
+  return {
+    status: u.status,
+    bannedAt: u.bannedAt,
+    email: u.email,
+    emailVerified: u.emailVerified,
+    phoneVerifiedAt: u.phoneVerifiedAt,
+    ageConfirmedAt: u.ageConfirmedAt,
+    termsVersion: u.termsVersion,
+    privacyVersion: u.privacyVersion,
+    communityVersion: u.communityVersion,
+    onboardingDone: u.onboardingDone,
+    registrationCompletedAt: u.registrationCompletedAt,
+  };
+}
+
+/**
+ * Thrown when activation is attempted but the immutable contract is violated
+ * (L7.3.9). Activation NEVER happens silently against the rules.
+ */
+export class RegistrationStateViolation extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "RegistrationStateViolation";
+  }
+}
+
+export type ActivationResult = {
+  activated: boolean;
+  state: RegistrationState;
+  reason: "activated" | "already_active" | "restricted" | "incomplete";
+};
+
+/**
+ * THE single canonical account activator (L7.3.8/L7.3.9). The ONLY code in the
+ * repository that transitions PENDING -> ACTIVE or writes registrationCompletedAt
+ * (enforced by tests/registration-governance.test.ts + the DB CHECK constraint
+ * "User_active_requires_completed_registration").
+ *
+ * Contract (Phase B): activation requires the FULL ladder complete (email +
+ * phone + age + terms + privacy + community + onboarding) AND the account not
+ * suspended/banned AND not already completed. Otherwise it does NOT activate:
+ *  - automatic path (no `force`): a safe no-op (reason: incomplete/restricted),
+ *    because the caller runs it hopefully after every rung.
+ *  - manual path (`force` by a Super Admin, Phase H): bypasses ONLY the ladder
+ *    rungs; still refuses a suspended/banned/already-complete account and MUST
+ *    carry an actor + reason, else RegistrationStateViolation.
+ *
+ * Every activation is audited (Phase I): previous state, new state, actor,
+ * automatic/manual, reason, requestId. Idempotent (already-complete = no-op).
+ */
+export async function activateAccountIfComplete(
+  userId: string,
+  opts: {
+    client?: PrismaClient | Prisma.TransactionClient;
+    /** Super-admin manual override; bypasses ladder rungs only. */
+    force?: { actorId: string; reason: string };
+    requestId?: string | null;
+  } = {},
+): Promise<ActivationResult> {
+  const client = opts.client ?? db;
+  const u = await client.user.findUnique({ where: { id: userId } });
+  if (!u) throw new RegistrationStateViolation(`activation: user ${userId} not found`);
+
+  const gateUser = toGateUser(u);
+  const previousState = resolveRegistrationState(gateUser);
+
+  // Idempotent: an already-completed account is never re-activated.
+  if (u.registrationCompletedAt) return { activated: false, state: previousState, reason: "already_active" };
+
+  // Contract: never activate a suspended/banned account (even with force).
+  if (u.status === "SUSPENDED" || u.status === "BANNED" || u.bannedAt) {
+    if (opts.force) {
+      throw new RegistrationStateViolation("cannot force-activate a suspended/banned account");
+    }
+    return { activated: false, state: previousState, reason: "restricted" };
+  }
+
+  const ladderComplete = registrationLadderComplete(gateUser);
+  if (!ladderComplete && !opts.force) {
+    return { activated: false, state: previousState, reason: "incomplete" };
+  }
+  if (opts.force && (!opts.force.actorId || !opts.force.reason)) {
+    throw new RegistrationStateViolation("force activation requires an actor and a reason");
+  }
+
+  const now = new Date();
+  await client.user.update({
+    where: { id: userId },
+    data: {
+      registrationCompletedAt: now,
+      // Only a PENDING registrant is promoted; restrictions are preserved.
+      ...(u.status === "PENDING" ? { status: "ACTIVE" } : {}),
+      ...(u.onboardingDone && !u.onboardingCompletedAt ? { onboardingCompletedAt: now } : {}),
+    },
+  });
+  // Audit (Phase I) - never blocks activation.
+  await recordAuthEvent({
+    type: opts.force ? "account_force_activated" : "account_activated",
+    userId,
+    metadata: {
+      previousState,
+      newState: "ACTIVE",
+      actor: opts.force?.actorId ?? "system",
+      mode: opts.force ? "manual_force" : "automatic",
+      reason: opts.force?.reason ?? "registration_complete",
+      requestId: opts.requestId ?? null,
+    },
+  });
+  console.info(
+    `[identity] account ${userId} ${opts.force ? "force-" : ""}activated (${previousState} -> ACTIVE)`,
+  );
+  return { activated: true, state: "ACTIVE", reason: "activated" };
 }
 
 // ---------------------------------------------------------------------------
@@ -394,6 +525,10 @@ export async function provisionPhoneLoginUser(opts: {
       data: {
         id: authUid,
         email: opts.email?.toLowerCase() ?? phonePlaceholderEmail(authUid),
+        // L7.3.8: phone-LOGIN accounts are born with a verified phone but still
+        // owe email attach + legal + onboarding, so they too start PENDING.
+        status: "PENDING",
+        registrationStartedAt: now,
         ...phoneStamps,
         ...loginStamps,
       },

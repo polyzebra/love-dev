@@ -65,9 +65,20 @@ export async function unbanUser(opts: {
   userId: string;
   req?: Request;
 }): Promise<void> {
+  // Restore to the correct base status: an account that never COMPLETED
+  // registration must return to PENDING, not ACTIVE (the DB CHECK constraint
+  // forbids ACTIVE without registrationCompletedAt). L7.3.9.
+  const prior = await db.user.findUnique({
+    where: { id: opts.userId },
+    select: { registrationCompletedAt: true },
+  });
   const user = await db.user.update({
     where: { id: opts.userId },
-    data: { bannedAt: null, banReason: null, status: "ACTIVE" },
+    data: {
+      bannedAt: null,
+      banReason: null,
+      status: prior?.registrationCompletedAt ? "ACTIVE" : "PENDING",
+    },
     select: { email: true },
   });
   // Reverse the ban's enforcement footprint: open BANNED violations and
@@ -496,9 +507,22 @@ export async function setUserStatus(opts: {
   status: "ACTIVE" | "SUSPENDED" | "SHADOW_BANNED";
   req?: Request;
 }): Promise<void> {
+  // L7.3.9: admins may restore/restrict, but may NOT activate an incomplete
+  // registration this way. Restoring to "ACTIVE" only sticks for a COMPLETED
+  // account; an incomplete one falls back to PENDING (the DB CHECK constraint
+  // forbids ACTIVE without registrationCompletedAt). Deliberate override lives
+  // in the super-admin Force-Activate path (activateAccountIfComplete force).
+  let effectiveStatus: "ACTIVE" | "PENDING" | "SUSPENDED" | "SHADOW_BANNED" = opts.status;
+  if (opts.status === "ACTIVE") {
+    const reg = await db.user.findUnique({
+      where: { id: opts.userId },
+      select: { registrationCompletedAt: true },
+    });
+    effectiveStatus = reg?.registrationCompletedAt ? "ACTIVE" : "PENDING";
+  }
   const user = await db.user.update({
     where: { id: opts.userId },
-    data: { status: opts.status },
+    data: { status: effectiveStatus },
     select: { email: true },
   });
   await audit({
