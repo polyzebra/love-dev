@@ -125,6 +125,7 @@ npm run dev              # http://localhost:3000
 
 ### `docs/` (Link, Don't Duplicate)
 - [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) — Token consolidation, identity, color system
+- [LAYOUT_GUIDE.md](docs/LAYOUT_GUIDE.md) — Public layout architecture + governance (build public pages with `<PageShell>`/`<Section>` from `@/components/layout/public`; the `public-layout` unit guard blocks hardcoded frames)
 - [AUTH-SETUP.md](docs/AUTH-SETUP.md) — Auth.js provider config
 - [ADMIN-SETUP.md](docs/ADMIN-SETUP.md) — Bootstrap + RBAC enforcement
 - [TRUST-SAFETY.md](docs/TRUST-SAFETY.md) — Enforcement policy + appeals

@@ -86,6 +86,7 @@ const UNIT = new Set([
   "face-binding-platform.test.ts",
   "support-request.test.ts",
   "global-scope.test.ts",
+  "public-layout.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

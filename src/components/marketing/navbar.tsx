@@ -16,6 +16,7 @@ import {
   DrawerDescription,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { layout } from "@/components/layout/public";
 
 // Both auth CTAs resolve to /login - the unified entry handles new AND
 // returning people (there is no separate password/registration flow).
@@ -45,7 +46,8 @@ export function MarketingNavbar() {
         layout
         transition={{ type: "spring", stiffness: 260, damping: 30 }}
         className={cn(
-          "glass flex w-full max-w-5xl items-center justify-between gap-3 rounded-full pr-2 pl-5",
+          "glass flex w-full items-center justify-between gap-3 rounded-full pr-2 pl-5",
+          layout.wide,
           condensed ? "shadow-float py-1.5" : "py-2.5",
         )}
       >

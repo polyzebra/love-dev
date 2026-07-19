@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 import { HELP_CATEGORIES } from "@/lib/help/content";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
@@ -15,7 +16,7 @@ export const metadata: Metadata = buildMarketingMetadata({
 // deep-linkable categories and articles.
 export default function HelpPage() {
   return (
-    <main className="mx-auto max-w-5xl px-5 pt-36 pb-20 md:px-8 md:pt-44">
+    <PageShell width="wide">
       <header className="max-w-2xl">
         <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">
           Help Centre
@@ -59,6 +60,6 @@ export default function HelpPage() {
           else is in immediate danger, call 112 or your local emergency number.
         </p>
       </div>
-    </main>
+    </PageShell>
   );
 }

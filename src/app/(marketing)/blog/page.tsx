@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
 
 export const metadata: Metadata = buildMarketingMetadata({
@@ -10,7 +11,7 @@ export const metadata: Metadata = buildMarketingMetadata({
 
 export default function BlogPage() {
   return (
-    <main className="mx-auto max-w-3xl px-5 pt-36 pb-16 md:px-8 md:pt-44">
+    <PageShell width="reading">
       <h1 className="font-display text-4xl font-semibold tracking-tight">Blog</h1>
       <div className="text-muted-foreground mt-6 space-y-4 leading-relaxed">
         <p>
@@ -25,6 +26,6 @@ export default function BlogPage() {
           .
         </p>
       </div>
-    </main>
+    </PageShell>
   );
 }

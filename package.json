@@ -30,10 +30,13 @@
     "test:unit": "node scripts/run-tests.mjs unit",
     "test:integration": "node scripts/run-tests.mjs integration",
     "test:integration:live": "node scripts/run-tests.mjs live",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:report": "playwright show-report",
     "db:validate": "prisma validate && prisma generate && git diff --exit-code --stat src/generated",
     "db:apply-migration": "tsx scripts/db-apply-migration.ts",
     "check:public-env": "node scripts/check-public-env.mjs",
-    "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check"
+    "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check && npm run test:visual"
   },
   "dependencies": {
     "@aws-amplify/ui-react-liveness": "^3.6.7",
@@ -70,6 +73,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

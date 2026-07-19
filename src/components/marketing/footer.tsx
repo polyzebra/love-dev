@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { legalFooterGroups, type LegalFooterLink } from "@/lib/legal/registry";
+import { layout } from "@/components/layout/public";
+import { cn } from "@/lib/utils";
 
 /**
  * Premium SaaS footer / Legal Centre.
@@ -101,7 +103,7 @@ export function MarketingFooter() {
   const legalGroups = legalFooterGroups();
   return (
     <footer className="border-border border-t">
-      <div className="mx-auto max-w-6xl px-6 py-14 md:px-10 md:py-20">
+      <div className={cn("mx-auto py-14 md:py-20", layout.wide, layout.paddingX)}>
         {/* Top: branding + marketing columns */}
         <div className="grid grid-cols-1 gap-x-10 gap-y-1 lg:grid-cols-[1.8fr_1fr_1fr] lg:items-start lg:gap-8">
           <div className="mb-6 max-w-xs lg:mb-0">
@@ -159,7 +161,7 @@ export function MarketingFooter() {
 
       {/* Bottom */}
       <div className="border-border border-t">
-        <p className="text-muted-foreground mx-auto max-w-6xl px-6 py-6 text-xs md:px-10">
+        <p className={cn("text-muted-foreground mx-auto py-6 text-xs", layout.wide, layout.paddingX)}>
           © {new Date().getFullYear()} WiseWave Limited. All rights reserved.
         </p>
       </div>

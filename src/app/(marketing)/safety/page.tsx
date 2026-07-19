@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
 import {
@@ -147,7 +148,7 @@ const TIPS = [
 
 export default function SafetyPage() {
   return (
-    <main className="mx-auto max-w-5xl px-5 pt-36 pb-20 md:px-8 md:pt-44">
+    <PageShell width="wide">
       <header className="max-w-2xl">
         <p className="text-primary-soft text-sm font-semibold tracking-wide uppercase">
           Trust &amp; safety
@@ -224,6 +225,6 @@ export default function SafetyPage() {
           ))}
         </ul>
       </section>
-    </main>
+    </PageShell>
   );
 }

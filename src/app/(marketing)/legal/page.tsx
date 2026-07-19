@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import { LEGAL_COMPANY, LEGAL_CATEGORY_ORDER, legalDocsByCategory } from "@/lib/legal/registry";
 import { isLegalDocSlug } from "@/lib/legal/doc-slugs";
 import { loadLegalDocument } from "@/lib/legal/loader";
@@ -46,7 +47,7 @@ export default async function LegalCentrePage() {
   const categories = LEGAL_CATEGORY_ORDER.filter((c) => flat.some((d) => d.category === c));
 
   return (
-    <main className="mx-auto max-w-5xl px-5 pt-36 pb-20 md:px-8 md:pt-44">
+    <PageShell width="wide">
       <header className="max-w-2xl">
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
           Legal Centre
@@ -108,6 +109,6 @@ export default async function LegalCentrePage() {
       </section>
 
       <LegalCentreDocs docs={docs} categories={categories} />
-    </main>
+    </PageShell>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell, layout } from "@/components/layout/public";
 import Link from "next/link";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = buildMarketingMetadata({
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="mt-10">
+    <section aria-labelledby={id} className={layout.section}>
       <h2 id={id} className="font-display text-2xl font-semibold tracking-tight">
         {title}
       </h2>
@@ -22,7 +23,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
 
 export default function CareersPage() {
   return (
-    <main className="mx-auto max-w-3xl px-5 pt-36 pb-20 md:px-8 md:pt-44">
+    <PageShell width="reading">
       <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">Careers</h1>
       <p className="text-muted-foreground mt-5 text-lg leading-relaxed">
         Tirvea is operated by <strong>WiseWave Limited</strong>, building a dating platform around
@@ -83,6 +84,6 @@ export default function CareersPage() {
           .
         </p>
       </Section>
-    </main>
+    </PageShell>
   );
 }

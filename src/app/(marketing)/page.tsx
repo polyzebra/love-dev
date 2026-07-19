@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cn } from "@/lib/utils";
+import { layout } from "@/components/layout/public";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -72,7 +74,7 @@ export default function LandingPage() {
 
       {/* ====================== MANIFESTO INTERLUDE ====================== */}
       <section className="relative overflow-hidden py-32 md:py-44">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+        <div className={cn("mx-auto text-center", layout.hero, layout.heroPaddingX)}>
           <Reveal>
             <p className="font-display text-[clamp(1.8rem,4.5vw,3.4rem)] leading-[1.25] font-medium tracking-tight text-balance">
               Swiping was built to be <span className="text-muted-foreground italic">endless</span>.
@@ -87,7 +89,7 @@ export default function LandingPage() {
       {/* ==================== EDITORIAL SPLIT · CRAFT ==================== */}
       <section className="relative overflow-hidden py-24 md:py-36">
         <Aurora intensity="faint" />
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 md:grid-cols-2 md:px-10">
+        <div className={cn("mx-auto grid items-center gap-14 md:grid-cols-2", layout.landing, layout.landingPaddingX)}>
           <Reveal className="order-2 md:order-1">
             <TiltCard maxTilt={7} className="rounded-2xl">
               <div className="shadow-float light:border-border relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/12">
@@ -146,7 +148,7 @@ export default function LandingPage() {
 
       {/* ======================= THREE PRINCIPLES ======================= */}
       <section className="relative py-24 md:py-36">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
+        <div className={cn("mx-auto", layout.landing, layout.landingPaddingX)}>
           <Reveal>
             <h2 className="font-display mb-20 max-w-2xl text-4xl leading-[1.06] font-medium tracking-tight md:text-6xl">
               Three promises,
@@ -179,7 +181,7 @@ export default function LandingPage() {
 
       {/* ===================== VERIFICATION SPOTLIGHT ===================== */}
       <section className="relative py-24 md:my-12 md:py-36">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
+        <div className={cn("mx-auto", layout.landing, layout.landingPaddingX)}>
           <Reveal>
             <div className="border-glow noise bg-card/60 relative overflow-hidden rounded-[36px] px-8 py-16 md:px-16 md:py-24">
               <div
@@ -221,7 +223,7 @@ export default function LandingPage() {
 
       {/* ========================= HOW IT BEGINS ========================= */}
       <section className="relative py-24 md:py-36">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
+        <div className={cn("mx-auto", layout.landing, layout.landingPaddingX)}>
           <div className="grid gap-16 md:grid-cols-[0.8fr_1.2fr]">
             <Reveal>
               <h2 className="font-display text-4xl leading-[1.06] font-medium tracking-tight md:sticky md:top-32 md:text-6xl">
@@ -267,7 +269,7 @@ export default function LandingPage() {
       {/* =========================== FINAL CTA =========================== */}
       <section className="noise relative overflow-hidden py-36 md:py-52">
         <Aurora intensity="hero" />
-        <div className="relative mx-auto max-w-4xl px-6 text-center">
+        <div className={cn("relative mx-auto text-center", layout.hero, layout.heroPaddingX)}>
           <Reveal>
             <ShieldCheck className="text-gold mx-auto mb-8 size-8" aria-hidden="true" />
           </Reveal>

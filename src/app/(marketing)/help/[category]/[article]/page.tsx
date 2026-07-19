@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
@@ -37,7 +38,7 @@ export default async function HelpArticlePage({
   const related = relatedArticles(cat.slug, doc.slug);
 
   return (
-    <main className="mx-auto max-w-2xl px-5 pt-36 pb-20 md:px-8 md:pt-44">
+    <PageShell width="reading">
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
         <ol className="flex flex-wrap items-center gap-1">
           <li>
@@ -130,6 +131,6 @@ export default async function HelpArticlePage({
         </Link>
         .
       </p>
-    </main>
+    </PageShell>
   );
 }

@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Check, Link2, Printer } from "lucide-react";
 import { LEGAL_COMPANY, legalDocByPath, legalDocNeighbours } from "@/lib/legal/registry";
 import { slugify } from "@/lib/legal/markdown";
+import { layout } from "@/components/layout/public";
+import { cn } from "@/lib/utils";
 
 const NON_REGISTRY_LABELS: Record<string, string> = {
   "/safety": "Safety Centre",
@@ -151,7 +153,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="mx-auto max-w-[64rem] px-5 pt-28 pb-24 md:px-8 md:pt-36">
+    <div className={cn("mx-auto", layout.wide, layout.paddingX, layout.paddingTop, layout.paddingBottom)}>
       {/* Breadcrumbs + schema */}
       <nav aria-label="Breadcrumb" className="text-muted-foreground mb-6 text-xs print:hidden">
         <ol className="flex flex-wrap items-center gap-1.5">

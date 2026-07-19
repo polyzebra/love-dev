@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
 // stay until counsel signs off; production stays blocked until then.
 export default function FaceCheckPage() {
   return (
-    <article className="prose prose-neutral dark:prose-invert mx-auto max-w-2xl px-4 py-12">
+    <PageShell width="reading">
+      <article className="prose prose-neutral dark:prose-invert">
       <h1>Photo verification, explained</h1>
 
       <p>
@@ -87,5 +89,6 @@ export default function FaceCheckPage() {
         info@tirvea.com.
       </p>
     </article>
+    </PageShell>
   );
 }

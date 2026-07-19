@@ -43,3 +43,10 @@ next-env.d.ts
 
 # Calibration reports (generated; never commit biometric-derived output)
 reports/calibration/
+
+# L5.4 - Playwright visual-regression run artifacts (NOT the baselines).
+# Baselines live in tests/visual/__screenshots__/ and ARE committed.
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/

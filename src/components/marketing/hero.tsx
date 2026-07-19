@@ -1,5 +1,6 @@
 import { Aurora } from "@/components/fx/aurora";
 import { cn } from "@/lib/utils";
+import { layout } from "@/components/layout/public";
 
 /**
  * The one hero system for all marketing pages.
@@ -47,7 +48,9 @@ export function MarketingHero({
 
       <div
         className={cn(
-          "relative mx-auto w-full max-w-6xl px-6 md:px-10",
+          "relative mx-auto w-full",
+          layout.landing,
+          layout.landingPaddingX,
           split
             ? "grid flex-1 items-center gap-10 pt-28 pb-10 md:grid-cols-[0.95fr_1.05fr] md:gap-0"
             : "max-w-5xl",

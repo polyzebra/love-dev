@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 import { ContactForm } from "@/components/marketing/contact-form";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
@@ -12,7 +13,7 @@ export const metadata: Metadata = buildMarketingMetadata({
 
 export default function ContactPage() {
   return (
-    <main className="mx-auto max-w-3xl px-5 pt-36 pb-20 md:px-8 md:pt-44">
+    <PageShell width="reading">
       <h1 className="font-display text-4xl font-semibold tracking-tight">Contact us</h1>
       <p className="text-muted-foreground mt-4 max-w-2xl leading-relaxed">
         Send a message and a person will read it and reply by email. Choose the category that fits
@@ -63,6 +64,6 @@ export default function ContactPage() {
           Ireland. The registered office is not a customer walk-in or support location.
         </p>
       </div>
-    </main>
+    </PageShell>
   );
 }

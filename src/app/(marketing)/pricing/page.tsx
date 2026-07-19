@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cn } from "@/lib/utils";
+import { layout } from "@/components/layout/public";
 import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
@@ -52,7 +54,7 @@ export default async function PricingPage() {
         subtitle="Start free. Upgrade when you want more. Cancel in two taps - no dark patterns, no win-back mazes."
       />
       <section className="relative pb-28 md:pb-40">
-        <div className="mx-auto max-w-5xl px-6 pt-10 md:px-10 md:pt-14">
+        <div className={cn("mx-auto pt-10 md:pt-14", layout.wide, layout.paddingX)}>
           {/* Stripe cancel_url returns here with ?checkout=cancelled. */}
           <Suspense fallback={null}>
             <CheckoutCancelledNotice />

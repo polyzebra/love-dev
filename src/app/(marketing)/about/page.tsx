@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PageShell, layout } from "@/components/layout/public";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Sparkles, ShieldCheck, Lock, Cpu, BadgeCheck, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,7 +48,7 @@ function Section({
   className?: string;
 }) {
   return (
-    <section aria-labelledby={id} className={"mt-20 md:mt-28 " + (className ?? "")}>
+    <section aria-labelledby={id} className={cn(layout.section, className)}>
       <h2
         id={id}
         className="font-display text-2xl font-semibold tracking-tight md:text-3xl"
@@ -83,7 +85,7 @@ const DIFFERENTIATORS = [
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto max-w-3xl px-5 pt-36 pb-24 md:px-8 md:pt-44">
+    <PageShell width="reading">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -137,7 +139,7 @@ export default function AboutPage() {
       </Section>
 
       {/* What makes Tirvea different - callouts */}
-      <section aria-labelledby="different" className="mt-20 md:mt-28">
+      <section aria-labelledby="different" className={layout.section}>
         <h2 id="different" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
           What makes Tirvea different
         </h2>
@@ -253,7 +255,7 @@ export default function AboutPage() {
       </Section>
 
       {/* Principles */}
-      <section aria-labelledby="principles" className="mt-20 md:mt-28">
+      <section aria-labelledby="principles" className={layout.section}>
         <h2 id="principles" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
           Our principles
         </h2>
@@ -286,7 +288,7 @@ export default function AboutPage() {
       {/* Company information */}
       <section
         aria-labelledby="company"
-        className="border-border/60 mt-20 border-t pt-10 md:mt-28"
+        className={cn(layout.section, "border-border/60 border-t pt-10")}
       >
         <h2 id="company" className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
           Company information
@@ -321,7 +323,7 @@ export default function AboutPage() {
       </section>
 
       {/* Final CTA */}
-      <section aria-labelledby="cta" className="mt-20 text-center md:mt-28">
+      <section aria-labelledby="cta" className={cn(layout.section, "text-center")}>
         <h2 id="cta" className="font-display text-3xl font-semibold tracking-tight md:text-4xl">
           Ready when you are.
         </h2>
@@ -337,6 +339,6 @@ export default function AboutPage() {
           </Button>
         </div>
       </section>
-    </main>
+    </PageShell>
   );
 }
