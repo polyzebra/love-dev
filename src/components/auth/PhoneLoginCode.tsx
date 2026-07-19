@@ -229,7 +229,7 @@ export function PhoneLoginCode() {
             <>
               Need a hand?{" "}
               <a
-                href="mailto:support@tirvea.app"
+                href="mailto:info@tirvea.com"
                 className="hover:text-foreground underline underline-offset-2"
               >
                 Contact support

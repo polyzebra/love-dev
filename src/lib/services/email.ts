@@ -75,7 +75,7 @@ function resendKey(): string | null {
 }
 
 function emailFrom(): string {
-  return process.env.EMAIL_FROM?.trim() || "Tirvea <hello@tirvea.app>";
+  return process.env.EMAIL_FROM?.trim() || "Tirvea <noreply@tirvea.com>";
 }
 
 export const resendEmailProvider: EmailProvider = {
@@ -205,7 +205,7 @@ export type RenderedEmail = { subject: string; text: string; html: string };
 export const OTP_EMAIL_FROM = process.env.EMAIL_OTP_FROM?.trim() || "Tirvea <noreply@tirvea.com>";
 
 /** Support address shown in the OTP email footer. */
-export const OTP_SUPPORT_EMAIL = "support@tirvea.com";
+export const OTP_SUPPORT_EMAIL = "info@tirvea.com";
 
 /** The canonical OTP subject - identical across every flow. */
 export const OTP_EMAIL_SUBJECT = "Your Tirvea verification code";

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Check, Clock, FileDown, Link2, Printer } from "lucide-react";
+import { Check, Link2, Printer } from "lucide-react";
 import { LEGAL_COMPANY, legalDocByPath, legalDocNeighbours } from "@/lib/legal/registry";
 import { slugify } from "@/lib/legal/markdown";
 
@@ -14,18 +14,42 @@ const NON_REGISTRY_LABELS: Record<string, string> = {
 function relatedTitle(path: string): string {
   return legalDocByPath(path)?.title ?? NON_REGISTRY_LABELS[path] ?? path;
 }
-function relatedSummary(path: string): string | undefined {
-  return legalDocByPath(path)?.summary;
+
+/** Quiet middot separator for the metadata row. */
+function Dot() {
+  return (
+    <span aria-hidden className="text-foreground/25">
+      &middot;
+    </span>
+  );
 }
 
+/**
+ * L4.0 - documentation typography. Reading is primary: generous measure and
+ * spacing, a strong H1/H2/H3 hierarchy, and NO section-dividing borders (the
+ * dashboard look). Colours and the type family are the Tirvea tokens,
+ * unchanged - only the hierarchy and rhythm are elevated.
+ */
 const PROSE =
-  "prose-neutral max-w-none [&_h1]:font-display [&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:md:text-4xl [&_h2]:mt-12 [&_h2]:scroll-mt-28 [&_h2]:border-t [&_h2]:border-border/60 [&_h2]:pt-8 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_h3]:scroll-mt-28 [&_h3]:text-base [&_h3]:font-semibold [&_p]:mt-4 [&_p]:leading-7 [&_p]:text-muted-foreground [&_li]:text-muted-foreground [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-foreground/30 [&_a]:underline-offset-[3px] [&_a:hover]:decoration-foreground [&_strong]:text-foreground [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_hr]:my-10 [&_hr]:border-border [&_blockquote]:my-6 [&_blockquote]:rounded-r-lg [&_blockquote]:border-l-2 [&_blockquote]:border-foreground/25 [&_blockquote]:bg-muted/40 [&_blockquote]:py-3 [&_blockquote]:pr-4 [&_blockquote]:pl-4 [&_blockquote_p]:mt-0 [&_table]:my-6 [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm [&_thead]:bg-muted/50 [&_th]:border [&_th]:border-border [&_th]:p-2.5 [&_th]:text-left [&_th]:font-semibold [&_td]:border [&_td]:border-border [&_td]:p-2.5 [&_td]:align-top [&_td]:text-muted-foreground";
+  "prose-neutral max-w-none " +
+  "[&_h1]:font-display [&_h1]:text-4xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-foreground [&_h1]:md:text-5xl " +
+  "[&_h2]:mt-16 [&_h2]:scroll-mt-28 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-foreground " +
+  "[&_h3]:mt-10 [&_h3]:scroll-mt-28 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground " +
+  "[&_p]:mt-5 [&_p]:leading-[1.8] [&_p]:text-muted-foreground " +
+  "[&_li]:leading-[1.75] [&_li]:text-muted-foreground [&_ul]:mt-5 [&_ul]:list-disc [&_ul]:space-y-2.5 [&_ul]:pl-6 [&_ol]:mt-5 [&_ol]:list-decimal [&_ol]:space-y-2.5 [&_ol]:pl-6 " +
+  "[&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-foreground/30 [&_a]:underline-offset-[3px] [&_a:hover]:decoration-foreground " +
+  "[&_strong]:text-foreground [&_strong]:font-semibold " +
+  "[&_code]:rounded [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[0.85em] " +
+  "[&_hr]:my-14 [&_hr]:border-border/70 " +
+  "[&_blockquote]:my-8 [&_blockquote]:border-l-2 [&_blockquote]:border-foreground/20 [&_blockquote]:pl-5 [&_blockquote]:text-muted-foreground [&_blockquote_p]:mt-0 [&_blockquote_p]:leading-[1.7] " +
+  "[&_table]:my-8 [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm [&_thead]:border-b [&_thead]:border-border [&_th]:px-3 [&_th]:py-2.5 [&_th]:text-left [&_th]:font-semibold [&_th]:text-foreground [&_td]:border-t [&_td]:border-border/50 [&_td]:px-3 [&_td]:py-2.5 [&_td]:align-top [&_td]:text-muted-foreground";
 
 type Heading = { id: string; text: string; level: number };
 
 export function LegalChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const articleRef = useRef<HTMLElement>(null);
+  const tocRef = useRef<HTMLElement>(null);
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [readingMin, setReadingMin] = useState<number | null>(null);
@@ -34,7 +58,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
   const isHub = pathname === "/legal";
 
   // Scan the rendered article for headings (assigning ids where missing, e.g.
-  // legacy JSX pages) and compute reading time - so the ToC + metadata bar work
+  // legacy JSX pages) and compute reading time - so the ToC + metadata work
   // uniformly for markdown and legacy pages alike.
   useEffect(() => {
     if (isHub) return;
@@ -70,11 +94,21 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
     return () => observer.disconnect();
   }, [headings]);
 
+  // Keep the active ToC item visible in the sticky (scrollable) desktop rail
+  // as the reader scrolls a long document - without moving the page. Honours
+  // reduced-motion (instant vs smooth).
+  useEffect(() => {
+    if (!activeId) return;
+    const link = tocRef.current?.querySelector<HTMLElement>(`[data-toc-id="${activeId}"]`);
+    if (!link) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    link.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }, [activeId]);
+
   if (isHub) return <>{children}</>;
 
   const doc = legalDocByPath(pathname);
   const { prev, next } = legalDocNeighbours(pathname);
-  const isDraft = doc?.status === "draft";
 
   const copyLink = async () => {
     try {
@@ -86,42 +120,49 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const actionBtn =
-    "inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:cursor-not-allowed disabled:opacity-50";
+  // Quiet utility controls - text + icon, no borders or pills.
+  const utilityBtn =
+    "inline-flex items-center gap-1.5 rounded text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20";
 
   const tocList = (onNavigate?: (e: MouseEvent<HTMLAnchorElement>) => void) => (
-    <ul className="space-y-1.5 text-sm">
-      {headings.map((h) => (
-        <li key={h.id} className={h.level === 3 ? "pl-3" : ""}>
-          <a
-            href={`#${h.id}`}
-            onClick={onNavigate}
-            aria-current={activeId === h.id ? "location" : undefined}
-            className={
-              "block border-l-2 py-0.5 pl-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 " +
-              (activeId === h.id
-                ? "border-foreground font-medium text-foreground"
-                : "border-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground")
-            }
-          >
-            {h.text}
-          </a>
-        </li>
-      ))}
+    <ul className="space-y-0.5 text-sm">
+      {headings.map((h) => {
+        const active = activeId === h.id;
+        return (
+          <li key={h.id} className={h.level === 3 ? "pl-3" : ""}>
+            <a
+              href={`#${h.id}`}
+              data-toc-id={h.id}
+              onClick={onNavigate}
+              aria-current={active ? "location" : undefined}
+              className={
+                "block rounded-r border-l-2 py-1 pl-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 " +
+                (active
+                  ? "border-primary-soft bg-muted/50 font-semibold text-foreground"
+                  : "border-border/50 text-muted-foreground hover:border-foreground/40 hover:text-foreground")
+              }
+            >
+              {h.text}
+            </a>
+          </li>
+        );
+      })}
     </ul>
   );
 
   return (
-    <div className="mx-auto max-w-[64rem] px-5 pt-28 pb-20 md:px-8 md:pt-36">
+    <div className="mx-auto max-w-[64rem] px-5 pt-28 pb-24 md:px-8 md:pt-36">
       {/* Breadcrumbs + schema */}
-      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-5 text-xs print:hidden">
+      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-6 text-xs print:hidden">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
             <Link href="/" className="hover:text-foreground transition-colors">
               Home
             </Link>
           </li>
-          <li aria-hidden="true">/</li>
+          <li aria-hidden="true" className="text-foreground/30">
+            /
+          </li>
           <li>
             <Link href="/legal" className="hover:text-foreground transition-colors">
               Legal Centre
@@ -129,8 +170,11 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
           </li>
           {doc && (
             <>
-              <li aria-hidden="true">/</li>
-              <li aria-current="page" className="text-foreground/80">
+              <li aria-hidden="true" className="text-foreground/30">
+                /
+              </li>
+              {/* Current document: brand-coloured, semibold, non-clickable. */}
+              <li aria-current="page" className="text-primary-soft font-semibold">
                 {doc.title}
               </li>
             </>
@@ -154,50 +198,36 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Metadata + action bar */}
+      {/* Minimal documentation meta row - no card, no badges. */}
       {doc && (
-        <div className="border-border bg-muted/30 mb-8 rounded-xl border p-4 md:p-5 print:mb-4 print:border-0 print:bg-transparent print:p-0">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
-            <span className="border-border text-foreground/70 rounded-full border px-2.5 py-0.5 font-medium">
-              {doc.category}
-            </span>
-            <span
-              className={
-                "rounded-full border px-2.5 py-0.5 font-medium tracking-wide uppercase " +
-                (isDraft
-                  ? "border-amber-500/40 text-amber-700 dark:text-amber-400"
-                  : "border-emerald-500/40 text-emerald-700 dark:text-emerald-400")
-              }
-            >
-              {isDraft ? "Draft · under review" : "Published"}
-            </span>
-            <span className="text-muted-foreground inline-flex items-center gap-1">
-              <Clock aria-hidden className="size-3.5" />
-              {readingMin ? `${readingMin} min read` : "…"}
-            </span>
-          </div>
-          <dl className="text-muted-foreground mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs">
-            <div className="flex gap-1.5">
-              <dt className="text-foreground/50">Version</dt>
-              <dd>{doc.version}</dd>
-            </div>
-            <div className="flex gap-1.5">
-              <dt className="text-foreground/50">Effective</dt>
-              <dd>{doc.effectiveDate || "Pending publication"}</dd>
-            </div>
-            <div className="flex gap-1.5">
-              <dt className="text-foreground/50">Last updated</dt>
-              <dd>{doc.lastUpdated}</dd>
-            </div>
+        <div className="mb-10 flex flex-wrap items-center justify-between gap-x-8 gap-y-3 print:mb-6">
+          <dl className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            <dt className="sr-only">Publisher</dt>
+            <dd className="text-foreground/70 font-medium">{LEGAL_COMPANY.entity}</dd>
+            <Dot />
+            <dt className="sr-only">Category</dt>
+            <dd>{doc.category}</dd>
+            <Dot />
+            <dt className="sr-only">Effective date</dt>
+            <dd>Effective {doc.effectiveDate || "pending"}</dd>
+            <Dot />
+            <dt className="sr-only">Last updated</dt>
+            <dd>Updated {doc.lastUpdated}</dd>
+            {readingMin ? (
+              <>
+                <Dot />
+                <dd>{readingMin} min read</dd>
+              </>
+            ) : null}
           </dl>
-          <div className="mt-4 flex flex-wrap items-center gap-2 print:hidden">
-            <button type="button" onClick={() => window.print()} className={actionBtn}>
+          <div className="flex items-center gap-4 print:hidden">
+            <button type="button" onClick={() => window.print()} className={utilityBtn}>
               <Printer aria-hidden className="size-3.5" /> Print
             </button>
             <button
               type="button"
               onClick={copyLink}
-              className={actionBtn}
+              className={utilityBtn}
               aria-live="polite"
               aria-label={copied ? "Link copied" : "Copy link to this page"}
             >
@@ -208,31 +238,19 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
               )}
               {copied ? "Copied" : "Copy link"}
             </button>
-            <button
-              type="button"
-              disabled
-              title="PDF export - coming soon"
-              className={actionBtn}
-            >
-              <FileDown aria-hidden className="size-3.5" /> Download PDF
-            </button>
-            <span className="text-foreground/40 ml-auto hidden text-[11px] sm:inline">
-              {LEGAL_COMPANY.entity} · Company No. {LEGAL_COMPANY.companyNumber}
-            </span>
           </div>
         </div>
       )}
 
       {/* Mobile ToC */}
       {headings.length > 0 && (
-        <details className="border-border bg-background/80 sticky top-20 z-20 mb-6 rounded-lg border backdrop-blur lg:hidden print:hidden">
+        <details className="border-border/70 bg-background/85 sticky top-20 z-20 mb-8 rounded-lg border backdrop-blur lg:hidden print:hidden">
           <summary className="text-foreground flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium">
-            On this page
+            Contents
             <span className="text-muted-foreground text-xs">{headings.length} sections</span>
           </summary>
           <div className="max-h-[50vh] overflow-y-auto px-4 pb-4">
             {tocList((e) => {
-              // close the disclosure after tapping a link
               (e?.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute(
                 "open",
               );
@@ -242,67 +260,55 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Body + desktop ToC */}
-      <div className="lg:grid lg:grid-cols-[minmax(0,46rem)_14rem] lg:gap-12">
+      <div className="lg:grid lg:grid-cols-[minmax(0,44rem)_15rem] lg:gap-16">
         <div className="min-w-0">
           <article ref={articleRef} className={PROSE}>
             {children}
           </article>
 
-          {/* Related policies */}
+          {/* Related policies - simple documentation links, no cards. */}
           {doc && doc.related.length > 0 && (
-            <section aria-label="Related policies" className="mt-14 print:hidden">
-              <h2 className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
+            <section aria-labelledby="related-heading" className="mt-16 print:hidden">
+              <h2
+                id="related-heading"
+                className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase"
+              >
                 Related policies
               </h2>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                {doc.related.map((r) => (
-                  <li key={r}>
-                    <Link
-                      href={r}
-                      className="border-border hover:border-foreground/30 block h-full rounded-xl border p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
-                    >
-                      <span className="text-foreground block text-sm font-medium">
-                        {relatedTitle(r)}
-                      </span>
-                      {relatedSummary(r) && (
-                        <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
-                          {relatedSummary(r)}
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Revision history */}
-          {doc && doc.revisionHistory.length > 0 && (
-            <section aria-label="Revision history" className="mt-12">
-              <h2 className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
-                Revision history
-              </h2>
-              <ul className="border-border mt-4 divide-y overflow-hidden rounded-xl border text-sm">
-                {doc.revisionHistory.map((r) => {
-                  const current = r.version === doc.version;
+              <ul className="mt-5 grid gap-x-10 gap-y-3 sm:grid-cols-2">
+                {doc.related.map((r) => {
+                  // Active/Current: if a related target IS the current document,
+                  // never render it as a normal link - mark it "Currently
+                  // viewing" (distinguished by weight + label + colour, not
+                  // colour alone), non-clickable.
+                  const isCurrent = r === pathname;
                   return (
-                    <li
-                      key={`${r.version}-${r.date}`}
-                      className={
-                        "flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 " +
-                        (current ? "bg-muted/40" : "")
-                      }
-                    >
-                      <span className="text-foreground font-medium">v{r.version}</span>
-                      {current && (
-                        <span className="rounded-full border border-emerald-500/40 px-2 py-0.5 text-[10px] font-medium tracking-wide text-emerald-700 uppercase dark:text-emerald-400">
-                          Current
+                    <li key={r}>
+                      {isCurrent ? (
+                        <span
+                          aria-current="page"
+                          className="text-primary-soft inline-flex items-center gap-2 text-sm font-semibold"
+                        >
+                          <span aria-hidden className="bg-primary-soft size-1.5 shrink-0 rounded-full" />
+                          {relatedTitle(r)}
+                          <span className="text-muted-foreground text-xs font-normal">
+                            Currently viewing
+                          </span>
                         </span>
+                      ) : (
+                        <Link
+                          href={r}
+                          className="text-foreground/80 hover:text-foreground group inline-flex items-center gap-1.5 rounded text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                        >
+                          {relatedTitle(r)}
+                          <span
+                            aria-hidden
+                            className="text-foreground/40 group-hover:text-foreground/70 motion-safe:transition-transform group-hover:translate-x-0.5"
+                          >
+                            &rarr;
+                          </span>
+                        </Link>
                       )}
-                      <span className="text-muted-foreground text-xs">{r.date}</span>
-                      <span className="text-muted-foreground w-full text-xs sm:w-auto sm:flex-1">
-                        {r.note}
-                      </span>
                     </li>
                   );
                 })}
@@ -310,44 +316,84 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
             </section>
           )}
 
-          {/* Prev / next */}
+          {/* Version history - minimal, never dominant. */}
+          {doc && doc.revisionHistory.length > 0 && (
+            <section aria-labelledby="history-heading" className="mt-14">
+              <h2
+                id="history-heading"
+                className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase"
+              >
+                Version history
+              </h2>
+              <ul className="mt-5 space-y-2.5 text-sm">
+                {doc.revisionHistory.map((r) => (
+                  <li
+                    key={`${r.version}-${r.date}`}
+                    className="text-muted-foreground flex flex-wrap items-baseline gap-x-3 gap-y-0.5"
+                  >
+                    <span className="text-foreground w-10 shrink-0 font-medium tabular-nums">
+                      v{r.version}
+                    </span>
+                    <span className="tabular-nums">{r.date}</span>
+                    <span className="text-foreground/60">{r.note}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Prev / next - destination cards that highlight on hover/focus,
+              with a reduced-motion-safe arrow animation. */}
           {(prev || next) && (
             <nav
               aria-label="Legal document navigation"
-              className="border-border mt-12 grid gap-4 border-t pt-8 sm:grid-cols-2 print:hidden"
+              className="border-border/60 mt-16 grid gap-4 border-t pt-8 sm:grid-cols-2 print:hidden"
             >
               {prev ? (
                 <Link
                   href={prev.path}
-                  className="border-border hover:border-foreground/30 rounded-lg border p-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                  className="group border-border/50 hover:border-foreground/25 hover:bg-muted/30 rounded-xl border p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
                 >
-                  <span className="text-muted-foreground text-xs">Previous</span>
-                  <span className="text-foreground mt-1 block">← {prev.title}</span>
+                  <span className="text-foreground/40 text-xs">Previous</span>
+                  <span className="text-foreground/80 group-hover:text-foreground mt-1 flex items-center gap-1.5 text-sm font-medium">
+                    <span
+                      aria-hidden
+                      className="motion-safe:transition-transform group-hover:-translate-x-0.5"
+                    >
+                      &larr;
+                    </span>
+                    {prev.title}
+                  </span>
                 </Link>
               ) : (
-                <span />
+                <span className="hidden sm:block" />
               )}
               {next ? (
                 <Link
                   href={next.path}
-                  className="border-border hover:border-foreground/30 rounded-lg border p-4 text-right text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 sm:col-start-2"
+                  className="group border-border/50 hover:border-foreground/25 hover:bg-muted/30 rounded-xl border p-4 text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 sm:col-start-2"
                 >
-                  <span className="text-muted-foreground text-xs">Next</span>
-                  <span className="text-foreground mt-1 block">{next.title} →</span>
+                  <span className="text-foreground/40 text-xs">Next</span>
+                  <span className="text-foreground/80 group-hover:text-foreground mt-1 flex items-center justify-end gap-1.5 text-sm font-medium">
+                    {next.title}
+                    <span
+                      aria-hidden
+                      className="motion-safe:transition-transform group-hover:translate-x-0.5"
+                    >
+                      &rarr;
+                    </span>
+                  </span>
                 </Link>
               ) : null}
             </nav>
           )}
 
-          {/* Feedback + copy (future-ready enterprise features) */}
-          <PageFeedback onCopy={copyLink} copied={copied} />
-
-          <div className="mt-10 print:hidden">
+          <div className="mt-14 print:hidden">
             <Link
               href="/legal"
               className="text-muted-foreground hover:text-foreground text-sm transition-colors"
             >
-              ← Back to Legal Centre
+              &larr; Back to Legal Centre
             </Link>
           </div>
         </div>
@@ -356,6 +402,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
         {headings.length > 0 && (
           <aside className="hidden lg:block print:hidden">
             <nav
+              ref={tocRef}
               aria-label="Table of contents"
               className="sticky top-32 max-h-[calc(100dvh-10rem)] overflow-y-auto"
             >
@@ -367,45 +414,6 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
           </aside>
         )}
       </div>
-    </div>
-  );
-}
-
-function PageFeedback({ onCopy, copied }: { onCopy: () => void; copied: boolean }) {
-  const [vote, setVote] = useState<"up" | "down" | null>(null);
-  return (
-    <div className="border-border mt-12 flex flex-wrap items-center justify-between gap-4 border-t pt-6 print:hidden">
-      <div className="flex items-center gap-3 text-sm">
-        {vote ? (
-          <span className="text-muted-foreground">Thanks for your feedback.</span>
-        ) : (
-          <>
-            <span className="text-muted-foreground">Was this page helpful?</span>
-            <button
-              type="button"
-              onClick={() => setVote("up")}
-              className="border-border hover:border-foreground/30 hover:text-foreground rounded-full border px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-foreground/20 focus-visible:outline-none"
-            >
-              Yes
-            </button>
-            <button
-              type="button"
-              onClick={() => setVote("down")}
-              className="border-border hover:border-foreground/30 hover:text-foreground rounded-full border px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-foreground/20 focus-visible:outline-none"
-            >
-              No
-            </button>
-          </>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={onCopy}
-        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-foreground/20 focus-visible:outline-none"
-      >
-        {copied ? <Check aria-hidden className="size-3.5" /> : <Link2 aria-hidden className="size-3.5" />}
-        {copied ? "Copied" : "Copy link"}
-      </button>
     </div>
   );
 }

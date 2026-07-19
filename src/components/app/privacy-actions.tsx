@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signOutEverywhere } from "@/components/auth/sign-out";
 import { toast } from "sonner";
 import { FileDown, Loader2, Trash2 } from "lucide-react";
@@ -29,7 +28,6 @@ export function ExportDataButton() {
 }
 
 export function DeleteAccountButton() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -39,7 +37,7 @@ export function DeleteAccountButton() {
     const res = await fetch("/api/account/delete", { method: "POST" });
     setBusy(false);
     if (!res.ok) {
-      toast.error("Couldn't process the deletion. Contact privacy@tirvea.app.");
+      toast.error("Couldn't process the deletion. Contact info@tirvea.com.");
       return;
     }
     toast.success("Account scheduled for deletion.");

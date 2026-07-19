@@ -41,7 +41,7 @@ export default function SupportPage() {
 
       <div className="space-y-6">
         <a
-          href="mailto:support@tirvea.app"
+          href="mailto:info@tirvea.com"
           className="border-border bg-card/80 shadow-card hover:bg-muted flex items-center gap-4 rounded-3xl border px-5 py-5 transition-colors"
         >
           <span className="bg-accent flex size-11 shrink-0 items-center justify-center rounded-2xl">
@@ -50,7 +50,7 @@ export default function SupportPage() {
           <span className="min-w-0 flex-1">
             <span className="block font-medium">Contact us</span>
             <span className="text-muted-foreground block truncate text-sm">
-              support@tirvea.app - a real person reads every message
+              info@tirvea.com - a real person reads every message
             </span>
           </span>
           <ChevronRight className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />

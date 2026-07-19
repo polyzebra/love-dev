@@ -1870,3 +1870,92 @@ enum FaceBindingStatus {
   PROVIDER_UNAVAILABLE
   CONSENT_WITHDRAWN
 }
+
+// ---------------------------------------------------------------------------
+// Support (P1.3 - Help, Safety & Contact platform). Inbound support/contact
+// requests. Persisted FIRST, notified SECOND (email is best-effort); a
+// request is never lost to a delivery failure. Category/status/priority are
+// enums so the admin queue filters are type-safe.
+// ---------------------------------------------------------------------------
+
+enum SupportCategory {
+  TECHNICAL
+  ACCOUNT
+  SUBSCRIPTION
+  REFUND
+  IDENTITY_VERIFICATION
+  PHOTO_VERIFICATION
+  PRIVACY
+  SAFETY
+  APPEAL
+  BUSINESS
+  PRESS
+  OTHER
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  RESOLVED
+  CLOSED
+}
+
+enum SupportPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model SupportRequest {
+  id       String          @id @default(cuid())
+  category SupportCategory
+  status   SupportStatus   @default(OPEN)
+  priority SupportPriority @default(NORMAL)
+  name     String
+  email    String
+  /** Optional: the account email the request is about (may differ from the reply-to email). */
+  accountEmail String?
+  /** Optional user-supplied case/reference number. */
+  reference    String?
+  message      String  @db.Text
+  /** Salted SHA-256 of the submitter IP - never a raw IP (auth/audit.ts). */
+  ipHash String?
+  /** Set when the submitter was signed in; null for anonymous submissions. */
+  userId String?
+  /** Staff-flagged spam; hidden from the default queue. */
+  spam Boolean @default(false)
+  /** Admin user id currently handling this request (denormalized, no FK). */
+  assignedAdmin String?
+  /** sha256(lowercased email + normalized message) - short-window dedupe. */
+  dedupeHash String?
+  /** True once the best-effort notification email was accepted by the provider. */
+  emailDelivered Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  closedAt       DateTime?
+
+  notes SupportNote[]
+
+  @@index([status, createdAt])
+  @@index([category, status])
+  @@index([assignedAdmin, status])
+  @@index([email, createdAt])
+  @@index([dedupeHash, createdAt])
+}
+
+// Append-only staff-internal timeline for a support request: notes and
+// logged replies. NEVER shown to the user (no user read model selects it).
+model SupportNote {
+  id        String   @id @default(cuid())
+  requestId String
+  /** Admin user id who wrote the note (denormalized, no FK). */
+  authorId String?
+  body     String   @db.Text
+  createdAt DateTime @default(now())
+
+  request SupportRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId, createdAt])
+}

@@ -156,7 +156,7 @@ export function RecoveryOptions({ phoneEnabled }: { phoneEnabled: boolean }) {
           <>
             Still stuck?{" "}
             <a
-              href="mailto:support@tirvea.app"
+              href="mailto:info@tirvea.com"
               className="text-primary-soft font-medium underline-offset-2 hover:underline"
             >
               Contact support

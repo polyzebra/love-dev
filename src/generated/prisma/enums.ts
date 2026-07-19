@@ -594,3 +594,42 @@ export const FaceBindingStatus = {
 } as const
 
 export type FaceBindingStatus = (typeof FaceBindingStatus)[keyof typeof FaceBindingStatus]
+
+
+export const SupportCategory = {
+  TECHNICAL: 'TECHNICAL',
+  ACCOUNT: 'ACCOUNT',
+  SUBSCRIPTION: 'SUBSCRIPTION',
+  REFUND: 'REFUND',
+  IDENTITY_VERIFICATION: 'IDENTITY_VERIFICATION',
+  PHOTO_VERIFICATION: 'PHOTO_VERIFICATION',
+  PRIVACY: 'PRIVACY',
+  SAFETY: 'SAFETY',
+  APPEAL: 'APPEAL',
+  BUSINESS: 'BUSINESS',
+  PRESS: 'PRESS',
+  OTHER: 'OTHER'
+} as const
+
+export type SupportCategory = (typeof SupportCategory)[keyof typeof SupportCategory]
+
+
+export const SupportStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  WAITING_USER: 'WAITING_USER',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type SupportStatus = (typeof SupportStatus)[keyof typeof SupportStatus]
+
+
+export const SupportPriority = {
+  LOW: 'LOW',
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT'
+} as const
+
+export type SupportPriority = (typeof SupportPriority)[keyof typeof SupportPriority]

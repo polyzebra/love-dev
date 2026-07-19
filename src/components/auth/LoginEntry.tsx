@@ -320,9 +320,8 @@ export function LoginEntry({
             Privacy Policy
           </Link>{" "}
           and{" "}
-          {/* No /legal/cookies route exists (yet) - cookie disclosures live in the privacy policy. */}
           <Link
-            href="/legal/privacy"
+            href="/legal/cookies"
             className="hover:text-foreground underline underline-offset-2"
           >
             Cookie Policy

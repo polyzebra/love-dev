@@ -60,39 +60,49 @@ export default async function LegalCentrePage() {
         </p>
       </header>
 
-      {/* Company information */}
+      {/* Company & platform availability - aligned documentation metadata,
+          not a card. Labels are secondary; values lead. */}
       <section
         aria-label="Company information"
-        className="border-border text-muted-foreground mt-8 rounded-xl border p-5 text-sm leading-relaxed md:p-6"
+        className="border-border/50 mt-10 border-t pt-8 text-sm"
       >
-        <h2 className="text-foreground text-sm font-semibold">{LEGAL_COMPANY.entity}</h2>
-        <dl className="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-          <div>
-            <dt className="text-foreground/70 text-xs uppercase">Company number</dt>
-            <dd>
+        <dl className="grid gap-y-5 sm:grid-cols-[10rem_1fr] sm:gap-x-8 sm:gap-y-4">
+          <div className="sm:contents">
+            <dt className="text-muted-foreground text-xs tracking-wide uppercase">Company</dt>
+            <dd className="text-foreground mt-1 font-medium sm:mt-0">{LEGAL_COMPANY.entity}</dd>
+          </div>
+          <div className="sm:contents">
+            <dt className="text-muted-foreground text-xs tracking-wide uppercase">CRO number</dt>
+            <dd className="text-foreground/90 mt-1 sm:mt-0">
               {LEGAL_COMPANY.companyNumber} · {LEGAL_COMPANY.registrar}
             </dd>
           </div>
-          <div>
-            <dt className="text-foreground/70 text-xs uppercase">Registered office</dt>
-            <dd>
+          <div className="sm:contents">
+            <dt className="text-muted-foreground text-xs tracking-wide uppercase">
+              Registered office
+            </dt>
+            <dd className="text-foreground/90 mt-1 sm:mt-0">
               <address className="not-italic">{LEGAL_COMPANY.address.join(", ")}</address>
             </dd>
           </div>
-          <div>
-            <dt className="text-foreground/70 text-xs uppercase">Contact</dt>
-            <dd>
+          <div className="sm:contents">
+            <dt className="text-muted-foreground text-xs tracking-wide uppercase">Contact</dt>
+            <dd className="mt-1 sm:mt-0">
               <a
                 href={`mailto:${LEGAL_COMPANY.email}`}
-                className="hover:text-foreground underline underline-offset-4"
+                className="text-foreground/90 hover:text-foreground underline underline-offset-4"
               >
                 {LEGAL_COMPANY.email}
               </a>
             </dd>
           </div>
-          <div>
-            <dt className="text-foreground/70 text-xs uppercase">Operating regions</dt>
-            <dd>{LEGAL_COMPANY.jurisdictions.join(" · ")}</dd>
+          <div className="sm:contents">
+            <dt className="text-muted-foreground text-xs tracking-wide uppercase">
+              Platform availability
+            </dt>
+            <dd className="text-foreground/90 mt-1 max-w-2xl leading-relaxed sm:mt-0">
+              {LEGAL_COMPANY.availabilityStatement}
+            </dd>
           </div>
         </dl>
       </section>

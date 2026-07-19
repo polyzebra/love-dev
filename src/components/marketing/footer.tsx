@@ -25,7 +25,7 @@ const MARKETING_GROUPS: { title: string; id: string; links: FooterLink[] }[] = [
       { href: "/safety", label: "Safety Centre" },
       { href: "/login", label: "Create Account" },
       { href: "/login", label: "Sign In" },
-      { href: "/settings/support", label: "Help" },
+      { href: "/help", label: "Help" },
     ],
   },
   {
@@ -33,7 +33,7 @@ const MARKETING_GROUPS: { title: string; id: string; links: FooterLink[] }[] = [
     id: "footer-company",
     links: [
       { href: "/about", label: "About" },
-      { href: "mailto:info@tirvea.com", label: "Contact", external: true },
+      { href: "/contact", label: "Contact" },
       { href: "/careers", label: "Careers" },
       { href: "/blog", label: "Blog" },
       { href: "/press", label: "Press" },

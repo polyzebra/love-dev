@@ -115,14 +115,7 @@ export function LegalCentreDocs({ docs, categories }: { docs: HubDoc[]; categori
               {group.docs.map((doc) => {
                 const inner = (
                   <>
-                    <span className="text-foreground flex items-center gap-2 font-medium">
-                      {doc.title}
-                      {doc.status === "draft" && (
-                        <span className="border-amber-500/40 text-amber-700 dark:text-amber-400 rounded-full border px-2 py-0.5 text-[10px] tracking-wide uppercase">
-                          Draft
-                        </span>
-                      )}
-                    </span>
+                    <span className="text-foreground block font-medium">{doc.title}</span>
                     <span className="text-muted-foreground mt-1 block text-sm leading-relaxed">
                       {doc.summary}
                     </span>

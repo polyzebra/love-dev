@@ -29,6 +29,24 @@ const CONFIRM = argv.includes("--confirm");
 // the additive objects exist. Keeps the script honest about what "applied"
 // means without re-parsing SQL.
 const VERIFY: Record<string, { sql: string; expect: string }[]> = {
+  "20260720060000_support_requests": [
+    {
+      sql: `SELECT 1 FROM information_schema.tables WHERE table_name='SupportRequest'`,
+      expect: "SupportRequest table",
+    },
+    {
+      sql: `SELECT 1 FROM information_schema.tables WHERE table_name='SupportNote'`,
+      expect: "SupportNote table",
+    },
+    {
+      sql: `SELECT 1 FROM pg_type WHERE typname='SupportStatus'`,
+      expect: "SupportStatus enum",
+    },
+    {
+      sql: `SELECT 1 FROM pg_indexes WHERE indexname='SupportRequest_status_createdAt_idx'`,
+      expect: "support queue status index",
+    },
+  ],
   "20260719060000_face_identity_binding": [
     {
       sql: `SELECT 1 FROM information_schema.columns WHERE table_name='User' AND column_name='faceVerifiedAt'`,

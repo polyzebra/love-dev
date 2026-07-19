@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
@@ -19,7 +18,6 @@ import {
   VERIFICATION_USER_SELECT,
 } from "@/lib/services/verification";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Account & verification" };
@@ -188,17 +186,6 @@ export default async function AccountSettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-3xl">
-        <CardHeader>
-          <CardTitle className="text-base">Password</CardTitle>
-          <CardDescription>Change or set your password via a secure email link.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button variant="outline" className="h-11 rounded-full px-5" asChild>
-            <Link href="/forgot-password">Change password</Link>
-          </Button>
-        </CardContent>
-      </Card>
     </>
   );
 }

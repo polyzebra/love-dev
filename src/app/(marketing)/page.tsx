@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -15,6 +16,9 @@ import { TiltCard } from "@/components/fx/tilt-card";
 import { HeroScene } from "@/components/marketing/hero-scene";
 import { MarketingHero } from "@/components/marketing/hero";
 import { HeroCta } from "@/components/marketing/hero-cta";
+
+// Homepage keeps the root default title/OG; it only pins its canonical URL.
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const PRINCIPLES = [
   {

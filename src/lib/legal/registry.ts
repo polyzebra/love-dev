@@ -12,7 +12,13 @@ export const LEGAL_COMPANY = {
   registrar: "Companies Registration Office (Ireland)",
   address: ["39 Cooley Park", "Dundalk", "Co. Louth", "A91 AP2V", "Ireland"],
   email: "info@tirvea.com",
-  jurisdictions: ["Ireland", "United Kingdom"],
+  // The company is Irish (governing law and registered office above and in the
+  // Terms of Service are unchanged). This statement describes SERVICE
+  // AVAILABILITY, which is international and varies by country/region - it is
+  // NOT a list of operating territories. Keep availability wording here so the
+  // public surface derives from one source.
+  availabilityStatement:
+    "Tirvea is an international online dating platform operated by WiseWave Limited, an Irish company. Certain features, subscriptions, payment methods and identity verification services may vary depending on your country or region.",
 } as const;
 
 export type LegalCategory =
@@ -531,33 +537,29 @@ export const LEGAL_DOCS: LegalDoc[] = [
   // ---- Company & Support --------------------------------------------------
   {
     path: "/legal/contact",
-    title: "Legal Contact",
-    summary: "How to reach WiseWave Limited about legal or privacy matters.",
+    title: "Legal & Compliance",
+    summary:
+      "Where to reach WiseWave Limited about legal, privacy, security, and compliance matters.",
     category: "Company & Support",
-    version: "0.1",
+    version: "1.0",
     effectiveDate: D,
     lastUpdated: U,
-    revisionHistory: [{ version: "0.1", date: U, note: "Structural placeholder." }],
+    revisionHistory: [{ version: "1.0", date: U, note: "Legal & Compliance routing directory." }],
     language: "en",
     owner: "Company",
-    related: ["/about", "/legal/compliance"],
+    related: [
+      "/legal/privacy",
+      "/legal/gdpr",
+      "/legal/compliance",
+      "/legal/vulnerability-disclosure",
+    ],
     status: "draft",
   },
-  {
-    path: "/legal/status",
-    title: "System Status",
-    summary: "Live platform status and incident history.",
-    category: "Company & Support",
-    version: "0.1",
-    effectiveDate: D,
-    lastUpdated: U,
-    revisionHistory: [{ version: "0.1", date: U, note: "Structural placeholder." }],
-    language: "en",
-    owner: "Operations",
-    related: ["/legal/security"],
-    status: "draft",
-    external: "https://status.tirvea.com",
-  },
+  // System Status is intentionally NOT listed: Tirvea has no public status
+  // system yet and status.tirvea.com does not exist. De-listing here removes
+  // it from the footer, hub, search, sitemap, and related-policy navigation.
+  // The /legal/status route is retained (redirects to the Legal Centre) for
+  // when a real status product ships - see src/app/(marketing)/legal/status.
 ];
 
 export const LEGAL_CATEGORY_ORDER: LegalCategory[] = [

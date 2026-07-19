@@ -98,7 +98,9 @@ export const ModelName = {
   VerificationAuditEvent: 'VerificationAuditEvent',
   LivenessSession: 'LivenessSession',
   FaceReferenceRecord: 'FaceReferenceRecord',
-  FaceIdentityBinding: 'FaceIdentityBinding'
+  FaceIdentityBinding: 'FaceIdentityBinding',
+  SupportRequest: 'SupportRequest',
+  SupportNote: 'SupportNote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -996,6 +998,41 @@ export const FaceIdentityBindingScalarFieldEnum = {
 } as const
 
 export type FaceIdentityBindingScalarFieldEnum = (typeof FaceIdentityBindingScalarFieldEnum)[keyof typeof FaceIdentityBindingScalarFieldEnum]
+
+
+export const SupportRequestScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  status: 'status',
+  priority: 'priority',
+  name: 'name',
+  email: 'email',
+  accountEmail: 'accountEmail',
+  reference: 'reference',
+  message: 'message',
+  ipHash: 'ipHash',
+  userId: 'userId',
+  spam: 'spam',
+  assignedAdmin: 'assignedAdmin',
+  dedupeHash: 'dedupeHash',
+  emailDelivered: 'emailDelivered',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  closedAt: 'closedAt'
+} as const
+
+export type SupportRequestScalarFieldEnum = (typeof SupportRequestScalarFieldEnum)[keyof typeof SupportRequestScalarFieldEnum]
+
+
+export const SupportNoteScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportNoteScalarFieldEnum = (typeof SupportNoteScalarFieldEnum)[keyof typeof SupportNoteScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -26,7 +26,7 @@ const serverSchema = z.object({
   STRIPE_PLUS_MONTHLY_PRICE_ID: optionalStr,
   STRIPE_GOLD_MONTHLY_PRICE_ID: optionalStr,
   RESEND_API_KEY: optionalStr,
-  EMAIL_FROM: z.string().default("Tirvea <hello@tirvea.app>"),
+  EMAIL_FROM: z.string().default("Tirvea <noreply@tirvea.com>"),
   UPSTASH_REDIS_REST_URL: optionalStr,
   UPSTASH_REDIS_REST_TOKEN: optionalStr,
 });

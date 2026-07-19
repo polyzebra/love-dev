@@ -53,7 +53,6 @@ export default function FaceCheckPage() {
         Where enabled and legally approved, we may compare face references to detect one person
         running multiple verified accounts or impersonating someone. Only a clear impersonation
         match can affect your badge automatically; everything else is reviewed by a person.
-        [PLACEHOLDER - legal review of duplicate search scope]
       </p>
 
       <h2>Retention &amp; deletion</h2>
@@ -66,7 +65,6 @@ export default function FaceCheckPage() {
         </li>
         <li>
           Deleting your account, or withdrawing consent, destroys the reference at the provider.
-          [PLACEHOLDER - final retention periods pending DPIA sign-off]
         </li>
       </ul>
 
@@ -86,7 +84,7 @@ export default function FaceCheckPage() {
       <p>
         Full detail: <Link href="/legal/biometric-data">Biometric data notice</Link> ·{" "}
         <Link href="/help/photo-verification">Help &amp; troubleshooting</Link>. Questions:
-        support@tirvea.com.
+        info@tirvea.com.
       </p>
     </article>
   );

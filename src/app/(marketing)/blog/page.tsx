@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
+import { buildMarketingMetadata } from "@/lib/marketing/seo";
 
-export const metadata: Metadata = { title: "Blog" };
+export const metadata: Metadata = buildMarketingMetadata({
+  title: "Blog",
+  description: "Stories on dating with intention, safety, and how we build Tirvea. Coming soon.",
+  path: "/blog",
+  index: false,
+});
 
 export default function BlogPage() {
   return (

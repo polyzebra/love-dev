@@ -84,6 +84,8 @@ const UNIT = new Set([
   "face-badge-helpers.test.ts",
   "verification-presentation.test.ts",
   "face-binding-platform.test.ts",
+  "support-request.test.ts",
+  "global-scope.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

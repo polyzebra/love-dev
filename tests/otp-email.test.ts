@@ -71,11 +71,11 @@ async function main() {
     }
   });
 
-  await check("footer shows support@tirvea.com", () => {
+  await check("footer shows info@tirvea.com", () => {
     const { html, text } = renderOtpEmail("333444");
-    assert.equal(OTP_SUPPORT_EMAIL, "support@tirvea.com");
-    assert.ok(html.includes("Need help?") && html.includes("support@tirvea.com"));
-    assert.ok(text.includes("support@tirvea.com"));
+    assert.equal(OTP_SUPPORT_EMAIL, "info@tirvea.com");
+    assert.ok(html.includes("Need help?") && html.includes("info@tirvea.com"));
+    assert.ok(text.includes("info@tirvea.com"));
   });
 
   console.log("2. it is an OTP email, never a link / magic link");
@@ -97,7 +97,7 @@ async function main() {
       }
       // The ONLY link is the support mailto.
       const hrefs = [...html.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
-      assert.deepEqual(hrefs, ["mailto:support@tirvea.com"], "the only link is support mailto");
+      assert.deepEqual(hrefs, ["mailto:info@tirvea.com"], "the only link is support mailto");
     },
   );
 
@@ -214,12 +214,14 @@ async function main() {
     assert.ok(src.includes("sendBrandedOtpEmail"), "shared delivery");
     assert.ok(!/render\w*OtpEmail\s*\(/.test(src), "no bespoke OTP render in the attach client");
   });
-  await check("password reset is NOT converted to OTP (stays link-based)", () => {
+  await check("password reset is retired into the supported recovery flow (passwordless)", () => {
     const forgot = readFileSync("src/app/(auth)/forgot-password/page.tsx", "utf8");
+    // P1.2: Tirvea is passwordless; the reset flow is retired to /auth/recovery.
     assert.ok(
-      forgot.includes("resetPasswordForEmail"),
-      "reset still uses the Supabase recovery link",
+      forgot.includes('redirect("/auth/recovery")'),
+      "forgot-password redirects into the account-recovery flow",
     );
+    assert.ok(!forgot.includes("resetPasswordForEmail"), "no password reset link is sent");
     assert.ok(!forgot.includes("sendBrandedOtpEmail"), "reset does not use the OTP email");
   });
 

@@ -83,7 +83,7 @@ export default async function PrivacySettingsPage() {
           <Link href="/legal/privacy" className="underline underline-offset-2">
             Privacy Policy
           </Link>{" "}
-          or email privacy@tirvea.app
+          or email info@tirvea.com
         </p>
       </div>
     </>

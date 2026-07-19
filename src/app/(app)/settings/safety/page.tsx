@@ -107,18 +107,17 @@ export default function SafetyCentrePage() {
           </CardHeader>
           <CardContent className="text-muted-foreground space-y-3 text-sm leading-relaxed">
             <p>
-              Contact local emergency services first. In Ireland and the UK call{" "}
-              <span className="text-foreground font-medium">112</span> or{" "}
-              <span className="text-foreground font-medium">999</span>. Elsewhere, use your local
-              emergency number.
+              Contact your local emergency services first. Call your local emergency number - for
+              example, <span className="text-foreground font-medium">112</span> across much of
+              Europe or <span className="text-foreground font-medium">999</span> in the UK.
             </p>
             <p>
               For anything less urgent, our safety team is at{" "}
               <a
-                href="mailto:safety@tirvea.app"
+                href="mailto:info@tirvea.com"
                 className="text-foreground font-medium underline underline-offset-2"
               >
-                safety@tirvea.app
+                info@tirvea.com
               </a>
               . And always: trust your instincts. If something feels off, it probably is.
             </p>

@@ -58,7 +58,7 @@ function assertConfigured(): { publicKey: string; privateKey: string; subject: s
       `Web Push is not configured - missing env: ${cfg.missing.join(", ")}. ` +
         "Generate a keypair with `npx web-push generate-vapid-keys` and set " +
         "NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY and VAPID_SUBJECT " +
-        "(mailto:support@tirvea.app) locally and in Vercel.",
+        "(mailto:info@tirvea.com) locally and in Vercel.",
     );
   }
   return {

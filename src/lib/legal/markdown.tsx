@@ -31,7 +31,7 @@ export function parseFrontmatter(raw: string): { data: Frontmatter; content: str
     const idx = t.indexOf(":");
     if (idx === -1) continue;
     const key = t.slice(0, idx).trim();
-    let val = t.slice(idx + 1).trim();
+    const val = t.slice(idx + 1).trim();
     if (val === "") {
       data[key] = "";
     } else if (val === "true" || val === "false") {

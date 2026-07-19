@@ -257,3 +257,13 @@ export type FaceReferenceRecord = Prisma.FaceReferenceRecordModel
  * 
  */
 export type FaceIdentityBinding = Prisma.FaceIdentityBindingModel
+/**
+ * Model SupportRequest
+ * 
+ */
+export type SupportRequest = Prisma.SupportRequestModel
+/**
+ * Model SupportNote
+ * 
+ */
+export type SupportNote = Prisma.SupportNoteModel

@@ -224,4 +224,7 @@ export const RATE_LIMITS = {
   // Checkout/status/portal share one budget: generous enough for a
   // confirm-page poll, tight enough to blunt session-id probing.
   billing: { limit: 30, windowMs: 60_000, failMode: "closed" },
+  // Public contact/support intake: fail CLOSED so a store outage cannot be
+  // used to bypass the abuse budget on an unauthenticated write path.
+  support: { limit: 5, windowMs: 60 * 60_000, failMode: "closed" },
 } as const satisfies Record<string, RateLimitPreset>;

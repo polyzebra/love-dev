@@ -91,8 +91,10 @@ const NON_REGISTRY_OK = new Set(["/safety", "/about"]);
 console.log(`Legal integration: ${entries.length} registry entries, ${Object.keys(loaderMap).length} loader mappings, ${Object.keys(masters).length} masters`);
 
 // 1. registry count
-assert.equal(entries.length, 27, `expected 27 registry entries, got ${entries.length}`);
-ok("registry has 27 entries");
+// L4.3: System Status was de-listed (placeholder linking to a dead domain);
+// its route is retained as a redirect but has no registry entry.
+assert.equal(entries.length, 26, `expected 26 registry entries, got ${entries.length}`);
+ok("registry has 26 entries");
 
 // 2. every registry entry has a route
 for (const e of entries) {

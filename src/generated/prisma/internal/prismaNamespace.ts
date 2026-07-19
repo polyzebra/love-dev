@@ -431,7 +431,9 @@ export const ModelName = {
   VerificationAuditEvent: 'VerificationAuditEvent',
   LivenessSession: 'LivenessSession',
   FaceReferenceRecord: 'FaceReferenceRecord',
-  FaceIdentityBinding: 'FaceIdentityBinding'
+  FaceIdentityBinding: 'FaceIdentityBinding',
+  SupportRequest: 'SupportRequest',
+  SupportNote: 'SupportNote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -447,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent" | "livenessSession" | "faceReferenceRecord" | "faceIdentityBinding"
+    modelProps: "user" | "device" | "profile" | "photo" | "photoModerationEvent" | "interest" | "profileInterest" | "verification" | "like" | "match" | "firstMessage" | "conversation" | "participant" | "message" | "attachment" | "report" | "moderationCase" | "photoModerationResult" | "accountViolation" | "appeal" | "appealEvent" | "bannedCredential" | "block" | "subscription" | "stripeEvent" | "payment" | "notification" | "notificationDevice" | "notificationDelivery" | "suppressedEmail" | "providerHealth" | "conversationPresence" | "adminLog" | "featureFlag" | "exploreCategory" | "userExplorePreference" | "analyticsEvent" | "blockedIdentity" | "authVerificationEvent" | "profilePrompt" | "userSettings" | "apiIdempotencyKey" | "profilePhotoVerification" | "photoFaceCheck" | "verificationAuditEvent" | "livenessSession" | "faceReferenceRecord" | "faceIdentityBinding" | "supportRequest" | "supportNote"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4003,6 +4005,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SupportRequest: {
+      payload: Prisma.$SupportRequestPayload<ExtArgs>
+      fields: Prisma.SupportRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.SupportRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+        }
+        findMany: {
+          args: Prisma.SupportRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>[]
+        }
+        create: {
+          args: Prisma.SupportRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+        }
+        createMany: {
+          args: Prisma.SupportRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.SupportRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+        }
+        update: {
+          args: Prisma.SupportRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.SupportRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportRequest>
+        }
+        groupBy: {
+          args: Prisma.SupportRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    SupportNote: {
+      payload: Prisma.$SupportNotePayload<ExtArgs>
+      fields: Prisma.SupportNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>
+        }
+        findFirst: {
+          args: Prisma.SupportNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>
+        }
+        findMany: {
+          args: Prisma.SupportNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>[]
+        }
+        create: {
+          args: Prisma.SupportNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>
+        }
+        createMany: {
+          args: Prisma.SupportNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>[]
+        }
+        delete: {
+          args: Prisma.SupportNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>
+        }
+        update: {
+          args: Prisma.SupportNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportNotePayload>
+        }
+        aggregate: {
+          args: Prisma.SupportNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportNote>
+        }
+        groupBy: {
+          args: Prisma.SupportNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportNoteCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4923,6 +5073,41 @@ export const FaceIdentityBindingScalarFieldEnum = {
 export type FaceIdentityBindingScalarFieldEnum = (typeof FaceIdentityBindingScalarFieldEnum)[keyof typeof FaceIdentityBindingScalarFieldEnum]
 
 
+export const SupportRequestScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  status: 'status',
+  priority: 'priority',
+  name: 'name',
+  email: 'email',
+  accountEmail: 'accountEmail',
+  reference: 'reference',
+  message: 'message',
+  ipHash: 'ipHash',
+  userId: 'userId',
+  spam: 'spam',
+  assignedAdmin: 'assignedAdmin',
+  dedupeHash: 'dedupeHash',
+  emailDelivered: 'emailDelivered',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  closedAt: 'closedAt'
+} as const
+
+export type SupportRequestScalarFieldEnum = (typeof SupportRequestScalarFieldEnum)[keyof typeof SupportRequestScalarFieldEnum]
+
+
+export const SupportNoteScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportNoteScalarFieldEnum = (typeof SupportNoteScalarFieldEnum)[keyof typeof SupportNoteScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -5795,6 +5980,48 @@ export type EnumFaceBindingStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 export type ListEnumFaceBindingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FaceBindingStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'SupportCategory'
+ */
+export type EnumSupportCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportCategory[]'
+ */
+export type ListEnumSupportCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportCategory[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportStatus'
+ */
+export type EnumSupportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportStatus[]'
+ */
+export type ListEnumSupportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportPriority'
+ */
+export type EnumSupportPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportPriority'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportPriority[]'
+ */
+export type ListEnumSupportPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportPriority[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -5953,6 +6180,8 @@ export type GlobalOmitConfig = {
   livenessSession?: Prisma.LivenessSessionOmit
   faceReferenceRecord?: Prisma.FaceReferenceRecordOmit
   faceIdentityBinding?: Prisma.FaceIdentityBindingOmit
+  supportRequest?: Prisma.SupportRequestOmit
+  supportNote?: Prisma.SupportNoteOmit
 }
 
 /* Types for Logging */
