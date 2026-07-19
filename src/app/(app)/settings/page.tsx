@@ -20,6 +20,7 @@ import { effectiveTierOf } from "@/lib/services/entitlements";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { RestorePurchasesRow, SignOutRow } from "@/components/settings/restore-purchases";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -230,11 +231,11 @@ export default async function SettingsPage() {
 
         <p className="text-muted-foreground pb-4 text-center text-xs">
           Tirvea v1.0 ·{" "}
-          <Link href="/legal/terms" className="underline underline-offset-2">
+          <Link href={LEGAL_ROUTES.terms} className="underline underline-offset-2">
             Terms
           </Link>{" "}
           ·{" "}
-          <Link href="/legal/privacy" className="underline underline-offset-2">
+          <Link href={LEGAL_ROUTES.privacy} className="underline underline-offset-2">
             Privacy
           </Link>
         </p>

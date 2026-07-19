@@ -8,6 +8,7 @@ import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { AuthCard } from "@/components/auth/AuthCard";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 import { EASE_LUXE } from "@/lib/motion";
 import { useEntranceAnimatable } from "@/components/fx/use-entrance";
 import { appleLoginEnabled } from "@/lib/auth/apple";
@@ -309,19 +310,22 @@ export function LoginEntry({
 
         <p className="text-muted-foreground mt-8 text-center text-xs leading-relaxed text-pretty">
           By continuing, you agree to our{" "}
-          <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
+          <Link
+            href={LEGAL_ROUTES.terms}
+            className="hover:text-foreground underline underline-offset-2"
+          >
             Terms of Use
           </Link>{" "}
           and acknowledge our{" "}
           <Link
-            href="/legal/privacy"
+            href={LEGAL_ROUTES.privacy}
             className="hover:text-foreground underline underline-offset-2"
           >
             Privacy Policy
           </Link>{" "}
           and{" "}
           <Link
-            href="/legal/cookies"
+            href={LEGAL_ROUTES.cookies}
             className="hover:text-foreground underline underline-offset-2"
           >
             Cookie Policy

@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
   const me = await db.user.findUnique({
     where: { id: user.id },
-    select: { photoVerifiedAt: true },
+    select: { photoVerifiedAt: true, galleryVersion: true },
   });
   if (!me) return unauthorized();
   if (me.photoVerifiedAt) {
@@ -93,6 +93,9 @@ export async function POST(req: Request) {
           statusChangedAt: new Date(),
           provider: provider.name,
           providerSessionId: session.sessionId,
+          // L6.5 Phase H: pin the gallery version at session start. Approval
+          // restores the badge only if the gallery is unchanged since here.
+          galleryVersionAtStart: me.galleryVersion,
         },
         update: {
           status: "PENDING",
@@ -101,6 +104,7 @@ export async function POST(req: Request) {
           providerSessionId: session.sessionId,
           reviewNote: null,
           lastReconciledAt: null,
+          galleryVersionAtStart: me.galleryVersion,
         },
       }),
     ]);

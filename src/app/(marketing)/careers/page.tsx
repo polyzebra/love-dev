@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageShell, layout } from "@/components/layout/public";
 import Link from "next/link";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: "Careers",
@@ -10,7 +11,15 @@ export const metadata: Metadata = buildMarketingMetadata({
   path: "/careers",
 });
 
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section aria-labelledby={id} className={layout.section}>
       <h2 id={id} className="font-display text-2xl font-semibold tracking-tight">
@@ -47,8 +56,8 @@ export default function CareersPage() {
           <a className="text-foreground underline" href="mailto:info@tirvea.com">
             info@tirvea.com
           </a>{" "}
-          with &quot;Careers&quot; in the subject. We keep thoughtful introductions on file and reach
-          out if something opens up.
+          with &quot;Careers&quot; in the subject. We keep thoughtful introductions on file and
+          reach out if something opens up.
         </p>
       </Section>
 
@@ -78,7 +87,7 @@ export default function CareersPage() {
           consider you for current or future opportunities. We keep it for no longer than necessary
           for that purpose and do not use it for anything else. You can ask us to update or delete
           your details at any time. For how we handle personal data generally, see our{" "}
-          <Link href="/legal/privacy" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.privacy} className="text-foreground underline">
             Privacy Policy
           </Link>
           .

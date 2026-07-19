@@ -159,14 +159,32 @@ async function main() {
     // ---- H1: public-badge verdict honours suspension ------------------------
     await check("H1 verdict: verified only when identity present AND not suspended", () => {
       const now = new Date();
-      assert.equal(isPubliclyVerified({ photoVerifiedAt: now, faceBadgeSuspendedAt: null }), true);
       assert.equal(
-        isPubliclyVerified({ photoVerifiedAt: now, faceBadgeSuspendedAt: now }),
+        isPubliclyVerified({
+          photoVerifiedAt: now,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
+        true,
+      );
+      assert.equal(
+        isPubliclyVerified({
+          photoVerifiedAt: now,
+          faceBadgeSuspendedAt: now,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
         false,
         "suspended must never read as verified",
       );
       assert.equal(
-        isPubliclyVerified({ photoVerifiedAt: null, faceBadgeSuspendedAt: null }),
+        isPubliclyVerified({
+          photoVerifiedAt: null,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
         false,
       );
     });

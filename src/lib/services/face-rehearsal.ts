@@ -20,7 +20,7 @@ import {
   setFaceImageLoader,
 } from "@/lib/services/face-verification";
 import { deleteAllUserReferences } from "@/lib/services/face-reference-registry";
-import { isPubliclyVerified } from "@/lib/services/verification";
+import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
 
 /**
  * Phase 8 - internal rehearsal tooling. PREPARES a controlled internal
@@ -467,7 +467,7 @@ function finish(steps: StepResult[]): RehearsalRun {
 async function badgeVisible(userId: string): Promise<boolean> {
   const u = await db.user.findUnique({
     where: { id: userId },
-    select: { photoVerifiedAt: true, faceBadgeSuspendedAt: true },
+    select: PUBLIC_BADGE_SELECT,
   });
   return u ? isPubliclyVerified(u) : false;
 }

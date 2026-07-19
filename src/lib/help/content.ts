@@ -1,3 +1,4 @@
+import { LEGAL_ROUTES, LEGAL_HUB } from "@/lib/legal/routes";
 /**
  * Help Centre content (P1.3). Data-driven category + article architecture.
  * Every article is REPOSITORY-BACKED: it describes only behaviour the platform
@@ -73,8 +74,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
           {
             kind: "links",
             items: [
-              { href: "/legal/terms", label: "Terms of Service" },
-              { href: "/legal/community-guidelines", label: "Community Guidelines" },
+              { href: LEGAL_ROUTES.terms, label: "Terms of Service" },
+              { href: LEGAL_ROUTES.communityGuidelines, label: "Community Guidelines" },
             ],
           },
         ],
@@ -86,8 +87,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     title: "Account",
     summary: "Manage your account, sign-in methods, and deletion.",
     resources: [
-      { href: "/legal/account-deletion", label: "Account Deletion Policy" },
-      { href: "/legal/account-suspension", label: "Account Suspension Policy" },
+      { href: LEGAL_ROUTES.accountDeletion, label: "Account Deletion Policy" },
+      { href: LEGAL_ROUTES.accountSuspension, label: "Account Suspension Policy" },
     ],
     articles: [
       {
@@ -102,8 +103,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
           {
             kind: "links",
             items: [
-              { href: "/legal/account-deletion", label: "Account Deletion Policy" },
-              { href: "/legal/data-retention", label: "Data Retention Policy" },
+              { href: LEGAL_ROUTES.accountDeletion, label: "Account Deletion Policy" },
+              { href: LEGAL_ROUTES.dataRetention, label: "Data Retention Policy" },
             ],
           },
         ],
@@ -115,9 +116,9 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     title: "Verification",
     summary: "Identity and photo verification, and what the badges mean.",
     resources: [
-      { href: "/legal/identity-verification", label: "Identity Verification Policy" },
-      { href: "/legal/photo-verification", label: "Photo Verification Policy" },
-      { href: "/legal/biometric-data", label: "Biometric Information Policy" },
+      { href: LEGAL_ROUTES.identityVerification, label: "Identity Verification Policy" },
+      { href: LEGAL_ROUTES.photoVerification, label: "Photo Verification Policy" },
+      { href: LEGAL_ROUTES.biometricData, label: "Biometric Information Policy" },
     ],
     articles: [
       {
@@ -158,8 +159,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     summary: "Plans, payments, renewals, cancellation, and refunds.",
     resources: [
       { href: "/pricing", label: "Plans & pricing" },
-      { href: "/legal/subscription-terms", label: "Subscription Terms" },
-      { href: "/legal/refund-policy", label: "Refund Policy" },
+      { href: LEGAL_ROUTES.subscriptionTerms, label: "Subscription Terms" },
+      { href: LEGAL_ROUTES.refundPolicy, label: "Refund Policy" },
     ],
     articles: [
       {
@@ -173,7 +174,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
           },
           {
             kind: "links",
-            items: [{ href: "/legal/subscription-terms", label: "Subscription Terms" }],
+            items: [{ href: LEGAL_ROUTES.subscriptionTerms, label: "Subscription Terms" }],
           },
         ],
       },
@@ -189,7 +190,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
           {
             kind: "links",
             items: [
-              { href: "/legal/refund-policy", label: "Refund Policy" },
+              { href: LEGAL_ROUTES.refundPolicy, label: "Refund Policy" },
               { href: "/contact", label: "Request a refund" },
             ],
           },
@@ -202,10 +203,10 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     title: "Privacy & security",
     summary: "Your data, your rights, and how we protect the platform.",
     resources: [
-      { href: "/legal/privacy", label: "Privacy Policy" },
-      { href: "/legal/gdpr", label: "Your data rights (GDPR)" },
-      { href: "/legal/cookies", label: "Cookie Policy" },
-      { href: "/legal/security", label: "Security Policy" },
+      { href: LEGAL_ROUTES.privacy, label: "Privacy Policy" },
+      { href: LEGAL_ROUTES.gdpr, label: "Your data rights (GDPR)" },
+      { href: LEGAL_ROUTES.cookies, label: "Cookie Policy" },
+      { href: LEGAL_ROUTES.security, label: "Security Policy" },
     ],
     articles: [
       {
@@ -220,8 +221,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
           {
             kind: "links",
             items: [
-              { href: "/legal/gdpr", label: "Your data rights" },
-              { href: "/legal/account-deletion", label: "Account deletion" },
+              { href: LEGAL_ROUTES.gdpr, label: "Your data rights" },
+              { href: LEGAL_ROUTES.accountDeletion, label: "Account deletion" },
             ],
           },
         ],
@@ -234,9 +235,9 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     summary: "Report a user, block someone, and appeal a decision.",
     resources: [
       { href: "/safety", label: "Safety Centre" },
-      { href: "/legal/trust-safety", label: "Trust & Safety Policy" },
-      { href: "/legal/community-guidelines", label: "Community Guidelines" },
-      { href: "/legal/appeals", label: "Appeals Policy" },
+      { href: LEGAL_ROUTES.trustSafety, label: "Trust & Safety Policy" },
+      { href: LEGAL_ROUTES.communityGuidelines, label: "Community Guidelines" },
+      { href: LEGAL_ROUTES.appeals, label: "Appeals Policy" },
     ],
     articles: [
       {
@@ -252,7 +253,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
             kind: "links",
             items: [
               { href: "/safety", label: "Safety Centre" },
-              { href: "/legal/trust-safety", label: "How reports are handled" },
+              { href: LEGAL_ROUTES.trustSafety, label: "How reports are handled" },
             ],
           },
         ],
@@ -269,8 +270,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
           {
             kind: "links",
             items: [
-              { href: "/legal/appeals", label: "Appeals Policy" },
-              { href: "/legal/account-suspension", label: "Account suspension" },
+              { href: LEGAL_ROUTES.appeals, label: "Appeals Policy" },
+              { href: LEGAL_ROUTES.accountSuspension, label: "Account suspension" },
             ],
           },
         ],
@@ -281,7 +282,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
     slug: "legal",
     title: "Legal",
     summary: "Every policy in one place.",
-    resources: [{ href: "/legal", label: "Browse the Legal Centre" }],
+    resources: [{ href: LEGAL_HUB, label: "Browse the Legal Centre" }],
     articles: [],
   },
 ];

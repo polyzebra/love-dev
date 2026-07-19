@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 import { Logo } from "@/components/shared/logo";
 import { Aurora } from "@/components/fx/aurora";
 import { LogoutButton } from "./logout-button";
@@ -30,11 +31,17 @@ export default function AccountStatusLayout({ children }: { children: React.Reac
           Community resources
         </Link>{" "}
         ·{" "}
-        <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
+        <Link
+          href={LEGAL_ROUTES.terms}
+          className="hover:text-foreground underline underline-offset-2"
+        >
           Terms
         </Link>{" "}
         ·{" "}
-        <Link href="/legal/privacy" className="hover:text-foreground underline underline-offset-2">
+        <Link
+          href={LEGAL_ROUTES.privacy}
+          className="hover:text-foreground underline underline-offset-2"
+        >
           Privacy
         </Link>
       </footer>

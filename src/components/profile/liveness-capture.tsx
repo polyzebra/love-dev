@@ -6,6 +6,7 @@ import { Camera, RefreshCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LIVENESS_COPY, type LivenessCaptureState } from "@/lib/verification-presentation";
 import dynamic from "next/dynamic";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 
 // Heavy AWS Amplify SDK: dynamically imported so it never ships to other
 // routes (TASK 4). Mounted only during an active capture.
@@ -179,7 +180,7 @@ export function LivenessCapture({
                 Tirvea itself never holds your face images, video or biometric templates; we store
                 only an opaque reference. The reference is kept while your verification is valid
                 (see the{" "}
-                <a href="/legal/biometric-data" className="underline">
+                <a href={LEGAL_ROUTES.biometricData} className="underline">
                   Biometric data notice
                 </a>
                 ) and deleted when you withdraw consent or delete your account. By continuing you

@@ -1,6 +1,7 @@
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { ThemeSync } from "@/components/theme/theme-sync";
 import { MotionProvider } from "@/components/fx/motion-provider";
+import { siteUrl } from "@/lib/auth/url";
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
@@ -19,7 +20,11 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  // SEO-1 (L7.2): the ONE canonical site URL (siteUrl - NEXT_PUBLIC_SITE_URL,
+  // production localhost-guarded) backs metadataBase, so every root-relative
+  // canonical / Open Graph / Twitter URL resolves against the real origin.
+  // NEXT_PUBLIC_APP_URL is NO LONGER a metadata source.
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "Tirvea - Dating, designed with intention",
     template: "%s · Tirvea",

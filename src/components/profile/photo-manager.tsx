@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion, type PanInfo } from "motion/react";
 import { toast } from "sonner";
-import { BadgeCheck, Camera, Heart, MapPin, Settings, Trash2 } from "lucide-react";
+import { Camera, Heart, MapPin, Settings, Trash2 } from "lucide-react";
+import { VerifiedBadge } from "@/components/shared/verified-badge";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { SPRING } from "@/lib/motion";
 import { Badge } from "@/components/ui/badge";
@@ -314,13 +315,15 @@ export function PhotoManager({
               <h1 className="font-display flex flex-wrap items-center gap-3 text-[clamp(2.2rem,6vw,4rem)] leading-none font-medium tracking-tight text-white">
                 {displayName}, {age}
                 {photoVerified && (
-                  <span
-                    role="img"
-                    className="relative flex items-center justify-center"
-                    aria-label="Photo verified"
-                  >
-                    <span className="animate-ping-soft absolute size-8 rounded-full bg-sky-400/25" />
-                    <BadgeCheck className="relative size-8 fill-sky-400 text-white" />
+                  <span className="relative flex items-center justify-center">
+                    <span
+                      className="animate-ping-soft absolute size-8 rounded-full bg-sky-400/25"
+                      aria-hidden="true"
+                    />
+                    <VerifiedBadge
+                      className="relative text-[30px]"
+                      iconClassName="fill-sky-400 text-white"
+                    />
                   </span>
                 )}
               </h1>

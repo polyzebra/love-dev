@@ -43,12 +43,17 @@ async function main() {
     setFaceImageLoader,
   } = await import("../src/lib/services/face-verification");
   const { getFaceMatchProvider } = await import("../src/lib/services/face-match-providers");
-  const { createBoundLivenessSession, consumeLivenessFlow } = await import(
-    "../src/lib/services/face-liveness"
-  );
-  const { isPubliclyVerified } = await import("../src/lib/services/verification");
+  const { createBoundLivenessSession, consumeLivenessFlow } =
+    await import("../src/lib/services/face-liveness");
+  const { isPubliclyVerified, PUBLIC_BADGE_SELECT } =
+    await import("../src/lib/services/verification");
 
-  const saved = { p: env.FACE_MATCH_PROVIDER, l: env.FACE_LIVENESS_ENABLED, a: env.FACE_INTERNAL_USER_ALLOWLIST, c: env.FACE_INTERNAL_ALLOWLIST_COUNTRY_OVERRIDE };
+  const saved = {
+    p: env.FACE_MATCH_PROVIDER,
+    l: env.FACE_LIVENESS_ENABLED,
+    a: env.FACE_INTERNAL_USER_ALLOWLIST,
+    c: env.FACE_INTERNAL_ALLOWLIST_COUNTRY_OVERRIDE,
+  };
   env.FACE_MATCH_PROVIDER = "mock";
   env.FACE_LIVENESS_ENABLED = "1";
 
@@ -62,12 +67,15 @@ async function main() {
   const badgeHidden = async () => {
     const u = await db.user.findUniqueOrThrow({
       where: { id: uid },
-      select: { photoVerifiedAt: true, faceBadgeSuspendedAt: true },
+      select: PUBLIC_BADGE_SELECT,
     });
     return !isPubliclyVerified(u);
   };
   const setBadge = (hidden: boolean) =>
-    db.user.update({ where: { id: uid }, data: { faceBadgeSuspendedAt: hidden ? new Date() : null } });
+    db.user.update({
+      where: { id: uid },
+      data: { faceBadgeSuspendedAt: hidden ? new Date() : null },
+    });
   // Re-check the cover under the CURRENT marker: clear the cache + re-queue,
   // then run the worker. Returns the decision status.
   const rerunCover = async (marker: string) => {
@@ -80,23 +88,51 @@ async function main() {
 
   try {
     const email = `e2e-f2-${RUN}@example.com`;
-    uid = (await admin.auth.admin.createUser({ email, password: `f2-${RUN}-Aa1!`, email_confirm: true })).data.user!.id;
+    uid = (
+      await admin.auth.admin.createUser({ email, password: `f2-${RUN}-Aa1!`, email_confirm: true })
+    ).data.user!.id;
     env.FACE_INTERNAL_USER_ALLOWLIST = uid;
     env.FACE_INTERNAL_ALLOWLIST_COUNTRY_OVERRIDE = "1";
     const now = new Date();
     await db.user.create({
       data: {
-        id: uid, email, name: "F2", emailVerified: now,
-        phone: `+3538792${String(RUN).padStart(4, "0").slice(0, 4)}`, phoneVerifiedAt: now,
-        ageConfirmedAt: now, termsVersion: "2026-07", privacyVersion: "2026-07",
-        communityVersion: "2026-07", onboardingDone: true, photoVerifiedAt: now,
+        id: uid,
+        email,
+        name: "F2",
+        emailVerified: now,
+        phone: `+3538792${String(RUN).padStart(4, "0").slice(0, 4)}`,
+        phoneVerifiedAt: now,
+        ageConfirmedAt: now,
+        termsVersion: "2026-07",
+        privacyVersion: "2026-07",
+        communityVersion: "2026-07",
+        onboardingDone: true,
+        photoVerifiedAt: now,
+        // L6.5: baseline verified snapshot (galleryVersion defaults to 0) so the
+        // badge is visible; this test drives the face-layer suspension lever.
+        verifiedGalleryVersion: 0,
       },
     });
     await db.profile.create({
-      data: { userId: uid, displayName: "F2", birthDate: new Date("1993-03-03"), gender: "WOMAN", country: "IE" },
+      data: {
+        userId: uid,
+        displayName: "F2",
+        birthDate: new Date("1993-03-03"),
+        gender: "WOMAN",
+        country: "IE",
+      },
     });
     await db.photo.create({
-      data: { id: `f2c${RUN}`, userId: uid, url: `/api/media/f2c${RUN}/card`, position: 0, isCover: true, status: "ACTIVE", moderation: "APPROVED", storagePath: coverPath },
+      data: {
+        id: `f2c${RUN}`,
+        userId: uid,
+        url: `/api/media/f2c${RUN}/card`,
+        position: 0,
+        isCover: true,
+        status: "ACTIVE",
+        moderation: "APPROVED",
+        storagePath: coverPath,
+      },
     });
     markers.set(coverPath, "face:owner");
 
@@ -175,7 +211,10 @@ async function main() {
       // job and nulls our lease. Our owner-MATCH must NOT restore the badge.
       const racing = {
         ...mock,
-        compareReferenceToPhoto: async (refId: string, input: { image: Buffer; photoId: string; photoVersion: number }) => {
+        compareReferenceToPhoto: async (
+          refId: string,
+          input: { image: Buffer; photoId: string; photoVersion: number },
+        ) => {
           await enqueueProfilePhotoVerification(uid, "cover_changed", { consent: true });
           return mock.compareReferenceToPhoto(refId, input);
         },

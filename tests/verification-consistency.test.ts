@@ -82,7 +82,7 @@ check("VERIFIED: verified state, no action, card hidden", () => {
   for (const surface of ["profile", "settings"] as const) {
     const row = photoVerificationRow("verified", { ...cfg, surface });
     assert.equal(row.state, "verified");
-    assert.equal(row.label, "Photo verified");
+    assert.equal(row.label, "Verified");
     assert.equal(row.action, null);
   }
   const page = code("app", "(app)", "profile", "page.tsx");

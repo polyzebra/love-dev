@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { sendSafetyNotice } from "@/lib/services/safety-notices";
+import { publicBadgeVisible } from "@/lib/trust/verification-state-machine";
 import type { Prisma } from "@/generated/prisma/client";
 import type { VerificationStatus, VerificationType } from "@/generated/prisma/enums";
 
@@ -33,19 +34,32 @@ import type { VerificationStatus, VerificationType } from "@/generated/prisma/en
  */
 
 /**
- * PUBLIC badge verdict - the ONE rule for what other members see:
- * identity verified AND the face-badge not suspended by the
- * profile-photo verification layer (face-verification.ts). Suspension
- * withholds the badge without ever un-verifying the identity.
+ * PUBLIC badge verdict - the ONE rule for what other members see. ALL must hold:
+ *   1. identity verified                  (photoVerifiedAt set)
+ *   2. face-badge not suspended           (!faceBadgeSuspendedAt)
+ *   3. a verified-gallery snapshot exists  (verifiedGalleryVersion != null)
+ *   4. the CURRENT gallery IS that snapshot (verifiedGalleryVersion === galleryVersion)
+ *
+ * L6.5: (3)+(4) are the integrity lockdown. Every material gallery change
+ * increments galleryVersion synchronously (gallery-integrity.ts), so the badge
+ * turns off the instant the current gallery diverges from the verified one -
+ * with no dependency on the face-match provider, a worker, a cache, or a
+ * webhook. (2) still catches face-layer / admin / consent suspensions that are
+ * not gallery-version changes.
  */
 export function isPubliclyVerified(user: {
   photoVerifiedAt: Date | null;
-  // H1: REQUIRED (not optional). A caller that forgets to select this security
-  // field is now a COMPILE error, not a silent "not suspended". Spread
-  // PUBLIC_BADGE_SELECT into the query to satisfy it.
+  // H1: REQUIRED (not optional). A caller that forgets to select these security
+  // fields is a COMPILE error, not a silent "verified". Spread
+  // PUBLIC_BADGE_SELECT into the query to satisfy them.
   faceBadgeSuspendedAt: Date | null;
+  galleryVersion: number;
+  verifiedGalleryVersion: number | null;
 }): boolean {
-  return user.photoVerifiedAt !== null && !user.faceBadgeSuspendedAt;
+  // L6.6: delegates to the ONE canonical resolver. The conjunction itself lives
+  // only in publicBadgeVisible() (verification-state-machine.ts) - this function
+  // is the app-facing name for it. Nothing recomputes badge logic elsewhere.
+  return publicBadgeVisible(user);
 }
 
 /**
@@ -83,6 +97,11 @@ export function isPhotoVerified(user: { faceVerifiedAt?: Date | null }): boolean
 export const PUBLIC_BADGE_SELECT = {
   photoVerifiedAt: true,
   faceBadgeSuspendedAt: true,
+  // L6.5 gallery-integrity gate: the badge requires the current gallery to be
+  // the verified one. Both fields are consumed by isPubliclyVerified(), so this
+  // fragment carries them and omitting it is a compile error.
+  galleryVersion: true,
+  verifiedGalleryVersion: true,
 } as const satisfies Prisma.UserSelect;
 
 /** Select fragment - extend an existing user query instead of re-querying. */
@@ -222,6 +241,13 @@ export async function reviewVerification(opts: {
         where: { id: row.userId },
         data: { photoVerifiedAt: opts.approve ? new Date() : null },
       });
+      // L6.5: a staff approval is a deliberate verdict on the CURRENT gallery -
+      // stamp the verified-gallery snapshot so the badge turns on against
+      // exactly these photos. Any later material change re-invalidates it.
+      if (opts.approve) {
+        const { snapshotVerifiedGallery } = await import("@/lib/services/gallery-integrity");
+        await snapshotVerifiedGallery(tx, row.userId);
+      }
     }
     return row;
   });

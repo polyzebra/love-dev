@@ -387,6 +387,28 @@ model User {
   // for every existing user; the legacy badge (isPubliclyVerified) is unchanged.
   faceVerifiedAt            DateTime?
 
+  // -----------------------------------------------------------------------
+  // Gallery-integrity lockdown (L6.5). The blue Verified badge promises the
+  // CURRENT gallery is the verified one - never a historical verification.
+  // `galleryVersion` increments on every MATERIAL gallery change
+  // (gallery-integrity.ts) SYNCHRONOUSLY inside the mutation transaction;
+  // `verifiedGalleryVersion` is the snapshot stamped when verification passes.
+  // The public badge requires verifiedGalleryVersion === galleryVersion, so a
+  // material change turns the badge OFF instantly - no worker, no cache, no
+  // webhook wait, and independent of the face-match provider being configured.
+  // -----------------------------------------------------------------------
+  galleryVersion                      Int       @default(0)
+  verifiedGalleryVersion              Int?
+  verifiedCoverPhotoId                String?
+  verifiedGalleryHash                 String?
+  // L6.6 immutable snapshot: the exact photo id set that was verified + when the
+  // snapshot was stamped. The version gate is authoritative; these are the audit
+  // record + defense-in-depth (verified photos still exist / cover still matches).
+  verifiedPhotoIds                    String[]  @default([])
+  verifiedGallerySnapshotAt           DateTime?
+  photoVerificationInvalidatedAt      DateTime?
+  photoVerificationInvalidationReason String?
+
   lastActiveAt      DateTime  @default(now())
   // onboardingDone doubles as the spec's "onboarding completed" boolean
   onboardingDone    Boolean   @default(false)
@@ -610,6 +632,12 @@ model Verification {
   providerSessionId String? // opaque reference on the provider side
   reviewedById      String?
   reviewNote        String?
+  // L6.5 webhook safety (Phase H): the user's galleryVersion when this session
+  // was started. A late/replayed approval restores the badge ONLY if the
+  // gallery is unchanged since start (current galleryVersion === this value);
+  // otherwise identity is stamped but the photo badge stays withheld pending
+  // reverification. NULL = a session started before the lockdown (no pin).
+  galleryVersionAtStart Int?
   // When `status` last CHANGED (webhook, reconciliation, admin review) -
   // the audit timestamp. updatedAt cannot serve: reconciliation throttle
   // writes (lastReconciledAt) bump it without any status change.

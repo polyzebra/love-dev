@@ -31,6 +31,8 @@ export type UserAvgAggregateOutputType = {
   deviceCount: number | null
   scamScore: number | null
   safetyRiskScore: number | null
+  galleryVersion: number | null
+  verifiedGalleryVersion: number | null
 }
 
 export type UserSumAggregateOutputType = {
@@ -38,6 +40,8 @@ export type UserSumAggregateOutputType = {
   deviceCount: number | null
   scamScore: number | null
   safetyRiskScore: number | null
+  galleryVersion: number | null
+  verifiedGalleryVersion: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -89,6 +93,13 @@ export type UserMinAggregateOutputType = {
   photoVerificationSession: string | null
   faceBadgeSuspendedAt: Date | null
   faceVerifiedAt: Date | null
+  galleryVersion: number | null
+  verifiedGalleryVersion: number | null
+  verifiedCoverPhotoId: string | null
+  verifiedGalleryHash: string | null
+  verifiedGallerySnapshotAt: Date | null
+  photoVerificationInvalidatedAt: Date | null
+  photoVerificationInvalidationReason: string | null
   lastActiveAt: Date | null
   onboardingDone: boolean | null
   marketingOptIn: boolean | null
@@ -146,6 +157,13 @@ export type UserMaxAggregateOutputType = {
   photoVerificationSession: string | null
   faceBadgeSuspendedAt: Date | null
   faceVerifiedAt: Date | null
+  galleryVersion: number | null
+  verifiedGalleryVersion: number | null
+  verifiedCoverPhotoId: string | null
+  verifiedGalleryHash: string | null
+  verifiedGallerySnapshotAt: Date | null
+  photoVerificationInvalidatedAt: Date | null
+  photoVerificationInvalidationReason: string | null
   lastActiveAt: Date | null
   onboardingDone: boolean | null
   marketingOptIn: boolean | null
@@ -203,6 +221,14 @@ export type UserCountAggregateOutputType = {
   photoVerificationSession: number
   faceBadgeSuspendedAt: number
   faceVerifiedAt: number
+  galleryVersion: number
+  verifiedGalleryVersion: number
+  verifiedCoverPhotoId: number
+  verifiedGalleryHash: number
+  verifiedPhotoIds: number
+  verifiedGallerySnapshotAt: number
+  photoVerificationInvalidatedAt: number
+  photoVerificationInvalidationReason: number
   lastActiveAt: number
   onboardingDone: number
   marketingOptIn: number
@@ -218,6 +244,8 @@ export type UserAvgAggregateInputType = {
   deviceCount?: true
   scamScore?: true
   safetyRiskScore?: true
+  galleryVersion?: true
+  verifiedGalleryVersion?: true
 }
 
 export type UserSumAggregateInputType = {
@@ -225,6 +253,8 @@ export type UserSumAggregateInputType = {
   deviceCount?: true
   scamScore?: true
   safetyRiskScore?: true
+  galleryVersion?: true
+  verifiedGalleryVersion?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -276,6 +306,13 @@ export type UserMinAggregateInputType = {
   photoVerificationSession?: true
   faceBadgeSuspendedAt?: true
   faceVerifiedAt?: true
+  galleryVersion?: true
+  verifiedGalleryVersion?: true
+  verifiedCoverPhotoId?: true
+  verifiedGalleryHash?: true
+  verifiedGallerySnapshotAt?: true
+  photoVerificationInvalidatedAt?: true
+  photoVerificationInvalidationReason?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -333,6 +370,13 @@ export type UserMaxAggregateInputType = {
   photoVerificationSession?: true
   faceBadgeSuspendedAt?: true
   faceVerifiedAt?: true
+  galleryVersion?: true
+  verifiedGalleryVersion?: true
+  verifiedCoverPhotoId?: true
+  verifiedGalleryHash?: true
+  verifiedGallerySnapshotAt?: true
+  photoVerificationInvalidatedAt?: true
+  photoVerificationInvalidationReason?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -390,6 +434,14 @@ export type UserCountAggregateInputType = {
   photoVerificationSession?: true
   faceBadgeSuspendedAt?: true
   faceVerifiedAt?: true
+  galleryVersion?: true
+  verifiedGalleryVersion?: true
+  verifiedCoverPhotoId?: true
+  verifiedGalleryHash?: true
+  verifiedPhotoIds?: true
+  verifiedGallerySnapshotAt?: true
+  photoVerificationInvalidatedAt?: true
+  photoVerificationInvalidationReason?: true
   lastActiveAt?: true
   onboardingDone?: true
   marketingOptIn?: true
@@ -534,6 +586,14 @@ export type UserGroupByOutputType = {
   photoVerificationSession: string | null
   faceBadgeSuspendedAt: Date | null
   faceVerifiedAt: Date | null
+  galleryVersion: number
+  verifiedGalleryVersion: number | null
+  verifiedCoverPhotoId: string | null
+  verifiedGalleryHash: string | null
+  verifiedPhotoIds: string[]
+  verifiedGallerySnapshotAt: Date | null
+  photoVerificationInvalidatedAt: Date | null
+  photoVerificationInvalidationReason: string | null
   lastActiveAt: Date
   onboardingDone: boolean
   marketingOptIn: boolean
@@ -614,6 +674,14 @@ export type UserWhereInput = {
   photoVerificationSession?: Prisma.StringNullableFilter<"User"> | string | null
   faceBadgeSuspendedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   faceVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  galleryVersion?: Prisma.IntFilter<"User"> | number
+  verifiedGalleryVersion?: Prisma.IntNullableFilter<"User"> | number | null
+  verifiedCoverPhotoId?: Prisma.StringNullableFilter<"User"> | string | null
+  verifiedGalleryHash?: Prisma.StringNullableFilter<"User"> | string | null
+  verifiedPhotoIds?: Prisma.StringNullableListFilter<"User">
+  verifiedGallerySnapshotAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.StringNullableFilter<"User"> | string | null
   lastActiveAt?: Prisma.DateTimeFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolFilter<"User"> | boolean
@@ -706,6 +774,14 @@ export type UserOrderByWithRelationInput = {
   photoVerificationSession?: Prisma.SortOrderInput | Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   faceVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedCoverPhotoId?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedGalleryHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedPhotoIds?: Prisma.SortOrder
+  verifiedGallerySnapshotAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  photoVerificationInvalidatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  photoVerificationInvalidationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -801,6 +877,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   photoVerificationSession?: Prisma.StringNullableFilter<"User"> | string | null
   faceBadgeSuspendedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   faceVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  galleryVersion?: Prisma.IntFilter<"User"> | number
+  verifiedGalleryVersion?: Prisma.IntNullableFilter<"User"> | number | null
+  verifiedCoverPhotoId?: Prisma.StringNullableFilter<"User"> | string | null
+  verifiedGalleryHash?: Prisma.StringNullableFilter<"User"> | string | null
+  verifiedPhotoIds?: Prisma.StringNullableListFilter<"User">
+  verifiedGallerySnapshotAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.StringNullableFilter<"User"> | string | null
   lastActiveAt?: Prisma.DateTimeFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolFilter<"User"> | boolean
@@ -893,6 +977,14 @@ export type UserOrderByWithAggregationInput = {
   photoVerificationSession?: Prisma.SortOrderInput | Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   faceVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedCoverPhotoId?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedGalleryHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedPhotoIds?: Prisma.SortOrder
+  verifiedGallerySnapshotAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  photoVerificationInvalidatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  photoVerificationInvalidationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -958,6 +1050,14 @@ export type UserScalarWhereWithAggregatesInput = {
   photoVerificationSession?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   faceBadgeSuspendedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   faceVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  galleryVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
+  verifiedGalleryVersion?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
+  verifiedCoverPhotoId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  verifiedGalleryHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  verifiedPhotoIds?: Prisma.StringNullableListFilter<"User">
+  verifiedGallerySnapshotAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   lastActiveAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   onboardingDone?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   marketingOptIn?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
@@ -1015,6 +1115,14 @@ export type UserCreateInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1107,6 +1215,14 @@ export type UserUncheckedCreateInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1199,6 +1315,14 @@ export type UserUpdateInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1291,6 +1415,14 @@ export type UserUncheckedUpdateInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1383,6 +1515,14 @@ export type UserCreateManyInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -1440,6 +1580,14 @@ export type UserUpdateManyMutationInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1497,12 +1645,28 @@ export type UserUncheckedUpdateManyInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequested?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -1554,6 +1718,14 @@ export type UserCountOrderByAggregateInput = {
   photoVerificationSession?: Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrder
   faceVerifiedAt?: Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrder
+  verifiedCoverPhotoId?: Prisma.SortOrder
+  verifiedGalleryHash?: Prisma.SortOrder
+  verifiedPhotoIds?: Prisma.SortOrder
+  verifiedGallerySnapshotAt?: Prisma.SortOrder
+  photoVerificationInvalidatedAt?: Prisma.SortOrder
+  photoVerificationInvalidationReason?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -1567,6 +1739,8 @@ export type UserAvgOrderByAggregateInput = {
   deviceCount?: Prisma.SortOrder
   scamScore?: Prisma.SortOrder
   safetyRiskScore?: Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -1618,6 +1792,13 @@ export type UserMaxOrderByAggregateInput = {
   photoVerificationSession?: Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrder
   faceVerifiedAt?: Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrder
+  verifiedCoverPhotoId?: Prisma.SortOrder
+  verifiedGalleryHash?: Prisma.SortOrder
+  verifiedGallerySnapshotAt?: Prisma.SortOrder
+  photoVerificationInvalidatedAt?: Prisma.SortOrder
+  photoVerificationInvalidationReason?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -1675,6 +1856,13 @@ export type UserMinOrderByAggregateInput = {
   photoVerificationSession?: Prisma.SortOrder
   faceBadgeSuspendedAt?: Prisma.SortOrder
   faceVerifiedAt?: Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrder
+  verifiedCoverPhotoId?: Prisma.SortOrder
+  verifiedGalleryHash?: Prisma.SortOrder
+  verifiedGallerySnapshotAt?: Prisma.SortOrder
+  photoVerificationInvalidatedAt?: Prisma.SortOrder
+  photoVerificationInvalidationReason?: Prisma.SortOrder
   lastActiveAt?: Prisma.SortOrder
   onboardingDone?: Prisma.SortOrder
   marketingOptIn?: Prisma.SortOrder
@@ -1688,6 +1876,8 @@ export type UserSumOrderByAggregateInput = {
   deviceCount?: Prisma.SortOrder
   scamScore?: Prisma.SortOrder
   safetyRiskScore?: Prisma.SortOrder
+  galleryVersion?: Prisma.SortOrder
+  verifiedGalleryVersion?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1698,6 +1888,10 @@ export type UserScalarRelationFilter = {
 export type UserNullableScalarRelationFilter = {
   is?: Prisma.UserWhereInput | null
   isNot?: Prisma.UserWhereInput | null
+}
+
+export type UserCreateverifiedPhotoIdsInput = {
+  set: string[]
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -1738,6 +1932,19 @@ export type IntFieldUpdateOperationsInput = {
 
 export type NullableEnumSafetyRecommendedActionFieldUpdateOperationsInput = {
   set?: $Enums.SafetyRecommendedAction | null
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type UserUpdateverifiedPhotoIdsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -2287,6 +2494,14 @@ export type UserCreateWithoutDevicesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2378,6 +2593,14 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2485,6 +2708,14 @@ export type UserUpdateWithoutDevicesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2576,6 +2807,14 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2667,6 +2906,14 @@ export type UserCreateWithoutProfileInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2758,6 +3005,14 @@ export type UserUncheckedCreateWithoutProfileInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -2865,6 +3120,14 @@ export type UserUpdateWithoutProfileInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2956,6 +3219,14 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3047,6 +3318,14 @@ export type UserCreateWithoutPhotosInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3138,6 +3417,14 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3245,6 +3532,14 @@ export type UserUpdateWithoutPhotosInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3336,6 +3631,14 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3427,6 +3730,14 @@ export type UserCreateWithoutVerificationsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3518,6 +3829,14 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3625,6 +3944,14 @@ export type UserUpdateWithoutVerificationsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3716,6 +4043,14 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3807,6 +4142,14 @@ export type UserCreateWithoutLikesSentInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3898,6 +4241,14 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -3994,6 +4345,14 @@ export type UserCreateWithoutLikesReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4085,6 +4444,14 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4192,6 +4559,14 @@ export type UserUpdateWithoutLikesSentInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4283,6 +4658,14 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4385,6 +4768,14 @@ export type UserUpdateWithoutLikesReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4476,6 +4867,14 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4567,6 +4966,14 @@ export type UserCreateWithoutMatchesAsAInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4658,6 +5065,14 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4754,6 +5169,14 @@ export type UserCreateWithoutMatchesAsBInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4845,6 +5268,14 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -4952,6 +5383,14 @@ export type UserUpdateWithoutMatchesAsAInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5043,6 +5482,14 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5145,6 +5592,14 @@ export type UserUpdateWithoutMatchesAsBInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5236,6 +5691,14 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5327,6 +5790,14 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5418,6 +5889,14 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5514,6 +5993,14 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5605,6 +6092,14 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -5712,6 +6207,14 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5803,6 +6306,14 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5905,6 +6416,14 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5996,6 +6515,14 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6087,6 +6614,14 @@ export type UserCreateWithoutParticipantsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6178,6 +6713,14 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6285,6 +6828,14 @@ export type UserUpdateWithoutParticipantsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6376,6 +6927,14 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6467,6 +7026,14 @@ export type UserCreateWithoutMessagesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6558,6 +7125,14 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6665,6 +7240,14 @@ export type UserUpdateWithoutMessagesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6756,6 +7339,14 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6847,6 +7438,14 @@ export type UserCreateWithoutReportsMadeInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -6938,6 +7537,14 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7034,6 +7641,14 @@ export type UserCreateWithoutReportsReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7125,6 +7740,14 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7232,6 +7855,14 @@ export type UserUpdateWithoutReportsMadeInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7323,6 +7954,14 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7425,6 +8064,14 @@ export type UserUpdateWithoutReportsReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7516,6 +8163,14 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7607,6 +8262,14 @@ export type UserCreateWithoutModerationCasesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7698,6 +8361,14 @@ export type UserUncheckedCreateWithoutModerationCasesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -7805,6 +8476,14 @@ export type UserUpdateWithoutModerationCasesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7896,6 +8575,14 @@ export type UserUncheckedUpdateWithoutModerationCasesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7987,6 +8674,14 @@ export type UserCreateWithoutViolationsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8078,6 +8773,14 @@ export type UserUncheckedCreateWithoutViolationsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8185,6 +8888,14 @@ export type UserUpdateWithoutViolationsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8276,6 +8987,14 @@ export type UserUncheckedUpdateWithoutViolationsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8367,6 +9086,14 @@ export type UserCreateWithoutAppealsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8458,6 +9185,14 @@ export type UserUncheckedCreateWithoutAppealsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8565,6 +9300,14 @@ export type UserUpdateWithoutAppealsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8656,6 +9399,14 @@ export type UserUncheckedUpdateWithoutAppealsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8747,6 +9498,14 @@ export type UserCreateWithoutBlocksMadeInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8838,6 +9597,14 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -8934,6 +9701,14 @@ export type UserCreateWithoutBlocksReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9025,6 +9800,14 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9132,6 +9915,14 @@ export type UserUpdateWithoutBlocksMadeInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9223,6 +10014,14 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9325,6 +10124,14 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9416,6 +10223,14 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9507,6 +10322,14 @@ export type UserCreateWithoutSubscriptionInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9598,6 +10421,14 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9705,6 +10536,14 @@ export type UserUpdateWithoutSubscriptionInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9796,6 +10635,14 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9887,6 +10734,14 @@ export type UserCreateWithoutPaymentsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -9978,6 +10833,14 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10085,6 +10948,14 @@ export type UserUpdateWithoutPaymentsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10176,6 +11047,14 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10267,6 +11146,14 @@ export type UserCreateWithoutNotificationsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10358,6 +11245,14 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10465,6 +11360,14 @@ export type UserUpdateWithoutNotificationsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10556,6 +11459,14 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10647,6 +11558,14 @@ export type UserCreateWithoutNotificationDevicesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10738,6 +11657,14 @@ export type UserUncheckedCreateWithoutNotificationDevicesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -10845,6 +11772,14 @@ export type UserUpdateWithoutNotificationDevicesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -10936,6 +11871,14 @@ export type UserUncheckedUpdateWithoutNotificationDevicesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11027,6 +11970,14 @@ export type UserCreateWithoutConversationPresenceInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11118,6 +12069,14 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11225,6 +12184,14 @@ export type UserUpdateWithoutConversationPresenceInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11316,6 +12283,14 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11407,6 +12382,14 @@ export type UserCreateWithoutAdminLogsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11498,6 +12481,14 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11605,6 +12596,14 @@ export type UserUpdateWithoutAdminLogsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11696,6 +12695,14 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -11787,6 +12794,14 @@ export type UserCreateWithoutExplorePreferencesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11878,6 +12893,14 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -11985,6 +13008,14 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12076,6 +13107,14 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12167,6 +13206,14 @@ export type UserCreateWithoutAuthEventsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12258,6 +13305,14 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12365,6 +13420,14 @@ export type UserUpdateWithoutAuthEventsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12456,6 +13519,14 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12547,6 +13618,14 @@ export type UserCreateWithoutSettingsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12638,6 +13717,14 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -12745,6 +13832,14 @@ export type UserUpdateWithoutSettingsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12836,6 +13931,14 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -12927,6 +14030,14 @@ export type UserCreateWithoutApiIdempotencyKeysInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13018,6 +14129,14 @@ export type UserUncheckedCreateWithoutApiIdempotencyKeysInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13125,6 +14244,14 @@ export type UserUpdateWithoutApiIdempotencyKeysInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13216,6 +14343,14 @@ export type UserUncheckedUpdateWithoutApiIdempotencyKeysInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13307,6 +14442,14 @@ export type UserCreateWithoutProfilePhotoVerificationInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13398,6 +14541,14 @@ export type UserUncheckedCreateWithoutProfilePhotoVerificationInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13505,6 +14656,14 @@ export type UserUpdateWithoutProfilePhotoVerificationInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13596,6 +14755,14 @@ export type UserUncheckedUpdateWithoutProfilePhotoVerificationInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13687,6 +14854,14 @@ export type UserCreateWithoutVerificationAuditEventsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13778,6 +14953,14 @@ export type UserUncheckedCreateWithoutVerificationAuditEventsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -13885,6 +15068,14 @@ export type UserUpdateWithoutVerificationAuditEventsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -13976,6 +15167,14 @@ export type UserUncheckedUpdateWithoutVerificationAuditEventsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14067,6 +15266,14 @@ export type UserCreateWithoutLivenessSessionsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14158,6 +15365,14 @@ export type UserUncheckedCreateWithoutLivenessSessionsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14265,6 +15480,14 @@ export type UserUpdateWithoutLivenessSessionsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14356,6 +15579,14 @@ export type UserUncheckedUpdateWithoutLivenessSessionsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14447,6 +15678,14 @@ export type UserCreateWithoutFaceReferencesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14538,6 +15777,14 @@ export type UserUncheckedCreateWithoutFaceReferencesInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14645,6 +15892,14 @@ export type UserUpdateWithoutFaceReferencesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14736,6 +15991,14 @@ export type UserUncheckedUpdateWithoutFaceReferencesInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -14827,6 +16090,14 @@ export type UserCreateWithoutFaceIdentityBindingsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -14918,6 +16189,14 @@ export type UserUncheckedCreateWithoutFaceIdentityBindingsInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -15014,6 +16293,14 @@ export type UserCreateWithoutFaceBindingsReviewedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -15105,6 +16392,14 @@ export type UserUncheckedCreateWithoutFaceBindingsReviewedInput = {
   photoVerificationSession?: string | null
   faceBadgeSuspendedAt?: Date | string | null
   faceVerifiedAt?: Date | string | null
+  galleryVersion?: number
+  verifiedGalleryVersion?: number | null
+  verifiedCoverPhotoId?: string | null
+  verifiedGalleryHash?: string | null
+  verifiedPhotoIds?: Prisma.UserCreateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Date | string | null
+  photoVerificationInvalidatedAt?: Date | string | null
+  photoVerificationInvalidationReason?: string | null
   lastActiveAt?: Date | string
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -15212,6 +16507,14 @@ export type UserUpdateWithoutFaceIdentityBindingsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15303,6 +16606,14 @@ export type UserUncheckedUpdateWithoutFaceIdentityBindingsInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15405,6 +16716,14 @@ export type UserUpdateWithoutFaceBindingsReviewedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15496,6 +16815,14 @@ export type UserUncheckedUpdateWithoutFaceBindingsReviewedInput = {
   photoVerificationSession?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faceBadgeSuspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   faceVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  galleryVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  verifiedGalleryVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  verifiedCoverPhotoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedGalleryHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedPhotoIds?: Prisma.UserUpdateverifiedPhotoIdsInput | string[]
+  verifiedGallerySnapshotAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoVerificationInvalidationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActiveAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingOptIn?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -15888,6 +17215,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
   faceVerifiedAt?: boolean
+  galleryVersion?: boolean
+  verifiedGalleryVersion?: boolean
+  verifiedCoverPhotoId?: boolean
+  verifiedGalleryHash?: boolean
+  verifiedPhotoIds?: boolean
+  verifiedGallerySnapshotAt?: boolean
+  photoVerificationInvalidatedAt?: boolean
+  photoVerificationInvalidationReason?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -15981,6 +17316,14 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
   faceVerifiedAt?: boolean
+  galleryVersion?: boolean
+  verifiedGalleryVersion?: boolean
+  verifiedCoverPhotoId?: boolean
+  verifiedGalleryHash?: boolean
+  verifiedPhotoIds?: boolean
+  verifiedGallerySnapshotAt?: boolean
+  photoVerificationInvalidatedAt?: boolean
+  photoVerificationInvalidationReason?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -16038,6 +17381,14 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
   faceVerifiedAt?: boolean
+  galleryVersion?: boolean
+  verifiedGalleryVersion?: boolean
+  verifiedCoverPhotoId?: boolean
+  verifiedGalleryHash?: boolean
+  verifiedPhotoIds?: boolean
+  verifiedGallerySnapshotAt?: boolean
+  photoVerificationInvalidatedAt?: boolean
+  photoVerificationInvalidationReason?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -16095,6 +17446,14 @@ export type UserSelectScalar = {
   photoVerificationSession?: boolean
   faceBadgeSuspendedAt?: boolean
   faceVerifiedAt?: boolean
+  galleryVersion?: boolean
+  verifiedGalleryVersion?: boolean
+  verifiedCoverPhotoId?: boolean
+  verifiedGalleryHash?: boolean
+  verifiedPhotoIds?: boolean
+  verifiedGallerySnapshotAt?: boolean
+  photoVerificationInvalidatedAt?: boolean
+  photoVerificationInvalidationReason?: boolean
   lastActiveAt?: boolean
   onboardingDone?: boolean
   marketingOptIn?: boolean
@@ -16103,7 +17462,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "faceBadgeSuspendedAt" | "faceVerifiedAt" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "faceBadgeSuspendedAt" | "faceVerifiedAt" | "galleryVersion" | "verifiedGalleryVersion" | "verifiedCoverPhotoId" | "verifiedGalleryHash" | "verifiedPhotoIds" | "verifiedGallerySnapshotAt" | "photoVerificationInvalidatedAt" | "photoVerificationInvalidationReason" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
@@ -16233,6 +17592,14 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     photoVerificationSession: string | null
     faceBadgeSuspendedAt: Date | null
     faceVerifiedAt: Date | null
+    galleryVersion: number
+    verifiedGalleryVersion: number | null
+    verifiedCoverPhotoId: string | null
+    verifiedGalleryHash: string | null
+    verifiedPhotoIds: string[]
+    verifiedGallerySnapshotAt: Date | null
+    photoVerificationInvalidatedAt: Date | null
+    photoVerificationInvalidationReason: string | null
     lastActiveAt: Date
     onboardingDone: boolean
     marketingOptIn: boolean
@@ -16745,6 +18112,14 @@ export interface UserFieldRefs {
   readonly photoVerificationSession: Prisma.FieldRef<"User", 'String'>
   readonly faceBadgeSuspendedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly faceVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly galleryVersion: Prisma.FieldRef<"User", 'Int'>
+  readonly verifiedGalleryVersion: Prisma.FieldRef<"User", 'Int'>
+  readonly verifiedCoverPhotoId: Prisma.FieldRef<"User", 'String'>
+  readonly verifiedGalleryHash: Prisma.FieldRef<"User", 'String'>
+  readonly verifiedPhotoIds: Prisma.FieldRef<"User", 'String[]'>
+  readonly verifiedGallerySnapshotAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly photoVerificationInvalidatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly photoVerificationInvalidationReason: Prisma.FieldRef<"User", 'String'>
   readonly lastActiveAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly onboardingDone: Prisma.FieldRef<"User", 'Boolean'>
   readonly marketingOptIn: Prisma.FieldRef<"User", 'Boolean'>

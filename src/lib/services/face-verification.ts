@@ -663,12 +663,21 @@ export async function runProfilePhotoVerification(
     // ONLY on a confirmed MATCH (badgeStatus ACTIVE / AUTO_VERIFIED); every
     // other outcome - REVIEWING (MANUAL_REVIEW), SUSPENDED, NONE - keeps the
     // badge withheld (F2: the badge always reflects the CURRENT trusted state).
-    await db.user.update({
-      where: { id: userId },
-      data: {
-        faceBadgeSuspendedAt: decision.badgeStatus === "ACTIVE" ? null : new Date(),
-      },
-    });
+    if (decision.badgeStatus === "ACTIVE") {
+      // L6.5: a confirmed MATCH on the CURRENT gallery both clears the
+      // suspension AND re-stamps the verified-gallery snapshot
+      // (verifiedGalleryVersion = current galleryVersion), so the public
+      // badge gate passes for exactly the photos just re-confirmed. Without
+      // this, a version bumped by a gallery change would keep the badge off
+      // even after a legitimate re-match.
+      const { snapshotVerifiedGallery } = await import("@/lib/services/gallery-integrity");
+      await snapshotVerifiedGallery(db, userId);
+    } else {
+      await db.user.update({
+        where: { id: userId },
+        data: { faceBadgeSuspendedAt: new Date() },
+      });
+    }
     await recordVerificationAudit({
       userId,
       verificationId: job.id,
@@ -1017,17 +1026,21 @@ export async function adminFaceAction(opts: {
 
   switch (opts.action) {
     case "approve": {
-      await db.$transaction([
-        db.photoFaceCheck.updateMany({
+      // F-1 (L6.7.1): a staff approval confirms the CURRENT gallery; restore the
+      // badge ONLY through the canonical snapshot (re-stamps the version + clears
+      // suspension atomically) - no bare faceBadgeSuspendedAt write.
+      const { snapshotVerifiedGallery } = await import("@/lib/services/gallery-integrity");
+      await db.$transaction(async (tx) => {
+        await tx.photoFaceCheck.updateMany({
           where: { verificationId: job.id, decision: "FLAGGED" },
           data: { decision: "ALLOWED", reviewedById: opts.actorId, reviewedAt: new Date() },
-        }),
-        db.profilePhotoVerification.update({
+        });
+        await tx.profilePhotoVerification.update({
           where: { id: job.id },
           data: { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE", riskLevel: 0 },
-        }),
-        db.user.update({ where: { id: job.userId }, data: { faceBadgeSuspendedAt: null } }),
-      ]);
+        });
+        await snapshotVerifiedGallery(tx, job.userId);
+      });
       await audit("face_admin_approve", "AUTO_VERIFIED");
       return { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE" };
     }
@@ -1110,13 +1123,16 @@ export async function adminFaceAction(opts: {
       return { status: "SUSPENDED", badgeStatus: "SUSPENDED" };
     }
     case "restore_badge": {
-      await db.$transaction([
-        db.profilePhotoVerification.update({
+      // F-1 (L6.7.1): restore the badge ONLY through the canonical snapshot (the
+      // admin has confirmed the current gallery) - atomic, no bare write.
+      const { snapshotVerifiedGallery } = await import("@/lib/services/gallery-integrity");
+      await db.$transaction(async (tx) => {
+        await tx.profilePhotoVerification.update({
           where: { id: job.id },
           data: { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE" },
-        }),
-        db.user.update({ where: { id: job.userId }, data: { faceBadgeSuspendedAt: null } }),
-      ]);
+        });
+        await snapshotVerifiedGallery(tx, job.userId);
+      });
       await audit("face_admin_restore", "AUTO_VERIFIED");
       return { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE" };
     }

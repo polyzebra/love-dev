@@ -3,6 +3,7 @@ import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 import { ContactForm } from "@/components/marketing/contact-form";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
+import { LEGAL_ROUTES, LEGAL_HUB } from "@/lib/legal/routes";
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: "Contact",
@@ -49,11 +50,11 @@ export default function ContactPage() {
             info@tirvea.com
           </a>
           . For legal and privacy matters, see the{" "}
-          <Link href="/legal" className="text-foreground underline">
+          <Link href={LEGAL_HUB} className="text-foreground underline">
             Legal Centre
           </Link>
           ; for security reports, the{" "}
-          <Link href="/legal/vulnerability-disclosure" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.vulnerabilityDisclosure} className="text-foreground underline">
             Vulnerability Disclosure Policy
           </Link>
           .

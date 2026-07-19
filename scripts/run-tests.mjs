@@ -87,6 +87,12 @@ const UNIT = new Set([
   "support-request.test.ts",
   "global-scope.test.ts",
   "public-layout.test.ts",
+  "gallery-integrity.test.ts",
+  "verification-state-machine.test.ts",
+  "trust-contract-governance.test.ts",
+  "legal-navigation-governance.test.ts",
+  "link-integrity.test.ts",
+  "seo-integrity.test.ts",
 ]);
 
 const lane = process.argv[2] ?? "all";

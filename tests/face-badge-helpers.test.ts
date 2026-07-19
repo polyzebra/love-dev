@@ -35,18 +35,74 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 function main() {
-  // ---- legacy isPubliclyVerified: UNCHANGED ------------------------------
-  check("isPubliclyVerified keeps legacy semantics (identity && !suspended)", () => {
-    assert.equal(isPubliclyVerified({ photoVerifiedAt: D, faceBadgeSuspendedAt: null }), true);
-    assert.equal(isPubliclyVerified({ photoVerifiedAt: D, faceBadgeSuspendedAt: D }), false);
-    assert.equal(isPubliclyVerified({ photoVerifiedAt: null, faceBadgeSuspendedAt: null }), false);
-  });
+  // ---- isPubliclyVerified: L6.5 gallery-integrity gate -------------------
+  check(
+    "isPubliclyVerified requires identity, not-suspended, AND current gallery == verified",
+    () => {
+      // Verified: identity set, not suspended, current gallery IS the verified one.
+      assert.equal(
+        isPubliclyVerified({
+          photoVerifiedAt: D,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
+        true,
+      );
+      // Suspended by the face/admin/consent layer.
+      assert.equal(
+        isPubliclyVerified({
+          photoVerifiedAt: D,
+          faceBadgeSuspendedAt: D,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
+        false,
+      );
+      // No identity.
+      assert.equal(
+        isPubliclyVerified({
+          photoVerifiedAt: null,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
+        false,
+      );
+      // L6.5: the gallery changed since verification (version bumped) -> badge OFF.
+      assert.equal(
+        isPubliclyVerified({
+          photoVerifiedAt: D,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 1,
+          verifiedGalleryVersion: 0,
+        }),
+        false,
+      );
+      // Never verified against any gallery snapshot -> badge OFF.
+      assert.equal(
+        isPubliclyVerified({
+          photoVerifiedAt: D,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 0,
+          verifiedGalleryVersion: null,
+        }),
+        false,
+      );
+    },
+  );
 
-  check("adding faceVerifiedAt does NOT change the legacy badge (dormant equiv.)", () => {
-    // The legacy helper never reads faceVerifiedAt - a verified user stays
-    // verified regardless of the new column's value.
-    const withNull = { photoVerifiedAt: D, faceBadgeSuspendedAt: null, faceVerifiedAt: null };
-    const withDate = { photoVerifiedAt: D, faceBadgeSuspendedAt: null, faceVerifiedAt: D };
+  check("adding faceVerifiedAt does NOT change the public badge (dormant equiv.)", () => {
+    // The public helper never reads faceVerifiedAt - a verified user with a
+    // matching gallery stays verified regardless of the dormant grant column.
+    const base = {
+      photoVerifiedAt: D,
+      faceBadgeSuspendedAt: null,
+      galleryVersion: 0,
+      verifiedGalleryVersion: 0,
+    };
+    const withNull = { ...base, faceVerifiedAt: null };
+    const withDate = { ...base, faceVerifiedAt: D };
     assert.equal(isPubliclyVerified(withNull), true);
     assert.equal(isPubliclyVerified(withDate), true);
   });
@@ -71,7 +127,8 @@ function main() {
   // no route/UI writes it (reads are allowed).
   check("faceVerifiedAt has exactly one writer (the grant engine); nothing else writes it", () => {
     const files = walk("src");
-    const isWrite = (f: string) => /faceVerifiedAt:\s*(new Date\(\)|null)/.test(readFileSync(f, "utf8"));
+    const isWrite = (f: string) =>
+      /faceVerifiedAt:\s*(new Date\(\)|null)/.test(readFileSync(f, "utf8"));
     const writers = files.filter(isWrite);
     assert.deepEqual(writers, ["src/lib/services/photo-grant.ts"], "exactly one writer");
     const appWriters = files.filter((f) => f.startsWith("src/app/") && isWrite(f));

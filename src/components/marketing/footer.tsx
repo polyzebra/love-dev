@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { legalFooterGroups, type LegalFooterLink } from "@/lib/legal/registry";
 import { layout } from "@/components/layout/public";
 import { cn } from "@/lib/utils";
+import { LEGAL_HUB } from "@/lib/legal/routes";
 
 /**
  * Premium SaaS footer / Legal Centre.
@@ -96,7 +97,13 @@ function FooterSection({ title, id, links }: { title: string; id: string; links:
 }
 
 function categoryId(category: string): string {
-  return "footer-legal-" + category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return (
+    "footer-legal-" +
+    category
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  );
 }
 
 export function MarketingFooter() {
@@ -140,7 +147,7 @@ export function MarketingFooter() {
           <div className="mb-2 flex items-baseline justify-between lg:mb-6">
             <h2 className="text-foreground text-sm font-semibold">Legal Centre</h2>
             <Link
-              href="/legal"
+              href={LEGAL_HUB}
               className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/60 rounded-sm text-xs underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
             >
               View all
@@ -161,7 +168,9 @@ export function MarketingFooter() {
 
       {/* Bottom */}
       <div className="border-border border-t">
-        <p className={cn("text-muted-foreground mx-auto py-6 text-xs", layout.wide, layout.paddingX)}>
+        <p
+          className={cn("text-muted-foreground mx-auto py-6 text-xs", layout.wide, layout.paddingX)}
+        >
           © {new Date().getFullYear()} WiseWave Limited. All rights reserved.
         </p>
       </div>

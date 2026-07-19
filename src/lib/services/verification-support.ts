@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { computeVerificationRisk, type RiskBand } from "@/lib/services/risk-engine";
+import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
 
 /**
  * Support-scoped verification view (Phase 15). The return type IS the
@@ -44,8 +45,9 @@ export async function getVerificationSupportView(
   const user = await db.user.findUnique({
     where: { id: userId },
     select: {
-      photoVerifiedAt: true,
-      faceBadgeSuspendedAt: true,
+      // F-2 (L6.7.1): load the canonical badge fields so `badge.visible` is
+      // resolved by the Trust Contract, never recomputed here.
+      ...PUBLIC_BADGE_SELECT,
       verifications: {
         where: { type: "PHOTO" },
         select: { status: true },
@@ -113,7 +115,10 @@ export async function getVerificationSupportView(
       verifiedAt: user.photoVerifiedAt?.toISOString() ?? null,
     },
     badge: {
-      visible: Boolean(user.photoVerifiedAt) && !user.faceBadgeSuspendedAt,
+      // F-2 (L6.7.1): the admin badge is the PUBLIC badge - resolved by the
+      // Trust Contract (identity + not-suspended + current gallery == verified),
+      // so support sees exactly what members see. Never recomputed here.
+      visible: isPubliclyVerified(user),
       state: user.faceBadgeSuspendedAt ? "suspended" : (job?.badgeStatus ?? "NONE").toLowerCase(),
     },
     faceLayer: job

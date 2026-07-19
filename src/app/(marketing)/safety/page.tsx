@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/public";
 import Link from "next/link";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 import {
   Flag,
   Ban,
@@ -40,8 +41,8 @@ const SECTIONS: SafetySection[] = [
     title: "Report a user",
     body: "Report a profile or a single message using the report tool in the app. A person reviews reports, and serious reports are prioritised. You can report without the other person knowing.",
     links: [
-      { href: "/legal/trust-safety", label: "How reports are handled" },
-      { href: "/legal/community-guidelines", label: "Community Guidelines" },
+      { href: LEGAL_ROUTES.trustSafety, label: "How reports are handled" },
+      { href: LEGAL_ROUTES.communityGuidelines, label: "Community Guidelines" },
       { href: "/contact", label: "Contact the safety team" },
     ],
   },
@@ -50,7 +51,7 @@ const SECTIONS: SafetySection[] = [
     icon: Ban,
     title: "Block someone",
     body: "Blocking stops someone from seeing you, matching with you, or messaging you. Use Block from a profile or a chat. Blocking is separate from reporting - you can do both.",
-    links: [{ href: "/legal/community-guidelines", label: "What's not allowed" }],
+    links: [{ href: LEGAL_ROUTES.communityGuidelines, label: "What's not allowed" }],
   },
   {
     id: "scams",
@@ -58,7 +59,7 @@ const SECTIONS: SafetySection[] = [
     title: "Scams & fraud",
     body: "Never send money, gift cards, or crypto to someone you have not met. Be wary of anyone who quickly asks to move off Tirvea, professes love fast, or asks for financial help. Report and block them.",
     links: [
-      { href: "/legal/community-guidelines", label: "Prohibited behaviour" },
+      { href: LEGAL_ROUTES.communityGuidelines, label: "Prohibited behaviour" },
       { href: "/contact", label: "Report a scam" },
     ],
   },
@@ -68,7 +69,7 @@ const SECTIONS: SafetySection[] = [
     title: "Fake profiles",
     body: "Verification helps you know who is real. Look for verification badges, and report profiles that seem fake or use someone else's photos.",
     links: [
-      { href: "/legal/identity-verification", label: "Identity verification" },
+      { href: LEGAL_ROUTES.identityVerification, label: "Identity verification" },
       { href: "/safety/face-check", label: "Photo verification, explained" },
     ],
   },
@@ -78,8 +79,8 @@ const SECTIONS: SafetySection[] = [
     title: "Harassment & threats",
     body: "Harassment, hate, and threats are not allowed. Report and block anyone who behaves this way. If a threat makes you fear for your safety, treat it as an emergency (below) and contact your local authorities.",
     links: [
-      { href: "/legal/community-guidelines", label: "Community Guidelines" },
-      { href: "/legal/trust-safety", label: "Trust & Safety Policy" },
+      { href: LEGAL_ROUTES.communityGuidelines, label: "Community Guidelines" },
+      { href: LEGAL_ROUTES.trustSafety, label: "Trust & Safety Policy" },
       { href: "/contact", label: "Report harassment" },
     ],
   },
@@ -88,14 +89,14 @@ const SECTIONS: SafetySection[] = [
     icon: Baby,
     title: "Child safety",
     body: "Tirvea is strictly for adults (18+). We do not tolerate any content or behaviour that sexualises or endangers minors. Reports of child endangerment are treated with the highest priority and we cooperate with the appropriate authorities.",
-    links: [{ href: "/legal/child-safety", label: "Child Safety Policy" }],
+    links: [{ href: LEGAL_ROUTES.childSafety, label: "Child Safety Policy" }],
   },
   {
     id: "identity-verification",
     icon: BadgeCheck,
     title: "Identity verification",
     body: "Identity verification checks a government ID to confirm a real person is behind an account. It is used for trust and safety.",
-    links: [{ href: "/legal/identity-verification", label: "Identity Verification Policy" }],
+    links: [{ href: LEGAL_ROUTES.identityVerification, label: "Identity Verification Policy" }],
   },
   {
     id: "photo-verification",
@@ -104,7 +105,7 @@ const SECTIONS: SafetySection[] = [
     body: "Photo verification uses a short live video selfie to confirm the person matches their photos. Learn how it works and how your data is handled.",
     links: [
       { href: "/safety/face-check", label: "Photo verification, explained" },
-      { href: "/legal/photo-verification", label: "Photo Verification Policy" },
+      { href: LEGAL_ROUTES.photoVerification, label: "Photo Verification Policy" },
       { href: "/help/photo-verification", label: "Troubleshooting" },
     ],
   },
@@ -114,8 +115,8 @@ const SECTIONS: SafetySection[] = [
     title: "Appeals & account suspension",
     body: "If a decision affected your account, you can ask us to review it. Learn what suspension means and how to appeal.",
     links: [
-      { href: "/legal/appeals", label: "Appeals Policy" },
-      { href: "/legal/account-suspension", label: "Account Suspension Policy" },
+      { href: LEGAL_ROUTES.appeals, label: "Appeals Policy" },
+      { href: LEGAL_ROUTES.accountSuspension, label: "Account Suspension Policy" },
     ],
   },
   {
@@ -124,9 +125,9 @@ const SECTIONS: SafetySection[] = [
     title: "Privacy & your data",
     body: "Your precise location is never shown. You control your visibility, and you can export or delete your data at any time.",
     links: [
-      { href: "/legal/privacy", label: "Privacy Policy" },
-      { href: "/legal/gdpr", label: "Your data rights" },
-      { href: "/legal/account-deletion", label: "Delete your account" },
+      { href: LEGAL_ROUTES.privacy, label: "Privacy Policy" },
+      { href: LEGAL_ROUTES.gdpr, label: "Your data rights" },
+      { href: LEGAL_ROUTES.accountDeletion, label: "Delete your account" },
     ],
   },
   {
@@ -134,7 +135,7 @@ const SECTIONS: SafetySection[] = [
     icon: Landmark,
     title: "Law enforcement",
     body: "Information for authorities making a lawful request for data, and how we respond.",
-    links: [{ href: "/legal/law-enforcement", label: "Law Enforcement Guidelines" }],
+    links: [{ href: LEGAL_ROUTES.lawEnforcement, label: "Law Enforcement Guidelines" }],
   },
 ];
 
@@ -160,7 +161,7 @@ export default function SafetyPage() {
           Practical help for staying safe on Tirvea - how to report and block, spot scams, handle
           harassment, verify who you&apos;re talking to, and control your privacy. For the formal
           rules, see the{" "}
-          <Link href="/legal/trust-safety" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.trustSafety} className="text-foreground underline">
             Trust &amp; Safety Policy
           </Link>
           .

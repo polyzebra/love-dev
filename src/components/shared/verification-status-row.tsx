@@ -47,15 +47,16 @@ export function photoVerificationRow(
   const anchor = opts.surface === "profile" ? "#photo-verification" : "/profile#photo-verification";
   switch (ux) {
     case "verified":
-      return { label: "Photo verified", state: "verified", value: "Verified", action: null };
+      return { label: "Verified", state: "verified", value: "Verified", action: null };
     case "requires_reverification":
-      // Identity intact, but the badge is withheld because the profile
-      // photos changed and no longer confirm as the verified person.
+      // L6.6 Phase I: the verified badge was removed because the profile photos
+      // changed. Identity is intact; the owner must complete Photo Verification
+      // again to restore the badge.
       return {
-        label: "Photo verification",
+        label: "Verified badge removed",
         state: "needs-action",
-        value: "Photos changed - verify again",
-        action: opts.configured ? { label: "Verify again", href: anchor } : null,
+        value: "Your profile photos changed",
+        action: opts.configured ? { label: "Verify Photos", href: anchor } : null,
       };
     case "pending":
     case "verification_started":

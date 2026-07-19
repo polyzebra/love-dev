@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Sparkles, ShieldCheck, Lock, Cpu, BadgeCheck, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
+import { LEGAL_ROUTES, LEGAL_HUB } from "@/lib/legal/routes";
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: "About Tirvea",
@@ -49,10 +50,7 @@ function Section({
 }) {
   return (
     <section aria-labelledby={id} className={cn(layout.section, className)}>
-      <h2
-        id={id}
-        className="font-display text-2xl font-semibold tracking-tight md:text-3xl"
-      >
+      <h2 id={id} className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
         {title}
       </h2>
       <div className="text-muted-foreground mt-4 space-y-4 text-lg leading-relaxed">{children}</div>
@@ -140,7 +138,10 @@ export default function AboutPage() {
 
       {/* What makes Tirvea different - callouts */}
       <section aria-labelledby="different" className={layout.section}>
-        <h2 id="different" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
+        <h2
+          id="different"
+          className="font-display text-2xl font-semibold tracking-tight md:text-3xl"
+        >
           What makes Tirvea different
         </h2>
         <p className="text-muted-foreground mt-4 max-w-2xl text-lg leading-relaxed">
@@ -165,11 +166,11 @@ export default function AboutPage() {
           confirm a person matches their photos.
         </p>
         <p className="text-base">
-          <Link href="/legal/identity-verification" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.identityVerification} className="text-foreground underline">
             Identity Verification
           </Link>{" "}
           ·{" "}
-          <Link href="/legal/photo-verification" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.photoVerification} className="text-foreground underline">
             Photo Verification
           </Link>
         </p>
@@ -195,11 +196,11 @@ export default function AboutPage() {
           conversations are private, and you can export or delete your data whenever you choose.
         </p>
         <p className="text-base">
-          <Link href="/legal/privacy" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.privacy} className="text-foreground underline">
             Privacy Policy
           </Link>{" "}
           ·{" "}
-          <Link href="/legal/gdpr" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.gdpr} className="text-foreground underline">
             Your data rights
           </Link>
         </p>
@@ -213,11 +214,11 @@ export default function AboutPage() {
           appeal.
         </p>
         <p className="text-base">
-          <Link href="/legal/ai-moderation" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.aiModeration} className="text-foreground underline">
             AI Moderation Policy
           </Link>{" "}
           ·{" "}
-          <Link href="/legal/trust-safety" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.trustSafety} className="text-foreground underline">
             Trust &amp; Safety
           </Link>
         </p>
@@ -230,11 +231,11 @@ export default function AboutPage() {
           them too.
         </p>
         <p className="text-base">
-          <Link href="/legal/community-guidelines" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.communityGuidelines} className="text-foreground underline">
             Community Guidelines
           </Link>{" "}
           ·{" "}
-          <Link href="/legal/appeals" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.appeals} className="text-foreground underline">
             Appeals
           </Link>
         </p>
@@ -248,7 +249,7 @@ export default function AboutPage() {
           is tightly controlled.
         </p>
         <p className="text-base">
-          <Link href="/legal/security" className="text-foreground underline">
+          <Link href={LEGAL_ROUTES.security} className="text-foreground underline">
             Security Policy
           </Link>
         </p>
@@ -256,14 +257,20 @@ export default function AboutPage() {
 
       {/* Principles */}
       <section aria-labelledby="principles" className={layout.section}>
-        <h2 id="principles" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
+        <h2
+          id="principles"
+          className="font-display text-2xl font-semibold tracking-tight md:text-3xl"
+        >
           Our principles
         </h2>
         <ul className="mt-6 space-y-4">
           {[
             ["Authenticity", "Real people, real photos, real intentions."],
             ["Safety first", "We design for it, and we enforce it."],
-            ["Privacy by design", "We collect only what we need; you stay in control of your data."],
+            [
+              "Privacy by design",
+              "We collect only what we need; you stay in control of your data.",
+            ],
             ["Human judgment", "People, not algorithms, make the decisions that matter."],
             ["Honesty", "We describe what the platform actually does, and flag what it does not."],
           ].map(([title, body]) => (
@@ -280,8 +287,8 @@ export default function AboutPage() {
       <Section id="future" title="Growing with intention">
         <p>
           Tirvea is available today on the web and as a progressive web app, with native iOS and
-          Android apps planned. We are building for people wherever they are; availability, features,
-          and verification services may vary by country or region as we grow.
+          Android apps planned. We are building for people wherever they are; availability,
+          features, and verification services may vary by country or region as we grow.
         </p>
       </Section>
 
@@ -290,7 +297,10 @@ export default function AboutPage() {
         aria-labelledby="company"
         className={cn(layout.section, "border-border/60 border-t pt-10")}
       >
-        <h2 id="company" className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
+        <h2
+          id="company"
+          className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase"
+        >
           Company information
         </h2>
         <div className="text-muted-foreground mt-4 space-y-2 text-sm leading-relaxed">
@@ -300,7 +310,7 @@ export default function AboutPage() {
           <p>
             <Scale className="mr-1.5 inline size-3.5 align-[-2px]" aria-hidden="true" />
             Governing law: Ireland - see the{" "}
-            <Link href="/legal/terms" className="text-foreground underline">
+            <Link href={LEGAL_ROUTES.terms} className="text-foreground underline">
               Terms of Service
             </Link>
             .
@@ -311,7 +321,7 @@ export default function AboutPage() {
               info@tirvea.com
             </a>{" "}
             · All policies in the{" "}
-            <Link href="/legal" className="text-foreground underline">
+            <Link href={LEGAL_HUB} className="text-foreground underline">
               Legal Centre
             </Link>
           </p>

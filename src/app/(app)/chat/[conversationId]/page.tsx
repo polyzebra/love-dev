@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, BadgeCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { VerifiedBadge } from "@/components/shared/verified-badge";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { assertParticipant, markRead, listThreadMessages } from "@/lib/services/chat";
@@ -181,9 +182,9 @@ export default async function ConversationPage({
               <p className="flex items-center gap-1.5 truncate font-semibold">
                 {otherName}
                 {peek.isVerified && (
-                  <BadgeCheck
-                    className="text-card size-4 shrink-0 fill-sky-400"
-                    aria-hidden="true"
+                  <VerifiedBadge
+                    className="shrink-0 text-[16px]"
+                    iconClassName="text-card fill-sky-400"
                   />
                 )}
               </p>

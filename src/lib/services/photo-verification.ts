@@ -514,7 +514,7 @@ export async function applyVerificationOutcome(
   const result = await db.$transaction(async (tx): Promise<ApplyOutcomeResult> => {
     const row = await tx.verification.findFirst({
       where: { type: "PHOTO", provider: providerName, providerSessionId: sessionId },
-      select: { id: true, userId: true, status: true },
+      select: { id: true, userId: true, status: true, galleryVersionAtStart: true },
     });
     if (!row) return { applied: false, reason: "session_not_found" as const, userId: null };
 
@@ -546,6 +546,32 @@ export async function applyVerificationOutcome(
         where: { id: row.userId },
         data: { photoVerifiedAt: new Date() },
       });
+      // L6.5 Phase H (webhook safety): stamp the verified-gallery snapshot
+      // (badge ON) ONLY if the gallery is unchanged since this session started.
+      // If it changed (or a stale/replayed webhook arrives after a material
+      // edit), identity is verified but the photo badge stays withheld pending
+      // reverification - a late webhook can NEVER restore the badge onto a
+      // gallery that moved. A null pin = a session predating the lockdown (no
+      // pin) -> snapshot the current gallery as the baseline.
+      const { snapshotVerifiedGallery } = await import("@/lib/services/gallery-integrity");
+      const u = await tx.user.findUnique({
+        where: { id: row.userId },
+        select: { galleryVersion: true },
+      });
+      const unchanged =
+        row.galleryVersionAtStart == null || u?.galleryVersion === row.galleryVersionAtStart;
+      if (unchanged) {
+        await snapshotVerifiedGallery(tx, row.userId);
+      } else {
+        await tx.user.update({
+          where: { id: row.userId },
+          data: {
+            faceBadgeSuspendedAt: new Date(),
+            photoVerificationInvalidatedAt: new Date(),
+            photoVerificationInvalidationReason: "gallery_changed_during_verification",
+          },
+        });
+      }
     } else if (outcome === "rejected") {
       await tx.user.update({
         where: { id: row.userId },

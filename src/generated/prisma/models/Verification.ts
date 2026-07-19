@@ -20,8 +20,18 @@ export type VerificationModel = runtime.Types.Result.DefaultSelection<Prisma.$Ve
 
 export type AggregateVerification = {
   _count: VerificationCountAggregateOutputType | null
+  _avg: VerificationAvgAggregateOutputType | null
+  _sum: VerificationSumAggregateOutputType | null
   _min: VerificationMinAggregateOutputType | null
   _max: VerificationMaxAggregateOutputType | null
+}
+
+export type VerificationAvgAggregateOutputType = {
+  galleryVersionAtStart: number | null
+}
+
+export type VerificationSumAggregateOutputType = {
+  galleryVersionAtStart: number | null
 }
 
 export type VerificationMinAggregateOutputType = {
@@ -33,6 +43,7 @@ export type VerificationMinAggregateOutputType = {
   providerSessionId: string | null
   reviewedById: string | null
   reviewNote: string | null
+  galleryVersionAtStart: number | null
   statusChangedAt: Date | null
   lastReconciledAt: Date | null
   createdAt: Date | null
@@ -48,6 +59,7 @@ export type VerificationMaxAggregateOutputType = {
   providerSessionId: string | null
   reviewedById: string | null
   reviewNote: string | null
+  galleryVersionAtStart: number | null
   statusChangedAt: Date | null
   lastReconciledAt: Date | null
   createdAt: Date | null
@@ -63,6 +75,7 @@ export type VerificationCountAggregateOutputType = {
   providerSessionId: number
   reviewedById: number
   reviewNote: number
+  galleryVersionAtStart: number
   statusChangedAt: number
   lastReconciledAt: number
   createdAt: number
@@ -70,6 +83,14 @@ export type VerificationCountAggregateOutputType = {
   _all: number
 }
 
+
+export type VerificationAvgAggregateInputType = {
+  galleryVersionAtStart?: true
+}
+
+export type VerificationSumAggregateInputType = {
+  galleryVersionAtStart?: true
+}
 
 export type VerificationMinAggregateInputType = {
   id?: true
@@ -80,6 +101,7 @@ export type VerificationMinAggregateInputType = {
   providerSessionId?: true
   reviewedById?: true
   reviewNote?: true
+  galleryVersionAtStart?: true
   statusChangedAt?: true
   lastReconciledAt?: true
   createdAt?: true
@@ -95,6 +117,7 @@ export type VerificationMaxAggregateInputType = {
   providerSessionId?: true
   reviewedById?: true
   reviewNote?: true
+  galleryVersionAtStart?: true
   statusChangedAt?: true
   lastReconciledAt?: true
   createdAt?: true
@@ -110,6 +133,7 @@ export type VerificationCountAggregateInputType = {
   providerSessionId?: true
   reviewedById?: true
   reviewNote?: true
+  galleryVersionAtStart?: true
   statusChangedAt?: true
   lastReconciledAt?: true
   createdAt?: true
@@ -155,6 +179,18 @@ export type VerificationAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: VerificationAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: VerificationSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: VerificationMinAggregateInputType
@@ -185,6 +221,8 @@ export type VerificationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   _count?: VerificationCountAggregateInputType | true
+  _avg?: VerificationAvgAggregateInputType
+  _sum?: VerificationSumAggregateInputType
   _min?: VerificationMinAggregateInputType
   _max?: VerificationMaxAggregateInputType
 }
@@ -198,11 +236,14 @@ export type VerificationGroupByOutputType = {
   providerSessionId: string | null
   reviewedById: string | null
   reviewNote: string | null
+  galleryVersionAtStart: number | null
   statusChangedAt: Date | null
   lastReconciledAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: VerificationCountAggregateOutputType | null
+  _avg: VerificationAvgAggregateOutputType | null
+  _sum: VerificationSumAggregateOutputType | null
   _min: VerificationMinAggregateOutputType | null
   _max: VerificationMaxAggregateOutputType | null
 }
@@ -234,6 +275,7 @@ export type VerificationWhereInput = {
   providerSessionId?: Prisma.StringNullableFilter<"Verification"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"Verification"> | string | null
   reviewNote?: Prisma.StringNullableFilter<"Verification"> | string | null
+  galleryVersionAtStart?: Prisma.IntNullableFilter<"Verification"> | number | null
   statusChangedAt?: Prisma.DateTimeNullableFilter<"Verification"> | Date | string | null
   lastReconciledAt?: Prisma.DateTimeNullableFilter<"Verification"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
@@ -250,6 +292,7 @@ export type VerificationOrderByWithRelationInput = {
   providerSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  galleryVersionAtStart?: Prisma.SortOrderInput | Prisma.SortOrder
   statusChangedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastReconciledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -270,6 +313,7 @@ export type VerificationWhereUniqueInput = Prisma.AtLeast<{
   providerSessionId?: Prisma.StringNullableFilter<"Verification"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"Verification"> | string | null
   reviewNote?: Prisma.StringNullableFilter<"Verification"> | string | null
+  galleryVersionAtStart?: Prisma.IntNullableFilter<"Verification"> | number | null
   statusChangedAt?: Prisma.DateTimeNullableFilter<"Verification"> | Date | string | null
   lastReconciledAt?: Prisma.DateTimeNullableFilter<"Verification"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
@@ -286,13 +330,16 @@ export type VerificationOrderByWithAggregationInput = {
   providerSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  galleryVersionAtStart?: Prisma.SortOrderInput | Prisma.SortOrder
   statusChangedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastReconciledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VerificationCountOrderByAggregateInput
+  _avg?: Prisma.VerificationAvgOrderByAggregateInput
   _max?: Prisma.VerificationMaxOrderByAggregateInput
   _min?: Prisma.VerificationMinOrderByAggregateInput
+  _sum?: Prisma.VerificationSumOrderByAggregateInput
 }
 
 export type VerificationScalarWhereWithAggregatesInput = {
@@ -307,6 +354,7 @@ export type VerificationScalarWhereWithAggregatesInput = {
   providerSessionId?: Prisma.StringNullableWithAggregatesFilter<"Verification"> | string | null
   reviewedById?: Prisma.StringNullableWithAggregatesFilter<"Verification"> | string | null
   reviewNote?: Prisma.StringNullableWithAggregatesFilter<"Verification"> | string | null
+  galleryVersionAtStart?: Prisma.IntNullableWithAggregatesFilter<"Verification"> | number | null
   statusChangedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Verification"> | Date | string | null
   lastReconciledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Verification"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string
@@ -321,6 +369,7 @@ export type VerificationCreateInput = {
   providerSessionId?: string | null
   reviewedById?: string | null
   reviewNote?: string | null
+  galleryVersionAtStart?: number | null
   statusChangedAt?: Date | string | null
   lastReconciledAt?: Date | string | null
   createdAt?: Date | string
@@ -337,6 +386,7 @@ export type VerificationUncheckedCreateInput = {
   providerSessionId?: string | null
   reviewedById?: string | null
   reviewNote?: string | null
+  galleryVersionAtStart?: number | null
   statusChangedAt?: Date | string | null
   lastReconciledAt?: Date | string | null
   createdAt?: Date | string
@@ -351,6 +401,7 @@ export type VerificationUpdateInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -367,6 +418,7 @@ export type VerificationUncheckedUpdateInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -382,6 +434,7 @@ export type VerificationCreateManyInput = {
   providerSessionId?: string | null
   reviewedById?: string | null
   reviewNote?: string | null
+  galleryVersionAtStart?: number | null
   statusChangedAt?: Date | string | null
   lastReconciledAt?: Date | string | null
   createdAt?: Date | string
@@ -396,6 +449,7 @@ export type VerificationUpdateManyMutationInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -411,6 +465,7 @@ export type VerificationUncheckedUpdateManyInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -441,10 +496,15 @@ export type VerificationCountOrderByAggregateInput = {
   providerSessionId?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewNote?: Prisma.SortOrder
+  galleryVersionAtStart?: Prisma.SortOrder
   statusChangedAt?: Prisma.SortOrder
   lastReconciledAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type VerificationAvgOrderByAggregateInput = {
+  galleryVersionAtStart?: Prisma.SortOrder
 }
 
 export type VerificationMaxOrderByAggregateInput = {
@@ -456,6 +516,7 @@ export type VerificationMaxOrderByAggregateInput = {
   providerSessionId?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewNote?: Prisma.SortOrder
+  galleryVersionAtStart?: Prisma.SortOrder
   statusChangedAt?: Prisma.SortOrder
   lastReconciledAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -471,10 +532,15 @@ export type VerificationMinOrderByAggregateInput = {
   providerSessionId?: Prisma.SortOrder
   reviewedById?: Prisma.SortOrder
   reviewNote?: Prisma.SortOrder
+  galleryVersionAtStart?: Prisma.SortOrder
   statusChangedAt?: Prisma.SortOrder
   lastReconciledAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type VerificationSumOrderByAggregateInput = {
+  galleryVersionAtStart?: Prisma.SortOrder
 }
 
 export type VerificationCreateNestedManyWithoutUserInput = {
@@ -535,6 +601,7 @@ export type VerificationCreateWithoutUserInput = {
   providerSessionId?: string | null
   reviewedById?: string | null
   reviewNote?: string | null
+  galleryVersionAtStart?: number | null
   statusChangedAt?: Date | string | null
   lastReconciledAt?: Date | string | null
   createdAt?: Date | string
@@ -549,6 +616,7 @@ export type VerificationUncheckedCreateWithoutUserInput = {
   providerSessionId?: string | null
   reviewedById?: string | null
   reviewNote?: string | null
+  galleryVersionAtStart?: number | null
   statusChangedAt?: Date | string | null
   lastReconciledAt?: Date | string | null
   createdAt?: Date | string
@@ -593,6 +661,7 @@ export type VerificationScalarWhereInput = {
   providerSessionId?: Prisma.StringNullableFilter<"Verification"> | string | null
   reviewedById?: Prisma.StringNullableFilter<"Verification"> | string | null
   reviewNote?: Prisma.StringNullableFilter<"Verification"> | string | null
+  galleryVersionAtStart?: Prisma.IntNullableFilter<"Verification"> | number | null
   statusChangedAt?: Prisma.DateTimeNullableFilter<"Verification"> | Date | string | null
   lastReconciledAt?: Prisma.DateTimeNullableFilter<"Verification"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
@@ -607,6 +676,7 @@ export type VerificationCreateManyUserInput = {
   providerSessionId?: string | null
   reviewedById?: string | null
   reviewNote?: string | null
+  galleryVersionAtStart?: number | null
   statusChangedAt?: Date | string | null
   lastReconciledAt?: Date | string | null
   createdAt?: Date | string
@@ -621,6 +691,7 @@ export type VerificationUpdateWithoutUserInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -635,6 +706,7 @@ export type VerificationUncheckedUpdateWithoutUserInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -649,6 +721,7 @@ export type VerificationUncheckedUpdateManyWithoutUserInput = {
   providerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryVersionAtStart?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   statusChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastReconciledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -666,6 +739,7 @@ export type VerificationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   providerSessionId?: boolean
   reviewedById?: boolean
   reviewNote?: boolean
+  galleryVersionAtStart?: boolean
   statusChangedAt?: boolean
   lastReconciledAt?: boolean
   createdAt?: boolean
@@ -682,6 +756,7 @@ export type VerificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   providerSessionId?: boolean
   reviewedById?: boolean
   reviewNote?: boolean
+  galleryVersionAtStart?: boolean
   statusChangedAt?: boolean
   lastReconciledAt?: boolean
   createdAt?: boolean
@@ -698,6 +773,7 @@ export type VerificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   providerSessionId?: boolean
   reviewedById?: boolean
   reviewNote?: boolean
+  galleryVersionAtStart?: boolean
   statusChangedAt?: boolean
   lastReconciledAt?: boolean
   createdAt?: boolean
@@ -714,13 +790,14 @@ export type VerificationSelectScalar = {
   providerSessionId?: boolean
   reviewedById?: boolean
   reviewNote?: boolean
+  galleryVersionAtStart?: boolean
   statusChangedAt?: boolean
   lastReconciledAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "status" | "provider" | "providerSessionId" | "reviewedById" | "reviewNote" | "statusChangedAt" | "lastReconciledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["verification"]>
+export type VerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "status" | "provider" | "providerSessionId" | "reviewedById" | "reviewNote" | "galleryVersionAtStart" | "statusChangedAt" | "lastReconciledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["verification"]>
 export type VerificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -745,6 +822,7 @@ export type $VerificationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     providerSessionId: string | null
     reviewedById: string | null
     reviewNote: string | null
+    galleryVersionAtStart: number | null
     statusChangedAt: Date | null
     lastReconciledAt: Date | null
     createdAt: Date
@@ -1181,6 +1259,7 @@ export interface VerificationFieldRefs {
   readonly providerSessionId: Prisma.FieldRef<"Verification", 'String'>
   readonly reviewedById: Prisma.FieldRef<"Verification", 'String'>
   readonly reviewNote: Prisma.FieldRef<"Verification", 'String'>
+  readonly galleryVersionAtStart: Prisma.FieldRef<"Verification", 'Int'>
   readonly statusChangedAt: Prisma.FieldRef<"Verification", 'DateTime'>
   readonly lastReconciledAt: Prisma.FieldRef<"Verification", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Verification", 'DateTime'>

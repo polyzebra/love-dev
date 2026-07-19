@@ -3,6 +3,7 @@ import { PageShell, layout } from "@/components/layout/public";
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { buildMarketingMetadata } from "@/lib/marketing/seo";
+import { LEGAL_HUB } from "@/lib/legal/routes";
 
 export const metadata: Metadata = buildMarketingMetadata({
   title: "Press",
@@ -11,7 +12,15 @@ export const metadata: Metadata = buildMarketingMetadata({
   path: "/press",
 });
 
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section aria-labelledby={id} className={layout.section}>
       <h2 id={id} className="font-display text-2xl font-semibold tracking-tight">
@@ -51,7 +60,10 @@ export default function PressPage() {
           <Fact label="Product" value="Tirvea - premium dating platform" />
           <Fact label="Operator" value="WiseWave Limited" />
           <Fact label="Company number" value="762171 (Ireland)" />
-          <Fact label="Registered office" value="39 Cooley Park, Dundalk, Co. Louth, A91 AP2V, Ireland" />
+          <Fact
+            label="Registered office"
+            value="39 Cooley Park, Dundalk, Co. Louth, A91 AP2V, Ireland"
+          />
           <Fact label="Based in" value="Ireland (EU)" />
           <Fact label="Category" value="Online dating / social" />
           <Fact
@@ -90,11 +102,13 @@ export default function PressPage() {
             <strong>WiseWave Limited</strong>. Please don&apos;t write &quot;Tirvea Ltd&quot; or
             &quot;Tirvea Limited&quot;.
           </li>
-          <li>Use the supplied logo files; please don&apos;t recolour, stretch, or alter the mark.</li>
+          <li>
+            Use the supplied logo files; please don&apos;t recolour, stretch, or alter the mark.
+          </li>
           <li>Leave clear space around the logo and keep it legible at small sizes.</li>
           <li>
-            &quot;Tirvea&quot; is a trademark of WiseWave Limited; please use it as an adjective with
-            the product name, not as a verb.
+            &quot;Tirvea&quot; is a trademark of WiseWave Limited; please use it as an adjective
+            with the product name, not as a verb.
           </li>
         </ul>
       </Section>
@@ -114,7 +128,7 @@ export default function PressPage() {
             About page
           </Link>{" "}
           and the{" "}
-          <Link href="/legal" className="text-foreground underline">
+          <Link href={LEGAL_HUB} className="text-foreground underline">
             Legal Centre
           </Link>
           .

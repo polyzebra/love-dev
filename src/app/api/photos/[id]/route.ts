@@ -2,6 +2,10 @@ import { notFound, ok, requireSession } from "@/lib/api";
 import { db } from "@/lib/db";
 import { deletePhotoObjects } from "@/lib/services/photos";
 import { resolveCasesForDeletedPhoto } from "@/lib/services/trust-safety";
+import {
+  invalidateBadgeOnGalleryChange,
+  recordGalleryInvalidationSideEffects,
+} from "@/lib/services/gallery-integrity";
 import { after } from "next/server";
 
 type Params = { params: Promise<{ id: string }> };
@@ -27,29 +31,38 @@ export async function DELETE(_req: Request, { params }: Params) {
     // Storage not configured or transient error - row removal still proceeds.
   }
 
-  await db.photo.delete({ where: { id: photo.id } });
+  // L6.5: delete the row, promote a new cover if needed, AND invalidate the
+  // verified badge - all in ONE transaction. Deleting any visible photo is a
+  // material gallery change, so the blue badge drops immediately (before this
+  // response) until reverification. `cover_changed` when the cover went.
+  const reason = photo.isCover ? ("cover_changed" as const) : ("photo_deleted" as const);
+  await db.$transaction(async (tx) => {
+    await tx.photo.delete({ where: { id: photo.id } });
+    if (photo.isCover) {
+      const next = await tx.photo.findFirst({
+        where: { userId: user.id },
+        orderBy: { position: "asc" },
+        select: { id: true },
+      });
+      if (next) {
+        await tx.photo.update({ where: { id: next.id }, data: { isCover: true } });
+      }
+    }
+    await invalidateBadgeOnGalleryChange(user.id, reason, { tx });
+  });
 
   // Edge case: photo deleted mid-review - auto-resolve moderation cases
   // whose subject was exactly this photo (trust-safety.ts).
   await resolveCasesForDeletedPhoto(photo.id).catch(() => undefined);
 
-  // If the cover was removed, promote the photo now first in line.
-  if (photo.isCover) {
-    const next = await db.photo.findFirst({
-      where: { userId: user.id },
-      orderBy: { position: "asc" },
-      select: { id: true },
-    });
-    if (next) {
-      await db.photo.update({ where: { id: next.id }, data: { isCover: true } });
-    }
-  }
+  // Best-effort side effects after the badge-off commit (dormant grant + audit).
+  await recordGalleryInvalidationSideEffects(user.id, reason);
 
-  // Deleting the cover promotes a new one - the face layer must re-verify
-  // the NEW cover before the badge can rest on it.
+  // The face layer must re-verify the current gallery before the badge can
+  // rest on it again (dormant-safe; runs post-response).
   const { onProfilePhotosChanged, runProfilePhotoVerification } =
     await import("@/lib/services/face-verification");
-  await onProfilePhotosChanged(user.id, photo.isCover ? "cover_changed" : "photo_deleted");
+  await onProfilePhotosChanged(user.id, reason);
   after(() => runProfilePhotoVerification(user.id));
 
   return ok({ deleted: true });

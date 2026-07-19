@@ -6,8 +6,10 @@ import { usePathname } from "next/navigation";
 import { Check, Link2, Printer } from "lucide-react";
 import { LEGAL_COMPANY, legalDocByPath, legalDocNeighbours } from "@/lib/legal/registry";
 import { slugify } from "@/lib/legal/markdown";
+import { siteUrl } from "@/lib/auth/url";
 import { layout } from "@/components/layout/public";
 import { cn } from "@/lib/utils";
+import { LEGAL_HUB } from "@/lib/legal/routes";
 
 const NON_REGISTRY_LABELS: Record<string, string> = {
   "/safety": "Safety Centre",
@@ -111,6 +113,8 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
 
   const doc = legalDocByPath(pathname);
   const { prev, next } = legalDocNeighbours(pathname);
+  // SEO-2: absolute base for JSON-LD (the ONE canonical site URL).
+  const legalOrigin = siteUrl().replace(/\/$/, "");
 
   const copyLink = async () => {
     try {
@@ -138,9 +142,9 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
               onClick={onNavigate}
               aria-current={active ? "location" : undefined}
               className={
-                "block rounded-r border-l-2 py-1 pl-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 " +
+                "focus-visible:ring-foreground/20 block rounded-r border-l-2 py-1 pl-3 transition-colors focus-visible:ring-2 focus-visible:outline-none " +
                 (active
-                  ? "border-primary-soft bg-muted/50 font-semibold text-foreground"
+                  ? "border-primary-soft bg-muted/50 text-foreground font-semibold"
                   : "border-border/50 text-muted-foreground hover:border-foreground/40 hover:text-foreground")
               }
             >
@@ -153,7 +157,15 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className={cn("mx-auto", layout.wide, layout.paddingX, layout.paddingTop, layout.paddingBottom)}>
+    <div
+      className={cn(
+        "mx-auto",
+        layout.wide,
+        layout.paddingX,
+        layout.paddingTop,
+        layout.paddingBottom,
+      )}
+    >
       {/* Breadcrumbs + schema */}
       <nav aria-label="Breadcrumb" className="text-muted-foreground mb-6 text-xs print:hidden">
         <ol className="flex flex-wrap items-center gap-1.5">
@@ -166,7 +178,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
             /
           </li>
           <li>
-            <Link href="/legal" className="hover:text-foreground transition-colors">
+            <Link href={LEGAL_HUB} className="hover:text-foreground transition-colors">
               Legal Centre
             </Link>
           </li>
@@ -190,10 +202,23 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "BreadcrumbList",
+              // SEO-2 (L7.2): schema.org ListItem.item MUST be absolute - raw
+              // JSON-LD is not resolved against metadataBase. Built from the ONE
+              // canonical siteUrl().
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-                { "@type": "ListItem", position: 2, name: "Legal Centre", item: "/legal" },
-                { "@type": "ListItem", position: 3, name: doc.title, item: doc.path },
+                { "@type": "ListItem", position: 1, name: "Home", item: `${legalOrigin}/` },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Legal Centre",
+                  item: `${legalOrigin}${LEGAL_HUB}`,
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: doc.title,
+                  item: `${legalOrigin}${doc.path}`,
+                },
               ],
             }),
           }}
@@ -291,7 +316,10 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
                           aria-current="page"
                           className="text-primary-soft inline-flex items-center gap-2 text-sm font-semibold"
                         >
-                          <span aria-hidden className="bg-primary-soft size-1.5 shrink-0 rounded-full" />
+                          <span
+                            aria-hidden
+                            className="bg-primary-soft size-1.5 shrink-0 rounded-full"
+                          />
                           {relatedTitle(r)}
                           <span className="text-muted-foreground text-xs font-normal">
                             Currently viewing
@@ -300,12 +328,12 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
                       ) : (
                         <Link
                           href={r}
-                          className="text-foreground/80 hover:text-foreground group inline-flex items-center gap-1.5 rounded text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                          className="text-foreground/80 hover:text-foreground group focus-visible:ring-foreground/20 inline-flex items-center gap-1.5 rounded text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
                         >
                           {relatedTitle(r)}
                           <span
                             aria-hidden
-                            className="text-foreground/40 group-hover:text-foreground/70 motion-safe:transition-transform group-hover:translate-x-0.5"
+                            className="text-foreground/40 group-hover:text-foreground/70 group-hover:translate-x-0.5 motion-safe:transition-transform"
                           >
                             &rarr;
                           </span>
@@ -354,13 +382,13 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
               {prev ? (
                 <Link
                   href={prev.path}
-                  className="group border-border/50 hover:border-foreground/25 hover:bg-muted/30 rounded-xl border p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                  className="group border-border/50 hover:border-foreground/25 hover:bg-muted/30 focus-visible:ring-foreground/20 rounded-xl border p-4 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <span className="text-foreground/40 text-xs">Previous</span>
                   <span className="text-foreground/80 group-hover:text-foreground mt-1 flex items-center gap-1.5 text-sm font-medium">
                     <span
                       aria-hidden
-                      className="motion-safe:transition-transform group-hover:-translate-x-0.5"
+                      className="group-hover:-translate-x-0.5 motion-safe:transition-transform"
                     >
                       &larr;
                     </span>
@@ -373,14 +401,14 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
               {next ? (
                 <Link
                   href={next.path}
-                  className="group border-border/50 hover:border-foreground/25 hover:bg-muted/30 rounded-xl border p-4 text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 sm:col-start-2"
+                  className="group border-border/50 hover:border-foreground/25 hover:bg-muted/30 focus-visible:ring-foreground/20 rounded-xl border p-4 text-right transition-colors focus-visible:ring-2 focus-visible:outline-none sm:col-start-2"
                 >
                   <span className="text-foreground/40 text-xs">Next</span>
                   <span className="text-foreground/80 group-hover:text-foreground mt-1 flex items-center justify-end gap-1.5 text-sm font-medium">
                     {next.title}
                     <span
                       aria-hidden
-                      className="motion-safe:transition-transform group-hover:translate-x-0.5"
+                      className="group-hover:translate-x-0.5 motion-safe:transition-transform"
                     >
                       &rarr;
                     </span>
@@ -392,7 +420,7 @@ export function LegalChrome({ children }: { children: React.ReactNode }) {
 
           <div className="mt-14 print:hidden">
             <Link
-              href="/legal"
+              href={LEGAL_HUB}
               className="text-muted-foreground hover:text-foreground text-sm transition-colors"
             >
               &larr; Back to Legal Centre

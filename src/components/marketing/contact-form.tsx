@@ -13,8 +13,11 @@ import {
   SUPPORT_LIMITS,
   supportRequestSchema,
 } from "@/lib/support/schema";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 
-type FieldErrors = Partial<Record<"name" | "email" | "category" | "message" | "accountEmail", string>>;
+type FieldErrors = Partial<
+  Record<"name" | "email" | "category" | "message" | "accountEmail", string>
+>;
 type Status = "idle" | "submitting" | "success" | "error";
 
 const inputClass = "h-12";
@@ -59,7 +62,8 @@ export function ContactForm() {
       const firstInvalid = (["name", "email", "category", "message", "accountEmail"] as const).find(
         (k) => fieldErrors[k],
       );
-      if (firstInvalid) formRef.current?.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
+      if (firstInvalid)
+        formRef.current?.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
       return;
     }
     setErrors({});
@@ -71,9 +75,10 @@ export function ContactForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
-      const json = (await res.json().catch(() => null)) as
-        | { data?: { ok?: boolean; id?: string }; error?: { message?: string } }
-        | null;
+      const json = (await res.json().catch(() => null)) as {
+        data?: { ok?: boolean; id?: string };
+        error?: { message?: string };
+      } | null;
       if (res.ok && json?.data?.ok) {
         setTicketId(json.data.id ?? null);
         setStatus("success");
@@ -101,15 +106,17 @@ export function ContactForm() {
         className="border-border rounded-3xl border p-8 text-center"
       >
         <CheckCircle2 className="text-success mx-auto size-12" aria-hidden="true" />
-        <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight">Message received</h2>
+        <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight">
+          Message received
+        </h2>
         <p className="text-muted-foreground mx-auto mt-2 max-w-md leading-relaxed">
           Thanks - your message has been logged and a person will read it. We&apos;ll reply to the
           email you gave us.
           {ticketId ? (
             <>
               {" "}
-              Your reference is <span className="text-foreground font-mono text-sm">{ticketId}</span>
-              .
+              Your reference is{" "}
+              <span className="text-foreground font-mono text-sm">{ticketId}</span>.
             </>
           ) : null}
         </p>
@@ -228,7 +235,9 @@ export function ContactForm() {
           </Label>
           <span
             className={
-              messageLen > SUPPORT_LIMITS.message.max ? "text-destructive text-xs" : "text-muted-foreground text-xs"
+              messageLen > SUPPORT_LIMITS.message.max
+                ? "text-destructive text-xs"
+                : "text-muted-foreground text-xs"
             }
             aria-live="polite"
           >
@@ -257,14 +266,21 @@ export function ContactForm() {
         <input id={`${uid}-website`} name="website" tabIndex={-1} autoComplete="off" />
       </div>
 
-      <Button type="submit" size="lg" className="h-12 w-full rounded-full" disabled={status === "submitting"}>
-        {status === "submitting" ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+      <Button
+        type="submit"
+        size="lg"
+        className="h-12 w-full rounded-full"
+        disabled={status === "submitting"}
+      >
+        {status === "submitting" ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : null}
         {status === "submitting" ? "Sending…" : "Send message"}
       </Button>
 
       <p className="text-muted-foreground text-xs leading-relaxed">
         By sending this form you agree to our{" "}
-        <a href="/legal/privacy" className="underline">
+        <a href={LEGAL_ROUTES.privacy} className="underline">
           Privacy Policy
         </a>
         . We use your details only to answer your request. This form is protected against spam and

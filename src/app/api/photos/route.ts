@@ -4,6 +4,10 @@ import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { moderatePhoto } from "@/lib/services/moderation";
 import { assertUploadAllowed } from "@/lib/services/trust-safety";
+import {
+  invalidateBadgeOnGalleryChange,
+  recordGalleryInvalidationSideEffects,
+} from "@/lib/services/gallery-integrity";
 import { after } from "next/server";
 import {
   deletePhotoObjects,
@@ -132,50 +136,59 @@ export async function POST(req: Request) {
     });
     const position = (last?.position ?? -1) + 1;
 
-    const photo = await db.photo.create({
-      data: {
-        // Row id == storage id, so /api/media/{photoId}/{variant} and
-        // users/{uid}/photos/{photoId}/ address the same photo.
-        id: uploaded.photoId,
-        userId: user.id,
-        // Stored URLs are relative proxy paths - the private bucket is only
-        // reachable through GET /api/media/[photoId]/[variant].
-        url: photoProxyPath(uploaded.photoId, "card"),
-        thumbUrl: photoProxyPath(uploaded.photoId, "thumb"),
-        galleryUrl: photoProxyPath(uploaded.photoId, "gallery"),
-        fullUrl: photoProxyPath(uploaded.photoId, "full"),
-        storagePath: uploaded.storagePath,
-        blurDataUrl,
-        blurhash: processed.blurhash,
-        dominantColor: processed.dominantColor,
-        mimeType: file.type,
-        sizeBytes: file.size,
-        width: processed.width,
-        height: processed.height,
-        position,
-        // The very first photo is automatically the profile cover.
-        isCover: position === 0,
-        // ACTIVE for now: the moderation phase lands next and will own the
-        // PROCESSING -> ACTIVE/REJECTED transition.
-        status: "ACTIVE",
-      },
-      select: {
-        id: true,
-        url: true,
-        thumbUrl: true,
-        galleryUrl: true,
-        fullUrl: true,
-        blurDataUrl: true,
-        blurhash: true,
-        dominantColor: true,
-        width: true,
-        height: true,
-        position: true,
-        isCover: true,
-        status: true,
-        moderation: true,
-        createdAt: true,
-      },
+    // L6.5: create the row AND invalidate the verified badge in ONE
+    // transaction - a new photo is a material gallery change, so the blue
+    // badge must drop immediately (before this response) until reverification.
+    const photo = await db.$transaction(async (tx) => {
+      const createdPhoto = await tx.photo.create({
+        data: {
+          // Row id == storage id, so /api/media/{photoId}/{variant} and
+          // users/{uid}/photos/{photoId}/ address the same photo.
+          id: uploaded.photoId,
+          userId: user.id,
+          // Stored URLs are relative proxy paths - the private bucket is only
+          // reachable through GET /api/media/[photoId]/[variant].
+          url: photoProxyPath(uploaded.photoId, "card"),
+          thumbUrl: photoProxyPath(uploaded.photoId, "thumb"),
+          galleryUrl: photoProxyPath(uploaded.photoId, "gallery"),
+          fullUrl: photoProxyPath(uploaded.photoId, "full"),
+          storagePath: uploaded.storagePath,
+          blurDataUrl,
+          blurhash: processed.blurhash,
+          dominantColor: processed.dominantColor,
+          mimeType: file.type,
+          sizeBytes: file.size,
+          width: processed.width,
+          height: processed.height,
+          position,
+          // The very first photo is automatically the profile cover.
+          isCover: position === 0,
+          // ACTIVE for now: the moderation phase lands next and will own the
+          // PROCESSING -> ACTIVE/REJECTED transition.
+          status: "ACTIVE",
+        },
+        select: {
+          id: true,
+          url: true,
+          thumbUrl: true,
+          galleryUrl: true,
+          fullUrl: true,
+          blurDataUrl: true,
+          blurhash: true,
+          dominantColor: true,
+          width: true,
+          height: true,
+          position: true,
+          isCover: true,
+          status: true,
+          moderation: true,
+          createdAt: true,
+        },
+      });
+      // L6.5: a new photo is a material gallery change - drop the verified
+      // badge synchronously, in the same transaction as the create.
+      await invalidateBadgeOnGalleryChange(user.id, "photo_uploaded", { tx });
+      return createdPhoto;
     });
 
     // Automated moderation: picks a provider by env (external when
@@ -183,6 +196,10 @@ export async function POST(req: Request) {
     // applies the verdict to Photo.status / Photo.moderation transactionally
     // and records a PhotoModerationEvent. Never throws for provider failures.
     await moderatePhoto(photo.id);
+
+    // Best-effort side effects after the badge-off commit (clear the dormant
+    // positive grant + audit). Never rolls back the invalidation.
+    await recordGalleryInvalidationSideEffects(user.id, "photo_uploaded");
 
     // Profile-photo verification (face layer): a NEW photo of a verified
     // user re-enters review before its face-check verdict exists. Cheap

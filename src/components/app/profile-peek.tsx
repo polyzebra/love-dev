@@ -104,7 +104,7 @@ export function ProfilePeek({
                     {/* Explicit string: the compiler strips the leading space
                         of JSX text following an expression at a line end. */}
                     {profile.displayName}
-                    {" passed photo verification"}
+                    {" is a verified member"}
                   </li>
                 )}
               </ul>

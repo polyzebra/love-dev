@@ -950,14 +950,6 @@ export type ProfileNullableScalarRelationFilter = {
   isNot?: Prisma.ProfileWhereInput | null
 }
 
-export type StringNullableListFilter<$PrismaModel = never> = {
-  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
-  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
-  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
-  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
 export type EnumGenderNullableListFilter<$PrismaModel = never> = {
   equals?: $Enums.Gender[] | Prisma.ListEnumGenderFieldRefInput<$PrismaModel> | null
   has?: $Enums.Gender | Prisma.EnumGenderFieldRefInput<$PrismaModel> | null
@@ -1155,14 +1147,6 @@ export type ProfileCreateinterestedInInput = {
 
 export type EnumGenderFieldUpdateOperationsInput = {
   set?: $Enums.Gender
-}
-
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type EnumRelationshipGoalFieldUpdateOperationsInput = {

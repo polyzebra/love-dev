@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeleteAccountButton, ExportDataButton } from "@/components/app/privacy-actions";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 
 export const metadata: Metadata = { title: "Privacy Centre" };
 
@@ -80,7 +81,7 @@ export default async function PrivacySettingsPage() {
 
         <p className="text-muted-foreground text-center text-xs">
           Questions? Read our{" "}
-          <Link href="/legal/privacy" className="underline underline-offset-2">
+          <Link href={LEGAL_ROUTES.privacy} className="underline underline-offset-2">
             Privacy Policy
           </Link>{" "}
           or email info@tirvea.com

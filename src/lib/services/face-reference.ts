@@ -445,13 +445,19 @@ export async function onFaceViolationReversed(
     select: { id: true, status: true },
   });
   if (!job) return;
-  await db.$transaction([
-    db.profilePhotoVerification.update({
+  await db.$transaction(async (tx) => {
+    await tx.profilePhotoVerification.update({
       where: { id: job.id },
       data: { status: "AUTO_VERIFIED", badgeStatus: "ACTIVE", duplicateClass: "UNKNOWN" },
-    }),
-    db.user.update({ where: { id: userId }, data: { faceBadgeSuspendedAt: null } }),
-  ]);
+    });
+    // F-1 (L6.7.1): restore the badge ONLY through the canonical snapshot -
+    // re-stamps galleryVersion/verifiedGalleryVersion/verifiedPhotoIds/hash/
+    // cover AND clears the suspension. Never a bare faceBadgeSuspendedAt write,
+    // so an appeal reversal can never restore a badge onto a gallery that has
+    // since diverged (the version gate stays authoritative).
+    const { snapshotVerifiedGallery } = await import("@/lib/services/gallery-integrity");
+    await snapshotVerifiedGallery(tx, userId);
+  });
   await recordVerificationAudit({
     userId,
     verificationId: job.id,

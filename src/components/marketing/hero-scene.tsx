@@ -171,7 +171,7 @@ export function HeroScene() {
               Saoirse, 29
               <motion.span
                 role="img"
-                aria-label="Photo verified"
+                aria-label="Verified"
                 initial={reduced ? false : { scale: 0, rotate: -30 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15, delay: 1.1 }}

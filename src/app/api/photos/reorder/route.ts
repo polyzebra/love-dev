@@ -2,6 +2,10 @@ import { z } from "zod";
 import { apiError, ok, parseBody, requireSession } from "@/lib/api";
 import { PHOTO_LIMITS } from "@/lib/constants";
 import { db } from "@/lib/db";
+import {
+  invalidateBadgeOnGalleryChange,
+  recordGalleryInvalidationSideEffects,
+} from "@/lib/services/gallery-integrity";
 import { after } from "next/server";
 
 const reorderSchema = z.object({
@@ -39,20 +43,27 @@ export async function PATCH(req: Request) {
     return apiError(400, "invalid_order", "Provide every photo id you own, exactly once.");
   }
 
-  await db.$transaction(
-    data.order.map((id, index) =>
-      db.photo.update({
-        where: { id },
-        data: { position: index, isCover: index === 0 },
-      }),
-    ),
-  );
-
-  // Reorder can crown a NEW cover (index 0) - re-verify before the badge
-  // rests on it; unchanged photo versions keep their stored verdicts. Only a
-  // genuine cover change signals "cover_changed" (which withholds the badge);
-  // a pure gallery reorder must not suspend a harmless edit (F2 / Phase 5).
+  // Reorder can crown a NEW cover (index 0). A genuine cover change is a
+  // MATERIAL gallery change and MUST drop the badge; a pure reorder (same set,
+  // same cover) is the one product-policy-allowed non-material change and keeps
+  // it. Both the position writes AND the invalidation commit in ONE transaction.
   const coverChanged = data.order[0] !== prevCoverId;
+  await db.$transaction(async (tx) => {
+    for (let index = 0; index < data.order.length; index++) {
+      await tx.photo.update({
+        where: { id: data.order[index] },
+        data: { position: index, isCover: index === 0 },
+      });
+    }
+    if (coverChanged) {
+      await invalidateBadgeOnGalleryChange(user.id, "cover_changed", { tx });
+    }
+  });
+
+  if (coverChanged) {
+    await recordGalleryInvalidationSideEffects(user.id, "cover_changed");
+  }
+
   const { onProfilePhotosChanged, runProfilePhotoVerification } =
     await import("@/lib/services/face-verification");
   await onProfilePhotosChanged(user.id, coverChanged ? "cover_changed" : "photos_reordered");

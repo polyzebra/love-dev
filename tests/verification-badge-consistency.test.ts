@@ -40,11 +40,21 @@ async function main() {
     "isPubliclyVerified: verified+not-suspended -> true; verified+suspended -> false",
     () => {
       assert.equal(
-        isPubliclyVerified({ photoVerifiedAt: VERIFIED, faceBadgeSuspendedAt: null }),
+        isPubliclyVerified({
+          photoVerifiedAt: VERIFIED,
+          faceBadgeSuspendedAt: null,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
         true,
       );
       assert.equal(
-        isPubliclyVerified({ photoVerifiedAt: VERIFIED, faceBadgeSuspendedAt: SUSPENDED }),
+        isPubliclyVerified({
+          photoVerifiedAt: VERIFIED,
+          faceBadgeSuspendedAt: SUSPENDED,
+          galleryVersion: 0,
+          verifiedGalleryVersion: 0,
+        }),
         false,
       );
     },
@@ -127,14 +137,14 @@ async function main() {
     assert.equal(deriveVerificationPresentation("verified", null), "verified");
   });
 
-  await check("status row: requires_reverification -> needs-action + 'Verify again'", () => {
+  await check("status row: requires_reverification -> needs-action + 'Verify Photos'", () => {
     const row = photoVerificationRow("requires_reverification", {
       configured: true,
       surface: "profile",
     });
     assert.equal(row.state, "needs-action");
-    assert.equal(row.value, "Photos changed - verify again");
-    assert.equal(row.action?.label, "Verify again");
+    assert.equal(row.value, "Your profile photos changed");
+    assert.equal(row.action?.label, "Verify Photos");
     assert.ok(row.action?.href.endsWith("#photo-verification"));
     // The verified state stays clean (badge, no action).
     assert.equal(

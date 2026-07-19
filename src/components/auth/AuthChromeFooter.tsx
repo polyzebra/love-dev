@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 
 /**
  * The auth-chrome legal footer. It is the ONE legal notice for the step
@@ -18,11 +19,17 @@ export function AuthChromeFooter() {
   return (
     <footer className="safe-bottom text-muted-foreground relative pb-6 text-center text-xs">
       By continuing you agree to our{" "}
-      <Link href="/legal/terms" className="hover:text-foreground underline underline-offset-2">
+      <Link
+        href={LEGAL_ROUTES.terms}
+        className="hover:text-foreground underline underline-offset-2"
+      >
         Terms
       </Link>{" "}
       and{" "}
-      <Link href="/legal/privacy" className="hover:text-foreground underline underline-offset-2">
+      <Link
+        href={LEGAL_ROUTES.privacy}
+        className="hover:text-foreground underline underline-offset-2"
+      >
         Privacy Policy
       </Link>
       .

@@ -25,7 +25,7 @@ import {
 } from "@/lib/services/face-verification";
 import { createBoundLivenessSession, consumeLivenessFlow } from "@/lib/services/face-liveness";
 import { bumpPhotoMediaVersion } from "@/lib/services/photos";
-import { isIdentityVerified } from "@/lib/verification-presentation";
+import { isIdentityVerified } from "@/lib/services/verification";
 
 /**
  * Epic 5 - THE canonical internal-rehearsal controller. It exercises the entire

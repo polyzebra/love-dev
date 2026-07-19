@@ -5,19 +5,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { toast } from "sonner";
-import {
-  BadgeCheck,
-  Heart,
-  MapPin,
-  MessageCircle,
-  Quote,
-  RotateCcw,
-  Sparkles,
-  Star,
-  X,
-} from "lucide-react";
+import { Heart, MapPin, MessageCircle, Quote, RotateCcw, Sparkles, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OnlineDot } from "@/components/shared/online-dot";
+import { VerifiedBadge } from "@/components/shared/verified-badge";
 import { PhotoFrame } from "@/components/shared/photo-frame";
 import { SafetyMenu } from "@/components/shared/safety-menu";
 import { emitInteraction } from "@/lib/interaction-events";
@@ -425,13 +416,15 @@ export function ExploreProfileViewer({
                 {profile.displayName}, {profile.age}
               </span>
               {profile.isVerified && (
-                <span
-                  role="img"
-                  aria-label="Photo verified"
-                  className="relative flex items-center justify-center"
-                >
-                  <span className="animate-ping-soft absolute size-6 rounded-full bg-sky-400/25" />
-                  <BadgeCheck className="relative size-6 fill-sky-400 text-white" />
+                <span className="relative flex items-center justify-center">
+                  <span
+                    className="animate-ping-soft absolute size-6 rounded-full bg-sky-400/25"
+                    aria-hidden="true"
+                  />
+                  <VerifiedBadge
+                    className="relative text-[22px]"
+                    iconClassName="fill-sky-400 text-white"
+                  />
                 </span>
               )}
               <OnlineDot online={profile.isOnline} className="ml-1" />
