@@ -35,6 +35,13 @@
     "test:visual:report": "playwright show-report",
     "db:validate": "prisma validate && prisma generate && git diff --exit-code --stat src/generated",
     "db:apply-migration": "tsx scripts/db-apply-migration.ts",
+    "db:migrate:status": "node scripts/release/migrate-status.mjs",
+    "db:migrate:deploy": "node scripts/release/migrate-deploy.mjs",
+    "db:schema:verify": "node scripts/release/schema-verify.mjs",
+    "release:preflight": "node scripts/release/preflight.mjs",
+    "release:build": "npm run release:preflight && npm run build",
+    "release:smoke": "node scripts/release/smoke.mjs",
+    "release:production": "node scripts/release/production.mjs",
     "check:public-env": "node scripts/check-public-env.mjs",
     "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check && npm run test:visual"
   },

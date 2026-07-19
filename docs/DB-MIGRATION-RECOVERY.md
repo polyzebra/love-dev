@@ -64,10 +64,20 @@ port 5432 — the pooler hangs the Prisma CLI on this project):
    the session cookie is set, redirect proceeds, and the logs show **no P2022 /
    no auth_unavailable**.
 
-## Deploy-order enforcement (do this once, permanently)
+## Deploy-order enforcement (implemented — L7.3.7)
 
-The active delivery path (Vercel git auto-deploy) builds the app but does **not**
-run migrations; the CI-gated deploy that would is inactive. **Add a release step
-that runs `prisma migrate deploy` against `DIRECT_URL` before the app goes live**
-(activate the CI-gated deploy, or a Vercel release/predeploy hook). Until then,
-run step 4 manually on every schema-changing deploy.
+The migration-gated release now exists: the CI `deploy` job runs
+`npm run release:production` (preflight → `migrate deploy` on `DIRECT_URL` →
+schema verify) **before** building/promoting the same commit, then smokes it —
+so migrations always run before the app is activated. It is serialized by a
+`production-release` concurrency lock and stays **inactive** until the operator
+adds the Vercel + `PROD_DATABASE_URL`/`PROD_DIRECT_URL` secrets and sets
+`CI_DEPLOYS_ONLY=1`. Full contract, activation order, and rollback:
+[RELEASE.md](RELEASE.md).
+
+Until activation, the git-push path does not run migrations — so run the gate
+manually on every schema-changing deploy:
+
+```
+DATABASE_URL="$DIRECT_URL" npm run release:production   # or the 3 db:* scripts
+```

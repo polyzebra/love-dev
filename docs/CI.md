@@ -47,13 +47,21 @@ changed no production behaviour:
    Preview builds are never affected. Unset the var to instantly restore
    git auto-deploys (rollback is a dashboard toggle, no code change).
 2. The workflow's `deploy` job runs only on push to `main`, **needs every
-   other job green**, and deploys via the Vercel CLI
-   (`vercel pull/build/deploy --prebuilt --prod`). If `VERCEL_TOKEN` is
-   not configured it exits with a notice instead of failing.
+   other job green**, is serialized by a `production-release` concurrency
+   lock, and is **migration-gated**: it runs `npm run release:production`
+   (preflight → `migrate deploy` on `DIRECT_URL` → schema verify) **before**
+   building/promoting the same commit (`vercel deploy --prebuilt --prod`),
+   then smokes the live deployment. Migrations always run before the app is
+   activated — the fix for the L7.3.x incident. If `VERCEL_TOKEN` or
+   `PROD_DIRECT_URL` is absent it exits with a notice instead of failing.
 
-Activation order (do not reverse): add the three Vercel secrets → watch
-one green `deploy` job ship successfully → then set `CI_DEPLOYS_ONLY=1`.
-From that moment a red check blocks production.
+The full contract, scripts, rollback, and smoke procedure live in
+[RELEASE.md](RELEASE.md); secret rotation in [SECRET-ROTATION.md](SECRET-ROTATION.md).
+
+Activation order (do not reverse): add the Vercel + `PROD_DATABASE_URL` /
+`PROD_DIRECT_URL` secrets → watch one green `deploy` job ship end-to-end
+(gate → build → deploy → smoke) → then set `CI_DEPLOYS_ONLY=1`. From that
+moment a red check blocks production.
 
 ## Required CI environment (names only — never commit values)
 
@@ -64,6 +72,10 @@ GitHub repository secrets:
 | `VERCEL_TOKEN`                 | Vercel CLI auth for the gated deploy                                | deploy job                |
 | `VERCEL_ORG_ID`                | Vercel scope                                                        | deploy job                |
 | `VERCEL_PROJECT_ID`            | Vercel project                                                      | deploy job                |
+| `PROD_DATABASE_URL`            | production runtime pooler URL (migration same-project check)        | deploy job (DB gate)      |
+| `PROD_DIRECT_URL`              | production DIRECT_URL (`:5432`) — Prisma Migrate target             | deploy job (DB gate)      |
+| `PROD_SUPABASE_URL`            | production Supabase URL for the post-deploy smoke OTP e2e           | deploy job (smoke, opt.)  |
+| `PROD_SUPABASE_SERVICE_ROLE_KEY` | production service-role key for the smoke OTP e2e                 | deploy job (smoke, opt.)  |
 | `CI_SUPABASE_URL`              | throwaway/staging Supabase project URL                              | live test lane (optional) |
 | `CI_SUPABASE_ANON_KEY`         | its anon key                                                        | live test lane (optional) |
 | `CI_SUPABASE_SERVICE_ROLE_KEY` | its service-role key — use a dedicated CI project, never production | live test lane (optional) |

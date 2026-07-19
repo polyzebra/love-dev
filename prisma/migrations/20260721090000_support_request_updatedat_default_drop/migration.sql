@@ -1,0 +1,14 @@
+-- Corrective (L7.3.7 release-gate hardening). The 20260720060000_support_requests
+-- migration created "SupportRequest"."updatedAt" with a DB-level
+-- DEFAULT CURRENT_TIMESTAMP - unlike every other @updatedAt column in the
+-- schema, where Prisma manages the value application-side and no DB default
+-- exists. That drifted the production database from the Prisma datamodel
+-- (`prisma migrate diff --from-config-datasource --to-schema` flagged exactly
+-- this: SupportRequest.updatedAt default Now -> None). Drop the default so
+-- migration history reproduces the schema exactly and the CI drift gate is green.
+--
+-- Behaviour-preserving: `updatedAt DateTime @updatedAt` means Prisma always
+-- writes updatedAt on create and update; the DB default only ever applied to
+-- raw inserts, which the app does not perform for SupportRequest. Idempotent:
+-- DROP DEFAULT on a column without one is a no-op.
+ALTER TABLE "SupportRequest" ALTER COLUMN "updatedAt" DROP DEFAULT;

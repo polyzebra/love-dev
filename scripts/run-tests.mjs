@@ -94,6 +94,8 @@ const UNIT = new Set([
   "link-integrity.test.ts",
   "prisma-migration-drift.test.ts",
   "migration-portability.test.ts",
+  "release-gate.test.ts",
+  "release-governance.test.ts",
   "seo-integrity.test.ts",
 ]);
 

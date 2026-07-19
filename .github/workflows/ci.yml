@@ -89,10 +89,14 @@ jobs:
       - name: Migrations replay cleanly onto an empty database
         run: npx prisma migrate deploy
       - name: Migration history reproduces the schema exactly
+        # Prisma 7.8 flags: compare the migrated datasource (the ephemeral DB
+        # just brought up by `migrate deploy` above) against the schema
+        # datamodel. Empty diff (exit 0) proves migrations ≡ schema; a
+        # non-empty diff (exit 2) fails the job.
         run: >
           npx prisma migrate diff
-          --from-schema-datasource prisma/schema.prisma
-          --to-schema-datamodel prisma/schema.prisma
+          --from-config-datasource
+          --to-schema prisma/schema.prisma
           --exit-code
 
   integration:
@@ -169,33 +173,91 @@ jobs:
       - run: gitleaks detect --no-git --redact --verbose
 
   # ---------------------------------------------------------------------
-  # Gated production deploy. Inactive until BOTH are configured:
+  # Gated production release (L7.3.7). The authoritative delivery path:
+  # migrations ALWAYS run and verify against the production database BEFORE
+  # the app build is activated, on the SAME commit, fail-closed. Inactive
+  # until configured:
   #   1. Vercel env var CI_DEPLOYS_ONLY=1 (production) - flips
   #      vercel.json's ignoreCommand so git pushes stop auto-building.
-  #   2. Repo secrets VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID.
+  #   2. Repo secrets VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID and
+  #      PROD_DATABASE_URL / PROD_DIRECT_URL (migration + runtime targets).
+  #   3. (optional) PROD_SUPABASE_URL / PROD_SUPABASE_SERVICE_ROLE_KEY for
+  #      the post-deploy email-OTP smoke e2e.
   # Until then this job is a no-op notice and Vercel auto-deploy behaves
-  # exactly as before this workflow existed (behaviour preserved).
+  # exactly as before (behaviour preserved). See docs/RELEASE.md.
   # ---------------------------------------------------------------------
   deploy:
-    name: Deploy to production (checks-gated)
+    name: Release to production (migration-gated)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [quality, unit, visual, prisma, integration, build, audit, secrets]
     runs-on: ubuntu-latest
+    # Serialize production releases: never let two runs apply migrations or
+    # promote different commits concurrently. Queue (do NOT cancel) so an
+    # in-flight migrate deploy is never interrupted mid-release.
+    concurrency:
+      group: production-release
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: npm }
-      - name: Deploy via Vercel CLI (skips with notice if secrets absent)
+      - run: npm ci
+
+      - name: Activation gate (required secrets present?)
+        id: gate
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          PROD_DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$PROD_DIRECT_URL" ]; then
+            echo "::notice::CI-gated release inactive (VERCEL_TOKEN or PROD_DIRECT_URL unset); Vercel git auto-deploy remains the delivery path until activation. See docs/RELEASE.md."
+            echo "active=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # STAGE 1-4: preflight -> migrate deploy -> schema verify. Fail-closed:
+      # a non-zero here stops the release with NO new build activated.
+      - name: Production DB release gate
+        if: steps.gate.outputs.active == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: npm run release:production
+
+      # STAGE 5-6: build + promote the SAME commit, ONLY after the DB gate.
+      - name: Build & deploy to Vercel Production (prebuilt)
+        if: steps.gate.outputs.active == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::notice::VERCEL_TOKEN not configured - CI-gated deploys inactive; Vercel git auto-deploy remains the delivery path. See docs/CI.md."
-            exit 0
-          fi
           npm i -g vercel@latest
           vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
           vercel build --prod --token "$VERCEL_TOKEN"
-          vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"
+          url=$(vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN")
+          echo "DEPLOY_URL=$url" >> "$GITHUB_ENV"
+          echo "::notice::Deployed $url (commit ${GITHUB_SHA})"
+
+      - name: Wait until deployment is Ready
+        if: steps.gate.outputs.active == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel inspect "$DEPLOY_URL" --wait --token "$VERCEL_TOKEN"
+
+      # STAGE 7: smoke the LIVE deployment; a failure fails the release.
+      - name: Post-deploy smoke tests
+        if: steps.gate.outputs.active == 'true'
+        env:
+          TARGET: https://tirvea.com
+          EXPECTED_COMMIT: ${{ github.sha }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PROD_SUPABASE_SERVICE_ROLE_KEY }}
+          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::warning::PROD_SUPABASE_SERVICE_ROLE_KEY unset - smoke runs HTTP-surface checks only; email-OTP e2e skipped (not a full GO)."
+            export SMOKE_SKIP_OTP=1
+          fi
+          npm run release:smoke
