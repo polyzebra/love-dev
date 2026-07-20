@@ -304,6 +304,7 @@ function toGateUser(u: AppUser): GateUser {
     communityVersion: u.communityVersion,
     onboardingDone: u.onboardingDone,
     registrationCompletedAt: u.registrationCompletedAt,
+    livenessPassedAt: u.livenessPassedAt,
   };
 }
 

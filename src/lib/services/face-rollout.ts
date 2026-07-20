@@ -132,6 +132,28 @@ export function faceEmergencyDisabled(): boolean {
   return process.env.FACE_EMERGENCY_DISABLE === "1";
 }
 
+/**
+ * L8.1 Trust ENTRY GATE switch. Is AWS Face Liveness a REQUIRED registration
+ * rung before a user may interact with other members?
+ *
+ * FAIL OPEN by design. The gate is active ONLY when BOTH hold:
+ *   1. the operator explicitly set LIVENESS_ENTRY_GATE=1, AND
+ *   2. a face-match provider is actually configured (FACE_MATCH_PROVIDER set),
+ *      so a real liveness capture can succeed.
+ * If liveness cannot run (provider dormant - the production state per L8.2.1)
+ * the gate stays INACTIVE, so NO user is ever blocked by a rung they cannot
+ * clear. Enabling it blindly while the provider is dormant would lock EVERY
+ * user out of the entire app - this guard makes that impossible. The kill
+ * switch also forces it off. Pure env read; no adapter import (safe in the
+ * auth hot path).
+ */
+export function livenessEntryGateActive(): boolean {
+  if (process.env.LIVENESS_ENTRY_GATE !== "1") return false;
+  if (faceEmergencyDisabled()) return false;
+  const provider = process.env.FACE_MATCH_PROVIDER?.trim().toLowerCase();
+  return Boolean(provider) && provider !== "off" && provider !== "none";
+}
+
 /** Parse a comma-separated approved-versions env into a trimmed, non-empty list. */
 function splitApprovedVersions(raw: string | undefined): string[] {
   return (raw ?? "")

@@ -107,6 +107,7 @@ export type UserMinAggregateOutputType = {
   registrationStartedAt: Date | null
   onboardingCompletedAt: Date | null
   registrationCompletedAt: Date | null
+  livenessPassedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -174,6 +175,7 @@ export type UserMaxAggregateOutputType = {
   registrationStartedAt: Date | null
   onboardingCompletedAt: Date | null
   registrationCompletedAt: Date | null
+  livenessPassedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -242,6 +244,7 @@ export type UserCountAggregateOutputType = {
   registrationStartedAt: number
   onboardingCompletedAt: number
   registrationCompletedAt: number
+  livenessPassedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -329,6 +332,7 @@ export type UserMinAggregateInputType = {
   registrationStartedAt?: true
   onboardingCompletedAt?: true
   registrationCompletedAt?: true
+  livenessPassedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -396,6 +400,7 @@ export type UserMaxAggregateInputType = {
   registrationStartedAt?: true
   onboardingCompletedAt?: true
   registrationCompletedAt?: true
+  livenessPassedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -464,6 +469,7 @@ export type UserCountAggregateInputType = {
   registrationStartedAt?: true
   onboardingCompletedAt?: true
   registrationCompletedAt?: true
+  livenessPassedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -619,6 +625,7 @@ export type UserGroupByOutputType = {
   registrationStartedAt: Date | null
   onboardingCompletedAt: Date | null
   registrationCompletedAt: Date | null
+  livenessPassedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -710,6 +717,7 @@ export type UserWhereInput = {
   registrationStartedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   onboardingCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   registrationCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  livenessPassedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   devices?: Prisma.DeviceListRelationFilter
@@ -813,6 +821,7 @@ export type UserOrderByWithRelationInput = {
   registrationStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   onboardingCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   registrationCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  livenessPassedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   devices?: Prisma.DeviceOrderByRelationAggregateInput
@@ -919,6 +928,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   registrationStartedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   onboardingCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   registrationCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  livenessPassedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   devices?: Prisma.DeviceListRelationFilter
@@ -1022,6 +1032,7 @@ export type UserOrderByWithAggregationInput = {
   registrationStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   onboardingCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   registrationCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  livenessPassedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -1098,6 +1109,7 @@ export type UserScalarWhereWithAggregatesInput = {
   registrationStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   onboardingCompletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   registrationCompletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  livenessPassedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -1166,6 +1178,7 @@ export type UserCreateInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -1269,6 +1282,7 @@ export type UserUncheckedCreateInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -1372,6 +1386,7 @@ export type UserUpdateInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -1475,6 +1490,7 @@ export type UserUncheckedUpdateInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -1578,6 +1594,7 @@ export type UserCreateManyInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1646,6 +1663,7 @@ export type UserUpdateManyMutationInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1714,6 +1732,7 @@ export type UserUncheckedUpdateManyInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1790,6 +1809,7 @@ export type UserCountOrderByAggregateInput = {
   registrationStartedAt?: Prisma.SortOrder
   onboardingCompletedAt?: Prisma.SortOrder
   registrationCompletedAt?: Prisma.SortOrder
+  livenessPassedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1866,6 +1886,7 @@ export type UserMaxOrderByAggregateInput = {
   registrationStartedAt?: Prisma.SortOrder
   onboardingCompletedAt?: Prisma.SortOrder
   registrationCompletedAt?: Prisma.SortOrder
+  livenessPassedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1933,6 +1954,7 @@ export type UserMinOrderByAggregateInput = {
   registrationStartedAt?: Prisma.SortOrder
   onboardingCompletedAt?: Prisma.SortOrder
   registrationCompletedAt?: Prisma.SortOrder
+  livenessPassedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -2575,6 +2597,7 @@ export type UserCreateWithoutDevicesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
@@ -2677,6 +2700,7 @@ export type UserUncheckedCreateWithoutDevicesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2795,6 +2819,7 @@ export type UserUpdateWithoutDevicesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
@@ -2897,6 +2922,7 @@ export type UserUncheckedUpdateWithoutDevicesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2999,6 +3025,7 @@ export type UserCreateWithoutProfileInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -3101,6 +3128,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -3219,6 +3247,7 @@ export type UserUpdateWithoutProfileInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -3321,6 +3350,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -3423,6 +3453,7 @@ export type UserCreateWithoutPhotosInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -3525,6 +3556,7 @@ export type UserUncheckedCreateWithoutPhotosInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -3643,6 +3675,7 @@ export type UserUpdateWithoutPhotosInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -3745,6 +3778,7 @@ export type UserUncheckedUpdateWithoutPhotosInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -3847,6 +3881,7 @@ export type UserCreateWithoutVerificationsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -3949,6 +3984,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -4067,6 +4103,7 @@ export type UserUpdateWithoutVerificationsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -4169,6 +4206,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -4271,6 +4309,7 @@ export type UserCreateWithoutLikesSentInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -4373,6 +4412,7 @@ export type UserUncheckedCreateWithoutLikesSentInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -4480,6 +4520,7 @@ export type UserCreateWithoutLikesReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -4582,6 +4623,7 @@ export type UserUncheckedCreateWithoutLikesReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -4700,6 +4742,7 @@ export type UserUpdateWithoutLikesSentInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -4802,6 +4845,7 @@ export type UserUncheckedUpdateWithoutLikesSentInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -4915,6 +4959,7 @@ export type UserUpdateWithoutLikesReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -5017,6 +5062,7 @@ export type UserUncheckedUpdateWithoutLikesReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -5119,6 +5165,7 @@ export type UserCreateWithoutMatchesAsAInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -5221,6 +5268,7 @@ export type UserUncheckedCreateWithoutMatchesAsAInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -5328,6 +5376,7 @@ export type UserCreateWithoutMatchesAsBInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -5430,6 +5479,7 @@ export type UserUncheckedCreateWithoutMatchesAsBInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -5548,6 +5598,7 @@ export type UserUpdateWithoutMatchesAsAInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -5650,6 +5701,7 @@ export type UserUncheckedUpdateWithoutMatchesAsAInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -5763,6 +5815,7 @@ export type UserUpdateWithoutMatchesAsBInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -5865,6 +5918,7 @@ export type UserUncheckedUpdateWithoutMatchesAsBInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -5967,6 +6021,7 @@ export type UserCreateWithoutFirstMessagesSentInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -6069,6 +6124,7 @@ export type UserUncheckedCreateWithoutFirstMessagesSentInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -6176,6 +6232,7 @@ export type UserCreateWithoutFirstMessagesReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -6278,6 +6335,7 @@ export type UserUncheckedCreateWithoutFirstMessagesReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -6396,6 +6454,7 @@ export type UserUpdateWithoutFirstMessagesSentInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -6498,6 +6557,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesSentInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -6611,6 +6671,7 @@ export type UserUpdateWithoutFirstMessagesReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -6713,6 +6774,7 @@ export type UserUncheckedUpdateWithoutFirstMessagesReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -6815,6 +6877,7 @@ export type UserCreateWithoutParticipantsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -6917,6 +6980,7 @@ export type UserUncheckedCreateWithoutParticipantsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -7035,6 +7099,7 @@ export type UserUpdateWithoutParticipantsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -7137,6 +7202,7 @@ export type UserUncheckedUpdateWithoutParticipantsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -7239,6 +7305,7 @@ export type UserCreateWithoutMessagesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -7341,6 +7408,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -7459,6 +7527,7 @@ export type UserUpdateWithoutMessagesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -7561,6 +7630,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -7663,6 +7733,7 @@ export type UserCreateWithoutReportsMadeInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -7765,6 +7836,7 @@ export type UserUncheckedCreateWithoutReportsMadeInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -7872,6 +7944,7 @@ export type UserCreateWithoutReportsReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -7974,6 +8047,7 @@ export type UserUncheckedCreateWithoutReportsReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -8092,6 +8166,7 @@ export type UserUpdateWithoutReportsMadeInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -8194,6 +8269,7 @@ export type UserUncheckedUpdateWithoutReportsMadeInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -8307,6 +8383,7 @@ export type UserUpdateWithoutReportsReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -8409,6 +8486,7 @@ export type UserUncheckedUpdateWithoutReportsReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -8511,6 +8589,7 @@ export type UserCreateWithoutModerationCasesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -8613,6 +8692,7 @@ export type UserUncheckedCreateWithoutModerationCasesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -8731,6 +8811,7 @@ export type UserUpdateWithoutModerationCasesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -8833,6 +8914,7 @@ export type UserUncheckedUpdateWithoutModerationCasesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -8935,6 +9017,7 @@ export type UserCreateWithoutViolationsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -9037,6 +9120,7 @@ export type UserUncheckedCreateWithoutViolationsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -9155,6 +9239,7 @@ export type UserUpdateWithoutViolationsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -9257,6 +9342,7 @@ export type UserUncheckedUpdateWithoutViolationsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -9359,6 +9445,7 @@ export type UserCreateWithoutAppealsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -9461,6 +9548,7 @@ export type UserUncheckedCreateWithoutAppealsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -9579,6 +9667,7 @@ export type UserUpdateWithoutAppealsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -9681,6 +9770,7 @@ export type UserUncheckedUpdateWithoutAppealsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -9783,6 +9873,7 @@ export type UserCreateWithoutBlocksMadeInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -9885,6 +9976,7 @@ export type UserUncheckedCreateWithoutBlocksMadeInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -9992,6 +10084,7 @@ export type UserCreateWithoutBlocksReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -10094,6 +10187,7 @@ export type UserUncheckedCreateWithoutBlocksReceivedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -10212,6 +10306,7 @@ export type UserUpdateWithoutBlocksMadeInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -10314,6 +10409,7 @@ export type UserUncheckedUpdateWithoutBlocksMadeInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -10427,6 +10523,7 @@ export type UserUpdateWithoutBlocksReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -10529,6 +10626,7 @@ export type UserUncheckedUpdateWithoutBlocksReceivedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -10631,6 +10729,7 @@ export type UserCreateWithoutSubscriptionInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -10733,6 +10832,7 @@ export type UserUncheckedCreateWithoutSubscriptionInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -10851,6 +10951,7 @@ export type UserUpdateWithoutSubscriptionInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -10953,6 +11054,7 @@ export type UserUncheckedUpdateWithoutSubscriptionInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -11055,6 +11157,7 @@ export type UserCreateWithoutPaymentsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -11157,6 +11260,7 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -11275,6 +11379,7 @@ export type UserUpdateWithoutPaymentsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -11377,6 +11482,7 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -11479,6 +11585,7 @@ export type UserCreateWithoutNotificationsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -11581,6 +11688,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -11699,6 +11807,7 @@ export type UserUpdateWithoutNotificationsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -11801,6 +11910,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -11903,6 +12013,7 @@ export type UserCreateWithoutNotificationDevicesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -12005,6 +12116,7 @@ export type UserUncheckedCreateWithoutNotificationDevicesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -12123,6 +12235,7 @@ export type UserUpdateWithoutNotificationDevicesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -12225,6 +12338,7 @@ export type UserUncheckedUpdateWithoutNotificationDevicesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -12327,6 +12441,7 @@ export type UserCreateWithoutConversationPresenceInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -12429,6 +12544,7 @@ export type UserUncheckedCreateWithoutConversationPresenceInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -12547,6 +12663,7 @@ export type UserUpdateWithoutConversationPresenceInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -12649,6 +12766,7 @@ export type UserUncheckedUpdateWithoutConversationPresenceInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -12751,6 +12869,7 @@ export type UserCreateWithoutAdminLogsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -12853,6 +12972,7 @@ export type UserUncheckedCreateWithoutAdminLogsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -12971,6 +13091,7 @@ export type UserUpdateWithoutAdminLogsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -13073,6 +13194,7 @@ export type UserUncheckedUpdateWithoutAdminLogsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -13175,6 +13297,7 @@ export type UserCreateWithoutExplorePreferencesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -13277,6 +13400,7 @@ export type UserUncheckedCreateWithoutExplorePreferencesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -13395,6 +13519,7 @@ export type UserUpdateWithoutExplorePreferencesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -13497,6 +13622,7 @@ export type UserUncheckedUpdateWithoutExplorePreferencesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -13599,6 +13725,7 @@ export type UserCreateWithoutAuthEventsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -13701,6 +13828,7 @@ export type UserUncheckedCreateWithoutAuthEventsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -13819,6 +13947,7 @@ export type UserUpdateWithoutAuthEventsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -13921,6 +14050,7 @@ export type UserUncheckedUpdateWithoutAuthEventsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -14023,6 +14153,7 @@ export type UserCreateWithoutSettingsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -14125,6 +14256,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -14243,6 +14375,7 @@ export type UserUpdateWithoutSettingsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -14345,6 +14478,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -14447,6 +14581,7 @@ export type UserCreateWithoutApiIdempotencyKeysInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -14549,6 +14684,7 @@ export type UserUncheckedCreateWithoutApiIdempotencyKeysInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -14667,6 +14803,7 @@ export type UserUpdateWithoutApiIdempotencyKeysInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -14769,6 +14906,7 @@ export type UserUncheckedUpdateWithoutApiIdempotencyKeysInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -14871,6 +15009,7 @@ export type UserCreateWithoutProfilePhotoVerificationInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -14973,6 +15112,7 @@ export type UserUncheckedCreateWithoutProfilePhotoVerificationInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -15091,6 +15231,7 @@ export type UserUpdateWithoutProfilePhotoVerificationInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -15193,6 +15334,7 @@ export type UserUncheckedUpdateWithoutProfilePhotoVerificationInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -15295,6 +15437,7 @@ export type UserCreateWithoutVerificationAuditEventsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -15397,6 +15540,7 @@ export type UserUncheckedCreateWithoutVerificationAuditEventsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -15515,6 +15659,7 @@ export type UserUpdateWithoutVerificationAuditEventsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -15617,6 +15762,7 @@ export type UserUncheckedUpdateWithoutVerificationAuditEventsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -15719,6 +15865,7 @@ export type UserCreateWithoutLivenessSessionsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -15821,6 +15968,7 @@ export type UserUncheckedCreateWithoutLivenessSessionsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -15939,6 +16087,7 @@ export type UserUpdateWithoutLivenessSessionsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -16041,6 +16190,7 @@ export type UserUncheckedUpdateWithoutLivenessSessionsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -16143,6 +16293,7 @@ export type UserCreateWithoutFaceReferencesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -16245,6 +16396,7 @@ export type UserUncheckedCreateWithoutFaceReferencesInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -16363,6 +16515,7 @@ export type UserUpdateWithoutFaceReferencesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -16465,6 +16618,7 @@ export type UserUncheckedUpdateWithoutFaceReferencesInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -16567,6 +16721,7 @@ export type UserCreateWithoutFaceIdentityBindingsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -16669,6 +16824,7 @@ export type UserUncheckedCreateWithoutFaceIdentityBindingsInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -16776,6 +16932,7 @@ export type UserCreateWithoutFaceBindingsReviewedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceCreateNestedManyWithoutUserInput
@@ -16878,6 +17035,7 @@ export type UserUncheckedCreateWithoutFaceBindingsReviewedInput = {
   registrationStartedAt?: Date | string | null
   onboardingCompletedAt?: Date | string | null
   registrationCompletedAt?: Date | string | null
+  livenessPassedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutUserInput
@@ -16996,6 +17154,7 @@ export type UserUpdateWithoutFaceIdentityBindingsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -17098,6 +17257,7 @@ export type UserUncheckedUpdateWithoutFaceIdentityBindingsInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -17211,6 +17371,7 @@ export type UserUpdateWithoutFaceBindingsReviewedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUpdateManyWithoutUserNestedInput
@@ -17313,6 +17474,7 @@ export type UserUncheckedUpdateWithoutFaceBindingsReviewedInput = {
   registrationStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrationCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  livenessPassedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutUserNestedInput
@@ -17716,6 +17878,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   registrationStartedAt?: boolean
   onboardingCompletedAt?: boolean
   registrationCompletedAt?: boolean
+  livenessPassedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
@@ -17820,6 +17983,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   registrationStartedAt?: boolean
   onboardingCompletedAt?: boolean
   registrationCompletedAt?: boolean
+  livenessPassedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -17888,6 +18052,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   registrationStartedAt?: boolean
   onboardingCompletedAt?: boolean
   registrationCompletedAt?: boolean
+  livenessPassedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -17956,11 +18121,12 @@ export type UserSelectScalar = {
   registrationStartedAt?: boolean
   onboardingCompletedAt?: boolean
   registrationCompletedAt?: boolean
+  livenessPassedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "faceBadgeSuspendedAt" | "faceVerifiedAt" | "galleryVersion" | "verifiedGalleryVersion" | "verifiedCoverPhotoId" | "verifiedGalleryHash" | "verifiedPhotoIds" | "verifiedGallerySnapshotAt" | "photoVerificationInvalidatedAt" | "photoVerificationInvalidationReason" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "registrationStartedAt" | "onboardingCompletedAt" | "registrationCompletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "phone" | "phoneVerified" | "name" | "image" | "role" | "status" | "phoneE164" | "phoneCountryIso" | "phoneDialCode" | "phoneVerifiedAt" | "phoneSyncStatus" | "phoneSyncErrorCode" | "phoneSyncUpdatedAt" | "authCompleted" | "riskScore" | "bannedAt" | "banReason" | "lastLoginAt" | "lastLoginIpHash" | "lastUserAgentHash" | "previousIpHash" | "lastIpCountry" | "lastIpAsn" | "lastDeviceHash" | "deviceCount" | "scamScore" | "riskReason" | "riskUpdatedAt" | "safetyRiskScore" | "safetyRiskReasons" | "safetyRecommendedAction" | "safetyRiskUpdatedAt" | "ageConfirmedAt" | "ageConfirmedIpHash" | "termsVersion" | "privacyVersion" | "communityVersion" | "consentAcceptedAt" | "consentIpHash" | "consentUserAgentHash" | "photoVerifiedAt" | "photoVerificationProvider" | "photoVerificationSession" | "faceBadgeSuspendedAt" | "faceVerifiedAt" | "galleryVersion" | "verifiedGalleryVersion" | "verifiedCoverPhotoId" | "verifiedGalleryHash" | "verifiedPhotoIds" | "verifiedGallerySnapshotAt" | "photoVerificationInvalidatedAt" | "photoVerificationInvalidationReason" | "lastActiveAt" | "onboardingDone" | "marketingOptIn" | "deletionRequested" | "registrationStartedAt" | "onboardingCompletedAt" | "registrationCompletedAt" | "livenessPassedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.User$devicesArgs<ExtArgs>
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
@@ -18105,6 +18271,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     registrationStartedAt: Date | null
     onboardingCompletedAt: Date | null
     registrationCompletedAt: Date | null
+    livenessPassedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -18628,6 +18795,7 @@ export interface UserFieldRefs {
   readonly registrationStartedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly onboardingCompletedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly registrationCompletedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly livenessPassedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

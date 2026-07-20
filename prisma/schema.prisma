@@ -434,6 +434,12 @@ model User {
   registrationStartedAt   DateTime?
   onboardingCompletedAt   DateTime?
   registrationCompletedAt DateTime?
+  // L8.1 Trust entry gate. Stamped ONCE by the AWS Face Liveness PASS handler
+  // (face-liveness.ts). When the entry gate is active (LIVENESS_ENTRY_GATE +
+  // provider configured) this becomes the final ladder rung before /discover;
+  // while the gate is dormant it is written but never gates anything (fail
+  // open). Never set from gallery photos - it is a live-capture signal only.
+  livenessPassedAt        DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

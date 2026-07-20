@@ -1,5 +1,6 @@
 import { needsAgeConfirmation, needsConsent } from "@/lib/auth/consent";
 import { phoneVerificationEnabled } from "@/lib/auth/phone";
+import { livenessEntryGateActive } from "@/lib/services/face-rollout";
 
 /**
  * The auth progression gate - ONE pure function deciding where a user
@@ -46,6 +47,13 @@ export type GateUser = {
    * Optional so legacy callers that don't select it still type-check.
    */
   registrationCompletedAt?: Date | null;
+  /**
+   * L8.1 AWS Face Liveness pass timestamp. The final ladder rung ONLY when the
+   * entry gate is active (livenessEntryGateActive()). Optional + retro-lock
+   * safe: an already-completed account (registrationCompletedAt set) keeps
+   * access even with the gate on and this null.
+   */
+  livenessPassedAt?: Date | null;
 };
 
 /**
@@ -79,9 +87,23 @@ export function needsEmailAttach(user: Pick<GateUser, "email" | "emailVerified">
  */
 export const RESTRICTED_ACCOUNT_ROUTE = "/account-blocked";
 
+/**
+ * L8.1 The Trust ENTRY GATE step: a one-time AWS Face Liveness capture that is
+ * the FINAL rung before /discover when the gate is active. Reached only after
+ * the whole profile is prepared (this is the "Start Dating" destination).
+ */
+export const LIVENESS_STEP = "/auth/liveness";
+
 export function authNextStep(
   user: GateUser,
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
+  /**
+   * L8.1: is a one-time liveness capture required to finish registration?
+   * Defaults to the operator gate, which is OFF unless explicitly enabled AND
+   * a provider is configured (livenessEntryGateActive) - so the DEFAULT path is
+   * byte-identical to before this rung existed (fail open). Overridable for tests.
+   */
+  livenessRequired: boolean = livenessEntryGateActive(),
 ): string {
   // Suspended/banned: the ONLY destination is the status area. Sessions for
   // these accounts survive (see auth()) so the user can read their status
@@ -104,6 +126,13 @@ export function authNextStep(
   if (needsAgeConfirmation(user)) return "/auth/age";
   if (needsConsent(user)) return "/auth/legal";
   if (!user.onboardingDone) return "/onboarding";
+  // L8.1 FINAL rung: profile fully prepared, but the user may NOT interact with
+  // other members until a one-time AWS Face Liveness capture passes. Gated:
+  // when livenessRequired is false (the default while the provider is dormant)
+  // this rung is invisible and the ladder is exactly as before. Retro-lock
+  // safe: registrationComplete() short-circuits on registrationCompletedAt, so
+  // an already-active account is never sent here.
+  if (livenessRequired && !user.livenessPassedAt) return LIVENESS_STEP;
   return "/discover";
 }
 
@@ -154,6 +183,7 @@ export type RegistrationState =
   | "PHONE_PENDING" // email done, phone verification owed
   | "LEGAL_PENDING" // age confirmation and/or legal consent owed
   | "ONBOARDING_PENDING" // profile onboarding owed
+  | "LIVENESS_PENDING" // L8.1: profile prepared, one-time AWS Face Liveness owed
   | "ACTIVE" // registration fully complete
   | "CANCELLED" // deactivated / deleted registration
   | "BLOCKED"; // suspended / banned
@@ -166,10 +196,11 @@ export type RegistrationState =
 export function registrationComplete(
   user: GateUser,
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
+  livenessRequired: boolean = livenessEntryGateActive(),
 ): boolean {
   // Persisted stamp is authoritative (never retro-lock a completed account);
   // otherwise the live ladder decides (belt-and-braces / self-heal).
-  return !!user.registrationCompletedAt || registrationLadderComplete(user, phoneEnabled);
+  return !!user.registrationCompletedAt || registrationLadderComplete(user, phoneEnabled, livenessRequired);
 }
 
 /**
@@ -180,20 +211,22 @@ export function registrationComplete(
 export function registrationLadderComplete(
   user: GateUser,
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
+  livenessRequired: boolean = livenessEntryGateActive(),
 ): boolean {
-  return authNextStep(user, phoneEnabled) === "/discover";
+  return authNextStep(user, phoneEnabled, livenessRequired) === "/discover";
 }
 
 /** Canonical registration state, derived from the one ladder (authNextStep). */
 export function resolveRegistrationState(
   user: GateUser,
   phoneEnabled: boolean = isPhoneVerificationEnabled(),
+  livenessRequired: boolean = livenessEntryGateActive(),
 ): RegistrationState {
   if (user.status === "DELETED" || user.status === "DEACTIVATED") return "CANCELLED";
   if (user.bannedAt || user.status === "SUSPENDED" || user.status === "BANNED") return "BLOCKED";
   // A stamped account is ACTIVE for state purposes even if a newer rung exists.
   if (user.registrationCompletedAt) return "ACTIVE";
-  switch (authNextStep(user, phoneEnabled)) {
+  switch (authNextStep(user, phoneEnabled, livenessRequired)) {
     case RESTRICTED_ACCOUNT_ROUTE:
       return "BLOCKED";
     case "/login":
@@ -206,6 +239,8 @@ export function resolveRegistrationState(
       return "LEGAL_PENDING";
     case "/onboarding":
       return "ONBOARDING_PENDING";
+    case LIVENESS_STEP:
+      return "LIVENESS_PENDING";
     case "/discover":
       return "ACTIVE";
     default:

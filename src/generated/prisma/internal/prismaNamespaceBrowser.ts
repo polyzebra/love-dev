@@ -183,6 +183,7 @@ export const UserScalarFieldEnum = {
   registrationStartedAt: 'registrationStartedAt',
   onboardingCompletedAt: 'onboardingCompletedAt',
   registrationCompletedAt: 'registrationCompletedAt',
+  livenessPassedAt: 'livenessPassedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

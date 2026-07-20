@@ -8,6 +8,7 @@ import {
   BIOMETRIC_CONSENT_VERSION,
 } from "@/lib/services/face-verification";
 import { enrollReferenceSaga } from "@/lib/services/face-reference-registry";
+import { activateAccountIfComplete } from "@/lib/auth/identity";
 
 /**
  * Liveness session ownership binding (C-1) + reference enrollment (C-2).
@@ -191,6 +192,23 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
     newStatus: "QUEUED",
     reasonCode: "reference_enrolled",
   });
+  // L8.1 Trust entry gate: record the one-time liveness pass and run the ONE
+  // canonical activator. Idempotent - stamp only if unset; the activator no-ops
+  // if the account is already complete or other rungs are still owed. This is
+  // the ONLY connection from liveness to account activation (no second
+  // activation implementation). Best-effort: even if activation lags, access
+  // self-heals via registrationComplete()'s ladder fallback (livenessPassedAt
+  // is now stamped) on the next request.
+  await db.user.updateMany({
+    where: { id: userId, livenessPassedAt: null },
+    data: { livenessPassedAt: new Date() },
+  });
+  try {
+    await activateAccountIfComplete(userId);
+  } catch {
+    // Activation is eventually-consistent; the liveness enrollment already
+    // succeeded and must not roll back on an activation hiccup.
+  }
   // Resume the SAME canonical job (recovery admission - already admitted).
   await enqueueProfilePhotoVerification(userId, "liveness_passed", { isRecovery: true });
   // Epic 3: if human binding review is the configured + legally-approved
