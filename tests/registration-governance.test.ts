@@ -94,11 +94,8 @@ function main() {
     const body = api.slice(api.indexOf("function requireActiveAccount"));
     assert.ok(/registrationComplete\(user\)/.test(body), "must call registrationComplete");
     assert.ok(/registration_incomplete/.test(api), "must return registration_incomplete");
-    // The resolver derives state from the ONE ladder (authNextStep). L8.1 added
-    // an optional gated liveness arg; the derivation is unchanged.
-    assert.ok(
-      /authNextStep\(user, phoneEnabled(, livenessRequired)?\)\s*===\s*"\/discover"/.test(gate),
-    );
+    // The resolver derives state from the ONE ladder (authNextStep).
+    assert.ok(/authNextStep\(user, phoneEnabled\)\s*===\s*"\/discover"/.test(gate));
   });
 
   // Post-activation feature routes gate via requireActiveAccount.

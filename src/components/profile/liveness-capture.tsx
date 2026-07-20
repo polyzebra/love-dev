@@ -57,13 +57,9 @@ const LivenessDetector = dynamic(
 export function LivenessCapture({
   consentVersion,
   onDone,
-  startLabel,
 }: {
   consentVersion: string;
   onDone?: () => void;
-  /** Label for the consent+start button (defaults to "Agree & start"). The
-   *  /auth/liveness entry page passes "Start Face Verification" (Phase C/M). */
-  startLabel?: string;
 }) {
   const router = useRouter();
   // No session/flow id is ever placed in the URL, storage or history
@@ -206,7 +202,7 @@ export function LivenessCapture({
                   <RefreshCw className="size-4" aria-hidden="true" /> Try again
                 </>
               ) : state === "consent_required" ? (
-                (startLabel ?? "Agree & start")
+                "Agree & start"
               ) : (
                 "Start check"
               )}

@@ -46,14 +46,6 @@ export type AppSession = {
     authCompleted: boolean;
     /** Persisted registration-complete signal (L7.3.8); null while PENDING. */
     registrationCompletedAt: Date | null;
-    /**
-     * L8.1 one-time AWS Face Liveness pass (the entry-gate rung). Carried in the
-     * session so authNextStep() on pages resolves the liveness rung correctly
-     * the moment the gate is active - without it a just-passed user would be
-     * re-routed to /auth/liveness. Retro-lock-safe accounts still rely on
-     * registrationCompletedAt above.
-     */
-    livenessPassedAt: Date | null;
   };
 };
 
@@ -171,7 +163,6 @@ export const auth = cache(async (): Promise<AppSession | null> => {
       communityVersion: appUser.communityVersion,
       authCompleted: appUser.authCompleted,
       registrationCompletedAt: appUser.registrationCompletedAt,
-      livenessPassedAt: appUser.livenessPassedAt,
     },
   };
 });
