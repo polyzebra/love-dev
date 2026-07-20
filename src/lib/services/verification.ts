@@ -106,17 +106,30 @@ export function toTrustFacts(u: {
 }
 
 /**
- * Cohort-safe canary membership for the per-photo badge contract (Phase E).
- * A user is in the canary IFF: the master flag is on, the emergency switch is
- * off, AND (they are on the explicit stable-id allowlist OR fall inside the
- * deterministic percentage bucket). Default off: no allowlist + percent 0/unset
- * => nobody. A global env boolean alone can never enrol everyone.
+ * Is the per-photo badge contract active for this user? (L6.16 final contract.)
+ *
+ *   FACE_BADGE_PER_PHOTO=0            -> DISABLED globally (nobody; legacy badge).
+ *   FACE_BADGE_PER_PHOTO=1            -> ENABLED GLOBALLY for EVERY eligible user
+ *                                       (the production default - no allowlist,
+ *                                       no per-user approval, runs automatically).
+ *   FACE_BADGE_PER_PHOTO_CANARY=1     -> EXPLICIT canary mode: restrict the rollout
+ *                                       to FACE_BADGE_PER_PHOTO_ALLOWLIST (stable
+ *                                       ids) and/or FACE_BADGE_PER_PHOTO_PERCENT.
+ *
+ * The emergency kill switch always fails closed. The allowlist/percent are
+ * consulted ONLY in canary mode, so an empty/missing allowlist can NEVER
+ * accidentally disable the global rollout. No user is ever manually approved
+ * for production behaviour.
  */
 export function perPhotoBadgeCohort(userId: string): boolean {
-  if (!perPhotoBadgeEnabled()) return false; // master off -> legacy for all
+  if (!perPhotoBadgeEnabled()) return false; // global off -> legacy for all
   if (faceEmergencyDisabled()) return false; // emergency -> fail closed
   const id = userId?.trim();
   if (!id) return false;
+  // Global rollout is the default when the feature is on; the allowlist/percent
+  // are NEVER required for production and cannot disable it.
+  if (process.env.FACE_BADGE_PER_PHOTO_CANARY !== "1") return true;
+  // Explicit canary mode: restrict to the allowlist and/or the percentage cohort.
   const allow = (process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST ?? "")
     .split(",")
     .map((s) => s.trim())

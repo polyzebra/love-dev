@@ -247,47 +247,87 @@ async function main() {
   });
 
   // 12. Cohort (Phase E): a single global boolean can NEVER move all users.
-  check("cohort: master flag alone (no allowlist/percent) enrols NOBODY", () => {
+  const clearCohortEnv = () => {
     delete process.env.FACE_BADGE_PER_PHOTO;
+    delete process.env.FACE_BADGE_PER_PHOTO_CANARY;
     delete process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST;
     delete process.env.FACE_BADGE_PER_PHOTO_PERCENT;
     delete process.env.FACE_EMERGENCY_DISABLE;
-    assert.equal(perPhotoBadgeCohort("u1"), false, "flag off -> nobody");
-    process.env.FACE_BADGE_PER_PHOTO = "1";
-    assert.equal(perPhotoBadgeCohort("u1"), false, "master on, no allowlist/percent -> nobody");
-    delete process.env.FACE_BADGE_PER_PHOTO;
+  };
+
+  // L6.16 req 2: global flag OFF applies to NONE.
+  check("global flag off -> nobody (legacy for all)", () => {
+    clearCohortEnv();
+    for (const id of ["u1", "u2", "anyUserId"]) assert.equal(perPhotoBadgeCohort(id), false);
   });
 
-  check("cohort: explicit allowlist admits only listed stable ids", () => {
+  // L6.16 req 1 + 5: global flag ON applies to EVERY eligible user, with NO
+  // allowlist and NO manual per-user approval.
+  check("global flag on -> ALL eligible users (no allowlist, no manual approval)", () => {
+    clearCohortEnv();
     try {
       process.env.FACE_BADGE_PER_PHOTO = "1";
-      process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "userA, userB";
-      assert.equal(perPhotoBadgeCohort("userA"), true);
-      assert.equal(perPhotoBadgeCohort("userB"), true);
-      assert.equal(perPhotoBadgeCohort("userC"), false);
-      process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "a@b.com"; // emails ignored
-      assert.equal(perPhotoBadgeCohort("a@b.com"), false);
+      for (const id of ["u1", "someRandomId", "cuid_xyz", "never-listed-anywhere"]) {
+        assert.equal(perPhotoBadgeCohort(id), true, `${id} must be enrolled automatically`);
+      }
     } finally {
-      delete process.env.FACE_BADGE_PER_PHOTO;
-      delete process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST;
+      clearCohortEnv();
     }
   });
 
-  check("cohort: percentage bucketing is deterministic; emergency disable fails closed", () => {
+  // L6.16 req 4: an empty/missing allowlist can NEVER disable the global rollout.
+  check("global on: empty/missing allowlist does NOT disable the rollout", () => {
+    clearCohortEnv();
     try {
       process.env.FACE_BADGE_PER_PHOTO = "1";
+      assert.equal(perPhotoBadgeCohort("u1"), true, "missing allowlist -> still global");
+      process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = ""; // empty
+      assert.equal(perPhotoBadgeCohort("u1"), true, "empty allowlist -> still global");
+      process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "   ,  "; // whitespace-only
+      assert.equal(perPhotoBadgeCohort("u1"), true, "blank allowlist -> still global");
+    } finally {
+      clearCohortEnv();
+    }
+  });
+
+  // L6.16 req 3: the allowlist restricts ONLY when explicit canary mode is on.
+  check("allowlist restricts rollout ONLY in explicit canary mode", () => {
+    clearCohortEnv();
+    try {
+      process.env.FACE_BADGE_PER_PHOTO = "1";
+      process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "userA, userB";
+      // Without canary mode the allowlist is ignored -> global rollout.
+      assert.equal(perPhotoBadgeCohort("userC"), true, "allowlist ignored without canary mode");
+      // Turn on explicit canary mode -> the allowlist now restricts.
+      process.env.FACE_BADGE_PER_PHOTO_CANARY = "1";
+      assert.equal(perPhotoBadgeCohort("userA"), true);
+      assert.equal(perPhotoBadgeCohort("userB"), true);
+      assert.equal(perPhotoBadgeCohort("userC"), false, "canary mode restricts to the allowlist");
+      process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "a@b.com"; // emails never valid ids
+      assert.equal(perPhotoBadgeCohort("a@b.com"), false);
+    } finally {
+      clearCohortEnv();
+    }
+  });
+
+  // Canary mode percentage bucketing is deterministic; emergency disable always
+  // fails closed - even under the global rollout.
+  check("canary percentage is deterministic; emergency disable fails closed globally", () => {
+    clearCohortEnv();
+    try {
+      process.env.FACE_BADGE_PER_PHOTO = "1";
+      process.env.FACE_BADGE_PER_PHOTO_CANARY = "1";
       process.env.FACE_BADGE_PER_PHOTO_PERCENT = "100";
       assert.equal(perPhotoBadgeCohort("uX"), true);
       assert.equal(perPhotoBadgeCohort("uX"), perPhotoBadgeCohort("uX"), "deterministic");
       process.env.FACE_BADGE_PER_PHOTO_PERCENT = "0";
-      assert.equal(perPhotoBadgeCohort("uX"), false);
-      process.env.FACE_BADGE_PER_PHOTO_PERCENT = "100";
+      assert.equal(perPhotoBadgeCohort("uX"), false, "canary + 0% + not-listed -> excluded");
+      // emergency disable overrides even the GLOBAL rollout.
+      delete process.env.FACE_BADGE_PER_PHOTO_CANARY;
       process.env.FACE_EMERGENCY_DISABLE = "1";
       assert.equal(perPhotoBadgeCohort("uX"), false, "emergency disable -> fail closed");
     } finally {
-      delete process.env.FACE_BADGE_PER_PHOTO;
-      delete process.env.FACE_BADGE_PER_PHOTO_PERCENT;
-      delete process.env.FACE_EMERGENCY_DISABLE;
+      clearCohortEnv();
     }
   });
 
@@ -443,6 +483,7 @@ async function main() {
     async () => {
       try {
         process.env.FACE_BADGE_PER_PHOTO = "1";
+        process.env.FACE_BADGE_PER_PHOTO_CANARY = "1"; // canary mode -> allowlist restricts
         process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "canaryOK, canaryPending";
         const fx: Record<string, Fix> = { canaryOK: verifiedFix(), canaryPending: pendingFix() };
         const { client, counts } = countingClient(fx);
@@ -476,6 +517,7 @@ async function main() {
         );
       } finally {
         delete process.env.FACE_BADGE_PER_PHOTO;
+        delete process.env.FACE_BADGE_PER_PHOTO_CANARY;
         delete process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST;
       }
     },
@@ -486,6 +528,7 @@ async function main() {
     async () => {
       try {
         process.env.FACE_BADGE_PER_PHOTO = "1";
+        process.env.FACE_BADGE_PER_PHOTO_CANARY = "1"; // canary mode -> allowlist restricts
         process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST = "ghost, canaryOK";
         const { client } = countingClient({ canaryOK: verifiedFix() }); // ghost absent
         const legacyVisible: TrustFacts = {
@@ -503,6 +546,7 @@ async function main() {
         assert.equal(res.get("canaryOK")!.visible, true, "other canary user unaffected");
       } finally {
         delete process.env.FACE_BADGE_PER_PHOTO;
+        delete process.env.FACE_BADGE_PER_PHOTO_CANARY;
         delete process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST;
       }
     },
@@ -645,10 +689,20 @@ async function main() {
     assert.ok(!/photoFaceCheck\.delete/i.test(fn), "rotation must retain historical checks");
   });
 
-  check("cohort cannot be flipped by a single global boolean (allowlist/percent required)", () => {
-    const body = VER.slice(VER.indexOf("function perPhotoBadgeCohort"));
-    assert.ok(/FACE_BADGE_PER_PHOTO_ALLOWLIST/.test(body), "explicit allowlist");
-    assert.ok(/FACE_BADGE_PER_PHOTO_PERCENT/.test(body), "percentage cohort");
+  check("cohort contract: global-on default, explicit canary gate, emergency kill switch", () => {
+    const body = VER.slice(
+      VER.indexOf("function perPhotoBadgeCohort"),
+      VER.indexOf("function perPhotoBadgeCohort") + 900,
+    );
+    // Global rollout is the default when the feature is on: a return true that
+    // is NOT behind the allowlist/percent.
+    assert.ok(
+      /FACE_BADGE_PER_PHOTO_CANARY !== "1"\)\s*return true/.test(body),
+      "flag on + no canary mode -> global rollout (return true)",
+    );
+    assert.ok(/FACE_BADGE_PER_PHOTO_CANARY/.test(body), "explicit canary-mode gate");
+    assert.ok(/FACE_BADGE_PER_PHOTO_ALLOWLIST/.test(body), "canary allowlist");
+    assert.ok(/FACE_BADGE_PER_PHOTO_PERCENT/.test(body), "canary percentage");
     assert.ok(/faceEmergencyDisabled\(\)/.test(body), "emergency kill switch");
   });
 
