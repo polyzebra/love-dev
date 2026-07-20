@@ -28,6 +28,7 @@ export type AggregatePhotoFaceCheck = {
 
 export type PhotoFaceCheckAvgAggregateOutputType = {
   photoVersion: number | null
+  referenceVersion: number | null
   faceCount: number | null
   similarityScore: number | null
   qualityScore: number | null
@@ -36,6 +37,7 @@ export type PhotoFaceCheckAvgAggregateOutputType = {
 
 export type PhotoFaceCheckSumAggregateOutputType = {
   photoVersion: number | null
+  referenceVersion: number | null
   faceCount: number | null
   similarityScore: number | null
   qualityScore: number | null
@@ -48,6 +50,7 @@ export type PhotoFaceCheckMinAggregateOutputType = {
   userId: string | null
   photoId: string | null
   photoVersion: number | null
+  referenceVersion: number | null
   isCoverAtCheck: boolean | null
   classification: $Enums.FaceCheckClassification | null
   decision: $Enums.FaceCheckDecision | null
@@ -70,6 +73,7 @@ export type PhotoFaceCheckMaxAggregateOutputType = {
   userId: string | null
   photoId: string | null
   photoVersion: number | null
+  referenceVersion: number | null
   isCoverAtCheck: boolean | null
   classification: $Enums.FaceCheckClassification | null
   decision: $Enums.FaceCheckDecision | null
@@ -92,6 +96,7 @@ export type PhotoFaceCheckCountAggregateOutputType = {
   userId: number
   photoId: number
   photoVersion: number
+  referenceVersion: number
   isCoverAtCheck: number
   classification: number
   decision: number
@@ -112,6 +117,7 @@ export type PhotoFaceCheckCountAggregateOutputType = {
 
 export type PhotoFaceCheckAvgAggregateInputType = {
   photoVersion?: true
+  referenceVersion?: true
   faceCount?: true
   similarityScore?: true
   qualityScore?: true
@@ -120,6 +126,7 @@ export type PhotoFaceCheckAvgAggregateInputType = {
 
 export type PhotoFaceCheckSumAggregateInputType = {
   photoVersion?: true
+  referenceVersion?: true
   faceCount?: true
   similarityScore?: true
   qualityScore?: true
@@ -132,6 +139,7 @@ export type PhotoFaceCheckMinAggregateInputType = {
   userId?: true
   photoId?: true
   photoVersion?: true
+  referenceVersion?: true
   isCoverAtCheck?: true
   classification?: true
   decision?: true
@@ -154,6 +162,7 @@ export type PhotoFaceCheckMaxAggregateInputType = {
   userId?: true
   photoId?: true
   photoVersion?: true
+  referenceVersion?: true
   isCoverAtCheck?: true
   classification?: true
   decision?: true
@@ -176,6 +185,7 @@ export type PhotoFaceCheckCountAggregateInputType = {
   userId?: true
   photoId?: true
   photoVersion?: true
+  referenceVersion?: true
   isCoverAtCheck?: true
   classification?: true
   decision?: true
@@ -285,6 +295,7 @@ export type PhotoFaceCheckGroupByOutputType = {
   userId: string
   photoId: string
   photoVersion: number
+  referenceVersion: number | null
   isCoverAtCheck: boolean
   classification: $Enums.FaceCheckClassification
   decision: $Enums.FaceCheckDecision
@@ -330,6 +341,7 @@ export type PhotoFaceCheckWhereInput = {
   userId?: Prisma.StringFilter<"PhotoFaceCheck"> | string
   photoId?: Prisma.StringFilter<"PhotoFaceCheck"> | string
   photoVersion?: Prisma.IntFilter<"PhotoFaceCheck"> | number
+  referenceVersion?: Prisma.IntNullableFilter<"PhotoFaceCheck"> | number | null
   isCoverAtCheck?: Prisma.BoolFilter<"PhotoFaceCheck"> | boolean
   classification?: Prisma.EnumFaceCheckClassificationFilter<"PhotoFaceCheck"> | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFilter<"PhotoFaceCheck"> | $Enums.FaceCheckDecision
@@ -354,6 +366,7 @@ export type PhotoFaceCheckOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   isCoverAtCheck?: Prisma.SortOrder
   classification?: Prisma.SortOrder
   decision?: Prisma.SortOrder
@@ -382,6 +395,7 @@ export type PhotoFaceCheckWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"PhotoFaceCheck"> | string
   photoId?: Prisma.StringFilter<"PhotoFaceCheck"> | string
   photoVersion?: Prisma.IntFilter<"PhotoFaceCheck"> | number
+  referenceVersion?: Prisma.IntNullableFilter<"PhotoFaceCheck"> | number | null
   isCoverAtCheck?: Prisma.BoolFilter<"PhotoFaceCheck"> | boolean
   classification?: Prisma.EnumFaceCheckClassificationFilter<"PhotoFaceCheck"> | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFilter<"PhotoFaceCheck"> | $Enums.FaceCheckDecision
@@ -406,6 +420,7 @@ export type PhotoFaceCheckOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   isCoverAtCheck?: Prisma.SortOrder
   classification?: Prisma.SortOrder
   decision?: Prisma.SortOrder
@@ -436,6 +451,7 @@ export type PhotoFaceCheckScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"PhotoFaceCheck"> | string
   photoId?: Prisma.StringWithAggregatesFilter<"PhotoFaceCheck"> | string
   photoVersion?: Prisma.IntWithAggregatesFilter<"PhotoFaceCheck"> | number
+  referenceVersion?: Prisma.IntNullableWithAggregatesFilter<"PhotoFaceCheck"> | number | null
   isCoverAtCheck?: Prisma.BoolWithAggregatesFilter<"PhotoFaceCheck"> | boolean
   classification?: Prisma.EnumFaceCheckClassificationWithAggregatesFilter<"PhotoFaceCheck"> | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionWithAggregatesFilter<"PhotoFaceCheck"> | $Enums.FaceCheckDecision
@@ -456,6 +472,7 @@ export type PhotoFaceCheckCreateInput = {
   id?: string
   userId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -480,6 +497,7 @@ export type PhotoFaceCheckUncheckedCreateInput = {
   userId: string
   photoId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -500,6 +518,7 @@ export type PhotoFaceCheckUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -524,6 +543,7 @@ export type PhotoFaceCheckUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -546,6 +566,7 @@ export type PhotoFaceCheckCreateManyInput = {
   userId: string
   photoId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -566,6 +587,7 @@ export type PhotoFaceCheckUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -588,6 +610,7 @@ export type PhotoFaceCheckUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -626,6 +649,7 @@ export type PhotoFaceCheckCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrder
   isCoverAtCheck?: Prisma.SortOrder
   classification?: Prisma.SortOrder
   decision?: Prisma.SortOrder
@@ -644,6 +668,7 @@ export type PhotoFaceCheckCountOrderByAggregateInput = {
 
 export type PhotoFaceCheckAvgOrderByAggregateInput = {
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrder
   faceCount?: Prisma.SortOrder
   similarityScore?: Prisma.SortOrder
   qualityScore?: Prisma.SortOrder
@@ -656,6 +681,7 @@ export type PhotoFaceCheckMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrder
   isCoverAtCheck?: Prisma.SortOrder
   classification?: Prisma.SortOrder
   decision?: Prisma.SortOrder
@@ -678,6 +704,7 @@ export type PhotoFaceCheckMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrder
   isCoverAtCheck?: Prisma.SortOrder
   classification?: Prisma.SortOrder
   decision?: Prisma.SortOrder
@@ -696,6 +723,7 @@ export type PhotoFaceCheckMinOrderByAggregateInput = {
 
 export type PhotoFaceCheckSumOrderByAggregateInput = {
   photoVersion?: Prisma.SortOrder
+  referenceVersion?: Prisma.SortOrder
   faceCount?: Prisma.SortOrder
   similarityScore?: Prisma.SortOrder
   qualityScore?: Prisma.SortOrder
@@ -798,6 +826,7 @@ export type PhotoFaceCheckCreateWithoutPhotoInput = {
   id?: string
   userId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -820,6 +849,7 @@ export type PhotoFaceCheckUncheckedCreateWithoutPhotoInput = {
   verificationId: string
   userId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -871,6 +901,7 @@ export type PhotoFaceCheckScalarWhereInput = {
   userId?: Prisma.StringFilter<"PhotoFaceCheck"> | string
   photoId?: Prisma.StringFilter<"PhotoFaceCheck"> | string
   photoVersion?: Prisma.IntFilter<"PhotoFaceCheck"> | number
+  referenceVersion?: Prisma.IntNullableFilter<"PhotoFaceCheck"> | number | null
   isCoverAtCheck?: Prisma.BoolFilter<"PhotoFaceCheck"> | boolean
   classification?: Prisma.EnumFaceCheckClassificationFilter<"PhotoFaceCheck"> | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFilter<"PhotoFaceCheck"> | $Enums.FaceCheckDecision
@@ -891,6 +922,7 @@ export type PhotoFaceCheckCreateWithoutVerificationInput = {
   id?: string
   userId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -913,6 +945,7 @@ export type PhotoFaceCheckUncheckedCreateWithoutVerificationInput = {
   userId: string
   photoId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -960,6 +993,7 @@ export type PhotoFaceCheckCreateManyPhotoInput = {
   verificationId: string
   userId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -980,6 +1014,7 @@ export type PhotoFaceCheckUpdateWithoutPhotoInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -1002,6 +1037,7 @@ export type PhotoFaceCheckUncheckedUpdateWithoutPhotoInput = {
   verificationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -1023,6 +1059,7 @@ export type PhotoFaceCheckUncheckedUpdateManyWithoutPhotoInput = {
   verificationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -1044,6 +1081,7 @@ export type PhotoFaceCheckCreateManyVerificationInput = {
   userId: string
   photoId: string
   photoVersion: number
+  referenceVersion?: number | null
   isCoverAtCheck?: boolean
   classification: $Enums.FaceCheckClassification
   decision?: $Enums.FaceCheckDecision
@@ -1064,6 +1102,7 @@ export type PhotoFaceCheckUpdateWithoutVerificationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -1086,6 +1125,7 @@ export type PhotoFaceCheckUncheckedUpdateWithoutVerificationInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -1107,6 +1147,7 @@ export type PhotoFaceCheckUncheckedUpdateManyWithoutVerificationInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   photoId?: Prisma.StringFieldUpdateOperationsInput | string
   photoVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  referenceVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isCoverAtCheck?: Prisma.BoolFieldUpdateOperationsInput | boolean
   classification?: Prisma.EnumFaceCheckClassificationFieldUpdateOperationsInput | $Enums.FaceCheckClassification
   decision?: Prisma.EnumFaceCheckDecisionFieldUpdateOperationsInput | $Enums.FaceCheckDecision
@@ -1131,6 +1172,7 @@ export type PhotoFaceCheckSelect<ExtArgs extends runtime.Types.Extensions.Intern
   userId?: boolean
   photoId?: boolean
   photoVersion?: boolean
+  referenceVersion?: boolean
   isCoverAtCheck?: boolean
   classification?: boolean
   decision?: boolean
@@ -1155,6 +1197,7 @@ export type PhotoFaceCheckSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   userId?: boolean
   photoId?: boolean
   photoVersion?: boolean
+  referenceVersion?: boolean
   isCoverAtCheck?: boolean
   classification?: boolean
   decision?: boolean
@@ -1179,6 +1222,7 @@ export type PhotoFaceCheckSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   userId?: boolean
   photoId?: boolean
   photoVersion?: boolean
+  referenceVersion?: boolean
   isCoverAtCheck?: boolean
   classification?: boolean
   decision?: boolean
@@ -1203,6 +1247,7 @@ export type PhotoFaceCheckSelectScalar = {
   userId?: boolean
   photoId?: boolean
   photoVersion?: boolean
+  referenceVersion?: boolean
   isCoverAtCheck?: boolean
   classification?: boolean
   decision?: boolean
@@ -1219,7 +1264,7 @@ export type PhotoFaceCheckSelectScalar = {
   createdAt?: boolean
 }
 
-export type PhotoFaceCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "verificationId" | "userId" | "photoId" | "photoVersion" | "isCoverAtCheck" | "classification" | "decision" | "faceCount" | "ownerDetected" | "similarityScore" | "confidenceBand" | "qualityScore" | "manipulationRisk" | "failureReason" | "reviewedById" | "reviewedAt" | "calibrationVersion" | "createdAt", ExtArgs["result"]["photoFaceCheck"]>
+export type PhotoFaceCheckOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "verificationId" | "userId" | "photoId" | "photoVersion" | "referenceVersion" | "isCoverAtCheck" | "classification" | "decision" | "faceCount" | "ownerDetected" | "similarityScore" | "confidenceBand" | "qualityScore" | "manipulationRisk" | "failureReason" | "reviewedById" | "reviewedAt" | "calibrationVersion" | "createdAt", ExtArgs["result"]["photoFaceCheck"]>
 export type PhotoFaceCheckInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   verification?: boolean | Prisma.ProfilePhotoVerificationDefaultArgs<ExtArgs>
   photo?: boolean | Prisma.PhotoDefaultArgs<ExtArgs>
@@ -1245,6 +1290,7 @@ export type $PhotoFaceCheckPayload<ExtArgs extends runtime.Types.Extensions.Inte
     userId: string
     photoId: string
     photoVersion: number
+    referenceVersion: number | null
     isCoverAtCheck: boolean
     classification: $Enums.FaceCheckClassification
     decision: $Enums.FaceCheckDecision
@@ -1689,6 +1735,7 @@ export interface PhotoFaceCheckFieldRefs {
   readonly userId: Prisma.FieldRef<"PhotoFaceCheck", 'String'>
   readonly photoId: Prisma.FieldRef<"PhotoFaceCheck", 'String'>
   readonly photoVersion: Prisma.FieldRef<"PhotoFaceCheck", 'Int'>
+  readonly referenceVersion: Prisma.FieldRef<"PhotoFaceCheck", 'Int'>
   readonly isCoverAtCheck: Prisma.FieldRef<"PhotoFaceCheck", 'Boolean'>
   readonly classification: Prisma.FieldRef<"PhotoFaceCheck", 'FaceCheckClassification'>
   readonly decision: Prisma.FieldRef<"PhotoFaceCheck", 'FaceCheckDecision'>

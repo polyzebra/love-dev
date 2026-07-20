@@ -6,7 +6,12 @@ import { getReplySignals } from "@/lib/services/signals";
 import { promptLabel } from "@/config/prompts";
 import { GOAL_LINES } from "@/lib/discovery/taxonomy";
 import type { RelationshipGoal } from "@/generated/prisma/enums";
-import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
+import {
+  resolveBadgeVisibleForUsers,
+  toTrustFacts,
+  PUBLIC_BADGE_SELECT,
+} from "@/lib/services/verification";
+import type { TrustFacts } from "@/lib/trust/verification-state-machine";
 
 /**
  * Discovery feed. Excludes: self, already-swiped, blocked (either way),
@@ -166,6 +171,13 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
 
   const results: DiscoverProfile[] = [];
   const createdAtById = new Map<string, Date>();
+  // ONE batch badge resolution for the whole feed (no per-user query / N+1);
+  // the canonical dispatcher returns legacy or per-photo per cohort.
+  const badgeMap = await resolveBadgeVisibleForUsers(
+    candidates.map((c) => c.userId),
+    new Map<string, TrustFacts>(candidates.map((c) => [c.userId, toTrustFacts(c.user)])),
+  );
+  const badgeVisible = (userId: string) => badgeMap.get(userId)?.visible ?? false;
   for (const c of candidates) {
     let distanceKm: number | null = null;
     if (me.latitude != null && me.longitude != null && c.latitude != null && c.longitude != null) {
@@ -184,7 +196,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
       city: c.city,
       occupation: c.occupation,
       distanceKm,
-      isVerified: isPubliclyVerified(c.user),
+      isVerified: badgeVisible(c.userId),
       isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,
       isBoosted: c.isBoosted,
       interests: c.interests.map((i) => i.interest.label),
@@ -200,7 +212,7 @@ export async function getDiscoverFeed(userId: string, take = 20): Promise<Discov
           viewerScoring,
           toScoringProfile(c),
           {
-            isVerified: isPubliclyVerified(c.user),
+            isVerified: badgeVisible(c.userId),
             lastActiveAt: c.user.lastActiveAt,
             createdAt: c.user.createdAt,
             isOnline: now - c.user.lastActiveAt.getTime() < ONLINE_WINDOW_MS,

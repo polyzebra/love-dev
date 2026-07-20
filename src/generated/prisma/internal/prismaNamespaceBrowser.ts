@@ -911,6 +911,7 @@ export const PhotoFaceCheckScalarFieldEnum = {
   userId: 'userId',
   photoId: 'photoId',
   photoVersion: 'photoVersion',
+  referenceVersion: 'referenceVersion',
   isCoverAtCheck: 'isCoverAtCheck',
   classification: 'classification',
   decision: 'decision',

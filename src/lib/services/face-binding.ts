@@ -7,12 +7,19 @@ import { recordVerificationAudit } from "@/lib/services/face-verification";
  *
  * It owns the FaceIdentityBinding lifecycle: the identity<->liveness binding
  * whose BOUND status is the one gate that flips evaluatePhotoGrant() from
- * NO_BINDING to ELIGIBLE (Epic 1). This Epic introduces the CONTRACT, the
- * canonical states/events, the transition rules, the registry and the engine
- * facade - but NO real provider. In production the registry resolves NO
- * provider, so the engine returns NOT_IMPLEMENTED and nothing can ever reach
- * BOUND. Only a controlled test double (FakeBindingProvider, tests/support)
- * can produce BOUND. Business logic here NEVER names Stripe / AWS / Persona.
+ * NO_BINDING to ELIGIBLE. This module owns the CONTRACT, the canonical
+ * states/events, the transition rules, the registry and the engine facade.
+ *
+ * Two ways a binding reaches BOUND:
+ *   1. AUTOMATED provider (createBinding returns BOUND directly): TEST-ONLY -
+ *      only the FakeBindingProvider does this; no automated production provider
+ *      returns BOUND.
+ *   2. HUMAN REVIEW (completeReview("BOUND")): PRODUCTION - a registered
+ *      HUMAN_REVIEW provider (human-review-binding.ts) routes a binding to
+ *      MANUAL_REVIEW, and an authorized reviewer completes it to BOUND via
+ *      POST /api/admin/verification/bindings/[id]/review. Gated by
+ *      humanReviewConfigured() (config + binding legal gate), NOT by absent code.
+ * Business logic here NEVER names Stripe / AWS / Persona.
  *
  * Server-only (imports @/lib/db); never pulled into a client bundle.
  */

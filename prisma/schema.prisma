@@ -1726,6 +1726,13 @@ model PhotoFaceCheck {
   // image version (Photo.mediaVersion). Replaced/recropped bytes bump
   // mediaVersion and invalidate this row.
   photoVersion       Int
+  // L6.13: the ProfilePhotoVerification.referenceVersion this check was
+  // computed against - the immutable reference-currency stamp. Written
+  // transactionally with the verdict; NEVER inferred later. A rotation
+  // increments referenceVersion, so a check stamped at an older version can
+  // no longer satisfy the current badge (but is retained for audit). Nullable
+  // for backward compatibility: legacy rows (null) fail the per-photo predicate.
+  referenceVersion   Int?
   isCoverAtCheck     Boolean                 @default(false)
   classification     FaceCheckClassification
   decision           FaceCheckDecision       @default(PENDING)

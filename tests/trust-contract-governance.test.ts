@@ -202,12 +202,15 @@ function main() {
   });
 
   // ---- F-2 regression: admin support view matches the public badge -----------
-  check("F-2 regression: admin support badge.visible delegates to isPubliclyVerified", () => {
+  check("F-2 regression: admin support badge.visible delegates to the canonical dispatcher", () => {
     const src = read("src/lib/services/verification-support.ts");
+    // L6.15: migrated from isPubliclyVerified to the ONE badge dispatcher
+    // (resolveBadgeVisibleForUser - legacy or per-photo per cohort).
     assert.ok(
-      /visible:\s*isPubliclyVerified\(/.test(src),
-      "badge.visible must call isPubliclyVerified",
+      /resolveBadgeVisibleForUser\(/.test(src),
+      "badge.visible must delegate to resolveBadgeVisibleForUser",
     );
+    assert.ok(!/isPubliclyVerified\(/.test(src), "must NOT call isPubliclyVerified directly");
     assert.ok(/\.\.\.PUBLIC_BADGE_SELECT/.test(src), "must load PUBLIC_BADGE_SELECT");
     assert.ok(
       !/Boolean\(user\.photoVerifiedAt\)\s*&&\s*!user\.faceBadgeSuspendedAt/.test(src),

@@ -11,12 +11,23 @@ import {
  *
  * It is the SOLE writer of User.faceVerifiedAt. No other code path may set,
  * update, or clear it. faceVerifiedAt is the positive projection behind the
- * future isPhotoVerified() badge (verification.ts) - it is INERT today:
- *   - the grant only fires when EVERY condition passes, and one of them
- *     (BOUND identity<->liveness binding) is never produced yet (Epic 2), so
- *     in production evaluatePhotoGrant() always returns NOT-ELIGIBLE and
- *     faceVerifiedAt stays NULL;
- *   - nothing in production calls grantPhotoVerification() yet;
+ * isPhotoVerified() badge (verification.ts).
+ *
+ * The full grant chain IS implemented and production-wired (Epic 2 exists):
+ *   - grantPhotoVerification() IS called in production - by the profile-photo
+ *     worker on a cover MATCH (face-verification.ts runProfilePhotoVerification)
+ *     and by the admin human-review path (face-binding-review.ts
+ *     submitBindingReview after a BOUND decision);
+ *   - a BOUND identity<->liveness FaceIdentityBinding IS produced in production
+ *     via human review (FaceBindingEngine.completeReview("BOUND"), reached from
+ *     POST /api/admin/verification/bindings/[id]/review). Only the *automated*
+ *     provider path to BOUND is test-only (FakeBindingProvider);
+ *   - evaluatePhotoGrant() is therefore ELIGIBLE once every condition passes.
+ *
+ * It is DORMANT only by CONFIGURATION, not by missing code: the layer stays off
+ * until FACE_MATCH_PROVIDER + the match/binding legal gates + liveness are
+ * configured (see face-rollout.ts). While unconfigured, evaluatePhotoGrant()
+ * fails closed (PROVIDER_DISABLED / NO_BINDING) and faceVerifiedAt stays NULL.
  *   - the legacy public badge (isPubliclyVerified / faceBadgeSuspendedAt) is
  *     UNCHANGED and independent of this engine.
  *
@@ -137,8 +148,9 @@ export async function evaluatePhotoGrant(userId: string): Promise<GrantEvaluatio
 
   // Identity<->liveness BINDING (C2). The current reference record must carry
   // a BOUND binding. Rotation mints a NEW reference record with no binding, so
-  // it can never inherit an old grant. NOTHING produces BOUND yet (Epic 2), so
-  // this is the gate that keeps the whole engine dormant in production.
+  // it can never inherit an old grant. BOUND IS produced in production via human
+  // review (FaceBindingEngine.completeReview); until a binding is BOUND this gate
+  // fails closed with NO_BINDING - a transient state, not a permanent dormancy.
   const activeRef = await db.faceReferenceRecord.findFirst({
     where: { userId, status: "LINKED" },
     orderBy: { referenceVersion: "desc" },

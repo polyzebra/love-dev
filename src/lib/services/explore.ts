@@ -12,7 +12,12 @@ import {
 } from "@/lib/discovery/taxonomy";
 import type { Prisma } from "@/generated/prisma/client";
 import { PHOTO_VERIFIED_WHERE } from "@/lib/services/verification";
-import { isPubliclyVerified } from "@/lib/services/verification";
+import {
+  resolveBadgeVisibleForUser,
+  resolveBadgeVisibleForUsers,
+  toTrustFacts,
+} from "@/lib/services/verification";
+import type { TrustFacts } from "@/lib/trust/verification-state-machine";
 
 /**
  * Explore - discovery categories driven by the canonical taxonomy
@@ -271,14 +276,18 @@ export async function getExploreMatches(viewerId: string, slug: string, filters:
   });
 
   const mySlugs = new Set(me?.interests.map((i) => i.interest.slug) ?? []);
-  const scored = candidates
-    .filter((u) => u.profile)
+  const visibleMembers = candidates.filter((u) => u.profile);
+  // ONE batch badge resolution for the whole page (no per-user query / N+1);
+  // the canonical dispatcher returns legacy or per-photo per cohort.
+  const badgeMap = await resolveBadgeVisibleForUsers(
+    visibleMembers.map((u) => u.id),
+    new Map<string, TrustFacts>(visibleMembers.map((u) => [u.id, toTrustFacts(u)])),
+  );
+  const scored = visibleMembers
     .map((u) => {
       const p = u.profile!;
       const shared = p.interests.filter((i) => mySlugs.has(i.interest.slug)).length;
-      // Canonical photo-verified verdict (User.photoVerifiedAt - the full
-      // row is already loaded by the `include` above; see lib/services/verification.ts)
-      const verified = isPubliclyVerified(u);
+      const verified = badgeMap.get(u.id)?.visible ?? false;
       const recent = now - u.lastActiveAt.getTime() < 24 * 3600_000;
       const score =
         (u.explorePreferences.length > 0 ? 50 : 0) + // explicit category membership
@@ -358,6 +367,8 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
 
   const mySlugs = new Set(me?.interests.map((i) => i.interest.slug) ?? []);
   const p = target.profile;
+  // Canonical dispatcher (legacy or per-photo per cohort) - never recomputed.
+  const isVerified = await resolveBadgeVisibleForUser(target.id, toTrustFacts(target));
   return {
     userId: target.id,
     displayName: p.displayName,
@@ -367,8 +378,7 @@ export async function getExploreProfile(viewerId: string, targetId: string) {
     country: p.country,
     relationshipGoal: p.relationshipGoal,
     replySignal: signals.get(target.id) ?? null,
-    // Canonical photo-verified verdict (full row is loaded via `include`)
-    isVerified: isPubliclyVerified(target),
+    isVerified,
     isOnline: Date.now() - target.lastActiveAt.getTime() < 5 * 60_000,
     photos: target.photos,
     prompts: p.prompts.map((pr) => ({ label: promptLabel(pr.promptKey), answer: pr.answer })),

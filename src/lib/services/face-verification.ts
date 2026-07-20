@@ -519,7 +519,12 @@ export async function runProfilePhotoVerification(
         existing &&
         existing.decision !== "PENDING" &&
         existing.calibrationVersion === activeCalibration &&
-        existing.isCoverAtCheck === photo.isCover
+        existing.isCoverAtCheck === photo.isCover &&
+        // L6.13: a cached verdict is only reused for the CURRENT reference
+        // generation. A rotation bumps job.referenceVersion, so unchanged
+        // photos are re-analysed against the new reference (never silently
+        // reused across references) and their row is re-stamped.
+        existing.referenceVersion === job.referenceVersion
       ) {
         results.push({
           decision: existing.decision,
@@ -545,6 +550,7 @@ export async function runProfilePhotoVerification(
             userId,
             photoId: photo.id,
             photoVersion: photo.mediaVersion,
+            referenceVersion: job.referenceVersion,
             isCoverAtCheck: photo.isCover,
             calibrationVersion: activeCalibration,
             classification: "UNCERTAIN",
@@ -552,6 +558,7 @@ export async function runProfilePhotoVerification(
             failureReason: "image_unreadable",
           },
           update: {
+            referenceVersion: job.referenceVersion,
             calibrationVersion: activeCalibration,
             classification: "UNCERTAIN",
             decision: "FLAGGED",
@@ -585,6 +592,7 @@ export async function runProfilePhotoVerification(
           userId,
           photoId: photo.id,
           photoVersion: photo.mediaVersion,
+          referenceVersion: job.referenceVersion,
           isCoverAtCheck: photo.isCover,
           calibrationVersion: activeCalibration,
           classification: verdict.classification,
@@ -598,6 +606,7 @@ export async function runProfilePhotoVerification(
           failureReason: verdict.failureReason,
         },
         update: {
+          referenceVersion: job.referenceVersion,
           isCoverAtCheck: photo.isCover,
           calibrationVersion: activeCalibration,
           classification: verdict.classification,

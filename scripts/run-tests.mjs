@@ -71,7 +71,6 @@ const UNIT = new Set([
   "verification-consistency.test.ts",
   "auth-url.test.ts",
   "billing-ui.test.ts",
-  "login-routes.test.ts",
   "notifications-web-surface.test.ts",
   "auth-transport.test.ts",
   "api-contract.test.ts",
@@ -99,6 +98,7 @@ const UNIT = new Set([
   "registration-state-machine.test.ts",
   "registration-governance.test.ts",
   "activation-contract.test.ts",
+  "per-photo-badge.test.ts",
   "seo-integrity.test.ts",
 ]);
 

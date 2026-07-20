@@ -16,7 +16,11 @@ import { calculateAge, initialsOf } from "@/lib/utils";
 import { isOnline as presenceOnline } from "@/lib/presence";
 import { promptLabel } from "@/config/prompts";
 import { categoriesForProfile } from "@/lib/discovery/taxonomy";
-import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
+import {
+  resolveBadgeVisibleForUser,
+  toTrustFacts,
+  PUBLIC_BADGE_SELECT,
+} from "@/lib/services/verification";
 
 export const metadata: Metadata = { title: "Conversation" };
 
@@ -126,6 +130,11 @@ export default async function ConversationPage({
         })()
       : [];
 
+  // Canonical dispatcher (legacy or per-photo per cohort) - never recomputed.
+  const otherVerified = other
+    ? await resolveBadgeVisibleForUser(other.user.id, toTrustFacts(other.user))
+    : false;
+
   const peek = {
     displayName: otherName,
     age: other?.user.profile ? calculateAge(other.user.profile.birthDate) : null,
@@ -135,7 +144,7 @@ export default async function ConversationPage({
     sharedInterests: otherInterests
       .filter((i) => mySlugs.has(i.interest.slug))
       .map((i) => i.interest.label),
-    isVerified: other ? isPubliclyVerified(other.user) : false,
+    isVerified: otherVerified,
     isOnline: online,
     photoUrl: other?.user.photos[0]?.url ?? null,
     sameCity:

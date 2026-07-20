@@ -40,7 +40,23 @@ function location(res: Response): string {
   return url.pathname + url.search;
 }
 
+/** This suite REQUIRES a running app server. In any lane without one (CI unit
+ *  lane, integration lane) it skips gracefully instead of failing - it is a
+ *  live-server/e2e test, not a unit test. Set TEST_BASE_URL to run it. */
+async function serverReachable(): Promise<boolean> {
+  try {
+    await fetch(BASE, { method: "HEAD", signal: AbortSignal.timeout(1500) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
+  if (!(await serverReachable())) {
+    console.log(`SKIP - no app server at ${BASE} (live-server suite; set TEST_BASE_URL to run)`);
+    return;
+  }
   console.log("legacy /auth normalization (route handler + middleware)");
 
   await check("/auth (mobile UA) -> 308 /login", async () => {

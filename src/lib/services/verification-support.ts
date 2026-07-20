@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { computeVerificationRisk, type RiskBand } from "@/lib/services/risk-engine";
-import { isPubliclyVerified, PUBLIC_BADGE_SELECT } from "@/lib/services/verification";
+import {
+  resolveBadgeVisibleForUser,
+  toTrustFacts,
+  PUBLIC_BADGE_SELECT,
+} from "@/lib/services/verification";
 
 /**
  * Support-scoped verification view (Phase 15). The return type IS the
@@ -56,6 +60,10 @@ export async function getVerificationSupportView(
     },
   });
   if (!user) return null;
+
+  // The admin badge IS the public badge - resolved by the ONE canonical
+  // dispatcher (legacy or per-photo per cohort), never recomputed here.
+  const badgeVisible = await resolveBadgeVisibleForUser(userId, toTrustFacts(user));
 
   const [job, events, appeals, risk] = await Promise.all([
     db.profilePhotoVerification.findUnique({
@@ -115,10 +123,9 @@ export async function getVerificationSupportView(
       verifiedAt: user.photoVerifiedAt?.toISOString() ?? null,
     },
     badge: {
-      // F-2 (L6.7.1): the admin badge is the PUBLIC badge - resolved by the
-      // Trust Contract (identity + not-suspended + current gallery == verified),
-      // so support sees exactly what members see. Never recomputed here.
-      visible: isPubliclyVerified(user),
+      // The admin badge is the PUBLIC badge - support sees exactly what members
+      // see, via the ONE canonical dispatcher (resolved above).
+      visible: badgeVisible,
       state: user.faceBadgeSuspendedAt ? "suspended" : (job?.badgeStatus ?? "NONE").toLowerCase(),
     },
     faceLayer: job

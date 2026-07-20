@@ -1,7 +1,17 @@
 import { db } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { sendSafetyNotice } from "@/lib/services/safety-notices";
-import { publicBadgeVisible } from "@/lib/trust/verification-state-machine";
+import {
+  publicBadgeVisible,
+  publicBadgePerPhotoVisible,
+  perPhotoBadgeReason,
+  type TrustFacts,
+  type PerPhotoBadgeFacts,
+  type PerPhotoBadgeReason,
+  type PerPhotoCheckFact,
+  type RequiredPhotoFact,
+} from "@/lib/trust/verification-state-machine";
+import { userInPercentCohort, faceEmergencyDisabled } from "@/lib/services/face-rollout";
 import type { Prisma } from "@/generated/prisma/client";
 import type { VerificationStatus, VerificationType } from "@/generated/prisma/enums";
 
@@ -62,6 +72,303 @@ export function isPubliclyVerified(user: {
   return publicBadgeVisible(user);
 }
 
+// ---------------------------------------------------------------------------
+// L6.12/L6.13 - per-photo badge contract dispatcher + cohort (non-destructive).
+// Non-cohort users ALWAYS use the existing whole-gallery resolver, byte-for-
+// byte. Only a canary-cohort user uses the per-photo predicate. A single global
+// boolean can NEVER move all users (cohort membership requires an explicit
+// allowlist entry or a deliberately-set percentage). No surface is rewired
+// here; adoption is a canary-time action (see the L6.13 adoption map).
+// ---------------------------------------------------------------------------
+
+/** Master on/off. Necessary but NOT sufficient - cohort membership still gates. */
+export function perPhotoBadgeEnabled(): boolean {
+  return process.env.FACE_BADGE_PER_PHOTO === "1";
+}
+
+/**
+ * Project the four badge base facts off any already-loaded user row (the same
+ * fields PUBLIC_BADGE_SELECT carries). Surfaces pass this to the dispatcher -
+ * they never inspect the raw badge columns themselves (Trust Contract).
+ */
+export function toTrustFacts(u: {
+  photoVerifiedAt: Date | null;
+  faceBadgeSuspendedAt: Date | null;
+  galleryVersion: number;
+  verifiedGalleryVersion: number | null;
+}): TrustFacts {
+  return {
+    photoVerifiedAt: u.photoVerifiedAt,
+    faceBadgeSuspendedAt: u.faceBadgeSuspendedAt,
+    galleryVersion: u.galleryVersion,
+    verifiedGalleryVersion: u.verifiedGalleryVersion,
+  };
+}
+
+/**
+ * Cohort-safe canary membership for the per-photo badge contract (Phase E).
+ * A user is in the canary IFF: the master flag is on, the emergency switch is
+ * off, AND (they are on the explicit stable-id allowlist OR fall inside the
+ * deterministic percentage bucket). Default off: no allowlist + percent 0/unset
+ * => nobody. A global env boolean alone can never enrol everyone.
+ */
+export function perPhotoBadgeCohort(userId: string): boolean {
+  if (!perPhotoBadgeEnabled()) return false; // master off -> legacy for all
+  if (faceEmergencyDisabled()) return false; // emergency -> fail closed
+  const id = userId?.trim();
+  if (!id) return false;
+  const allow = (process.env.FACE_BADGE_PER_PHOTO_ALLOWLIST ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0 && !s.includes("@")); // stable ids only, never emails
+  if (allow.includes(id)) return true;
+  const pct = Number(process.env.FACE_BADGE_PER_PHOTO_PERCENT);
+  if (Number.isFinite(pct) && pct > 0) return userInPercentCohort(id, pct);
+  return false;
+}
+
+/**
+ * PURE data-driven dispatcher (Phase D). `perPhoto` present -> the canonical
+ * per-photo predicate; `perPhoto` null -> the existing whole-gallery resolver
+ * (unchanged). Cohort/flag selection lives in resolveBadgeVisibleForUser and
+ * batch callers, which decide whether to assemble per-photo facts at all.
+ */
+export function resolveBadgeVisible(
+  base: TrustFacts,
+  perPhoto: PerPhotoBadgeFacts | null,
+): boolean {
+  return perPhoto ? publicBadgePerPhotoVisible(perPhoto) : publicBadgeVisible(base);
+}
+
+/**
+ * THE cohort-aware single-user badge entry. Non-cohort users get the existing
+ * whole-gallery verdict (byte-identical). A canary user gets the per-photo
+ * predicate, FAILING CLOSED (no badge) only for THEM if the facts cannot be
+ * assembled. Never falls a canary user back to the weaker legacy contract.
+ */
+export async function resolveBadgeVisibleForUser(
+  userId: string,
+  base: TrustFacts,
+): Promise<boolean> {
+  if (!perPhotoBadgeCohort(userId)) return publicBadgeVisible(base);
+  const facts = await getPerPhotoBadgeFacts(userId);
+  return facts ? publicBadgePerPhotoVisible(facts) : false;
+}
+
+/**
+ * Per-photo badge STATE for a canary user (Phase G): visibility + a coarse
+ * machine reason for internal diagnostics / one safe user-facing action. No
+ * biometric data. Non-cohort users report the legacy visibility with no reason.
+ */
+export async function resolveBadgeStateForUser(
+  userId: string,
+  base: TrustFacts,
+): Promise<{ visible: boolean; reason: PerPhotoBadgeReason; cohort: boolean }> {
+  if (!perPhotoBadgeCohort(userId)) {
+    return { visible: publicBadgeVisible(base), reason: "LEGACY_VISIBLE", cohort: false };
+  }
+  const facts = await getPerPhotoBadgeFacts(userId);
+  if (!facts) return { visible: false, reason: "REFERENCE_REQUIRED", cohort: true };
+  return {
+    visible: publicBadgePerPhotoVisible(facts),
+    reason: perPhotoBadgeReason(facts),
+    cohort: true,
+  };
+}
+
+/**
+ * Minimal read surface the batch assembler needs. `db` satisfies it at runtime;
+ * tests inject a counting fake to prove the bounded query count.
+ */
+export type BadgeBatchClient = {
+  user: {
+    findMany(
+      a: unknown,
+    ): Promise<{ id: string; photoVerifiedAt: Date | null; faceBadgeSuspendedAt: Date | null }[]>;
+  };
+  profilePhotoVerification: {
+    findMany(a: unknown): Promise<
+      {
+        id: string;
+        userId: string;
+        referenceId: string | null;
+        referenceVersion: number | null;
+        referenceStatus: string | null;
+      }[]
+    >;
+  };
+  photo: {
+    findMany(
+      a: unknown,
+    ): Promise<{ id: string; userId: string; mediaVersion: number; isCover: boolean }[]>;
+  };
+  photoFaceCheck: {
+    findMany(a: unknown): Promise<
+      {
+        verificationId: string;
+        photoId: string;
+        photoVersion: number;
+        referenceVersion: number | null;
+        isCoverAtCheck: boolean;
+        decision: string;
+      }[]
+    >;
+  };
+};
+
+const ckey = (verificationId: string, photoId: string, version: number) =>
+  `${verificationId} ${photoId} ${version}`;
+
+/**
+ * THE canonical BATCH per-photo fact assembler (L6.14 Phase A). REUSES the
+ * existing pipeline data. Query plan: a CONSTANT 4 queries (user, verification,
+ * ACTIVE photos, PhotoFaceCheck) via `IN (...)` - independent of userCount, NO
+ * per-user query, NO N+1. The 4th is skipped when there is nothing to load (<=4
+ * total). Deterministic keyed mapping; returns one entry per requested user
+ * (null for a missing user). Exactly one check exists per
+ * (photoId, mediaVersion, verificationId) (unique key) -> an older PASSED can
+ * never shadow a current failure. Selects only predicate fields - no similarity
+ * / quality / manipulation scores reach this layer.
+ */
+export async function getPerPhotoBadgeFactsForUsers(
+  userIds: string[],
+  client: BadgeBatchClient = db as unknown as BadgeBatchClient,
+): Promise<Map<string, PerPhotoBadgeFacts | null>> {
+  const ids = [...new Set(userIds.filter((id) => id && id.trim().length > 0))];
+  const out = new Map<string, PerPhotoBadgeFacts | null>();
+  if (ids.length === 0) return out;
+
+  // Query 1-3 (parallel, IN-scoped).
+  const [users, jobs, photos] = await Promise.all([
+    client.user.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, photoVerifiedAt: true, faceBadgeSuspendedAt: true },
+    }),
+    client.profilePhotoVerification.findMany({
+      where: { userId: { in: ids } },
+      select: {
+        id: true,
+        userId: true,
+        referenceId: true,
+        referenceVersion: true,
+        referenceStatus: true,
+      },
+    }),
+    client.photo.findMany({
+      where: { userId: { in: ids }, status: "ACTIVE" },
+      select: { id: true, userId: true, mediaVersion: true, isCover: true },
+    }),
+  ]);
+  const userById = new Map(users.map((u) => [u.id, u]));
+  const jobByUser = new Map(jobs.map((j) => [j.userId, j]));
+  const jobIdByUser = new Map(jobs.map((j) => [j.userId, j.id]));
+  const photosByUser = new Map<string, typeof photos>();
+  for (const p of photos) {
+    const arr = photosByUser.get(p.userId);
+    if (arr) arr.push(p);
+    else photosByUser.set(p.userId, [p]);
+  }
+
+  // Query 4 (scoped to the loaded jobs + current photos), skipped if nothing.
+  const jobIds = jobs.map((j) => j.id);
+  const photoIds = photos.map((p) => p.id);
+  const checks =
+    jobIds.length > 0 && photoIds.length > 0
+      ? await client.photoFaceCheck.findMany({
+          where: { verificationId: { in: jobIds }, photoId: { in: photoIds } },
+          select: {
+            verificationId: true,
+            photoId: true,
+            photoVersion: true,
+            referenceVersion: true,
+            isCoverAtCheck: true,
+            decision: true,
+          },
+        })
+      : [];
+  const checkByKey = new Map(
+    checks.map((c) => [ckey(c.verificationId, c.photoId, c.photoVersion), c]),
+  );
+
+  for (const uid of ids) {
+    const u = userById.get(uid);
+    if (!u) {
+      out.set(uid, null);
+      continue;
+    }
+    const job = jobByUser.get(uid);
+    const jobId = jobIdByUser.get(uid);
+    const referenceCurrent =
+      job?.referenceId != null &&
+      (job.referenceStatus === "ACTIVE" || job.referenceStatus === "EXPIRING");
+    const requiredPhotos: RequiredPhotoFact[] = (photosByUser.get(uid) ?? []).map((p) => {
+      const c = jobId ? checkByKey.get(ckey(jobId, p.id, p.mediaVersion)) : undefined;
+      return {
+        photoId: p.id,
+        mediaVersion: p.mediaVersion,
+        isCover: p.isCover,
+        check: c
+          ? {
+              photoId: c.photoId,
+              photoVersion: c.photoVersion,
+              referenceVersion: c.referenceVersion, // persisted stamp (null legacy -> fails closed)
+              isCoverAtCheck: c.isCoverAtCheck,
+              decision: c.decision as PerPhotoCheckFact["decision"],
+            }
+          : null,
+      };
+    });
+    out.set(uid, {
+      photoVerifiedAt: u.photoVerifiedAt,
+      faceBadgeSuspendedAt: u.faceBadgeSuspendedAt,
+      currentReferenceId: referenceCurrent ? job!.referenceId : null,
+      currentReferenceVersion: referenceCurrent ? (job!.referenceVersion ?? null) : null,
+      requiredPhotos,
+    });
+  }
+  return out;
+}
+
+/** Single-user convenience: delegates to the ONE canonical batch assembler. */
+export async function getPerPhotoBadgeFacts(userId: string): Promise<PerPhotoBadgeFacts | null> {
+  return (await getPerPhotoBadgeFactsForUsers([userId])).get(userId) ?? null;
+}
+
+/**
+ * THE canonical BATCH badge dispatcher (L6.14 Phase B). Partitions by cohort:
+ * non-canary users resolve from their legacy base facts (NO per-photo assembly);
+ * only the canary subset triggers ONE batch fact load. A canary user whose facts
+ * are missing fails closed for THEM alone - one bad user never fails the batch.
+ * Returns a keyed map { visible, reason } with stable per-user results
+ * (page-position independent).
+ */
+export async function resolveBadgeVisibleForUsers(
+  userIds: string[],
+  baseById: Map<string, TrustFacts>,
+  client: BadgeBatchClient = db as unknown as BadgeBatchClient,
+): Promise<Map<string, { visible: boolean; reason: PerPhotoBadgeReason }>> {
+  const ids = [...new Set(userIds.filter(Boolean))];
+  const out = new Map<string, { visible: boolean; reason: PerPhotoBadgeReason }>();
+  const canary = ids.filter((id) => perPhotoBadgeCohort(id));
+  const facts = canary.length > 0 ? await getPerPhotoBadgeFactsForUsers(canary, client) : new Map();
+  const canarySet = new Set(canary);
+  for (const id of ids) {
+    if (!canarySet.has(id)) {
+      const base = baseById.get(id);
+      out.set(id, { visible: base ? publicBadgeVisible(base) : false, reason: "LEGACY_VISIBLE" });
+      continue;
+    }
+    const f = (facts.get(id) as PerPhotoBadgeFacts | null | undefined) ?? null;
+    out.set(
+      id,
+      f
+        ? { visible: publicBadgePerPhotoVisible(f), reason: perPhotoBadgeReason(f) }
+        : { visible: false, reason: "REFERENCE_REQUIRED" },
+    );
+  }
+  return out;
+}
+
 /**
  * Identity-only public fact (Epic 1 / F1): the account holder passed identity
  * verification. Same semantics as today's photoVerifiedAt check - the future
@@ -72,12 +379,18 @@ export function isIdentityVerified(user: { photoVerifiedAt: Date | null }): bool
 }
 
 /**
- * Positive "Photo Verified" grant (Epic 1 / F1). The future public badge that
- * means "these photos are the identity-verified person". INERT in this phase:
- * nothing writes User.faceVerifiedAt yet, so this is false for everyone, and
- * NO UI / list filter / worker / query consumes it. It exists only so later
- * epics have the ONE canonical positive signal to build on. `faceVerifiedAt`
- * is optional so legacy callers that never select it safely read false.
+ * Positive "Photo Verified" grant. The AWS-backed signal meaning "these photos
+ * are the identity-verified person". `faceVerifiedAt` IS written in production
+ * by the canonical grant engine (photo-grant.ts grantPhotoVerification), once
+ * the face layer is CONFIGURED (FACE_MATCH_PROVIDER + legal gates) and the full
+ * chain completes (liveness -> reference -> BOUND binding -> cover match). While
+ * the layer is unconfigured it stays NULL (fail-closed), so this reads false.
+ *
+ * NOTE (badge-enforcement gap): the current public badge resolver
+ * (publicBadgeVisible / isPubliclyVerified) does NOT yet consume this - it still
+ * grants on Stripe photoVerifiedAt + gallery snapshot. Wiring the badge to
+ * require faceVerifiedAt is a deploy-gated change (see L6.11 Phase F).
+ * `faceVerifiedAt` is optional so legacy callers that never select it read false.
  */
 export function isPhotoVerified(user: { faceVerifiedAt?: Date | null }): boolean {
   return user.faceVerifiedAt != null;
