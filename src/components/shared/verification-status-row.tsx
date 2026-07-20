@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { VerificationUxState } from "@/lib/services/photo-verification";
+import type { FaceAction } from "@/lib/verification-presentation";
 import { BadgeCheck, CircleAlert, CircleDashed, Hourglass, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,7 +38,15 @@ export const VERIFICATION_STATE_ICON: Record<
  */
 export function photoVerificationRow(
   ux: VerificationUxState,
-  opts: { configured: boolean; surface: "profile" | "settings" },
+  opts: {
+    configured: boolean;
+    surface: "profile" | "settings";
+    /** L8.3.1: the canonical face action (getFaceVerificationAction). When the
+     *  badge was withheld it disambiguates the row - first-time enrolment vs a
+     *  photo match vs an explicit blocking reason - instead of the bare
+     *  "Verified badge removed". Both surfaces pass the SAME resolved action. */
+    faceAction?: FaceAction;
+  },
 ): {
   label: string;
   state: VerificationRowState;
@@ -48,16 +57,36 @@ export function photoVerificationRow(
   switch (ux) {
     case "verified":
       return { label: "Verified", state: "verified", value: "Verified", action: null };
-    case "requires_reverification":
+    case "requires_reverification": {
       // L6.6 Phase I: the verified badge was removed because the profile photos
-      // changed. Identity is intact; the owner must complete Photo Verification
-      // again to restore the badge.
+      // changed. Identity is intact; the owner must act to restore the badge.
+      // L8.3.1: the ambiguous bare "Verified badge removed" is disambiguated
+      // by the canonical face action WHEN the AWS layer is live - first-time
+      // enrolment ("Start Face Verification") vs a photo match ("Verify New
+      // Photo"). When the layer is dormant/blocked the legacy Stripe re-verify
+      // CTA still restores the badge, so we FALL BACK to it (never show a
+      // "face verification unavailable" message next to a working flow).
+      const fa = opts.faceAction;
+      if (fa && (fa.kind === "START_LIVENESS" || fa.kind === "VERIFY_PHOTO") && fa.label) {
+        return {
+          label:
+            fa.kind === "START_LIVENESS" ? "Face verification needed" : "Verified badge removed",
+          state: "needs-action",
+          value:
+            fa.kind === "START_LIVENESS"
+              ? "First-time face verification needed"
+              : "Your profile photo changed - confirm it's you",
+          action: opts.configured ? { label: fa.label, href: anchor } : null,
+        };
+      }
+      // Layer dormant/blocked, or no action supplied - the legacy re-verify row.
       return {
         label: "Verified badge removed",
         state: "needs-action",
         value: "Your profile photos changed",
         action: opts.configured ? { label: "Verify Photos", href: anchor } : null,
       };
+    }
     case "pending":
     case "verification_started":
       // "Session open" is true for BOTH provider sub-states (user still

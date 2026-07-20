@@ -183,3 +183,164 @@ export const FACE_STATE_COPY = {
 // (Identity-only helpers isIdentityVerified/isPhotoVerified remain canonical in
 // verification.ts.)
 // ===========================================================================
+
+// ===========================================================================
+// L8.3.1 - THE canonical AWS face-verification ACTION resolver.
+//
+// This is NOT a badge resolver (it never computes badge visibility - that
+// stays in verification-state-machine.ts). It answers ONE question that the
+// Account AND Profile surfaces must answer identically: given a user's face
+// state, what single face-verification action do we offer, and if none, why?
+//
+// The two distinct actions the surfaces conflated before:
+//   - START_LIVENESS: first-time ENROLMENT. No canonical face reference yet -
+//     one video-selfie liveness capture links the face to the profile. Happens
+//     exactly once per user.
+//   - VERIFY_PHOTO:   photo MATCH. A reference already exists - a changed photo
+//     is matched against it. NO liveness, ever again.
+//
+// Requirement 4: the CTA is never silently disabled. When the layer can't run,
+// the resolver returns kind:"BLOCKED" with an EXPLICIT blockingReason.
+// ===========================================================================
+
+export type FaceActionKind =
+  | "IDENTITY_FIRST" // identity not verified yet - the face layer is downstream
+  | "START_LIVENESS" // first-time enrolment (no reference) -> real AWS liveness
+  | "VERIFY_PHOTO" // reference exists + photo changed -> match only, no liveness
+  | "VERIFIED" // enrolled and current - nothing to do
+  | "CONSENT_WITHDRAWN" // owner turned face comparison off
+  | "BLOCKED"; // cannot run - see blockingReason
+
+export type FaceBlockingReason =
+  | "AWS_UNAVAILABLE" // provider not configured (FACE_MATCH_PROVIDER unset / dormant)
+  | "LEGAL_GATE_CLOSED" // faceMatchLegalGate() not satisfied
+  | "EMERGENCY_DISABLED" // FACE_EMERGENCY_DISABLE kill switch on
+  | "REFERENCE_MISSING" // a match is required but the reference is gone (revoked/expired)
+  | "ROUTE_NOT_WIRED"; // the liveness API route is absent (build/deploy defect)
+
+/** Everything the pure resolver needs - computed by each surface (server side)
+ *  from the SAME canonical sources so the surfaces can never disagree. */
+export type FaceActionFacts = {
+  /** Stripe identity verified (photoVerifiedAt present). Gates the face layer. */
+  identityVerified: boolean;
+  /** Public badge currently withheld (faceBadgeSuspendedAt present) - a photo changed. */
+  badgeSuspended: boolean;
+  /** A usable canonical face reference exists (enrolment already happened). */
+  hasReference: boolean;
+  /** Owner withdrew face-comparison consent. */
+  consentWithdrawn: boolean;
+  /** isFaceMatchConfigured() - provider wired. */
+  faceLayerConfigured: boolean;
+  /** faceMatchLegalGate().ok - compliance approvals present. */
+  legalGateOpen: boolean;
+  /** faceEmergencyDisabled() - kill switch. */
+  emergencyDisabled: boolean;
+  /** The liveness API route exists (compile-time invariant; a guard for build defects). */
+  routeWired: boolean;
+};
+
+export type FaceAction = {
+  kind: FaceActionKind;
+  /** CTA button label - null when there is no actionable button. */
+  label: string | null;
+  /** Card headline. Never the bare "Verified badge removed" - always says
+   *  whether the user needs first-time enrolment or only a photo match. */
+  headline: string;
+  body: string;
+  /** Populated only for kind:"BLOCKED" - the exact machine reason. */
+  blockingReason: FaceBlockingReason | null;
+};
+
+const FACE_ACTION_COPY = {
+  START_LIVENESS: {
+    label: "Start Face Verification",
+    headline: "Verify your face - one time only",
+    body: "Record a short one-time video selfie to link your face to your profile. After this, new photos are checked automatically - you'll never record another video.",
+  },
+  VERIFY_PHOTO: {
+    label: "Verify New Photo",
+    headline: "Confirm your new photo",
+    body: "Your profile photo changed, so your badge is paused. We'll match the new photo to the face you already verified - no video needed. Your badge returns the moment it matches.",
+  },
+  VERIFIED: {
+    label: null,
+    headline: "Your face is verified",
+    body: "New photos are checked automatically against your verified face. Nothing is needed from you.",
+  },
+  CONSENT_WITHDRAWN: {
+    label: null,
+    headline: "Photo comparison is turned off",
+    body: "Your verified badge is hidden. Turn photo comparison back on and complete verification to restore it.",
+  },
+  IDENTITY_FIRST: {
+    label: null,
+    headline: "Verify your identity first",
+    body: "Complete identity verification to unlock face verification for your photos.",
+  },
+} as const;
+
+const BLOCKED_COPY: Record<FaceBlockingReason, { headline: string; body: string }> = {
+  AWS_UNAVAILABLE: {
+    headline: "Face verification isn't available yet",
+    body: "Face verification will open here soon. Your verified badge is unaffected.",
+  },
+  LEGAL_GATE_CLOSED: {
+    headline: "Face verification is being finalised",
+    body: "We're completing the compliance review before face verification opens. Your verified badge is unaffected.",
+  },
+  EMERGENCY_DISABLED: {
+    headline: "Face verification is paused",
+    body: "Face verification is temporarily paused for maintenance. Your verified badge is unaffected.",
+  },
+  REFERENCE_MISSING: {
+    headline: "Re-verify your face",
+    body: "Your saved face reference is no longer valid, so a quick one-time video selfie is needed again before new photos can be matched.",
+  },
+  ROUTE_NOT_WIRED: {
+    headline: "Face verification is unavailable",
+    body: "This feature isn't reachable right now. Your verified badge is unaffected.",
+  },
+};
+
+/**
+ * The ONE face-verification action resolver. Pure, fail-closed, side-effect
+ * free. Order matters:
+ *   1. identity is the prerequisite (no identity -> no face CTA);
+ *   2. explicit consent withdrawal is its own state;
+ *   3. config/compliance gates block with an EXPLICIT reason (never a silent
+ *      disabled button);
+ *   4. only then: no reference -> first-time enrolment; reference present ->
+ *      photo match if the badge is suspended, else nothing to do.
+ *
+ * INVARIANT (the task's core guarantee): once `hasReference` is true the
+ * resolver NEVER returns START_LIVENESS - a gallery change can only ever
+ * produce VERIFY_PHOTO. A second liveness session is structurally impossible.
+ */
+export function resolveFaceVerificationAction(f: FaceActionFacts): FaceAction {
+  const action = (
+    kind: Exclude<FaceActionKind, "BLOCKED">,
+  ): FaceAction => ({ kind, ...FACE_ACTION_COPY[kind], blockingReason: null });
+  const blocked = (blockingReason: FaceBlockingReason): FaceAction => ({
+    kind: "BLOCKED",
+    label: null,
+    ...BLOCKED_COPY[blockingReason],
+    blockingReason,
+  });
+
+  if (!f.identityVerified) return action("IDENTITY_FIRST");
+  if (f.consentWithdrawn) return action("CONSENT_WITHDRAWN");
+
+  // Config/compliance gates - fail closed with the exact reason.
+  if (f.emergencyDisabled) return blocked("EMERGENCY_DISABLED");
+  if (!f.faceLayerConfigured) return blocked("AWS_UNAVAILABLE");
+  if (!f.legalGateOpen) return blocked("LEGAL_GATE_CLOSED");
+  if (!f.routeWired) return blocked("ROUTE_NOT_WIRED");
+
+  // Layer live. No reference -> the ONE-TIME enrolment path.
+  if (!f.hasReference) return action("START_LIVENESS");
+
+  // Reference exists -> liveness is NEVER offered again. A changed photo is a
+  // match; an unchanged, current badge needs nothing.
+  if (f.badgeSuspended) return action("VERIFY_PHOTO");
+  return action("VERIFIED");
+}

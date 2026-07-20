@@ -17,6 +17,7 @@ import {
   TRUST_WEIGHTS,
   VERIFICATION_USER_SELECT,
 } from "@/lib/services/verification";
+import { getFaceVerificationAction } from "@/lib/services/face-action";
 import { SettingsSubheader } from "@/components/settings/settings-subheader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -53,9 +54,24 @@ export default async function AccountSettingsPage() {
     faceBadgeSuspendedAt: user?.faceBadgeSuspendedAt ?? null,
     verification: photoWorkflow,
   });
+  // L8.3.1: the SAME canonical face action the Profile surface resolves, so
+  // the Account row can never disagree about first-time enrolment vs a photo
+  // match. Load the per-user face row only once identity is verified.
+  const faceJob = user?.photoVerifiedAt
+    ? await db.profilePhotoVerification.findUnique({
+        where: { userId: viewer.id },
+        select: { status: true, consentAt: true },
+      })
+    : null;
+  const faceAction = getFaceVerificationAction({
+    identityVerified: user?.photoVerifiedAt != null,
+    badgeSuspended: user?.faceBadgeSuspendedAt != null,
+    faceJob,
+  });
   const photoRow = photoVerificationRow(photoUx, {
     configured: photoConfigured,
     surface: "settings",
+    faceAction,
   });
   // Public verdict date only (photoVerifiedAt) - internal workflow
   // timestamps (statusChangedAt / lastReconciledAt) never leave admin.

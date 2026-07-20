@@ -14,7 +14,7 @@ import {
   XCircle,
 } from "lucide-react";
 import type { VerificationUxState } from "@/lib/services/photo-verification";
-import { FACE_STATE_COPY } from "@/lib/verification-presentation";
+import { FACE_STATE_COPY, type FaceAction } from "@/lib/verification-presentation";
 import dynamic from "next/dynamic";
 
 // Biometric capture code is dynamically imported: it never ships to
@@ -61,6 +61,7 @@ export function PhotoVerifyCard({
   workflowStatus = null,
   facePresentation = null,
   liveness = null,
+  faceAction = null,
 }: {
   state: VerificationUxState;
   /** Raw Verification.status - WORDING only (expired vs rejected retry
@@ -78,6 +79,10 @@ export function PhotoVerifyCard({
   /** Liveness capture required before profile photos can be checked (no
    *  trusted reference yet). Carries the consent version to accept. */
   liveness?: { consentVersion: string } | null;
+  /** L8.3.1: the canonical face action (getFaceVerificationAction) - drives the
+   *  enrolment-vs-match headline and, when the layer can't run, the explicit
+   *  blocking reason. Null renders the identity flow exactly as before. */
+  faceAction?: FaceAction | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -202,7 +207,15 @@ export function PhotoVerifyCard({
   // the user sees; no provider vocabulary, no similarity scores)
   // Capture step: identity verified, face layer on, no trusted reference
   // yet -> the video-selfie liveness flow (Phases 23/24).
-  if (liveness && facePresentation === "checking_profile_photos") {
+  // L8.3.1: this is the FIRST-TIME ENROLMENT entry point. It fires when the
+  // canonical action is START_LIVENESS (layer live + legal gate open + no
+  // reference) or the legacy capture state. Because the resolver only returns
+  // START_LIVENESS AFTER the config/legal gates pass, the enrolment CTA can
+  // never appear while the AWS layer is dormant - no prompt storm in prod.
+  if (
+    liveness &&
+    (faceAction?.kind === "START_LIVENESS" || facePresentation === "checking_profile_photos")
+  ) {
     return wrap(<LivenessCapture consentVersion={liveness.consentVersion} />);
   }
   if (

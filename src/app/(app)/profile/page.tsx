@@ -15,6 +15,8 @@ import {
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { toVerificationState, VERIFICATION_USER_SELECT } from "@/lib/services/verification";
+import { getFaceVerificationAction } from "@/lib/services/face-action";
+import { BIOMETRIC_CONSENT_VERSION } from "@/lib/services/face-verification";
 import {
   deriveVerificationUxState,
   isPhotoVerificationConfigured,
@@ -95,6 +97,14 @@ export default async function ProfilePage() {
   const facePresentation = deriveVerificationPresentation(verificationUx, faceJob, {
     workflowStatus: photoWorkflow?.status ?? null,
     consentWithdrawn,
+  });
+  // L8.3.1: the ONE canonical face action (shared with the Account surface) -
+  // first-time enrolment vs photo match vs an explicit blocking reason. The
+  // card renders its CTA/copy from this; both surfaces resolve it identically.
+  const faceAction = getFaceVerificationAction({
+    identityVerified: profile.user.photoVerifiedAt != null,
+    badgeSuspended: profile.user.faceBadgeSuspendedAt != null,
+    faceJob,
   });
   // With identity verified, the presentation is one of: verified /
   // checking_profile_photos / photo_update_review / manual_review /
@@ -177,12 +187,20 @@ export default async function ProfilePage() {
             "Coming soon" status row above (one unavailable message, no dead
             CTA). Selfie capture happens on the provider's side; no
             biometrics are ever stored. */}
-        {((!verification.photoVerified && verificationConfigured) || faceCardState) && (
+        {((!verification.photoVerified && verificationConfigured) ||
+          faceCardState ||
+          faceAction.kind === "START_LIVENESS") && (
           <Reveal>
             <PhotoVerifyCard
               state={verificationUx}
               workflowStatus={photoWorkflow?.status ?? null}
               facePresentation={faceCardState}
+              faceAction={faceAction}
+              liveness={
+                faceAction.kind === "START_LIVENESS"
+                  ? { consentVersion: BIOMETRIC_CONSENT_VERSION }
+                  : null
+              }
             />
           </Reveal>
         )}
