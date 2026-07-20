@@ -203,13 +203,37 @@ export const FACE_STATE_COPY = {
 // the resolver returns kind:"BLOCKED" with an EXPLICIT blockingReason.
 // ===========================================================================
 
-export type FaceActionKind =
+// L8.3.3: the canonical verification STATUS. One machine state per distinct
+// thing the user must understand (what happened / what's happening / what to
+// do / when nothing is required). Every status carries exact copy + a real CTA.
+export type FaceActionStatus =
   | "IDENTITY_FIRST" // identity not verified yet - the face layer is downstream
-  | "START_LIVENESS" // first-time enrolment (no reference) -> real AWS liveness
-  | "VERIFY_PHOTO" // reference exists + photo changed -> match only, no liveness
-  | "VERIFIED" // enrolled and current - nothing to do
+  | "FIRST_TIME" // no canonical reference -> one-time enrolment (AWS liveness)
+  | "PROCESSING" // a changed photo is being matched (spinner, no CTA)
+  | "MATCH_FAILED" // the photo could not be confirmed as the verified face
+  | "NO_FACE" // no face detected in a required (cover) photo
+  | "MULTIPLE_FACES" // more than one face in the photo
+  | "MANUAL_REVIEW" // a human is reviewing the photo
+  | "VERIFIED" // enrolled and current - nothing required
   | "CONSENT_WITHDRAWN" // owner turned face comparison off
-  | "BLOCKED"; // cannot run - see blockingReason
+  | "UNAVAILABLE"; // the layer can't run - see blockingReason (Retry)
+
+/** The per-photo check outcome once a canonical reference exists. Drives the
+ *  PROCESSING / *_FAILED / NO_FACE / MULTIPLE_FACES / MANUAL_REVIEW statuses. */
+export type FacePhotoOutcome =
+  | "NONE" // no photo change pending / nothing to report
+  | "PROCESSING" // AWS face match in flight
+  | "MATCH_FAILED" // matched against the reference and failed
+  | "NO_FACE" // detector found no face
+  | "MULTIPLE_FACES" // detector found more than one face
+  | "MANUAL_REVIEW"; // routed to human review
+
+/** The real action a CTA performs (never a dead navigation). */
+export type FaceCtaAction =
+  | "START_LIVENESS" // -> AWS Face Liveness (one-time enrolment)
+  | "VERIFY_PHOTO" // -> AWS Face Match (existing reference)
+  | "REPLACE_PHOTO" // -> the photo picker
+  | "RETRY"; // -> restart verification
 
 export type FaceBlockingReason =
   | "AWS_UNAVAILABLE" // provider not configured (FACE_MATCH_PROVIDER unset / dormant)
@@ -237,68 +261,104 @@ export type FaceActionFacts = {
   emergencyDisabled: boolean;
   /** The liveness API route exists (compile-time invariant; a guard for build defects). */
   routeWired: boolean;
+  /** L8.3.3: the current per-photo check outcome (once a reference exists). */
+  photoOutcome: FacePhotoOutcome;
 };
 
+/**
+ * THE canonical verification UX object both Account and Profile render. Never a
+ * generic/consequence message ("Verified badge removed", "Verify Photos") -
+ * always: what happened + what's happening + what to do + when nothing is needed.
+ */
 export type FaceAction = {
-  kind: FaceActionKind;
-  /** CTA button label - null when there is no actionable button. */
-  label: string | null;
-  /** Card headline. Never the bare "Verified badge removed" - always says
-   *  whether the user needs first-time enrolment or only a photo match. */
+  status: FaceActionStatus;
+  /** What happened / what to do - the primary line. */
   headline: string;
-  body: string;
-  /** Populated only for kind:"BLOCKED" - the exact machine reason. */
+  /** The supporting explanation. */
+  description: string;
+  /** The one real action, or null when nothing is required. The label is what
+   *  the button reads; the action is what it EXECUTES (never a dead nav). */
+  cta: { label: string; action: FaceCtaAction } | null;
+  /** Populated only for status:"UNAVAILABLE" - the exact machine reason. */
   blockingReason: FaceBlockingReason | null;
+  /** Progress indicator - spinner visible while a check is in flight. */
+  progress: { spinner: boolean };
 };
 
-const FACE_ACTION_COPY = {
-  START_LIVENESS: {
-    label: "Start Face Verification",
-    headline: "Verify your face - one time only",
-    body: "Record a short one-time video selfie to link your face to your profile. After this, new photos are checked automatically - you'll never record another video.",
+// L8.3.3 EXACT copy per status. Governance pins these strings, so the UI can
+// never regress to a generic/consequence message. `cta.action` is what the
+// button EXECUTES; `spinner` feeds the progress indicator.
+type FaceUx = {
+  headline: string;
+  description: string;
+  cta: { label: string; action: FaceCtaAction } | null;
+  spinner: boolean;
+};
+
+const FACE_ACTION_UX: Record<FaceActionStatus, FaceUx> = {
+  IDENTITY_FIRST: {
+    headline: "Verify your identity first",
+    description: "Complete identity verification to unlock face verification for your photos.",
+    cta: null,
+    spinner: false,
   },
-  VERIFY_PHOTO: {
-    label: "Verify New Photo",
-    headline: "Confirm your new photo",
-    body: "Your profile photo changed, so your badge is paused. We'll match the new photo to the face you already verified - no video needed. Your badge returns the moment it matches.",
+  FIRST_TIME: {
+    headline: "Complete Face Verification",
+    description:
+      "Complete a quick one-time face verification before you can start dating. This usually takes about 10 seconds. No ID document is required.",
+    cta: { label: "Start Face Verification", action: "START_LIVENESS" },
+    spinner: false,
+  },
+  PROCESSING: {
+    headline: "Checking your new photo",
+    description:
+      "We're comparing your new photo with your verified face. No additional face verification is required.",
+    cta: null,
+    spinner: true,
+  },
+  MATCH_FAILED: {
+    headline: "This photo couldn't be verified",
+    description: "Choose another photo showing your face clearly.",
+    cta: { label: "Replace Photo", action: "REPLACE_PHOTO" },
+    spinner: false,
+  },
+  NO_FACE: {
+    headline: "No face detected",
+    description: "Your cover photo must clearly show your face.",
+    cta: { label: "Choose Another Photo", action: "REPLACE_PHOTO" },
+    spinner: false,
+  },
+  MULTIPLE_FACES: {
+    headline: "Multiple faces detected",
+    description: "Use a photo that only shows you.",
+    cta: { label: "Replace Photo", action: "REPLACE_PHOTO" },
+    spinner: false,
+  },
+  MANUAL_REVIEW: {
+    headline: "Photo under review",
+    description: "We'll notify you when the review is complete.",
+    cta: null,
+    spinner: false,
   },
   VERIFIED: {
-    label: null,
     headline: "Your face is verified",
-    body: "New photos are checked automatically against your verified face. Nothing is needed from you.",
+    description:
+      "New photos are checked automatically against your verified face. Nothing is needed from you.",
+    cta: null,
+    spinner: false,
   },
   CONSENT_WITHDRAWN: {
-    label: null,
     headline: "Photo comparison is turned off",
-    body: "Your verified badge is hidden. Turn photo comparison back on and complete verification to restore it.",
+    description:
+      "Turn photo comparison back on and complete verification to restore your verified badge.",
+    cta: null,
+    spinner: false,
   },
-  IDENTITY_FIRST: {
-    label: null,
-    headline: "Verify your identity first",
-    body: "Complete identity verification to unlock face verification for your photos.",
-  },
-} as const;
-
-const BLOCKED_COPY: Record<FaceBlockingReason, { headline: string; body: string }> = {
-  AWS_UNAVAILABLE: {
-    headline: "Face verification isn't available yet",
-    body: "Face verification will open here soon. Your verified badge is unaffected.",
-  },
-  LEGAL_GATE_CLOSED: {
-    headline: "Face verification is being finalised",
-    body: "We're completing the compliance review before face verification opens. Your verified badge is unaffected.",
-  },
-  EMERGENCY_DISABLED: {
-    headline: "Face verification is paused",
-    body: "Face verification is temporarily paused for maintenance. Your verified badge is unaffected.",
-  },
-  REFERENCE_MISSING: {
-    headline: "Re-verify your face",
-    body: "Your saved face reference is no longer valid, so a quick one-time video selfie is needed again before new photos can be matched.",
-  },
-  ROUTE_NOT_WIRED: {
-    headline: "Face verification is unavailable",
-    body: "This feature isn't reachable right now. Your verified badge is unaffected.",
+  UNAVAILABLE: {
+    headline: "Verification temporarily unavailable",
+    description: "Please try again later.",
+    cta: { label: "Retry", action: "RETRY" },
+    spinner: false,
   },
 };
 
@@ -313,34 +373,55 @@ const BLOCKED_COPY: Record<FaceBlockingReason, { headline: string; body: string 
  *      photo match if the badge is suspended, else nothing to do.
  *
  * INVARIANT (the task's core guarantee): once `hasReference` is true the
- * resolver NEVER returns START_LIVENESS - a gallery change can only ever
- * produce VERIFY_PHOTO. A second liveness session is structurally impossible.
+ * resolver NEVER returns FIRST_TIME (whose CTA is the one-time liveness) - a
+ * gallery change can only ever produce PROCESSING / a failure state. A second
+ * liveness session is structurally impossible.
  */
 export function resolveFaceVerificationAction(f: FaceActionFacts): FaceAction {
-  const action = (
-    kind: Exclude<FaceActionKind, "BLOCKED">,
-  ): FaceAction => ({ kind, ...FACE_ACTION_COPY[kind], blockingReason: null });
-  const blocked = (blockingReason: FaceBlockingReason): FaceAction => ({
-    kind: "BLOCKED",
-    label: null,
-    ...BLOCKED_COPY[blockingReason],
-    blockingReason,
-  });
+  const make = (
+    status: FaceActionStatus,
+    blockingReason: FaceBlockingReason | null = null,
+  ): FaceAction => {
+    const u = FACE_ACTION_UX[status];
+    return {
+      status,
+      headline: u.headline,
+      description: u.description,
+      cta: u.cta,
+      blockingReason,
+      progress: { spinner: u.spinner },
+    };
+  };
 
-  if (!f.identityVerified) return action("IDENTITY_FIRST");
-  if (f.consentWithdrawn) return action("CONSENT_WITHDRAWN");
+  if (!f.identityVerified) return make("IDENTITY_FIRST");
+  if (f.consentWithdrawn) return make("CONSENT_WITHDRAWN");
 
-  // Config/compliance gates - fail closed with the exact reason.
-  if (f.emergencyDisabled) return blocked("EMERGENCY_DISABLED");
-  if (!f.faceLayerConfigured) return blocked("AWS_UNAVAILABLE");
-  if (!f.legalGateOpen) return blocked("LEGAL_GATE_CLOSED");
-  if (!f.routeWired) return blocked("ROUTE_NOT_WIRED");
+  // Config/compliance gates - one honest "temporarily unavailable" surface, the
+  // exact machine reason retained for telemetry. CTA: Retry (restart).
+  if (f.emergencyDisabled) return make("UNAVAILABLE", "EMERGENCY_DISABLED");
+  if (!f.faceLayerConfigured) return make("UNAVAILABLE", "AWS_UNAVAILABLE");
+  if (!f.legalGateOpen) return make("UNAVAILABLE", "LEGAL_GATE_CLOSED");
+  if (!f.routeWired) return make("UNAVAILABLE", "ROUTE_NOT_WIRED");
 
   // Layer live. No reference -> the ONE-TIME enrolment path.
-  if (!f.hasReference) return action("START_LIVENESS");
+  if (!f.hasReference) return make("FIRST_TIME");
 
-  // Reference exists -> liveness is NEVER offered again. A changed photo is a
-  // match; an unchanged, current badge needs nothing.
-  if (f.badgeSuspended) return action("VERIFY_PHOTO");
-  return action("VERIFIED");
+  // Reference exists -> liveness is NEVER offered again. The per-photo outcome
+  // drives exactly what the user sees; a changed-but-unreported photo reads as
+  // "checking"; a settled gallery needs nothing.
+  switch (f.photoOutcome) {
+    case "PROCESSING":
+      return make("PROCESSING");
+    case "NO_FACE":
+      return make("NO_FACE");
+    case "MULTIPLE_FACES":
+      return make("MULTIPLE_FACES");
+    case "MATCH_FAILED":
+      return make("MATCH_FAILED");
+    case "MANUAL_REVIEW":
+      return make("MANUAL_REVIEW");
+    case "NONE":
+    default:
+      return f.badgeSuspended ? make("PROCESSING") : make("VERIFIED");
+  }
 }

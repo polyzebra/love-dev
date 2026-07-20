@@ -85,10 +85,11 @@ check("VERIFIED: verified state, no action, card hidden", () => {
     assert.equal(row.label, "Verified");
     assert.equal(row.action, null);
   }
-  const page = code("app", "(app)", "profile", "page.tsx");
-  // Face layer (2026-07-15): the card renders while UNVERIFIED (identity
-  // flow) OR when a verified user's profile-photo check needs attention
-  // (faceCardState) - a plainly-verified profile still shows NO card.
+  // Face layer: the card renders while UNVERIFIED (identity flow) OR when a
+  // verified user's profile-photo check needs attention (faceCardState) - a
+  // plainly-verified profile still shows NO card. (Whitespace-normalised: the
+  // gate is multi-line and L8.3.3 adds a first-time-enrolment clause.)
+  const page = code("app", "(app)", "profile", "page.tsx").replace(/\s+/g, " ");
   assert.ok(
     page.includes("(!verification.photoVerified && verificationConfigured) || faceCardState"),
     "PhotoVerifyCard gate: identity flow while unverified, face attention when verified",
@@ -172,7 +173,8 @@ check("UNCONFIGURED: one compact Coming soon row, NO card, NO second message", (
     assert.equal(row.action, null, "no dead CTA when unavailable");
   }
   // Page: the card is gated on BOTH unverified and configured...
-  const page = code("app", "(app)", "profile", "page.tsx");
+  // (Whitespace-normalised: the render gate is multi-line.)
+  const page = code("app", "(app)", "profile", "page.tsx").replace(/\s+/g, " ");
   // Both arms of the gate require a configured provider (faceCardState
   // is only non-null when verificationConfigured) - unconfigured
   // environments still render NO card at all.

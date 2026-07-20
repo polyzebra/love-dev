@@ -3,6 +3,7 @@ import { faceEmergencyDisabled, faceMatchLegalGate } from "@/lib/services/face-r
 import {
   resolveFaceVerificationAction,
   type FaceAction,
+  type FacePhotoOutcome,
 } from "@/lib/verification-presentation";
 
 /**
@@ -30,6 +31,29 @@ export function hasCanonicalFaceReference(faceJob: FaceJobRow): boolean {
   return faceJob !== null && faceJob.status !== "LIVENESS_REQUIRED";
 }
 
+/**
+ * Coarse per-photo outcome from the ProfilePhotoVerification aggregate status.
+ * The fine NO_FACE / MULTIPLE_FACES split needs the latest cover PhotoFaceCheck
+ * classification, which a caller may pass explicitly via `photoOutcome`; absent
+ * that, a REJECTED job reads as a generic match failure.
+ */
+export function derivePhotoOutcome(faceJob: FaceJobRow): FacePhotoOutcome {
+  if (!faceJob) return "NONE";
+  switch (faceJob.status) {
+    case "QUEUED":
+    case "CLAIMED":
+    case "CHECKING":
+      return "PROCESSING";
+    case "MANUAL_REVIEW":
+    case "SUSPENDED":
+      return "MANUAL_REVIEW";
+    case "REJECTED":
+      return "MATCH_FAILED";
+    default:
+      return "NONE";
+  }
+}
+
 export function getFaceVerificationAction(input: {
   /** photoVerifiedAt !== null - Stripe identity verified. */
   identityVerified: boolean;
@@ -37,6 +61,9 @@ export function getFaceVerificationAction(input: {
   badgeSuspended: boolean;
   /** The user's ProfilePhotoVerification row (or null while the layer is dormant). */
   faceJob: FaceJobRow;
+  /** Optional precise per-photo outcome (from the latest cover PhotoFaceCheck
+   *  classification). Defaults to a coarse mapping from the job status. */
+  photoOutcome?: FacePhotoOutcome;
 }): FaceAction {
   const consentWithdrawn =
     input.badgeSuspended && input.faceJob !== null && input.faceJob.consentAt === null;
@@ -51,5 +78,6 @@ export function getFaceVerificationAction(input: {
     // The /api/verification/liveness route is a compile-time invariant; this
     // guards only against a build/deploy that dropped it.
     routeWired: true,
+    photoOutcome: input.photoOutcome ?? derivePhotoOutcome(input.faceJob),
   });
 }

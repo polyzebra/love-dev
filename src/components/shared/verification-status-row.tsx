@@ -58,33 +58,27 @@ export function photoVerificationRow(
     case "verified":
       return { label: "Verified", state: "verified", value: "Verified", action: null };
     case "requires_reverification": {
-      // L6.6 Phase I: the verified badge was removed because the profile photos
-      // changed. Identity is intact; the owner must act to restore the badge.
-      // L8.3.1: the ambiguous bare "Verified badge removed" is disambiguated
-      // by the canonical face action WHEN the AWS layer is live - first-time
-      // enrolment ("Start Face Verification") vs a photo match ("Verify New
-      // Photo"). When the layer is dormant/blocked the legacy Stripe re-verify
-      // CTA still restores the badge, so we FALL BACK to it (never show a
-      // "face verification unavailable" message next to a working flow).
+      // L8.3.3: the badge is withheld because the photos changed. NEVER the
+      // generic "Verified badge removed"/"Verify Photos" - the row renders the
+      // ONE canonical verification status (what happened + what to do), which
+      // Account and Profile both consume identically.
       const fa = opts.faceAction;
-      if (fa && (fa.kind === "START_LIVENESS" || fa.kind === "VERIFY_PHOTO") && fa.label) {
+      if (fa && fa.status !== "UNAVAILABLE") {
+        const busy = fa.status === "PROCESSING" || fa.status === "MANUAL_REVIEW";
         return {
-          label:
-            fa.kind === "START_LIVENESS" ? "Face verification needed" : "Verified badge removed",
-          state: "needs-action",
-          value:
-            fa.kind === "START_LIVENESS"
-              ? "First-time face verification needed"
-              : "Your profile photo changed - confirm it's you",
-          action: opts.configured ? { label: fa.label, href: anchor } : null,
+          label: fa.headline,
+          state: busy ? "pending" : "needs-action",
+          value: fa.description,
+          action: fa.cta && opts.configured ? { label: fa.cta.label, href: anchor } : null,
         };
       }
-      // Layer dormant/blocked, or no action supplied - the legacy re-verify row.
+      // Face layer dormant/blocked - the identity (Stripe) re-verify path.
+      // Honest, non-generic copy; the CTA re-runs verification at the card.
       return {
-        label: "Verified badge removed",
+        label: "Re-verify your photos",
         state: "needs-action",
-        value: "Your profile photos changed",
-        action: opts.configured ? { label: "Verify Photos", href: anchor } : null,
+        value: "Your profile photos changed - re-verify to restore your badge.",
+        action: opts.configured ? { label: "Re-verify", href: anchor } : null,
       };
     }
     case "pending":

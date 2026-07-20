@@ -137,14 +137,18 @@ async function main() {
     assert.equal(deriveVerificationPresentation("verified", null), "verified");
   });
 
-  await check("status row: requires_reverification -> needs-action + 'Verify Photos'", () => {
+  await check("status row: requires_reverification -> needs-action, real non-generic CTA", () => {
+    // L8.3.3: no faceAction passed (face layer dormant) -> the identity
+    // re-verify path with honest, non-generic copy. NEVER "Verify Photos"/
+    // "Verified badge removed" (governance-banned generic/consequence strings).
     const row = photoVerificationRow("requires_reverification", {
       configured: true,
       surface: "profile",
     });
     assert.equal(row.state, "needs-action");
-    assert.equal(row.value, "Your profile photos changed");
-    assert.equal(row.action?.label, "Verify Photos");
+    assert.notEqual(row.action?.label, "Verify Photos");
+    assert.notEqual(row.value, "Verified badge removed");
+    assert.equal(row.action?.label, "Re-verify");
     assert.ok(row.action?.href.endsWith("#photo-verification"));
     // The verified state stays clean (badge, no action).
     assert.equal(

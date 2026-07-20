@@ -214,7 +214,7 @@ export function PhotoVerifyCard({
   // never appear while the AWS layer is dormant - no prompt storm in prod.
   if (
     liveness &&
-    (faceAction?.kind === "START_LIVENESS" || facePresentation === "checking_profile_photos")
+    (faceAction?.status === "FIRST_TIME" || facePresentation === "checking_profile_photos")
   ) {
     return wrap(<LivenessCapture consentVersion={liveness.consentVersion} />);
   }

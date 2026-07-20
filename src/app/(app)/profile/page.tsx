@@ -189,7 +189,7 @@ export default async function ProfilePage() {
             biometrics are ever stored. */}
         {((!verification.photoVerified && verificationConfigured) ||
           faceCardState ||
-          faceAction.kind === "START_LIVENESS") && (
+          faceAction.status === "FIRST_TIME") && (
           <Reveal>
             <PhotoVerifyCard
               state={verificationUx}
@@ -197,7 +197,7 @@ export default async function ProfilePage() {
               facePresentation={faceCardState}
               faceAction={faceAction}
               liveness={
-                faceAction.kind === "START_LIVENESS"
+                faceAction.status === "FIRST_TIME"
                   ? { consentVersion: BIOMETRIC_CONSENT_VERSION }
                   : null
               }
