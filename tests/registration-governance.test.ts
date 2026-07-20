@@ -112,9 +112,20 @@ function main() {
     ];
     for (const f of feature) {
       const s = read(f);
-      assert.ok(/requireActiveAccount\(/.test(s), `${f} must use requireActiveAccount`);
+      // L8.3.4F: Discovery routes gate via requireDiscoveryViewer, the canonical
+      // wrapper that composes requireActiveAccount + the capability resolver.
+      assert.ok(
+        /requireActiveAccount\(/.test(s) || /requireDiscoveryViewer\(/.test(s),
+        `${f} must use requireActiveAccount (or the canonical requireDiscoveryViewer wrapper)`,
+      );
       assert.ok(!/\brequireSession\(/.test(s), `${f} must not use bare requireSession`);
     }
+    // The Discovery wrapper itself must still enforce the completeness gate.
+    assert.match(
+      read("src/lib/services/discovery-access.ts"),
+      /requireActiveAccount\(/,
+      "requireDiscoveryViewer must compose requireActiveAccount",
+    );
   });
 
   // Registration/setup routes must NOT require completion (would deadlock).
