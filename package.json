@@ -43,7 +43,8 @@
     "release:smoke": "node scripts/release/smoke.mjs",
     "release:production": "node scripts/release/production.mjs",
     "check:public-env": "node scripts/check-public-env.mjs",
-    "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check && npm run test:visual"
+    "ci": "npm run format:check && npm run lint && npm run typecheck && npm run db:validate && npm run check:public-env && npm run test:unit && npm run build && npm run perf:check && npm run test:visual",
+    "ci:face-readiness": "node scripts/check-face-readiness.mjs"
   },
   "dependencies": {
     "@aws-amplify/ui-react-liveness": "^3.6.7",

@@ -22,6 +22,7 @@ import { daysAgo } from "@/lib/presence";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FaceReadinessCard } from "@/components/admin/face-readiness-card";
 
 export const dynamic = "force-dynamic";
 
@@ -271,6 +272,11 @@ export default async function AdminDashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* AWS Face Liveness production readiness (read-only; no secrets). */}
+      <div className="mt-4 max-w-xl">
+        <FaceReadinessCard />
       </div>
     </>
   );
