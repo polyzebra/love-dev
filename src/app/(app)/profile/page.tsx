@@ -102,7 +102,10 @@ export default async function ProfilePage() {
   // first-time enrolment vs photo match vs an explicit blocking reason. The
   // card renders its CTA/copy from this; both surfaces resolve it identically.
   const faceAction = getFaceVerificationAction({
-    identityVerified: profile.user.photoVerifiedAt != null,
+    // L9.1.2: AWS Face Liveness is optional and available to any REGISTERED
+    // user - requireUser() above guarantees this page is registered-only, so
+    // the face CTA no longer waits on Stripe identity (photoVerifiedAt).
+    eligible: true,
     badgeSuspended: profile.user.faceBadgeSuspendedAt != null,
     faceJob,
   });

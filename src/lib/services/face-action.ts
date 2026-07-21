@@ -55,8 +55,10 @@ export function derivePhotoOutcome(faceJob: FaceJobRow): FacePhotoOutcome {
 }
 
 export function getFaceVerificationAction(input: {
-  /** photoVerifiedAt !== null - Stripe identity verified. */
-  identityVerified: boolean;
+  /** L9.1.2: the user is a REGISTERED account eligible to do AWS Face Liveness
+   *  (email + phone + legal + onboarding complete). NOT Stripe - AWS liveness is
+   *  optional and available regardless of Stripe. */
+  eligible: boolean;
   /** faceBadgeSuspendedAt !== null - the public badge is withheld. */
   badgeSuspended: boolean;
   /** The user's ProfilePhotoVerification row (or null while the layer is dormant). */
@@ -68,7 +70,7 @@ export function getFaceVerificationAction(input: {
   const consentWithdrawn =
     input.badgeSuspended && input.faceJob !== null && input.faceJob.consentAt === null;
   return resolveFaceVerificationAction({
-    identityVerified: input.identityVerified,
+    eligible: input.eligible,
     badgeSuspended: input.badgeSuspended,
     hasReference: hasCanonicalFaceReference(input.faceJob),
     consentWithdrawn,

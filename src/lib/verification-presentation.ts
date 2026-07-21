@@ -245,8 +245,14 @@ export type FaceBlockingReason =
 /** Everything the pure resolver needs - computed by each surface (server side)
  *  from the SAME canonical sources so the surfaces can never disagree. */
 export type FaceActionFacts = {
-  /** Stripe identity verified (photoVerifiedAt present). Gates the face layer. */
-  identityVerified: boolean;
+  /**
+   * L9.1.2: the user is a REGISTERED account (email + phone + legal + onboarding
+   * complete) and therefore eligible to do AWS Face Liveness. This is NOT Stripe
+   * identity - AWS liveness is an OPTIONAL verification available to any
+   * registered user regardless of Stripe (`photoVerifiedAt`). Stripe stays a
+   * separate optional action for the Blue Badge only.
+   */
+  eligible: boolean;
   /** Public badge currently withheld (faceBadgeSuspendedAt present) - a photo changed. */
   badgeSuspended: boolean;
   /** A usable canonical face reference exists (enrolment already happened). */
@@ -297,8 +303,8 @@ type FaceUx = {
 
 const FACE_ACTION_UX: Record<FaceActionStatus, FaceUx> = {
   IDENTITY_FIRST: {
-    headline: "Verify your identity first",
-    description: "Complete identity verification to unlock face verification for your photos.",
+    headline: "Finish setting up your account",
+    description: "Complete registration to unlock face verification.",
     cta: null,
     spinner: false,
   },
@@ -393,7 +399,7 @@ export function resolveFaceVerificationAction(f: FaceActionFacts): FaceAction {
     };
   };
 
-  if (!f.identityVerified) return make("IDENTITY_FIRST");
+  if (!f.eligible) return make("IDENTITY_FIRST");
   if (f.consentWithdrawn) return make("CONSENT_WITHDRAWN");
 
   // Config/compliance gates - one honest "temporarily unavailable" surface, the

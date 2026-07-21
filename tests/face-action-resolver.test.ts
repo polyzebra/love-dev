@@ -23,7 +23,7 @@ function check(name: string, fn: () => void): void {
 /** A fully-live layer for a verified, enrolled, settled user. Override per test. */
 function facts(over: Partial<FaceActionFacts> = {}): FaceActionFacts {
   return {
-    identityVerified: true,
+    eligible: true,
     badgeSuspended: false,
     hasReference: true,
     consentWithdrawn: false,
@@ -160,9 +160,17 @@ function main() {
     }
   });
 
-  // ---- Identity + consent ---------------------------------------------------
-  check("identity not verified -> IDENTITY_FIRST, no CTA", () => {
-    const a = resolveFaceVerificationAction(facts({ identityVerified: false, hasReference: false }));
+  // ---- L9.1.2: AWS liveness is OPTIONAL and Stripe-independent ---------------
+  check("registered user, no reference -> FIRST_TIME (AWS CTA) regardless of Stripe", () => {
+    // The resolver no longer takes Stripe/identity as an input at all: a
+    // registered, eligible user with no reference gets the optional AWS CTA.
+    const a = resolveFaceVerificationAction(facts({ eligible: true, hasReference: false }));
+    assert.equal(a.status, "FIRST_TIME");
+    assert.deepEqual(a.cta, { label: "Start Face Verification", action: "START_LIVENESS" });
+  });
+
+  check("not eligible (registration incomplete) -> IDENTITY_FIRST, no CTA", () => {
+    const a = resolveFaceVerificationAction(facts({ eligible: false, hasReference: false }));
     assert.equal(a.status, "IDENTITY_FIRST");
     assert.equal(a.cta, null);
   });
@@ -184,7 +192,7 @@ function main() {
     facts({ photoOutcome: "MANUAL_REVIEW" }),
     facts(),
     facts({ consentWithdrawn: true }),
-    facts({ identityVerified: false }),
+    facts({ eligible: false }),
     facts({ faceLayerConfigured: false }),
   ];
 

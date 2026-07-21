@@ -64,7 +64,10 @@ export default async function AccountSettingsPage() {
       })
     : null;
   const faceAction = getFaceVerificationAction({
-    identityVerified: user?.photoVerifiedAt != null,
+    // L9.1.2: AWS Face Liveness is optional and available to any REGISTERED
+    // user, independent of Stripe identity (photoVerifiedAt). This page is
+    // registered-only (requireActiveAccount above).
+    eligible: true,
     badgeSuspended: user?.faceBadgeSuspendedAt != null,
     faceJob,
   });
