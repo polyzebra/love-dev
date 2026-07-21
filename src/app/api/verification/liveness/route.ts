@@ -2,9 +2,12 @@ import { z } from "zod";
 import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
 import { db } from "@/lib/db";
 import { isFaceMatchConfigured } from "@/lib/services/face-match-providers";
-import { admitToFaceVerification, faceRolloutConfig } from "@/lib/services/face-rollout";
+import { faceRolloutConfig } from "@/lib/services/face-rollout";
 import { getFaceMatchProvider } from "@/lib/services/face-match-providers";
-import { BIOMETRIC_CONSENT_VERSION } from "@/lib/services/face-verification";
+import {
+  BIOMETRIC_CONSENT_VERSION,
+  enqueueProfilePhotoVerification,
+} from "@/lib/services/face-verification";
 import { createBoundLivenessSession } from "@/lib/services/face-liveness";
 import { providerHealthState } from "@/lib/services/provider-resilience";
 
@@ -12,9 +15,10 @@ import { providerHealthState } from "@/lib/services/provider-resilience";
  * POST /api/verification/liveness - create a bound liveness session and
  * return an OPAQUE flowId (never the provider sessionId). The session is
  * persisted and bound to (userId, verificationId, environment) before the
- * flowId is returned (C-1). Requires identity verified + explicit
- * versioned consent + rollout admission (C-3). DEGRADED/UNAVAILABLE
- * providers answer 503 without rejecting the user's state.
+ * flowId is returned (C-1). AWS Face Liveness is OPTIONAL and Stripe-
+ * independent (L9.1.2): it requires explicit versioned consent + rollout
+ * admission (C-3), NOT prior Stripe Identity. DEGRADED/UNAVAILABLE providers
+ * answer 503 without rejecting the user's state.
  */
 const bodySchema = z.object({ consentVersion: z.string().max(64) });
 
@@ -39,24 +43,17 @@ export async function POST(req: Request) {
     );
   }
 
+  // L9.1.2/L8.3.5: AWS Face Liveness is OPTIONAL and Stripe-independent - a
+  // registered user may enrol without prior Stripe Identity (photoVerifiedAt).
+  // The config/legal gate below still governs whether the layer runs at all.
+  // We read only the profile country, used for the rollout admission check.
   const me = await db.user.findUnique({
     where: { id: user.id },
-    select: { photoVerifiedAt: true, profile: { select: { country: true } } },
+    select: { profile: { select: { country: true } } },
   });
-  if (!me?.photoVerifiedAt)
-    return apiError(409, "identity_required", "Verify your identity first.");
   if (!isFaceMatchConfigured() || !faceRolloutConfig().livenessEnabled) {
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   }
-  // Consent is being GRANTED in this request (the body's consentVersion was
-  // validated === BIOMETRIC_CONSENT_VERSION above), and is stamped on the job
-  // row right below - so tell admit consent is active for this call.
-  const admit = await admitToFaceVerification(user.id, {
-    country: me.profile?.country,
-    hasActiveConsent: true,
-  });
-  if (!admit.admit)
-    return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   const providerName = getFaceMatchProvider().name;
   if ((await providerHealthState(`face_match:${providerName}`)) === "UNAVAILABLE") {
     return apiError(
@@ -66,13 +63,19 @@ export async function POST(req: Request) {
     );
   }
 
-  // Consent is stamped on the canonical job row.
-  await db.profilePhotoVerification
-    .update({
-      where: { userId: user.id },
-      data: { consentVersion: BIOMETRIC_CONSENT_VERSION, consentAt: new Date() },
-    })
-    .catch(() => undefined);
+  // Ensure the canonical ProfilePhotoVerification row EXISTS before we mint a
+  // liveness session. A first-time enroller (esp. a non-Stripe registered user)
+  // has no row yet; createBoundLivenessSession binds the AWS session to this row
+  // and returns "unavailable" if it is missing. enqueue is admit-gated (the same
+  // canonical gate as above), idempotent (upsert), and stamps consent - so a
+  // first-time enroller lands in LIVENESS_REQUIRED with consent recorded.
+  const enqueued = await enqueueProfilePhotoVerification(user.id, "liveness_enrollment", {
+    consent: true,
+    country: me?.profile?.country,
+  });
+  if (!enqueued) {
+    return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
+  }
 
   const created = await createBoundLivenessSession(user.id);
   if ("error" in created) {

@@ -109,6 +109,9 @@ export function LivenessCapture({
 
   async function startCapture() {
     setBusy(true);
+    // A retry must always begin a FRESH session - drop any stale flowId so the
+    // poll effect and detector can never reuse a spent/never-created session.
+    setFlowId(null);
     try {
       // Camera permission first - explicit guidance beats a silent failure.
       try {
@@ -118,20 +121,39 @@ export function LivenessCapture({
         setState("camera_permission_required");
         return;
       }
-      const res = await fetch("/api/verification/liveness", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ consentVersion }),
-      });
+      let res: Response;
+      try {
+        res = await fetch("/api/verification/liveness", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ consentVersion }),
+        });
+      } catch {
+        // The request never reached the server (offline / DNS / CORS). The
+        // camera never ran, so this is a NETWORK error, not a liveness failure.
+        setState("network_error");
+        return;
+      }
+      // Provider dormant or degraded - the layer answers 503 without touching
+      // the user's state.
       if (res.status === 503) {
         setState("provider_unavailable");
         return;
       }
+      // ANY other non-ok (409/422/429/5xx) is a start-time failure BEFORE the
+      // AWS camera runs. It must NOT read as "lighting or movement"
+      // (capture_failed) - that copy is reserved for a real capture attempt.
       if (!res.ok) {
-        setState("capture_failed");
+        setState("start_failed");
         return;
       }
       const body = (await res.json()) as { data: { flowId: string } };
+      // Defensive: a 200 with no flowId means no AWS session exists to run.
+      // Treat it as a start failure, never as a capture (lighting) failure.
+      if (!body?.data?.flowId) {
+        setState("start_failed");
+        return;
+      }
       setFlowId(body.data.flowId);
       setState("capture_submitted");
     } finally {
@@ -144,6 +166,8 @@ export function LivenessCapture({
     state === "consent_required" ||
     state === "capture_ready" ||
     state === "capture_failed" ||
+    state === "start_failed" ||
+    state === "network_error" ||
     state === "camera_permission_required";
 
   return (
@@ -197,7 +221,10 @@ export function LivenessCapture({
               disabled={busy}
               onClick={startCapture}
             >
-              {state === "capture_failed" || state === "camera_permission_required" ? (
+              {state === "capture_failed" ||
+              state === "start_failed" ||
+              state === "network_error" ||
+              state === "camera_permission_required" ? (
                 <>
                   <RefreshCw className="size-4" aria-hidden="true" /> Try again
                 </>

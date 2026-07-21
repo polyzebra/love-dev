@@ -26,6 +26,11 @@ export type LivenessCaptureState =
   | "capturing"
   | "capture_submitted"
   | "liveness_processing"
+  // Pre-camera failures. These are DISTINCT from capture_failed: they mean the
+  // session could not even be started, so the AWS camera never ran. Only
+  // capture_failed ("lighting or movement") may follow a REAL capture attempt.
+  | "start_failed"
+  | "network_error"
   | "capture_failed"
   | "provider_unavailable";
 
@@ -53,6 +58,14 @@ export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: 
   liveness_processing: {
     title: "Checking it's really you",
     body: "This usually takes a few seconds.",
+  },
+  start_failed: {
+    title: "We couldn't start the check",
+    body: "Something went wrong before the camera opened. This is on our side, not your photos - please try again in a moment.",
+  },
+  network_error: {
+    title: "Connection problem",
+    body: "We couldn't reach Tirvea to start the check. Check your connection and try again.",
   },
   capture_failed: {
     title: "That didn't work",
