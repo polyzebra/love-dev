@@ -4,7 +4,12 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
+  // camera=(self): the AWS Face Liveness component (FaceLivenessDetectorCore)
+  // runs first-party and needs getUserMedia. `camera=()` is an EMPTY allowlist
+  // that denies the camera to EVERY origin including same-origin, which silently
+  // prevents the liveness camera from ever opening. Microphone stays denied
+  // (liveness is video-only); geolocation stays self.
+  { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(self)" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
   {
     key: "Strict-Transport-Security",
