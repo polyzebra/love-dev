@@ -13,6 +13,12 @@ Each GDPR data-subject right and processing principle, verified against the **ac
 implementation** (code file:line). Verdicts: IMPLEMENTED / PARTIAL / NOT FOUND.
 Controller: **WiseWave Limited**; supervisory authority: Irish DPC; contact: info@tirvea.com.
 
+> **L9.1 UPDATE (2026-07-21):** Item 2 (Right to erasure) is now **IMPLEMENTED**. The
+> self-service deletion completion gap is closed by `cleanupExpiredDeletions()` (daily
+> auth-cleanup cron → `teardownAccount` + GoTrue identity delete after the 30-day grace),
+> proven by `tests/account-deletion-sweep.test.ts`. GDPR posture: **no remaining gaps**;
+> the accuracy notes in §3 are wording refinements for the legal-review pass.
+
 ## 1. Rights & principles → implementation
 
 | # | GDPR item | Verdict | Code evidence | Note |

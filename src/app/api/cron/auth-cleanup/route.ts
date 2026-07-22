@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   cleanupAbandonedAuthUsers,
   cleanupAbandonedRegistrations,
+  cleanupExpiredDeletions,
   cleanupStalePhoneClaims,
 } from "@/lib/auth/cleanup";
 
@@ -29,10 +30,16 @@ export async function GET(req: Request) {
   const deleted = await cleanupAbandonedAuthUsers();
   const abandonedRegistrations = await cleanupAbandonedRegistrations();
   const phoneClaimsCleared = await cleanupStalePhoneClaims();
+  // GDPR Art. 17: complete the erasure of accounts whose 30-day deletion grace
+  // window has elapsed (personal data + biometrics + AWS + login identity).
+  const deletionsErased = await cleanupExpiredDeletions();
   console.info(
     `[cron:auth-cleanup] swept ${deleted} abandoned auth user(s), ` +
       `${abandonedRegistrations} abandoned registration(s), ` +
-      `cleared ${phoneClaimsCleared} stale phone claim(s)`,
+      `cleared ${phoneClaimsCleared} stale phone claim(s), ` +
+      `erased ${deletionsErased} expired deletion(s)`,
   );
-  return NextResponse.json({ data: { deleted, abandonedRegistrations, phoneClaimsCleared } });
+  return NextResponse.json({
+    data: { deleted, abandonedRegistrations, phoneClaimsCleared, deletionsErased },
+  });
 }

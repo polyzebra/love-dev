@@ -12,6 +12,20 @@
 Single GO/NO-GO view for publishing the legal documentation set and (separately)
 activating Face Liveness. **This document does not grant approval.** No document is Approved.
 
+## L9.1 UPDATE (2026-07-21) — Documentation blockers cleared
+
+The two documentation blockers are **resolved** (see `LEGAL-GAP-REPORT.md` → L9.1 CLOSURE):
+G1 (Copyright Policy created, slug wired, page converted) and G2 (GDPR deletion cron
+implemented + live-tested). Timeline (G6), schema comments (G7), and entity name (G8)
+are reconciled. All legal-governance tests pass (`legal-integration`, `activation-legal-gate`,
+`auth-cleanup`, `account-deletion-sweep`).
+
+**Documentation verdict (updated): READY FOR LEGAL REVIEW.** All required documents now
+exist and are implementation-consistent; the remaining items are counsel-judgement
+wording refinements (P2) plus, separately, the **Face Liveness activation** track, which
+stays **BLOCKED — LEGAL + CALIBRATION** (unchanged; §2 below). No document is Approved —
+only the authorised approver may set Status→Approved + an Effective Date.
+
 ## 1. GO / NO-GO — Legal documentation publication
 
 | # | Criterion | State |

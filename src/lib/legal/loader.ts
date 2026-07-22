@@ -16,6 +16,7 @@ import { LEGAL_DOC_SLUGS, type LegalDocSlug, isLegalDocSlug } from "./doc-slugs"
 /** slug → canonical master file under docs/. The ONLY place this mapping lives. */
 export const LEGAL_DOC_FILES: Record<LegalDocSlug, string> = {
   terms: "L2.2-TERMS-OF-SERVICE-DRAFT.md",
+  copyright: "L2.1-COPYRIGHT-POLICY-DRAFT.md",
   privacy: "L2.3-PRIVACY-POLICY-DRAFT.md",
   cookies: "L2.4-COOKIE-POLICY-DRAFT.md",
   "community-guidelines": "L2.5-COMMUNITY-GUIDELINES-DRAFT.md",

@@ -14,6 +14,13 @@ Photo Verification Policy L5.2, Identity Verification Policy L5.3, DPIA) against
 **enforced implementation**. Special-category data (GDPR Art. 9). Provider: **AWS
 Rekognition** (incl. **AWS Face Liveness**), eu-west-1.
 
+> **L9.1 UPDATE (2026-07-21):** G7 resolved — `schema.prisma` `referenceId`/
+> `identitySessionId` comments corrected to the liveness-only origin (the accurate
+> `STRIPE_SELFIE_COMPARE` binding-method enum was intentionally left intact). Biometric
+> deletion on account erasure is now enforced end-to-end (the 30-day deletion cron calls
+> `teardownAccount` → `DeleteFaces`; see GDPR report). Activation remains **BLOCKED —
+> LEGAL + CALIBRATION** (compliance approvals, unchanged from L8.3.7).
+
 ## 1. Claim-by-claim verification (implementation wins)
 
 | # | Claim | Verdict | Evidence |

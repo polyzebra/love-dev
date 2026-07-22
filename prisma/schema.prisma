@@ -1668,8 +1668,9 @@ model ProfilePhotoVerification {
   id                   String                         @id @default(cuid())
   userId               String                         @unique
   provider             String? // face-match provider name (e.g. "mock")
-  // Opaque provider-side reference handle (created from the Stripe
-  // identity selfie). NEVER an embedding - deleting it at the provider
+  // Opaque provider-side reference handle (created from the PASSED liveness
+  // capture - see createReferenceFromLiveness; never from an unverified photo
+  // or a Stripe selfie). NEVER an embedding - deleting it at the provider
   // destroys the biometric data.
   referenceId          String?
   referenceVersion     Int                            @default(0)
@@ -1678,7 +1679,7 @@ model ProfilePhotoVerification {
   riskLevel            Int                            @default(0) // aggregate mismatch score
   consentVersion       String? // biometric consent version accepted at start
   consentAt            DateTime?
-  identitySessionId    String? // Stripe session the reference derives from
+  identitySessionId    String? // optional Stripe identity session linked for the identity-binding layer (the reference derives from the liveness capture, NOT this)
   lastRunAt            DateTime?
   expiresAt            DateTime? // reference re-challenge horizon
   // --- Reference lifecycle (Phase 3) ---

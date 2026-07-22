@@ -130,6 +130,77 @@ const ABANDON_THRESHOLD_HOURS: Partial<Record<RegistrationState, number>> = {
   ONBOARDING_PENDING: 24 * 7,
 };
 
+/**
+ * GDPR erasure sweep (Art. 17). Self-service deletion of a registration-complete
+ * account parks it in DEACTIVATED with `deletionRequested` set and the profile
+ * hidden; signing in during the 30-day grace window cancels it (ensureAppUser
+ * restores ACTIVE). Once the window elapses this performs the permanent erasure
+ * the Account Deletion / Data Retention policies promise:
+ *   1. teardownAccount() - deletes photos, profile, verifications, devices,
+ *      notifications, settings, storage objects, AND the biometric reference at
+ *      the vendor (AWS Rekognition DeleteFaces). It anonymises the User row to a
+ *      tombstone (no PII) so financial/audit records can be retained for the
+ *      legally required period per the Data Retention Policy.
+ *   2. DELETE the GoTrue identity (auth.users) - removes the login email/phone
+ *      PII; cascades auth sessions/identities. This makes the self-service path
+ *      converge on the exact end state of the auth-webhook deletion path.
+ *
+ * No reprocessing/churn: teardownAccount tombstones the email (`deleted+...`), and
+ * the sweep excludes tombstone rows, so an account erased by this cron OR the auth
+ * webhook is never a candidate again. Every erasure is best-effort and isolated -
+ * one failure never blocks the rest of the batch. The grace period is fixed at 30
+ * days to match the policy copy shown at deletion time.
+ */
+export const DELETION_GRACE_DAYS = 30;
+
+export async function cleanupExpiredDeletions(now: Date = new Date()): Promise<number> {
+  try {
+    const cutoff = new Date(now.getTime() - DELETION_GRACE_DAYS * 24 * 60 * 60 * 1000);
+    // Both self-service deletion outcomes: a registration-complete account is
+    // parked DEACTIVATED (grace, cancellable by signing in); a pre-registration
+    // account goes straight to DELETED. Both still hold PII until torn down.
+    // Excluding tombstone rows (email `deleted+...`) skips accounts already erased
+    // by teardownAccount (this cron OR the auth webhook), so there is no churn.
+    const candidates = await db.user.findMany({
+      where: {
+        status: { in: ["DEACTIVATED", "DELETED"] },
+        deletionRequested: { lt: cutoff },
+        NOT: { email: { startsWith: "deleted+" } },
+      },
+      select: { id: true },
+      take: 500,
+    });
+    if (candidates.length === 0) return 0;
+    if (candidates.length === 500) {
+      console.warn("[auth:cleanup] expired-deletion batch hit the 500 cap; remainder next run");
+    }
+    const { teardownAccount } = await import("@/lib/auth/identity");
+    let count = 0;
+    for (const { id } of candidates) {
+      try {
+        // Erase personal data + biometrics + AWS + storage; anonymise the row.
+        await teardownAccount(id, "gdpr_deletion_grace_expired");
+        // Erase the login identity (email/phone PII); cascades auth sessions.
+        await db.$executeRaw`DELETE FROM auth.users WHERE id::text = ${id}`.catch(() => {});
+        count += 1;
+      } catch (error) {
+        console.error(`[auth:cleanup] GDPR erasure failed for ${id}:`, error);
+      }
+    }
+    if (count > 0) {
+      await recordAuthEvent({
+        type: "auth_cleanup",
+        userId: null,
+        metadata: { kind: "gdpr_deletion_expired", count },
+      });
+    }
+    return count;
+  } catch (error) {
+    console.error("[auth:cleanup] expired-deletion sweep failed:", error);
+    return 0;
+  }
+}
+
 export async function cleanupAbandonedRegistrations(now: Date = new Date()): Promise<number> {
   try {
     const phoneEnabled = isPhoneVerificationEnabled();

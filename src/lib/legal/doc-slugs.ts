@@ -6,6 +6,7 @@
  */
 export const LEGAL_DOC_SLUGS = [
   "terms",
+  "copyright",
   "privacy",
   "cookies",
   "community-guidelines",

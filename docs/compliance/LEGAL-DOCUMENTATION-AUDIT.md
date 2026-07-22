@@ -56,9 +56,10 @@ Approved By **Pending**. Purpose = as titled. Completeness = complete draft unle
 | L7.4-TRANSPARENCY-REPORT-POLICY-DRAFT.md | transparency | Transparency Report | Legal Counsel | 2026-07-18 | — |
 | L7.5-COMPLIANCE-STATEMENT-DRAFT.md | compliance | Compliance Statement | Legal Counsel | 2026-07-18 | — |
 
-**Missing published document:** **Copyright Policy** (`/legal/copyright`) — referenced
-as incorporated/live in 6 docs but **no master file exists** and the slug is **not in
-the loader map**. See gap report G1.
+**Copyright Policy** (`/legal/copyright`) — **RESOLVED in L9.1.** Created
+`docs/L2.1-COPYRIGHT-POLICY-DRAFT.md` (v1.0, draft, all 7 frontmatter fields), wired the
+slug in `doc-slugs.ts` + `loader.ts`, and converted the page to the `LegalDocument`
+wrapper. The set is now **25 slug-mapped policies** and all incorporations resolve.
 
 ## 3. Internal / architecture / compliance docs (not slug-published)
 

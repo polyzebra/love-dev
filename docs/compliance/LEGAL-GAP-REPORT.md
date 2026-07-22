@@ -14,6 +14,35 @@ cross-reference audits. Severity: **P0** = blocks legal review / go-live; **P1**
 must fix before publication; **P2** = normalize/cleanup. "Impl wins" = the code is
 correct and the document must be rewritten to match it.
 
+## L9.1 CLOSURE (2026-07-21)
+
+The blocking gaps are now **RESOLVED**:
+
+- **G1 (Copyright Policy)** — created `docs/L2.1-COPYRIGHT-POLICY-DRAFT.md`; registered
+  slug in `doc-slugs.ts` + `loader.ts` (registry.ts already had it); converted the
+  hardcoded `/legal/copyright` page to the `LegalDocument` master-file wrapper. All
+  6 incorporations now resolve; `legal-integration` test passes.
+- **G2 (GDPR erasure)** — implemented `cleanupExpiredDeletions()` (daily via the
+  auth-cleanup cron): after the 30-day grace it runs `teardownAccount` (personal data +
+  biometrics `DeleteFaces` + storage) and deletes the GoTrue identity; the self-service
+  path now converges with the webhook path. Proven by `tests/account-deletion-sweep.test.ts`
+  (live DB, 6 checks). The delete-route comment no longer over-promises.
+- **G4/G5 (DPIA)** — manual-review wording + `dpo@`→`info@` fixed (L9.0).
+- **G6 (timeline)** — reconciled: L4.3 §10 rewritten (30-day grace, daily sweep,
+  erasure within 30 days of the request); L4.1 findings + tombstone row aligned.
+- **G7 (schema comments)** — `schema.prisma` `referenceId`/`identitySessionId` comments
+  corrected to the liveness-only origin (the accurate `STRIPE_SELFIE_COMPARE` binding
+  enum was left intact). Comment-only; no migration.
+- **G8 (entity name)** — Refund Policy bare "WiseWave" → "WiseWave Limited".
+
+Remaining **P2 accuracy notes** (non-blocking, for counsel during review): age is a
+self-attested *gate* not *verification* (L3.4/Terms wording); at-rest encryption is
+inherited from managed infra (L7.1 wording); restriction levers wording (L4.2);
+`status.tirvea.com` provisioning (G9, ops). These are wording refinements appropriate
+to the legal-review pass, not documentation defects.
+
+**Post-L9.1 status: READY FOR LEGAL REVIEW.** Original findings retained below for the record.
+
 ## P0 — Blockers
 
 | ID | Gap | Evidence | Owner | Remediation |

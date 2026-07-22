@@ -4,9 +4,16 @@ import { audit } from "@/lib/audit";
 
 /**
  * GDPR account deletion (Art. 17 - right to erasure).
- * Marks the account for deletion with a 30-day grace window, hides the
- * profile immediately and revokes all sessions. A scheduled job performs
- * the hard delete after the window (cascades cover related rows).
+ * Marks the account for deletion with a 30-day grace window and hides the
+ * profile immediately; signing in during the window cancels it (ensureAppUser
+ * restores ACTIVE). After the window the daily auth-cleanup cron
+ * (cleanupExpiredDeletions -> teardownAccount + auth.users delete) performs the
+ * permanent erasure: photos, profile, verifications, devices, notifications,
+ * settings, storage objects, the biometric reference at the vendor (DeleteFaces),
+ * and the login identity. The User row is anonymised to a tombstone so financial/
+ * audit records are retained only for the legally required period (Data Retention
+ * Policy). A pre-registration (PENDING) account has nothing to preserve and goes
+ * straight to DELETED.
  */
 export async function POST() {
   const { user, response } = await requireSession();
