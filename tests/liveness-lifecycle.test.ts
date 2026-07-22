@@ -66,6 +66,40 @@ function main() {
     assert.doesNotMatch(src, /setState\("verified"\)|setState\("passed"\)/);
   });
 
+  // ---- L9.7: video-complete contract (leave liveness_processing on CONSUMED) -
+  check("L9.7: checking_profile_photos setStates OUT of liveness_processing (not refresh-only)", () => {
+    const src = read(CLIENT);
+    // The transition must setState to the photo-check state so the liveness
+    // deadline can never fire result_timeout after a successful capture.
+    const at = src.indexOf('next === "checking_profile_photos"');
+    assert.notEqual(at, -1);
+    const near = src.slice(at, at + 500);
+    assert.match(near, /setState\("video_complete_photo_checking"\)/, "must leave liveness_processing via setState");
+  });
+
+  check("L9.7: video_complete_photo_checking never offers 'Try again' / a fresh video", () => {
+    const src = read(CLIENT);
+    // Not a start-able state (no retry button); the only action is Return to profile.
+    const canStart = src.slice(src.indexOf("const canStart ="), src.indexOf("const canStart =") + 400);
+    assert.doesNotMatch(canStart, /video_complete_photo_checking/, "must NOT be retryable");
+    assert.match(src, /"Return to profile"/, "offers Return to profile instead");
+  });
+
+  check("L9.7: video-complete copy says the video is done + no new video needed", () => {
+    const text = `${LIVENESS_COPY.video_complete_photo_checking.title} ${LIVENESS_COPY.video_complete_photo_checking.body}`.toLowerCase();
+    assert.match(text, /video check complete/);
+    assert.match(text, /not need to record another video|no.*another video|don't need to record/);
+  });
+
+  check("L9.7: video_complete_photo_checking reconciles (refresh) with a 30s Return-to-profile, no hard error", () => {
+    const src = read(CLIENT);
+    const at = src.indexOf('state !== "video_complete_photo_checking"');
+    assert.notEqual(at, -1, "a reconciliation effect must exist for the photo-check phase");
+    const eff = src.slice(at, at + 260);
+    assert.match(eff, /router\.refresh\(\)/, "keeps reconciling the server state");
+    assert.match(eff, /setPhotoReturnable\(true\)/, "offers Return to profile past ~30s");
+  });
+
   // ---- Post-PASS photo-check card is bounded too -----------------------------
   check("checking_profile_photos card polls with a hard deadline + terminal timeout", () => {
     const src = read(CARD);

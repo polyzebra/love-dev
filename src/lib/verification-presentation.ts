@@ -26,6 +26,11 @@ export type LivenessCaptureState =
   | "capturing"
   | "capture_submitted"
   | "liveness_processing"
+  // L9.7: the video/liveness step is DONE (server reported checking_profile_photos
+  // = session CONSUMED + reference enrolled). The client leaves liveness_processing
+  // immediately so its deadline can never fire, and switches to a photo-check state
+  // that NEVER offers "Try video again".
+  | "video_complete_photo_checking"
   // Pre-camera failures. These are DISTINCT from capture_failed: they mean the
   // session could not even be started, so the AWS camera never ran. Only
   // capture_failed ("lighting or movement") may follow a REAL capture attempt.
@@ -67,6 +72,10 @@ export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: 
   liveness_processing: {
     title: "Checking it's really you",
     body: "This usually takes a few seconds.",
+  },
+  video_complete_photo_checking: {
+    title: "Video check complete",
+    body: "We're checking your profile photos. You do not need to record another video - this page updates automatically.",
   },
   start_failed: {
     title: "We couldn't start the check",

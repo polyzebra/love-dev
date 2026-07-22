@@ -72,6 +72,10 @@ export function LivenessCapture({
   // Advisory flag: the result is taking longer than usual (still within the
   // hard deadline). Purely cosmetic - the deadline below is what bounds it.
   const [takingLong, setTakingLong] = useState(false);
+  // L9.7: after the video is complete, if the photo check is still running past
+  // ~30s, offer "Return to profile" (reconciliation continues in the background;
+  // reload resumes from the persisted stage). Never a "try video again".
+  const [photoReturnable, setPhotoReturnable] = useState(false);
   const liveRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -114,6 +118,11 @@ export function LivenessCapture({
         const next = body.data?.state;
         // Terminal states stop the poll; only "liveness_processing" keeps it going.
         if (next === "checking_profile_photos") {
+          // Video/liveness step is COMPLETE (session consumed + reference enrolled).
+          // Leave liveness_processing IMMEDIATELY via setState so this component's
+          // deadline can never fire result_timeout after a successful capture - do
+          // NOT rely on router.refresh() unmounting us (L9.7 root cause).
+          setState("video_complete_photo_checking");
           onDone?.();
           router.refresh();
         } else if (next === "session_not_found") {
@@ -139,12 +148,27 @@ export function LivenessCapture({
     };
   }, [flowId, state, router, onDone]);
 
+  // L9.7: once the video step is complete, reconcile the PHOTO check (not the
+  // liveness result) - refresh the server state until the job terminalizes (this
+  // component unmounts) and, past ~30s, offer "Return to profile". No hard error
+  // state here: a downstream photo-check delay must never demand another video.
+  useEffect(() => {
+    if (state !== "video_complete_photo_checking") return;
+    const startedAt = Date.now();
+    const id = setInterval(() => {
+      if (Date.now() - startedAt >= 30_000) setPhotoReturnable(true);
+      router.refresh();
+    }, 4000);
+    return () => clearInterval(id);
+  }, [state, router]);
+
   async function startCapture() {
     setBusy(true);
     // A retry must always begin a FRESH session - drop any stale flowId so the
     // poll effect and detector can never reuse a spent/never-created session.
     setFlowId(null);
     setTakingLong(false);
+    setPhotoReturnable(false);
     try {
       // We do NOT pre-acquire the camera here. FaceLivenessDetectorCore owns
       // camera acquisition + the permission prompt through its own start screen,
@@ -327,6 +351,20 @@ export function LivenessCapture({
               ) : (
                 "Start check"
               )}
+            </Button>
+          )}
+
+          {/* L9.7: the video is done - offer "Return to profile" (never "Try
+              video again"). Reconciliation continues in the background and a
+              reload resumes from the persisted stage. */}
+          {state === "video_complete_photo_checking" && photoReturnable && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-4 rounded-full px-5"
+              onClick={() => router.refresh()}
+            >
+              Return to profile
             </Button>
           )}
         </div>
