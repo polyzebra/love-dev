@@ -117,6 +117,38 @@ export function PhotoVerifyCard({
     };
   }, [state]);
 
+  // L9.4: the post-liveness "checking_profile_photos" card is otherwise a static
+  // server-rendered spinner - the face check finishes in the background (after()
+  // job) but the page never re-fetches, so it spins forever. Poll by refreshing
+  // the server state until the job terminalizes (facePresentation changes and
+  // this effect tears down), with a hard deadline so the spinner can never hang.
+  // Skipped while `liveness` is set (LivenessCapture owns polling in that phase).
+  const [photoCheckLong, setPhotoCheckLong] = useState(false);
+  const [photoCheckTimedOut, setPhotoCheckTimedOut] = useState(false);
+  useEffect(() => {
+    if (facePresentation !== "checking_profile_photos" || liveness) return;
+    const startedAt = Date.now();
+    const PHOTO_ADVISORY_MS = 20_000;
+    const PHOTO_DEADLINE_MS = 60_000;
+    const id = setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      if (elapsed >= PHOTO_DEADLINE_MS) {
+        setPhotoCheckTimedOut(true);
+        clearInterval(id);
+        return;
+      }
+      if (elapsed >= PHOTO_ADVISORY_MS) setPhotoCheckLong(true);
+      router.refresh();
+    }, 4000);
+    // Reset the flags when the check phase ends (or before a fresh re-entry), so
+    // a later attempt never inherits a stale "taking long"/timeout flag.
+    return () => {
+      clearInterval(id);
+      setPhotoCheckLong(false);
+      setPhotoCheckTimedOut(false);
+    };
+  }, [facePresentation, liveness, router]);
+
   // Deep links (#photo-verification from Settings or the profile trust
   // row) land ON the card: scroll it into view and move focus to the
   // wrapper (tabIndex -1) so screen readers announce it. Effect-on-mount
@@ -218,6 +250,29 @@ export function PhotoVerifyCard({
   ) {
     return wrap(<LivenessCapture consentVersion={liveness.consentVersion} />);
   }
+  if (facePresentation === "checking_profile_photos" && photoCheckTimedOut) {
+    // Bounded (L9.4): the background check didn't terminalize before the hard
+    // deadline - stop the spinner and offer an explicit status re-check.
+    return wrap(
+      <StateCard
+        icon={<XCircle className="text-muted-foreground size-5" aria-hidden="true" />}
+        title="We couldn't finish verification"
+        body="Your video was submitted, but the result isn't ready yet. Check the status, or try again shortly."
+      >
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-full px-5"
+            disabled={pending}
+            onClick={checkStatus}
+          >
+            <RefreshCw className="size-4" aria-hidden="true" /> Check status
+          </Button>
+        </div>
+      </StateCard>,
+    );
+  }
   if (
     facePresentation === "checking_profile_photos" ||
     facePresentation === "photo_update_review"
@@ -227,7 +282,11 @@ export function PhotoVerifyCard({
       <StateCard
         icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
         title={copy.title}
-        body={copy.body}
+        body={
+          photoCheckLong && facePresentation === "checking_profile_photos"
+            ? "This is taking longer than usual… keep this page open."
+            : copy.body
+        }
       />,
     );
   }

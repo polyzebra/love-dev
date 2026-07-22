@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LIVENESS_COPY, type LivenessCaptureState } from "@/lib/verification-presentation";
 import dynamic from "next/dynamic";
 import { LEGAL_ROUTES } from "@/lib/legal/routes";
+import { LivenessFullscreen } from "@/components/profile/liveness-fullscreen";
 
 // Heavy AWS Amplify SDK: dynamically imported so it never ships to other
 // routes (TASK 4). Mounted only during an active capture.
@@ -68,8 +69,18 @@ export function LivenessCapture({
   const [state, setState] = useState<LivenessCaptureState>("consent_required");
   const [flowId, setFlowId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Advisory flag: the result is taking longer than usual (still within the
+  // hard deadline). Purely cosmetic - the deadline below is what bounds it.
+  const [takingLong, setTakingLong] = useState(false);
   const liveRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Bounded result processing (L9.4): poll only while the server says PROCESSING,
+  // and never spin forever. After ADVISORY_MS show "taking longer"; after
+  // DEADLINE_MS stop and show a terminal retry state (result_timeout).
+  const POLL_INTERVAL_MS = 3000;
+  const ADVISORY_MS = 20_000;
+  const DEADLINE_MS = 60_000;
 
   // Poll the session ONLY once a real capture has completed and analysis is
   // running (liveness_processing). We must NOT poll during capture_submitted:
@@ -79,9 +90,21 @@ export function LivenessCapture({
   useEffect(() => {
     if (!flowId || state !== "liveness_processing") return;
     let alive = true;
+    const startedAt = Date.now();
+    const controller = new AbortController();
     const poll = async () => {
+      // Hard terminal deadline: never leave a permanent spinner. An AWS result
+      // that is still not ready by DEADLINE_MS ends in a retryable timeout.
+      const elapsed = Date.now() - startedAt;
+      if (elapsed >= DEADLINE_MS) {
+        if (alive) setState("result_timeout");
+        return;
+      }
+      if (elapsed >= ADVISORY_MS && alive) setTakingLong(true);
       try {
-        const res = await fetch(`/api/verification/liveness/${flowId}`);
+        const res = await fetch(`/api/verification/liveness/${flowId}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) {
           if (alive) setState("provider_unavailable");
           return;
@@ -89,6 +112,7 @@ export function LivenessCapture({
         const body = (await res.json()) as { data?: { state?: string } };
         if (!alive) return;
         const next = body.data?.state;
+        // Terminal states stop the poll; only "liveness_processing" keeps it going.
         if (next === "checking_profile_photos") {
           onDone?.();
           router.refresh();
@@ -99,14 +123,18 @@ export function LivenessCapture({
         } else if (next === "provider_unavailable") {
           setState("provider_unavailable");
         }
-      } catch {
+        // next === "liveness_processing" (or unknown) -> keep polling until the
+        // deadline; the elapsed check above guarantees termination.
+      } catch (err) {
+        if ((err as Error)?.name === "AbortError") return;
         if (alive) setState("provider_unavailable");
       }
     };
-    pollRef.current = setInterval(poll, 3000);
+    pollRef.current = setInterval(poll, POLL_INTERVAL_MS);
     void poll();
     return () => {
       alive = false;
+      controller.abort(); // cancel any in-flight request from this attempt
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [flowId, state, router, onDone]);
@@ -116,6 +144,7 @@ export function LivenessCapture({
     // A retry must always begin a FRESH session - drop any stale flowId so the
     // poll effect and detector can never reuse a spent/never-created session.
     setFlowId(null);
+    setTakingLong(false);
     try {
       // We do NOT pre-acquire the camera here. FaceLivenessDetectorCore owns
       // camera acquisition + the permission prompt through its own start screen,
@@ -196,11 +225,20 @@ export function LivenessCapture({
     }
   }
 
+  // Closing the full-screen capture aborts the attempt and returns to the inline
+  // card (which restores body scroll + the bottom nav). Retry mints a fresh session.
+  function handleClose(): void {
+    setState("consent_required");
+    setFlowId(null);
+    setTakingLong(false);
+  }
+
   const copy = LIVENESS_COPY[state];
   const canStart =
     state === "consent_required" ||
     state === "capture_ready" ||
     state === "capture_failed" ||
+    state === "result_timeout" ||
     state === "camera_stream_failed" ||
     state === "liveness_component_failed" ||
     state === "aws_stream_start_failed" ||
@@ -208,8 +246,17 @@ export function LivenessCapture({
     state === "network_error" ||
     state === "camera_permission_required";
 
-  return (
-    <div ref={liveRef} role="status" aria-live="polite" className="glass rounded-3xl p-5">
+  // Active capture (get-ready + camera + processing) renders in a focused
+  // full-screen layer on all devices so the AWS UI never overlaps the bottom
+  // nav or the iPhone status bar; other states stay as the inline card.
+  const isFullscreen = state === "capture_submitted" || state === "liveness_processing";
+  const inner = (
+    <div
+      ref={liveRef}
+      role="status"
+      aria-live="polite"
+      className={isFullscreen ? "outline-none" : "glass rounded-3xl p-5"}
+    >
       <div className="flex items-start gap-3.5">
         <span className="glass-chip flex size-11 shrink-0 items-center justify-center rounded-full">
           <Camera className="text-gold size-5" aria-hidden="true" />
@@ -217,6 +264,11 @@ export function LivenessCapture({
         <div className="min-w-0 flex-1">
           <p className="font-display text-lg font-medium tracking-tight">{copy.title}</p>
           <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{copy.body}</p>
+          {takingLong && state === "liveness_processing" && (
+            <p className="text-muted-foreground/80 mt-1 text-sm leading-relaxed" aria-live="polite">
+              This is taking longer than usual…
+            </p>
+          )}
 
           {flowId && (state === "capture_submitted" || state === "liveness_processing") && (
             <div className="mt-3">
@@ -260,6 +312,7 @@ export function LivenessCapture({
               onClick={startCapture}
             >
               {state === "capture_failed" ||
+              state === "result_timeout" ||
               state === "camera_stream_failed" ||
               state === "liveness_component_failed" ||
               state === "aws_stream_start_failed" ||
@@ -280,4 +333,13 @@ export function LivenessCapture({
       </div>
     </div>
   );
+
+  if (isFullscreen) {
+    return (
+      <LivenessFullscreen title={copy.title} onClose={handleClose}>
+        {inner}
+      </LivenessFullscreen>
+    );
+  }
+  return inner;
 }

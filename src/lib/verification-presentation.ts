@@ -38,6 +38,9 @@ export type LivenessCaptureState =
   | "liveness_component_failed"
   | "aws_stream_start_failed"
   | "capture_failed"
+  // Bounded-poll terminal state (L9.4): the result did not resolve before the
+  // hard deadline, so we stop the spinner and offer a retry instead of hanging.
+  | "result_timeout"
   | "provider_unavailable";
 
 export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: string }> = {
@@ -88,6 +91,10 @@ export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: 
   capture_failed: {
     title: "That didn't work",
     body: "The check couldn't be completed - lighting or movement is the usual cause. You can try again right away.",
+  },
+  result_timeout: {
+    title: "We couldn't finish verification",
+    body: "Your video may have been submitted, but the result isn't available yet. Try again, or contact support if this keeps happening.",
   },
   provider_unavailable: {
     title: "We can't run this right now",
