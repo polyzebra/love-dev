@@ -110,6 +110,33 @@ function main() {
     assert.match(src, /aria-label="Close verification"/, "close control is labelled");
   });
 
+  check("shell has a Tirvea top bar (identity + step) - not a raw provider widget", () => {
+    const src = read(SHELL);
+    assert.match(src, /Tirvea verification/, "top bar identifies the Tirvea flow");
+    assert.match(src, /\{step\}/, "top bar shows the concise step label");
+  });
+
+  // ---- L9.5: liveness result is diagnosable (real AWS status observable) -----
+  const REKOG = "src/lib/services/aws-rekognition.ts";
+  const SVC = "src/lib/services/face-liveness.ts";
+
+  check("getLivenessResult surfaces the raw AWS status (providerStatus)", () => {
+    const src = read(REKOG);
+    assert.match(src, /providerStatus: status/, "raw AWS Status carried for diagnostics");
+  });
+
+  check("consumeLivenessFlow logs the real AWS status per poll (redacted, no PII)", () => {
+    const src = read(SVC);
+    assert.match(src, /awsStatus=\$\{result\.providerStatus/, "logs the raw vendor status");
+    assert.doesNotMatch(src, /session\.userId\b.*console|console.*session\.userId/, "no userId in logs");
+  });
+
+  check("a thrown provider error is terminal provider_unavailable, never endless pending", () => {
+    const src = read(SVC);
+    // The catch around getLivenessResult returns a terminal state.
+    assert.match(src, /catch \(error\) \{[\s\S]*?return \{ state: "provider_unavailable" \}/);
+  });
+
   console.log(`\n${passed} checks passed`);
 }
 

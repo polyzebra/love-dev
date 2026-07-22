@@ -87,10 +87,14 @@ export interface FaceComparisonProvider {
   /** Liveness capture (Phase 23): create a hosted/SDK session. */
   createLivenessSession?(userId: string): Promise<{ sessionId: string }>;
   /** Liveness result: normalized outcome + whether a trusted reference
-   *  frame is available. NEVER returns media, scores or vendor payloads. */
-  getLivenessResult?(
-    sessionId: string,
-  ): Promise<{ status: "pending" | "passed" | "failed"; referenceFrameReady: boolean }>;
+   *  frame is available. NEVER returns media, scores or vendor payloads.
+   *  `providerStatus` is the raw non-PII vendor status string (e.g. AWS
+   *  "CREATED"/"IN_PROGRESS"/"SUCCEEDED") for diagnostics only. */
+  getLivenessResult?(sessionId: string): Promise<{
+    status: "pending" | "passed" | "failed";
+    referenceFrameReady: boolean;
+    providerStatus?: string;
+  }>;
   /** Create the reference FROM a passed liveness session (Phase 24: the
    *  ONLY trusted reference source - never an unverified profile photo). */
   createReferenceFromLiveness?(input: {

@@ -335,8 +335,9 @@ export function LivenessCapture({
   );
 
   if (isFullscreen) {
+    const step = state === "liveness_processing" ? "Checking your video" : "Get ready";
     return (
-      <LivenessFullscreen title={copy.title} onClose={handleClose}>
+      <LivenessFullscreen title={copy.title} step={step} onClose={handleClose}>
         {inner}
       </LivenessFullscreen>
     );

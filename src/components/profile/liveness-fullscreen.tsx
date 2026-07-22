@@ -20,10 +20,13 @@ import { X } from "lucide-react";
  */
 export function LivenessFullscreen({
   title,
+  step,
   onClose,
   children,
 }: {
   title: string;
+  /** Concise step label shown under the title (e.g. "Get ready", "Checking your video"). */
+  step?: string;
   onClose?: () => void;
   children: React.ReactNode;
 }) {
@@ -60,18 +63,28 @@ export function LivenessFullscreen({
         paddingRight: "max(env(safe-area-inset-right), 1rem)",
       }}
     >
-      {onClose && (
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close verification"
-          className="glass-chip absolute right-4 z-10 flex size-10 items-center justify-center rounded-full"
-          style={{ top: "max(env(safe-area-inset-top), 1rem)" }}
-        >
-          <X className="size-5" aria-hidden="true" />
-        </button>
-      )}
-      <div className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center py-12">
+      {/* Safe-area-correct Tirvea top bar: identity + concise step + close. This
+          is what makes the flow read as a Tirvea verification surface rather than
+          a raw embedded provider widget. */}
+      <div className="mx-auto flex w-full max-w-md items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-gold text-[0.7rem] font-semibold tracking-[0.25em] uppercase">
+            Tirvea verification
+          </p>
+          {step && <p className="text-foreground mt-0.5 text-sm font-medium">{step}</p>}
+        </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close verification"
+            className="glass-chip flex size-10 shrink-0 items-center justify-center rounded-full"
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+      <div className="mx-auto flex min-h-[calc(100dvh-8rem)] w-full max-w-md flex-col justify-center py-8">
         {children}
       </div>
     </div>,

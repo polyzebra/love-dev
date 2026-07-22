@@ -417,12 +417,18 @@ export const awsRekognitionProvider: FaceComparisonProvider = {
     const res = await call("GetFaceLivenessSessionResults", { SessionId: sessionId });
     const status = String(res.Status ?? "");
     if (status === "SUCCEEDED") {
-      return { status: "passed" as const, referenceFrameReady: Boolean(res.ReferenceImage) };
+      return {
+        status: "passed" as const,
+        referenceFrameReady: Boolean(res.ReferenceImage),
+        providerStatus: status,
+      };
     }
     if (status === "FAILED" || status === "EXPIRED") {
-      return { status: "failed" as const, referenceFrameReady: false };
+      return { status: "failed" as const, referenceFrameReady: false, providerStatus: status };
     }
-    return { status: "pending" as const, referenceFrameReady: false };
+    // CREATED / IN_PROGRESS / unknown -> still pending. Carry the raw status so
+    // the runtime can log WHY a completed capture is not yet terminal (L9.5).
+    return { status: "pending" as const, referenceFrameReady: false, providerStatus: status };
   },
 
   /** Emergency purge (admin credentials, NOT the runtime path). */

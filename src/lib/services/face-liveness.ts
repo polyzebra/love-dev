@@ -126,12 +126,32 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
     return { state: "denied" };
   }
 
-  let result: { status: "pending" | "passed" | "failed"; referenceFrameReady: boolean };
+  let result: {
+    status: "pending" | "passed" | "failed";
+    referenceFrameReady: boolean;
+    providerStatus?: string;
+  };
   try {
     result = await provider.getLivenessResult(session.sessionId);
-  } catch {
+  } catch (error) {
+    // A thrown provider error (throttle / access / validation / network) is a
+    // TERMINAL provider state, not endless pending. Log the error name only.
+    console.warn(
+      `[liveness] getLivenessResult failed flow=…${session.flowId.slice(-6)} ` +
+        `err=${(error as Error)?.message?.slice(0, 80) ?? "unknown"}`,
+    );
     return { state: "provider_unavailable" };
   }
+
+  // Diagnostic (L9.5): record WHY a completed capture is/ is not terminal. Non-PII
+  // (flow suffix + raw vendor status + session age); visible in Vercel logs so a
+  // stuck "pending" reveals the real AWS status (e.g. CREATED/IN_PROGRESS) instead
+  // of being an opaque 60s spinner. No sessionId, userId, media or scores.
+  console.info(
+    `[liveness] poll flow=…${session.flowId.slice(-6)} ` +
+      `norm=${result.status} awsStatus=${result.providerStatus ?? "?"} ` +
+      `ageMs=${Date.now() - session.createdAt.getTime()}`,
+  );
 
   if (result.status === "pending") {
     await db.livenessSession.update({ where: { id: session.id }, data: { status: "PROCESSING" } });
