@@ -143,11 +143,12 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
     return { state: "provider_unavailable" };
   }
 
-  // Diagnostic (L9.5): record WHY a completed capture is/ is not terminal. Non-PII
-  // (flow suffix + raw vendor status + session age); visible in Vercel logs so a
-  // stuck "pending" reveals the real AWS status (e.g. CREATED/IN_PROGRESS) instead
-  // of being an opaque 60s spinner. No sessionId, userId, media or scores.
-  console.info(
+  // Diagnostic (L9.5/L9.5.1): record WHY a completed capture is/ is not terminal.
+  // console.WARN (not info) so Vercel's default log level surfaces it. Non-PII:
+  // flow suffix + raw vendor status + session age; no sessionId, userId, media or
+  // scores. The admin endpoint /api/admin/liveness-diagnostic reads the same status
+  // on demand when logs are still not observable.
+  console.warn(
     `[liveness] poll flow=…${session.flowId.slice(-6)} ` +
       `norm=${result.status} awsStatus=${result.providerStatus ?? "?"} ` +
       `ageMs=${Date.now() - session.createdAt.getTime()}`,
@@ -313,4 +314,68 @@ export async function invalidateOpenLivenessSessions(userId: string): Promise<vo
     where: { userId, status: { in: ["CREATED", "PROCESSING", "PASSED"] } },
     data: { status: "INVALIDATED", invalidatedAt: new Date() },
   });
+}
+
+/**
+ * L9.5.1 - admin-only, non-PII diagnostic for ONE liveness flow (the requester's
+ * latest, or a specified user's). A PURE READ: it calls GetFaceLivenessSessionResults
+ * once to observe the CURRENT provider status but never consumes, enrolls, or mutates
+ * the session (that stays in consumeLivenessFlow). This exists because the per-poll
+ * server logs were not observable in production; the exact AWS status is surfaced here
+ * on demand. NEVER returns the full flowId/sessionId, credentials, email, uid, media or
+ * scores.
+ */
+export type LivenessFlowDiagnostic = {
+  flowSuffix: string;
+  applicationState: string;
+  providerStatus: string | null;
+  attemptAgeMs: number;
+  consumed: boolean;
+  checkedAt: string;
+  lastSafeErrorCode: string | null;
+  referenceEnrolled: boolean;
+  profilePhotoStatus: string | null;
+} | null;
+
+export async function getLivenessFlowDiagnostic(userId: string): Promise<LivenessFlowDiagnostic> {
+  const session = await db.livenessSession.findFirst({
+    where: { userId, environment: faceEnvironment() },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!session) return null;
+
+  // Live, side-effect-free provider read (no consume/enroll here).
+  let providerStatus: string | null = null;
+  let lastSafeErrorCode: string | null = null;
+  const provider = getFaceMatchProvider();
+  if (provider.getLivenessResult) {
+    try {
+      const r = await provider.getLivenessResult(session.sessionId);
+      providerStatus = r.providerStatus ?? r.status;
+    } catch (error) {
+      // call() already normalises AWS errors to the error TYPE only (no payloads).
+      lastSafeErrorCode = (error as Error)?.message?.slice(0, 80) ?? "unknown_error";
+    }
+  }
+
+  const [reference, job] = await Promise.all([
+    db.faceReferenceRecord.findFirst({
+      where: { userId, status: "LINKED" },
+      orderBy: { referenceVersion: "desc" },
+      select: { id: true },
+    }),
+    db.profilePhotoVerification.findUnique({ where: { userId }, select: { status: true } }),
+  ]);
+
+  return {
+    flowSuffix: session.flowId.slice(-6),
+    applicationState: session.status,
+    providerStatus,
+    attemptAgeMs: Date.now() - session.createdAt.getTime(),
+    consumed: Boolean(session.consumedAt) || session.status === "CONSUMED",
+    checkedAt: new Date().toISOString(),
+    lastSafeErrorCode,
+    referenceEnrolled: Boolean(reference),
+    profilePhotoStatus: job?.status ?? null,
+  };
 }
