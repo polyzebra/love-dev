@@ -3,13 +3,11 @@ import { apiError, guardRate, ok, parseBody, requireSession } from "@/lib/api";
 import { db } from "@/lib/db";
 import { isFaceMatchConfigured } from "@/lib/services/face-match-providers";
 import { faceRolloutConfig } from "@/lib/services/face-rollout";
-import { getFaceMatchProvider } from "@/lib/services/face-match-providers";
 import {
   BIOMETRIC_CONSENT_VERSION,
   enqueueProfilePhotoVerification,
 } from "@/lib/services/face-verification";
 import { createBoundLivenessSession } from "@/lib/services/face-liveness";
-import { providerHealthState } from "@/lib/services/provider-resilience";
 
 /**
  * POST /api/verification/liveness - create a bound liveness session and
@@ -52,16 +50,18 @@ export async function POST(req: Request) {
     select: { profile: { select: { country: true } } },
   });
   if (!isFaceMatchConfigured() || !faceRolloutConfig().livenessEnabled) {
+    console.warn(
+      `[liveness] start refused user=…${user.id.slice(-6)} reason=layer_off ` +
+        `configured=${isFaceMatchConfigured()} livenessEnabled=${faceRolloutConfig().livenessEnabled}`,
+    );
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   }
-  const providerName = getFaceMatchProvider().name;
-  if ((await providerHealthState(`face_match:${providerName}`)) === "UNAVAILABLE") {
-    return apiError(
-      503,
-      "provider_unavailable",
-      "We can't run this check right now. Try again later.",
-    );
-  }
+  // L9.8: we DO NOT pre-gate liveness on the shared `face_match:*` circuit. That
+  // breaker is tripped by PHOTO-MATCH (CompareFaces/SearchFacesByImage) failures,
+  // a DIFFERENT AWS API from CreateFaceLivenessSession. Gating here made a
+  // photo-match outage masquerade as "verification partner unavailable" and block
+  // the camera entirely. The real CreateFaceLivenessSession call below is the
+  // source of truth for whether liveness can start.
 
   // Ensure the canonical ProfilePhotoVerification row EXISTS before we mint a
   // liveness session. A first-time enroller (esp. a non-Stripe registered user)
@@ -74,16 +74,19 @@ export async function POST(req: Request) {
     country: me?.profile?.country,
   });
   if (!enqueued) {
+    console.warn(`[liveness] start refused user=…${user.id.slice(-6)} reason=admit_refused`);
     return apiError(503, "liveness_unavailable", "Photo verification is coming soon.");
   }
 
   const created = await createBoundLivenessSession(user.id);
   if ("error" in created) {
-    return apiError(
-      503,
-      "provider_unavailable",
-      "We can't run this check right now. Try again later.",
+    // Distinct, logged reason (no PII): no_provider_method | no_job_row |
+    // create_session_failed:<awsErrorType>. This is the exact server-side cause
+    // that the client otherwise collapses into "provider unavailable".
+    console.warn(
+      `[liveness] CreateFaceLivenessSession failed user=…${user.id.slice(-6)} reason=${created.reason}`,
     );
+    return apiError(503, "provider_unavailable", "We can't run this check right now. Try again later.");
   }
   return ok({ flowId: created.flowId });
 }

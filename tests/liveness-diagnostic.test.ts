@@ -50,9 +50,32 @@ function main() {
       "lastSafeErrorCode",
       "referenceEnrolled",
       "profilePhotoStatus",
+      "matchProviderHealth",
     ]) {
       assert.match(body, new RegExp(`\\b${field}\\b`), `must expose ${field}`);
     }
+  });
+
+  // ---- L9.8: liveness start is decoupled from the photo-match circuit --------
+  check("L9.8: liveness START does not pre-gate on the face_match circuit breaker", () => {
+    const route = readFileSync("src/app/api/verification/liveness/route.ts", "utf8");
+    // The photo-MATCH circuit (CompareFaces failures) must NOT block starting a
+    // liveness capture (CreateFaceLivenessSession) - a different AWS API.
+    assert.doesNotMatch(route, /providerHealthState\(`face_match:/, "must not gate liveness on the match circuit");
+    assert.doesNotMatch(route, /import.*providerHealthState/, "unused breaker import removed");
+  });
+
+  check("L9.8: every provider_unavailable path carries a distinct, logged reason", () => {
+    const route = readFileSync("src/app/api/verification/liveness/route.ts", "utf8");
+    const svc = read(SVC);
+    // The route logs each refusal with a machine reason (no PII).
+    assert.match(route, /reason=layer_off/);
+    assert.match(route, /reason=admit_refused/);
+    assert.match(route, /reason=\$\{created\.reason\}/);
+    // createBoundLivenessSession distinguishes WHY it failed.
+    assert.match(svc, /no_provider_method/);
+    assert.match(svc, /no_job_row/);
+    assert.match(svc, /create_session_failed:/);
   });
 
   check("diagnostic exposes only the flow SUFFIX, never the full flowId or sessionId", () => {

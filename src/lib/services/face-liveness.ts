@@ -25,23 +25,25 @@ const SESSION_TTL_MS = (Number(process.env.FACE_LIVENESS_TTL_MINUTES) || 15) * 6
 /** Create + persist a bound liveness session; return the opaque flowId. */
 export async function createBoundLivenessSession(
   userId: string,
-): Promise<{ flowId: string } | { error: "unavailable" }> {
+): Promise<{ flowId: string } | { error: "unavailable"; reason: string }> {
   const provider = getFaceMatchProvider();
-  if (!provider.createLivenessSession) return { error: "unavailable" };
+  if (!provider.createLivenessSession) return { error: "unavailable", reason: "no_provider_method" };
 
   const job = await db.profilePhotoVerification.findUnique({
     where: { userId },
     select: { id: true },
   });
-  if (!job) return { error: "unavailable" };
+  if (!job) return { error: "unavailable", reason: "no_job_row" };
 
   const attemptNumber = (await db.livenessSession.count({ where: { userId } })) + 1;
 
   let sessionId: string;
   try {
     ({ sessionId } = await provider.createLivenessSession(userId));
-  } catch {
-    return { error: "unavailable" };
+  } catch (error) {
+    // The raw AWS error TYPE only (call() already normalises it - no payloads).
+    const reason = `create_session_failed:${(error as Error)?.message?.slice(0, 60) ?? "unknown"}`;
+    return { error: "unavailable", reason };
   }
 
   const flowId = randomUUID();
@@ -335,9 +337,18 @@ export type LivenessFlowDiagnostic = {
   lastSafeErrorCode: string | null;
   referenceEnrolled: boolean;
   profilePhotoStatus: string | null;
+  /** L9.8: the shared photo-MATCH circuit-breaker state. UNAVAILABLE here means
+   *  the match layer tripped (CompareFaces/SearchFacesByImage failures) - a
+   *  DIFFERENT AWS API from liveness. It no longer blocks liveness start, but it
+   *  explains a stuck/failing photo check and any "provider_unavailable". */
+  matchProviderHealth: string;
 } | null;
 
 export async function getLivenessFlowDiagnostic(userId: string): Promise<LivenessFlowDiagnostic> {
+  const provider0 = getFaceMatchProvider();
+  const { providerHealthState } = await import("@/lib/services/provider-resilience");
+  const matchProviderHealth = await providerHealthState(`face_match:${provider0.name}`);
+
   const session = await db.livenessSession.findFirst({
     where: { userId, environment: faceEnvironment() },
     orderBy: { createdAt: "desc" },
@@ -377,5 +388,6 @@ export async function getLivenessFlowDiagnostic(userId: string): Promise<Livenes
     lastSafeErrorCode,
     referenceEnrolled: Boolean(reference),
     profilePhotoStatus: job?.status ?? null,
+    matchProviderHealth,
   };
 }
