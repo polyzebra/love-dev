@@ -15,6 +15,13 @@ import {
 } from "lucide-react";
 import type { VerificationUxState } from "@/lib/services/photo-verification";
 import { FACE_STATE_COPY, type FaceAction } from "@/lib/verification-presentation";
+import {
+  deriveVerificationStage,
+  resolveVerificationTimeline,
+  type VerificationStage,
+} from "@/lib/verification-timeline";
+import { VerificationTimeline } from "@/components/profile/verification-timeline";
+import { LEGAL_ROUTES } from "@/lib/legal/routes";
 import dynamic from "next/dynamic";
 
 // Biometric capture code is dynamically imported: it never ships to
@@ -62,6 +69,8 @@ export function PhotoVerifyCard({
   facePresentation = null,
   liveness = null,
   faceAction = null,
+  emailVerified = true,
+  phoneVerified = true,
 }: {
   state: VerificationUxState;
   /** Raw Verification.status - WORDING only (expired vs rejected retry
@@ -83,6 +92,10 @@ export function PhotoVerifyCard({
    *  enrolment-vs-match headline and, when the layer can't run, the explicit
    *  blocking reason. Null renders the identity flow exactly as before. */
   faceAction?: FaceAction | null;
+  /** L10.0: prior steps for the verification timeline (default done - this card
+   *  only renders once identity verification is underway). */
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -273,22 +286,31 @@ export function PhotoVerifyCard({
       </StateCard>,
     );
   }
+  // L10.0: the in-progress post-video stages render the ONE canonical timeline
+  // (email -> phone -> video -> photos -> verified) + a state-aware status card,
+  // replacing the independent StateCards. onAction wires the stable tokens.
+  const renderTimeline = (stage: VerificationStage) =>
+    wrap(
+      <VerificationTimeline
+        timeline={resolveVerificationTimeline({ emailVerified, phoneVerified, stage })}
+        onAction={(action) => {
+          if (action === "LEARN_MORE") router.push(LEGAL_ROUTES.biometricData);
+          else if (action === "START_LIVENESS" || action === "REPLACE_PHOTO") setStep("explainer");
+        }}
+      />,
+    );
+
   if (
     facePresentation === "checking_profile_photos" ||
     facePresentation === "photo_update_review"
   ) {
-    const copy = FACE_STATE_COPY[facePresentation];
-    return wrap(
-      <StateCard
-        icon={<Hourglass className="text-gold size-5" aria-hidden="true" />}
-        title={copy.title}
-        body={
-          photoCheckLong && facePresentation === "checking_profile_photos"
-            ? "This is taking longer than usual… keep this page open."
-            : copy.body
-        }
-      />,
-    );
+    // photoCheckLong only adds an advisory; the timeline card already reassures.
+    void photoCheckLong;
+    return renderTimeline(deriveVerificationStage({
+      verificationUx: state,
+      facePresentation,
+      faceActionStatus: faceAction?.status ?? "PROCESSING",
+    }));
   }
   if (facePresentation === "action_required") {
     const copy = FACE_STATE_COPY.action_required;
@@ -301,13 +323,7 @@ export function PhotoVerifyCard({
     );
   }
   if (facePresentation === "manual_review") {
-    return wrap(
-      <StateCard
-        icon={<UserSearch className="text-gold size-5" aria-hidden="true" />}
-        title="Verification under review"
-        body="A member of our team is reviewing your verification. Nothing else is needed from you."
-      />,
-    );
+    return renderTimeline("MANUAL_REVIEW");
   }
   if (facePresentation === "consent_withdrawn") {
     const copy = FACE_STATE_COPY.consent_withdrawn;

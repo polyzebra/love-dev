@@ -199,6 +199,8 @@ export default async function ProfilePage() {
               workflowStatus={photoWorkflow?.status ?? null}
               facePresentation={faceCardState}
               faceAction={faceAction}
+              emailVerified={verification.emailVerified}
+              phoneVerified={verification.phoneVerified}
               liveness={
                 faceAction.status === "FIRST_TIME"
                   ? { consentVersion: BIOMETRIC_CONSENT_VERSION }
