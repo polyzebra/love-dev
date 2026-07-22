@@ -192,8 +192,8 @@ export function deriveVerificationPresentation(
 /** User-facing copy for the face-layer states the card renders. */
 export const FACE_STATE_COPY = {
   checking_profile_photos: {
-    title: "Checking your profile photos",
-    body: "Your identity is confirmed. We're making sure your profile photos are really you - this usually takes a moment.",
+    title: "Video verification complete",
+    body: "We're checking your profile photo now. You don't need to record another video - this page updates automatically.",
   },
   photo_update_review: {
     title: "Checking your new photo",

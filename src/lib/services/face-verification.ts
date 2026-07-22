@@ -436,16 +436,28 @@ export async function runProfilePhotoVerification(
     return null;
   }
 
-  // Identity verification is the precondition for the badge pipeline.
+  // L9.6: identity (User.photoVerifiedAt, from Stripe) gates the PUBLIC photo
+  // badge (gallery-integrity.ts) - but it is NOT the face layer's own proof. A
+  // COMPLETED liveness capture with a usable enrolled reference is. Previously
+  // this branch did `return null` for any user without photoVerifiedAt, which
+  // stranded the just-CLAIMED job FOREVER for a non-Stripe user whose liveness
+  // passed (the L9.6 bug: CONSUMED + referenceEnrolled + CLAIMED, never terminal).
+  // Fix: when a usable reference exists, RUN the match to a real terminal and
+  // never force another selfie; the public badge stays independently gated on
+  // photoVerifiedAt, so proceeding grants no badge a non-identity-verified user
+  // shouldn't have. Only when there is NO usable reference (true revocation /
+  // never enrolled) do we clear any stale grant and fall through to the reference
+  // guard below (-> LIVENESS_REQUIRED, lease released) - never a permanent CLAIMED.
   const user = await db.user.findUnique({
     where: { id: userId },
     select: { photoVerifiedAt: true },
   });
-  if (!user?.photoVerifiedAt) {
-    // Epic 6: identity revoked -> Photo Verified is impossible, clear any grant.
+  const referenceUsable =
+    Boolean(job.referenceId) &&
+    (job.referenceStatus === "ACTIVE" || job.referenceStatus === "EXPIRING");
+  if (!user?.photoVerifiedAt && !referenceUsable) {
     const { clearPhotoVerification, PhotoClearReason } = await import("@/lib/services/photo-grant");
     await clearPhotoVerification(userId, PhotoClearReason.IDENTITY_REVOKED).catch(() => undefined);
-    return null;
   }
 
   const previousStatus = job.status;
@@ -461,14 +473,16 @@ export async function runProfilePhotoVerification(
     // refuses it) and NEVER dead-letter this normal condition - we stop
     // safely at LIVENESS_REQUIRED and surface action-required UX. The
     // liveness flow (face-liveness.ts) enrolls the reference and re-queues.
-    const referenceUsable =
-      job.referenceId && (job.referenceStatus === "ACTIVE" || job.referenceStatus === "EXPIRING");
+    // referenceUsable computed above (L9.6). No usable reference -> a fresh
+    // liveness capture is needed; release the lease so the job never stays CLAIMED.
     if (!referenceUsable) {
       await db.profilePhotoVerification.update({
         where: { id: job.id },
         data: {
           status: "LIVENESS_REQUIRED",
           badgeStatus: job.badgeStatus === "ACTIVE" ? "REVIEWING" : job.badgeStatus,
+          leaseToken: null,
+          leaseExpiresAt: null,
         },
       });
       await recordVerificationAudit({
