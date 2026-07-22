@@ -136,12 +136,24 @@ export async function consumeLivenessFlow(flowId: string, userId: string): Promi
   try {
     result = await provider.getLivenessResult(session.sessionId);
   } catch (error) {
-    // A thrown provider error (throttle / access / validation / network) is a
-    // TERMINAL provider state, not endless pending. Log the error name only.
+    const msg = (error as Error)?.message ?? "";
     console.warn(
-      `[liveness] getLivenessResult failed flow=…${session.flowId.slice(-6)} ` +
-        `err=${(error as Error)?.message?.slice(0, 80) ?? "unknown"}`,
+      `[liveness] getLivenessResult failed flow=…${session.flowId.slice(-6)} err=${msg.slice(0, 80)}`,
     );
+    // L9.9: AWS discards a session after consumption, so a SessionNotFound here
+    // can mean the session was consumed between the top-of-function check and now
+    // (a race). Never turn that into provider_unavailable - resume the stored
+    // terminal state from the local DB.
+    if (/SessionNotFound/i.test(msg)) {
+      const fresh = await db.livenessSession
+        .findUnique({ where: { id: session.id }, select: { status: true, consumedAt: true } })
+        .catch(() => null);
+      if (fresh && (fresh.status === "CONSUMED" || fresh.consumedAt)) {
+        return { state: "checking_profile_photos" };
+      }
+    }
+    // A thrown provider error (throttle / access / validation / network) on a
+    // still-live session is a terminal provider state, not endless pending.
     return { state: "provider_unavailable" };
   }
 
@@ -355,11 +367,17 @@ export async function getLivenessFlowDiagnostic(userId: string): Promise<Livenes
   });
   if (!session) return null;
 
-  // Live, side-effect-free provider read (no consume/enroll here).
-  let providerStatus: string | null = null;
+  const consumed = Boolean(session.consumedAt) || session.status === "CONSUMED";
+  // Only CREATED/PROCESSING sessions still exist at AWS. A CONSUMED/terminal
+  // session was discarded by AWS after consumption, so GetFaceLivenessSessionResults
+  // would throw SessionNotFoundException (L9.9). NEVER call AWS then - the stored
+  // local state (applicationState + profilePhotoStatus below) IS the terminal truth.
+  const inFlight = !consumed && (session.status === "CREATED" || session.status === "PROCESSING");
+
+  let providerStatus: string | null = consumed ? "local:CONSUMED" : `local:${session.status}`;
   let lastSafeErrorCode: string | null = null;
   const provider = getFaceMatchProvider();
-  if (provider.getLivenessResult) {
+  if (inFlight && provider.getLivenessResult) {
     try {
       const r = await provider.getLivenessResult(session.sessionId);
       providerStatus = r.providerStatus ?? r.status;
