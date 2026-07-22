@@ -28,8 +28,18 @@ const read = (p: string) => readFileSync(p, "utf8");
 function startCaptureBody(src: string): string {
   const start = src.indexOf("async function startCapture()");
   assert.notEqual(start, -1, "startCapture() must exist");
+  // Ends where the detector-error mapper begins (handleDetectorError follows it).
+  const end = src.indexOf("function handleDetectorError", start);
+  assert.notEqual(end, -1, "expected handleDetectorError after startCapture()");
+  return src.slice(start, end);
+}
+
+/** The body of handleDetectorError() - the FaceLivenessDetector error mapper. */
+function detectorErrorBody(src: string): string {
+  const start = src.indexOf("function handleDetectorError");
+  assert.notEqual(start, -1, "handleDetectorError() must exist");
   const end = src.indexOf("const copy = LIVENESS_COPY[state]", start);
-  assert.notEqual(end, -1, "expected marker after startCapture()");
+  assert.notEqual(end, -1, "expected marker after handleDetectorError()");
   return src.slice(start, end);
 }
 
@@ -126,6 +136,51 @@ function main() {
   check("liveness route keeps the config/legal gate (isFaceMatchConfigured)", () => {
     const src = read(ROUTE);
     assert.match(src, /isFaceMatchConfigured\(\)/, "the compliance/config gate must remain");
+  });
+
+  // ---- L9.3: iOS Safari camera-open + correct pre-capture error mapping ------
+  const DETECTOR = "src/components/profile/liveness-detector.tsx";
+
+  check("L9.3: detector does NOT disableStartScreen (iOS needs the Begin gesture)", () => {
+    const src = read(DETECTOR);
+    assert.doesNotMatch(
+      src.split("\n").filter((l) => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n"),
+      /disableStartScreen/,
+      "disableStartScreen auto-starts camera with no gesture and fails on iOS",
+    );
+  });
+
+  check("L9.3: startCapture no longer pre-probes getUserMedia (detector owns the camera)", () => {
+    const body = startCaptureBody(read(CLIENT));
+    assert.doesNotMatch(body, /getUserMedia/, "no pre-probe; the AWS start screen acquires the camera");
+  });
+
+  check("L9.3: a CAMERA_ACCESS_ERROR maps to permission, NOT lighting/movement", () => {
+    const body = detectorErrorBody(read(CLIENT));
+    assert.match(body, /CAMERA_ACCESS_ERROR/);
+    // CAMERA_ACCESS_ERROR precedes camera_permission_required; the mapper never
+    // sends a camera/permission error to capture_failed.
+    const camIdx = body.indexOf("CAMERA_ACCESS_ERROR");
+    const permIdx = body.indexOf('setState("camera_permission_required")', camIdx);
+    assert.ok(permIdx > camIdx, "CAMERA_ACCESS_ERROR must map to camera_permission_required");
+  });
+
+  check("L9.3: the mapper's DEFAULT is a component failure, never capture_failed", () => {
+    const body = detectorErrorBody(read(CLIENT));
+    const def = body.lastIndexOf("default:");
+    assert.notEqual(def, -1, "mapper must have a default branch");
+    const tail = body.slice(def);
+    assert.match(tail, /setState\("liveness_component_failed"\)/, "default -> component failure");
+    assert.doesNotMatch(tail, /setState\("capture_failed"\)/, "default must NOT claim lighting/movement");
+  });
+
+  check("L9.3: capture_failed is set only for genuine mid-capture error states", () => {
+    const body = detectorErrorBody(read(CLIENT));
+    // The capture_failed branch must be guarded by mid-capture states (TIMEOUT etc.).
+    const cf = body.indexOf('setState("capture_failed")');
+    assert.notEqual(cf, -1, "mid-capture failures still map to capture_failed");
+    const before = body.slice(0, cf);
+    assert.match(before, /"TIMEOUT"|"FRESHNESS_TIMEOUT"|"FACE_DISTANCE_ERROR"|"MULTIPLE_FACES_ERROR"/);
   });
 
   console.log(`\n${passed} checks passed`);

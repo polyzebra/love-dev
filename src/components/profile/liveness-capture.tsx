@@ -71,9 +71,13 @@ export function LivenessCapture({
   const liveRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Poll the session while it is in flight. Cleared on unmount.
+  // Poll the session ONLY once a real capture has completed and analysis is
+  // running (liveness_processing). We must NOT poll during capture_submitted:
+  // that is the AWS start screen + live capture, and a GetFaceLivenessSessionResults
+  // poll against a not-yet-finished session could replace the capture UI with an
+  // error card mid-flow. onAnalysisComplete transitions us here when capture ends.
   useEffect(() => {
-    if (!flowId || (state !== "liveness_processing" && state !== "capture_submitted")) return;
+    if (!flowId || state !== "liveness_processing") return;
     let alive = true;
     const poll = async () => {
       try {
@@ -113,14 +117,12 @@ export function LivenessCapture({
     // poll effect and detector can never reuse a spent/never-created session.
     setFlowId(null);
     try {
-      // Camera permission first - explicit guidance beats a silent failure.
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach((t) => t.stop()); // provider SDK reopens it
-      } catch {
-        setState("camera_permission_required");
-        return;
-      }
+      // We do NOT pre-acquire the camera here. FaceLivenessDetectorCore owns
+      // camera acquisition + the permission prompt through its own start screen,
+      // within a user gesture (the "Begin check" tap) that iOS Safari requires.
+      // A pre-probe that grabs then releases the camera detaches that gesture and
+      // makes the detector fail on iOS (L9.3). Permission denial now surfaces as
+      // the detector's CAMERA_ACCESS_ERROR, mapped to camera_permission_required.
       let res: Response;
       try {
         res = await fetch("/api/verification/liveness", {
@@ -161,11 +163,47 @@ export function LivenessCapture({
     }
   }
 
+  // Map FaceLivenessDetectorCore's LivenessErrorState to the right client state.
+  // "lighting or movement" (capture_failed) is reserved for errors that can only
+  // occur AFTER a real capture UI ran; pre-capture errors get their own honest
+  // states so a failure right after the permission prompt is never mislabelled.
+  function handleDetectorError(errorState: string): void {
+    switch (errorState) {
+      case "CAMERA_ACCESS_ERROR":
+        setState("camera_permission_required");
+        return;
+      case "DEFAULT_CAMERA_NOT_FOUND_ERROR":
+      case "CAMERA_FRAMERATE_ERROR":
+        setState("camera_stream_failed");
+        return;
+      case "SERVER_ERROR":
+      case "CONNECTION_TIMEOUT":
+        setState("aws_stream_start_failed");
+        return;
+      // Mid-capture failures - the AWS UI ran and the check couldn't complete.
+      // Only here is the "lighting or movement" copy accurate.
+      case "TIMEOUT":
+      case "FRESHNESS_TIMEOUT":
+      case "FACE_DISTANCE_ERROR":
+      case "MULTIPLE_FACES_ERROR":
+      case "MOBILE_LANDSCAPE_ERROR":
+        setState("capture_failed");
+        return;
+      // RUNTIME_ERROR and anything unrecognised are pre-capture component
+      // failures by default - never claim lighting/movement without evidence.
+      default:
+        setState("liveness_component_failed");
+    }
+  }
+
   const copy = LIVENESS_COPY[state];
   const canStart =
     state === "consent_required" ||
     state === "capture_ready" ||
     state === "capture_failed" ||
+    state === "camera_stream_failed" ||
+    state === "liveness_component_failed" ||
+    state === "aws_stream_start_failed" ||
     state === "start_failed" ||
     state === "network_error" ||
     state === "camera_permission_required";
@@ -185,7 +223,7 @@ export function LivenessCapture({
               <LivenessDetector
                 flowId={flowId}
                 onComplete={() => setState("liveness_processing")}
-                onFailed={() => setState("capture_failed")}
+                onError={handleDetectorError}
                 onUnavailable={() => setState("provider_unavailable")}
               />
             </div>
@@ -222,6 +260,9 @@ export function LivenessCapture({
               onClick={startCapture}
             >
               {state === "capture_failed" ||
+              state === "camera_stream_failed" ||
+              state === "liveness_component_failed" ||
+              state === "aws_stream_start_failed" ||
               state === "start_failed" ||
               state === "network_error" ||
               state === "camera_permission_required" ? (

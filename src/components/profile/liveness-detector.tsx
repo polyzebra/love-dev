@@ -17,12 +17,14 @@ import "@aws-amplify/ui-react/styles.css";
 export function LivenessDetector({
   flowId,
   onComplete,
-  onFailed,
+  onError,
   onUnavailable,
 }: {
   flowId: string;
   onComplete: () => void;
-  onFailed: () => void;
+  /** Raw FaceLivenessDetectorCore error state (LivenessErrorState) so the parent
+   *  can distinguish a pre-capture failure from a real capture failure. */
+  onError: (errorState: string) => void;
   onUnavailable: () => void;
 }) {
   const [handle, setHandle] = useState<
@@ -81,8 +83,14 @@ export function LivenessDetector({
         }),
       }}
       onAnalysisComplete={async () => onComplete()}
-      onError={() => onFailed()}
-      disableStartScreen
+      // Surface the LivenessErrorState so the parent maps CAMERA_ACCESS_ERROR,
+      // RUNTIME_ERROR, SERVER_ERROR etc. to the correct pre-capture state instead
+      // of blindly calling it a lighting/movement capture failure (L9.3).
+      onError={(err) => onError((err as unknown as { state?: string })?.state ?? "RUNTIME_ERROR")}
+      // NO disableStartScreen: the built-in "Get ready / Begin check" start screen
+      // provides the USER GESTURE iOS Safari requires to start the camera stream.
+      // Auto-starting on mount (detached from the tap) throws CAMERA_ACCESS_ERROR
+      // on iOS before any preview renders - the L9.3 root cause.
     />
   );
 }

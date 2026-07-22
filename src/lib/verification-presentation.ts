@@ -31,6 +31,12 @@ export type LivenessCaptureState =
   // capture_failed ("lighting or movement") may follow a REAL capture attempt.
   | "start_failed"
   | "network_error"
+  // Detector-reported failures BEFORE a usable capture UI (L9.3). Mapped from
+  // FaceLivenessDetectorCore's LivenessErrorState so a failure right after the
+  // camera prompt is never mislabelled as "lighting or movement".
+  | "camera_stream_failed"
+  | "liveness_component_failed"
+  | "aws_stream_start_failed"
   | "capture_failed"
   | "provider_unavailable";
 
@@ -52,8 +58,8 @@ export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: 
     body: "Look at the camera and follow the on-screen guidance.",
   },
   capture_submitted: {
-    title: "Uploading your check",
-    body: "Almost done - keep this page open.",
+    title: "Get ready",
+    body: "Follow the on-screen guide and tap Begin to start the camera check.",
   },
   liveness_processing: {
     title: "Checking it's really you",
@@ -66,6 +72,18 @@ export const LIVENESS_COPY: Record<LivenessCaptureState, { title: string; body: 
   network_error: {
     title: "Connection problem",
     body: "We couldn't reach Tirvea to start the check. Check your connection and try again.",
+  },
+  camera_stream_failed: {
+    title: "Couldn't start your camera",
+    body: "Your camera didn't start. Close other apps that might be using it, then tap Try again.",
+  },
+  liveness_component_failed: {
+    title: "The check couldn't start",
+    body: "Something went wrong starting the camera check before it could run. This isn't about your photos - please try again.",
+  },
+  aws_stream_start_failed: {
+    title: "Couldn't connect the check",
+    body: "We couldn't reach the verification service to start the check. Check your connection and try again.",
   },
   capture_failed: {
     title: "That didn't work",
